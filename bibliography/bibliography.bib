@@ -1,0 +1,60 @@
+@article{Buttari:2008:UMP:1377596.1377597,
+ author = {Buttari, Alfredo and Dongarra, Jack and Kurzak, Jakub and Luszczek, Piotr and Tomov, Stanimir},
+ title = {Using Mixed Precision for Sparse Matrix Computations to Enhance the Performance While Achieving 64-bit Accuracy},
+ journal = {ACM Trans. Math. Softw.},
+ issue_date = {July 2008},
+ volume = {34},
+ number = {4},
+ month = jul,
+ year = {2008},
+ issn = {0098-3500},
+ pages = {17:1--17:22},
+ articleno = {17},
+ numpages = {22},
+ url = {http://doi.acm.org/10.1145/1377596.1377597},
+ doi = {10.1145/1377596.1377597},
+ acmid = {1377597},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {Linear systems, floating point, iterative refinement, precision},
+ annote={The authors tried using both single and double precision in an iterative refinement algorithm to try to increase speed while retaining accuracy.}
+} 
+
+
+@inproceedings{Langou:2006:EPB:1188455.1188573,
+ author = {Langou, Julie and Langou, Julien and Luszczek, Piotr and Kurzak, Jakub and Buttari, Alfredo and Dongarra, Jack},
+ title = {Exploiting the Performance of 32 Bit Floating Point Arithmetic in Obtaining 64 Bit Accuracy (Revisiting Iterative Refinement for Linear Systems)},
+ booktitle = {Proceedings of the 2006 ACM/IEEE Conference on Supercomputing},
+ series = {SC '06},
+ year = {2006},
+ isbn = {0-7695-2700-0},
+ location = {Tampa, Florida},
+ articleno = {113},
+ url = {http://doi.acm.org/10.1145/1188455.1188573},
+ doi = {10.1145/1188455.1188573},
+ acmid = {1188573},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ annote={Single precision floats are able to be processed faster and the communication is much cheaper that working with double precision floats.  The authors mixed single and double precision in each refinment step.  They found that if factorization, forward substitution and backward substitution are do in single precision while the residual and update to the solution are done in double precision then the iterative refinement will produce the same accuracy than if double precision was used exclusively (as long as the matrix is "not too badly conditioned").}
+} 
+
+@article{DBLP:journals/corr/abs-0808-2794,
+ author    = {Marc Baboulin and
+              Alfredo Buttari and
+              Jack Dongarra and
+              Jakub Kurzak and
+              Julie Langou and
+              Julien Langou and
+              Piotr Luszczek and
+              Stanimire Tomov},
+ title     = {Accelerating Scientific Computations with Mixed Precision Algorithms},
+ journal   = {CoRR},
+ volume    = {abs/0808.2794},
+ year      = {2008},
+ url       = {http://arxiv.org/abs/0808.2794},
+ timestamp = {Mon, 05 Dec 2011 18:04:36 +0100},
+ biburl    = {http://dblp.uni-trier.de/rec/bib/journals/corr/abs-0808-2794},
+ bibsource = {dblp computer science bibliography, http://dblp.org},
+ url       = {http://www.netlib.org/utk/people/JackDongarra/PAPERS/202_2009_Accelerating-Scientific-Computations-with-Mixed-Precision-Algorithms.pdf},
+ annote    = {The authors studied performance of iterative linear algebra solvers by doing the first passes with single precision floats, before using double precision to get the final awnser.  They found that doing the first passes with single precision floats was significantly faster than using only double precision.}
+}
