@@ -1,23 +1,32 @@
 @article{Buttari:2008:UMP:1377596.1377597,
- author = {Buttari, Alfredo and Dongarra, Jack and Kurzak, Jakub and Luszczek, Piotr and Tomov, Stanimir},
- title = {Using Mixed Precision for Sparse Matrix Computations to Enhance the Performance While Achieving 64-bit Accuracy},
- journal = {ACM Trans. Math. Softw.},
+ author     = {Buttari, Alfredo and
+               Dongarra, Jack and
+               Kurzak, Jakub and
+               Luszczek, Piotr and
+               Tomov, Stanimir},
+ title      = {Using Mixed Precision for Sparse Matrix Computations
+               to Enhance the Performance While Achieving
+               64-bit Accuracy},
+ journal    = {ACM Trans. Math. Softw.},
  issue_date = {July 2008},
- volume = {34},
- number = {4},
- month = jul,
- year = {2008},
- issn = {0098-3500},
- pages = {17:1--17:22},
- articleno = {17},
- numpages = {22},
- url = {http://doi.acm.org/10.1145/1377596.1377597},
- doi = {10.1145/1377596.1377597},
- acmid = {1377597},
- publisher = {ACM},
- address = {New York, NY, USA},
- keywords = {Linear systems, floating point, iterative refinement, precision},
- annote = {The authors tried using both single and double precision in an iterative refinement algorithm to try to increase speed while retaining accuracy.}
+ volume     = {34},
+ number     = {4},
+ month      = jul,
+ year       = {2008},
+ issn       = {0098-3500},
+ pages      = {17:1--17:22},
+ articleno  = {17},
+ numpages   = {22},
+ url        = {http://doi.acm.org/10.1145/1377596.1377597},
+ doi        = {10.1145/1377596.1377597},
+ acmid      = {1377597},
+ publisher  = {ACM},
+ address    = {New York, NY, USA},
+ keywords   = {Linear systems, floating point, iterative refinement,
+               precision},
+ annote     = {The authors tried using both single and double precision
+               in an iterative refinement algorithm to try to increase
+               speed while retaining accuracy.}
 } 
 
 
@@ -44,7 +53,16 @@
  acmid     = {1188573},
  publisher = {ACM},
  address   = {New York, NY, USA},
- annote    = {Single precision floats are able to be processed faster and the communication is much cheaper that working with double precision floats.  The authors mixed single and double precision in each refinment step.  They found that if factorization, forward substitution and backward substitution are do in single precision while the residual and update to the solution are done in double precision then the iterative refinement will produce the same accuracy than if double precision was used exclusively (as long as the matrix is "not too badly conditioned").}
+ annote    = {Single precision floats are able to be processed faster and
+              the communication is much cheaper that working with double
+              precision floats.  The authors mixed single and double
+              precision in each refinment step.  They found that if
+              factorization, forward substitution and backward
+              substitution are do in single precision while the residual
+              and update to the solution are done in double precision
+              then the iterative refinement will produce the same
+              accuracy than if double precision was used exclusively
+              (as long as the matrix is "not too badly conditioned").}
 } 
 
 @article{DBLP:journals/corr/abs-0808-2794,
@@ -65,7 +83,12 @@
  timestamp = {Mon, 05 Dec 2011 18:04:36 +0100},
  biburl    = {http://dblp.uni-trier.de/rec/bib/journals/corr/abs-0808-2794},
  bibsource = {dblp computer science bibliography, http://dblp.org},
- annote    = {The authors studied performance of iterative linear algebra solvers by doing the first passes with single precision floats, before using double precision to get the final awnser.  They found that doing the first passes with single precision floats was significantly faster than using only double precision.}
+ annote    = {The authors studied performance of iterative linear algebra
+              solvers by doing the first passes with single precision
+              floats, before using double precision to get the final
+              awnser.  They found that doing the first passes with single
+              precision floats was significantly faster than using only
+              double precision.}
 }
 
 @article{Buttari:2007:MPI:1297648.1297653,
@@ -91,8 +114,13 @@
  acmid      = {1297653},
  publisher  = {Sage Publications, Inc.},
  address    = {Thousand Oaks, CA, USA},
- keywords   = {Cholesky factorization, LU, iterative, mixed-precision, refinement},
- annote     = {The authors compared using strictly double precision to using mixed single and double precision in iterative linear equation solvers with dense matrices.  Except for small problems, the mixed precision solver was able to solve faster.}
+ keywords   = {Cholesky factorization, LU, iterative, mixed-precision,
+               refinement},
+ annote     = {The authors compared using strictly double precision to
+               using mixed single and double precision in iterative
+               linear equation solvers with dense matrices.  Except for
+               small problems, the mixed precision solver was able to
+               solve faster.}
 } 
 
 
@@ -111,7 +139,8 @@
 @article{Hogg:2010:FRM:1731022.1731027,
  author     = {Hogg, J. D. and
                Scott, J. A.},
- title      = {A Fast and Robust Mixed-precision Solver for the Solution of Sparse Symmetric Linear Systems},
+ title      = {A Fast and Robust Mixed-precision Solver for the
+               Solution of Sparse Symmetric Linear Systems},
  journal    = {ACM Trans. Math. Softw.},
  issue_date = {April 2010},
  volume     = {37},
@@ -127,8 +156,19 @@
  acmid      = {1731027},
  publisher  = {ACM},
  address    = {New York, NY, USA},
- keywords   = {FGMRES, Fortran 95, Gaussian elimination, iterative refinement, mixed precision, multifrontal method, sparse symmetric linear systems},
- annote     = {The author anaylizes uses a mixed precision strategy utilizing fallbacks to more accurate algorithms to reach the user's requested precision.  It starts with a single precision solve of $Ax=b$, then applies mixed-precision iterative refinement, then falls back to mixed-precision FGMRES, if target precision is not yet met then it uses a double precision solver on $Ax=b$ followed by double precision iterative refinement, then uses double-precision FGMRES.  If target precision is not met a this point, then algorithm results in an error.}
+ keywords   = {FGMRES, Fortran 95, Gaussian elimination,
+               iterative refinement, mixed precision,
+               multifrontal method, sparse symmetric linear systems},
+ annote     = {The author anaylizes uses a mixed precision strategy
+               utilizing fallbacks to more accurate algorithms to reach
+               the user's requested precision.  It starts with a single
+               precision solve of $Ax=b$, then applies mixed-precision
+               iterative refinement, then falls back to mixed-precision
+               FGMRES, if target precision is not yet met then it uses 
+               a double precision solver on $Ax=b$ followed by double
+               precision iterative refinement, then uses double-precision
+               FGMRES.  If target precision is not met a this point, then
+               algorithm results in an error.}
 } 
 
 
@@ -155,14 +195,22 @@
  acmid      = {3009846},
  publisher  = {ACM},
  address    = {New York, NY, USA},
- keywords   = {Energy-efficient computing, Floating-point arithmetic, Precision allocation, Program optimization, Rigorous compilation},
- annote     = {The authors address general improvements for mixing precision of floats in algorithms.}
+ keywords   = {Energy-efficient computing, Floating-point arithmetic,
+               Precision allocation, Program optimization,
+               Rigorous compilation},
+ annote     = {The authors address general improvements for mixing
+               precision of floats in algorithms.}
 } 
 
 
 
 @article{Demmel:2006:EBE:1141885.1141894,
- author     = {Demmel, James and Hida, Yozo and Kahan, William and Li, Xiaoye S. and Mukherjee, Sonil and Riedy, E. Jason},
+ author     = {Demmel, James and
+               Hida, Yozo and
+               Kahan, William and
+               Li, Xiaoye S. and
+               Mukherjee, Sonil and
+               Riedy, E. Jason},
  title      = {Error Bounds from Extra-precise Iterative Refinement},
  journal    = {ACM Trans. Math. Softw.},
  issue_date = {June 2006},
@@ -179,9 +227,49 @@
  publisher  = {ACM},
  address    = {New York, NY, USA},
  keywords   = {BLAS, LAPACK, Linear algebra, floating-point arithmetic},
- annote     = {The authors address calculating the error bounds when the precision used to calculate the residual is higher than the precision used for the rest of the calculations in an iterative refinement algorithm.}
+ annote     = {The authors address calculating the error bounds when the
+               precision used to calculate the residual is higher than
+               the precision used for the rest of the calculations in an
+               iterative refinement algorithm.}
 } 
 
 
 
+@Article{Anzt2010,
+ author={Anzt, Hartwig and
+        Rocker, Bj{\"o}rn and
+        Heuveline, Vincent},
+ title   = {Energy efficiency of mixed precision iterative refinement
+           methods using hybrid hardware platforms},
+ journal = {Computer Science - Research and Development},
+ year    = {2010},
+ volume  = {25},
+ number  = {3},
+ pages   = {141--148},
+ doi     = {10.1007/s00450-010-0124-2},
+ url     = {http://dx.doi.org/10.1007/s00450-010-0124-2},
+ annote  = {Experimental times for using mixed precision solvers on
+           high end computers}
+}
+
+
+
+@article{Tsuchida2012,
+ author    = {Eiji Tsuchida and
+              Yoong-Kee Choe},
+ title     = {Iterative diagonalization of symmetric matrices in mixed
+              precision and its application to electronic structure
+              calculations},
+ doi       = {10.1016/j.cpc.2012.01.002},
+ url       = {https://doi.org/10.1016/j.cpc.2012.01.002},
+ year      = {2012},
+ month     = {apr},
+ publisher = {Elsevier {BV}},
+ volume    = {183},
+ number    = {4},
+ pages     = {980--985},
+ journal   = {Computer Physics Communications},
+ annote    = {The author looks at using mixed precision when iterativly
+              diagonalizing a symmetric matrix.}
+}
 
