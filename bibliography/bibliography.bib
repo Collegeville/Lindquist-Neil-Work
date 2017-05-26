@@ -25,8 +25,11 @@
  keywords   = {Linear systems, floating point, iterative refinement,
                precision},
  annote     = {The authors tried using both single and double precision
-               in an iterative refinement algorithm to try to increase
-               speed while retaining accuracy.}
+               in an iterative refinement algorithms to try to increase
+               speed while retaining accuracy.  The algorithms were
+               modified to call a single precision linear solver to
+               solve \(Ac = r\) where \(c\) in amount to increment \(x\).
+               PCG and GMRES were both modified in this way.}
 } 
 
 
@@ -84,11 +87,11 @@
  biburl     = {http://dblp.uni-trier.de/rec/bib/journals/corr/abs-0808-2794},
  bibsource  = {dblp computer science bibliography, http://dblp.org},
  annote     = {The authors studied performance of iterative linear algebra
-               solvers by doing the first passes with single precision
-               floats, before using double precision to get the final
-               awnser.  They found that doing the first passes with single
-               precision floats was significantly faster than using only
-               double precision.}
+               solvers by doing the first few refinement passes with single
+               precision floats, before using double precision to get the
+               final awnser.  They found that doing the first passes with
+               single precision floats was significantly faster than using
+               only double precision.}
 }
 
 @article{Buttari:2007:MPI:1297648.1297653,
@@ -120,7 +123,9 @@
                using mixed single and double precision in iterative
                linear equation solvers with dense matrices.  Except for
                small problems, the mixed precision solver was able to
-               solve faster.}
+               solve faster.  The algorithm in question first solved
+               the system in single precision then refined it to double
+               precision quality.}
 } 
 
 
@@ -163,10 +168,10 @@
  annote     = {The author anaylizes uses a mixed precision strategy
                utilizing fallbacks to more accurate algorithms to reach
                the user's requested precision.  It starts with a single
-               precision solve of $Ax=b$, then applies mixed-precision
+               precision solve of \(Ax=b\), then applies mixed-precision
                iterative refinement, then falls back to mixed-precision
                FGMRES, if target precision is not yet met then it uses 
-               a double precision solver on $Ax=b$ followed by double
+               a double precision solver on \(Ax=b\) followed by double
                precision iterative refinement, then uses double-precision
                FGMRES.  If target precision is not met a this point, then
                algorithm results in an error.}
@@ -251,7 +256,9 @@
  doi        = {10.1007/s00450-010-0124-2},
  url        = {http://dx.doi.org/10.1007/s00450-010-0124-2},
  annote     = {Experimental times for using mixed precision solvers on
-               high end computers.}
+               high end computers.  The algorithm used utilized single
+               precision to solve \(Ac=r\) where \(c\) is the amount to
+               increment \(x\).}
 }
 
 
@@ -271,7 +278,7 @@
  number     = {4},
  pages      = {980--985},
  journal    = {Computer Physics Communications},
- annote     = {The author looks at using mixed precision when iterativly
+ annote     = {The author looks at using mixed precision when iteratively
                diagonalizing a symmetric matrix.}
 }
 
