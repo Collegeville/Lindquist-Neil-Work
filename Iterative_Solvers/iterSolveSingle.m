@@ -15,21 +15,29 @@ if nargin < 4
     end
 end
 
+n = size(b);
+n = n(1);
+
 x = single(x0);
+oldX = x;
 A = single(A);
 b = single(b);
 
-invL = inv(tril(A));
-T = -invL * triu(A, 1);
-C = invL*b;
-iteration = 0;
-while iteration < limit
-    iteration = iteration +1;
-    newX = T*x+C;
-    if norm(x - newX) < .000001
+for iteration = 1:limit    
+    for i = 1:n
+       x(i) = b(i);
+       for j = 1:n
+           if i ~= j
+               x(i) = x(i) - A(i, j)*x(j);
+           end
+       end
+       
+       x(i) = x(i)/A(i, i);
+    end
+    
+    if norm(x - oldX) < .0000001
        %seems to have stabilized, return
-       x = newX;
        break
     end
-    x = newX;
+    oldX = x;
 end

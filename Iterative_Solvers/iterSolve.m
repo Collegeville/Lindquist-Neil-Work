@@ -21,7 +21,7 @@ c = zeros(size(b));
 iteration = 0;
 while (norm(r) ~= 0) && (iteration < iterationLimit)
     iteration = iteration + 1;
-    r = b - A*x;
     c = iterSolveSingle(A, r, c, iterationLimit/20);
     x = x + double(c);
+    r = b - A*x;
 end
