@@ -4,7 +4,7 @@ function [b] = matvecMixed(A, x)
 %precision, but the arithmetic will be done in double precision
 
 [m, n] = size(A);
-b = zeros(m, 1);
+b = single(zeros(m, 1));
 
 for row = 1:m
     temp = double(0);
