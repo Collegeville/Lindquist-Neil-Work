@@ -375,5 +375,105 @@
  eprint     = {http://dx.doi.org/10.1137/120894488},
  annote     = {The authors improve on the error bound for inner products from Higham's 
                \textit{Accuracy and Stability of Numerical Algorithms}.}
-
 }
+
+
+@inproceedings{Jenkins:2012:BLD:2388996.2389062,
+ author     = {Jenkins, John and
+               Schendel, Eric R. and
+               Lakshminarasimhan, Sriram and
+               Boyuka,II, David A. and 
+               Rogers, Terry and 
+               Ethier, Stephane and 
+               Ross, Robert and 
+               Klasky, Scott and 
+               Samatova, Nagiza F.},
+ title      = {Byte-precision Level of Detail Processing 
+               for Variable Precision Analytics},
+ booktitle  = {Proceedings of the International Conference on High Performance Computing, Networking, Storage and Analysis},
+ series     = {SC '12},
+ year       = {2012},
+ isbn       = {978-1-4673-0804-5},
+ location   = {Salt Lake City, Utah},
+ pages      = {48:1--48:11},
+ articleno  = {48},
+ numpages   = {11},
+ url        = {http://dl.acm.org/citation.cfm?id=2388996.2389062},
+ acmid      = {2389062},
+ publisher  = {IEEE Computer Society Press},
+ address    = {Los Alamitos, CA, USA},
+ annote     = {The authors are attempting to reduce IO bottlenecks by not 
+               sending all bytes of a double-precision float when doing 
+               calculations, resulting in a lower precision value.}
+} 
+
+@article{Tran-Thong:1977:FPF:355719.355723,
+ author     = {Tran-Thong and Liu, Bede},
+ title      = {Floating Point Fast Fourier Transform Computation Using
+               Double Precision Floating Point Accumulators},
+ journal    = {ACM Trans. Math. Softw.},
+ issue_date = {March 1977},
+ volume     = {3},
+ number     = {1},
+ month      = mar,
+ year       = {1977},
+ issn       = {0098-3500},
+ pages      = {54--59},
+ numpages   = {6},
+ url        = {http://doi.acm.org/10.1145/355719.355723},
+ doi        = {10.1145/355719.355723},
+ acmid      = {355723},
+ publisher  = {ACM},
+ address    = {New York, NY, USA},
+ annote     = {The author looks at using a double precision accumulator when working with
+               single precision data in a Fast Fourier Transformation.}
+} 
+
+
+@article{Figueroa:1995:DRI:221332.221334,
+ author     = {Figueroa, Samuel A.},
+ title      = {When is Double Rounding Innocuous?},
+ journal    = {SIGNUM Newsl.},
+ issue_date = {July 1995},
+ volume     = {30},
+ number     = {3},
+ month      = jul,
+ year       = {1995},
+ issn       = {0163-5778},
+ pages      = {21--26},
+ numpages   = {6},
+ url        = {http://doi.acm.org/10.1145/221332.221334},
+ doi        = {10.1145/221332.221334},
+ acmid      = {221334},
+ publisher  = {ACM},
+ address    = {New York, NY, USA},
+ annote     = {The author proves that doing an arithmetic operation on single
+               precision floats in double precision then converting it to 
+               single precision is the same as doing the operation in single
+               precision.}
+} 
+
+
+@article{Kaneko:1973:LRE:321765.321771,
+ author     = {Kaneko, Toyohisa and
+               Liu, Bede},
+ title      = {On Local Roundoff Errors in Floating-Point Arithmetic},
+ journal    = {J. ACM},
+ issue_date = {July 1973},
+ volume     = {20},
+ number     = {3},
+ month      = jul,
+ year       = {1973},
+ issn       = {0004-5411},
+ pages      = {391--398},
+ numpages   = {8},
+ url        = {http://doi.acm.org/10.1145/321765.321771},
+ doi        = {10.1145/321765.321771},
+ acmid      = {321771},
+ publisher  = {ACM},
+ address    = {New York, NY, USA},
+ annote     = {The authors find the bound on error in float addition with a
+               single precision accumulator with guard bits. They found that
+               accuracy is almost as high as if a double precision accumulator
+               had been used.}
+} 
