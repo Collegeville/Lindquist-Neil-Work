@@ -115,7 +115,7 @@ end
 flag = 1;
 xmin = x;                          % Iterate which has minimal residual so far
 tolb = tol * n2b;                  % Relative tolerance
-r = b - sparseMatvec(A, x);
+r = b - A*x;
 normr = norm(r);                   % Norm of residual
 normr_act = normr;
 
@@ -171,7 +171,7 @@ for ii = 1 : maxit
         end
         p = z + beta * p;
     end
-    q = sparseMatvec(A, p);
+    q = A*p;
     pq = p' * q;
     if ((pq <= 0) || isinf(pq))
         flag = 4;
@@ -198,7 +198,7 @@ for ii = 1 : maxit
     
     % check for convergence
     if (normr <= tolb || stag >= maxstagsteps || moresteps)
-        r = b - sparseMatvec(A, x);
+        r = b - A*x;
         normr_act = norm(r);
         if (normr_act <= tolb)
             flag = 0;
@@ -229,7 +229,7 @@ end
 
 % returned solution is first with minimal residual
 if (flag ~= 0)
-    r_comp = b - sparseMatvec(A, xmin);
+    r_comp = b - A*xmin;
     if norm(r_comp) <= normr_act
         x = xmin;
     end
