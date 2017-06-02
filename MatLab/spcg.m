@@ -1,36 +1,36 @@
-function [x] = scg(A,b,tol,maxit,M1,M2,x0)
-%SCG   Sparse Conjugate Gradients Method.
-%   X = SCG(A,B) attempts to solve the system of linear equations A*X=B for
+function [x] = spcg(A,b,tol,maxit,M1,M2,x0)
+%SPCG   Sparse Preconditioned Conjugate Gradients Method.
+%   X = SPCG(A,B) attempts to solve the system of linear equations A*X=B for
 %   X. The N-by-N coefficient matrix A must be symmetric and positive
 %   definite and the right hand side column vector B must have length N.
 %
-%   X = SCG(A,B,TOL) specifies the tolerance of the method. If TOL is []
-%   then SCG uses the default, 1e-6.
+%   X = SPCG(A,B,TOL) specifies the tolerance of the method. If TOL is []
+%   then SPCG uses the default, 1e-6.
 %
-%   X = SCG(A,B,TOL,MAXIT) specifies the maximum number of iterations. If
-%   MAXIT is [] then SCG uses the default, min(N,20).
+%   X = SPCG(A,B,TOL,MAXIT) specifies the maximum number of iterations. If
+%   MAXIT is [] then SPCG uses the default, min(N,20).
 %
-%   X = SCG(A,B,TOL,MAXIT) specifies the maximum number of iterations. If
-%   MAXIT is [] then SCG uses the default, min(N,20).
+%   X = SPCG(A,B,TOL,MAXIT) specifies the maximum number of iterations. If
+%   MAXIT is [] then SPCG uses the default, min(N,20).
 %
-%   X = SCG(A,B,TOL,MAXIT,M) and X = SCG(A,B,TOL,MAXIT,M1,M2) use symmetric
+%   X = SPCG(A,B,TOL,MAXIT,M) and X = SPCG(A,B,TOL,MAXIT,M1,M2) use symmetric
 %   positive definite preconditioner M or M=M1*M2 and effectively solve the
 %   system inv(M)*A*X = inv(M)*B for X. If M is [] then a preconditioner
-%   is not applied. M may be a function handle MFUN returning M\X.
+%   is not applied.
 %
-%   X = SCG(A,B,TOL,MAXIT,M1,M2,X0) specifies the initial guess. If X0 is
-%   [] then SCG uses the default, an all zero vector.
+%   X = SPCG(A,B,TOL,MAXIT,M1,M2,X0) specifies the initial guess. If X0 is
+%   [] then SPCG uses the default, an all zero vector.
 %
 %   Example:
 %      n1 = 21; A = gallery('moler',n1);  b1 = A*ones(n1,1);
 %      tol = 1e-6;  maxit = 15;  M = diag([10:-1:1 1 1:10]);
-%      [x1] = SCG(A,b1,tol,maxit,M);
+%      x1 = SPCG(A,b1,tol,maxit,M);
 %   Or use this parameterized matrix-vector product function:
 %      A = @(x,n)gallery('moler',n)*x;
 %      n2 = 21; b2 = A(ones(n2,1),n2);
-%      [x2] = SCG(@(x)afun(x,n2),b2,tol,maxit,M);
+%      x2 = SPCG(@(x)afun(x,n2),b2,tol,maxit,M);
 %
-%   Class support for inputs A:
+%   Class support for inputs A, M1, M2:
 %      sparce matrix
 %
 %   Class support for inputs B,X0:
@@ -38,7 +38,8 @@ function [x] = scg(A,b,tol,maxit,M1,M2,x0)
 %
 %   See also PCG
 
-%   Copyright 1984-2013 The MathWorks, Inc., Modified by Neil Lindquist 2017
+%   Copyright 1984-2013 The MathWorks, Inc.
+%   Modified by Neil Lindquist, 2017
 
 if (nargin < 2)
     error(message('MATLAB:pcg:NotEnoughInputs'));
