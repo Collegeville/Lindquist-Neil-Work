@@ -12,7 +12,6 @@ classdef sparseSingle
         function self = sparseSingle(rows, cols, vals, m, n)
             if nargin == 1
                 %matrix copy
-                disp('copying')
                 org = rows;
                 [self.m, self.n] = size(org);
                 
@@ -42,14 +41,14 @@ classdef sparseSingle
                 if m <= 0 || n <= 0
                     error('Matrix dimentions must be positive')
                 end
-                if size(rows) ~= [1, m]
+                if ~isequal(size(rows), [1, m])
                     error('Incorrect number of row indices')
                 end
                 if size(cols) ~= size(vals)
                     error('Number of row indices does not match number of values')
                 end
 
-                self.rows = [rows m+1];
+                self.rows = [rows, m+1];
                 self.cols = cols;
                 self.vals = single(vals);
                 self.m = m;
@@ -62,12 +61,12 @@ classdef sparseSingle
             count = count(1);
         end
         
-        function [m n] = size(self)
-            if nargout == 1
-                m = [self.m self.n];
+        function varargout = size(self)
+            if nargout <= 1
+                varargout{1} = [self.m self.n];
             else
-                m = self.m;
-                n = self.n;
+                varargout{1} = self.m;
+                varargout{2} = self.n;
             end
         end
         
@@ -100,5 +99,83 @@ classdef sparseSingle
             end
             b(row) = single(temp);
         end
+        
+        function varargout = subsref(obj, s)
+            switch s(1).type
+                case '()'
+                    subs = s(1).subs;
+                    r = subs{1};
+                    c = subs{2};
+                    if r == ':'
+                        r = 1:obj.m;
+                    end
+                    if c == ':'
+                        c = 1:obj.n;
+                    end
+                    
+                    if length(r) * length(c) == 1
+                        i = obj.rows(r);
+                        varargout{1} = 0;
+                        while i < obj.rows(r+1)
+                            if obj.cols(i) == c
+                                varargout{1} = obj.vals(i);
+                                break
+                            end
+                            i = i+1;
+                        end
+                    else
+                        i = obj.rows(r(1));
+                        j = 1;
+                        newRows = zeros(1, length(r));
+                        nnz = obj.rows(r(end)+1)-obj.rows(r(1));
+                        newCols = zeros(1, nnz);
+                        newVals = zeros(1, nnz);
+                        currentRow = r(1)-1;
+                        while i < obj.rows(r(end)+1)
+                             if i >= obj.rows(currentRow+1)
+                                 currentRow = currentRow + 1;
+                                 newRows(currentRow-r(1)+1) = j;
+                             else
+                                 newCols(j) = obj.cols(i);
+                                 newVals(j) = obj.vals(i);
+                                 i = i+1;
+                                 j = j+1;
+                             end
+                        end
+                        varargout{1} = sparseSingle(newRows, newCols, newVals, length(r), length(c));
+                    end
+                    
+                case '.'
+                    varargout{1:nargout} = builtin('subsref', obj, s);
+                case '{}'
+                    varargout = builtin('subsref', obj, s);
+                otherwise
+                    error('Not a valid indexing expression')
+            end
+        end
+        
+        function s = sparse(self)
+            %converts the single precision sparse matrix to the builtin,
+            %double precision sparse matrix
+            r = zeros(size(self.cols));
+            currentRow = 1;
+            i = 1;
+            while i <= length(self.vals)
+                if i >= self.rows(currentRow+1)
+                    currentRow = currentRow + 1;
+                else
+                    if currentRow > 479
+                        disp(i);
+                    end
+                    r(i) = currentRow;
+                    i = i + 1;
+                end
+            end
+            s = sparse(r, double(self.cols), double(self.vals), self.m, self.n);
+        end
+        
     end
 end
+
+    
+    
