@@ -76,12 +76,21 @@ classdef sparseSingle
             %The matrix should be a single precision sparse matrix
             %The vector should be a single precision dense vector
 
-
+            [aRows, aCols] = size(A);
+            [xRows, xCols] = size(x);
+            
+            if aCols ~= xRows
+                error('Inner matrix dimensions must agree.');
+            end
+            if xCols ~= 1
+                error('Second operand must be a column vector');
+            end
+            
             r = A.rows;
             c = A.cols;
             v = A.vals;
 
-            b = single(zeros(size(x)));
+            b = single(zeros(aRows, xCols));
 
             nextEnd = r(2);
             row = 1;
