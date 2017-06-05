@@ -113,45 +113,57 @@ classdef sparseSingle
             switch s(1).type
                 case '()'
                     subs = s(1).subs;
-                    r = subs{1};
-                    c = subs{2};
-                    if r == ':'
-                        r = 1:obj.m;
-                    end
-                    if c == ':'
-                        c = 1:obj.n;
-                    end
-                    
-                    if length(r) * length(c) == 1
-                        i = obj.rows(r);
-                        varargout{1} = 0;
-                        while i < obj.rows(r+1)
-                            if obj.cols(i) == c
-                                varargout{1} = obj.vals(i);
-                                break
-                            end
-                            i = i+1;
+                    if length(subs) == 1
+                        %linear indexed, just get as list
+                        [r, c] = ind2sub(size(obj), subs{1});
+                        v = zeros(length(r), 1);
+                        for i = 1:length(r)
+                            
+                            v(i) = subsref(obj, struct('type', {'()'}, 'subs', {{r(i), c(i)}, 0}));
                         end
+                        varargout{1} = v;
                     else
-                        i = obj.rows(r(1));
-                        j = 1;
-                        newRows = zeros(1, length(r));
-                        nnz = obj.rows(r(end)+1)-obj.rows(r(1));
-                        newCols = zeros(1, nnz);
-                        newVals = zeros(1, nnz);
-                        currentRow = r(1)-1;
-                        while i < obj.rows(r(end)+1)
-                             if i >= obj.rows(currentRow+1)
-                                 currentRow = currentRow + 1;
-                                 newRows(currentRow-r(1)+1) = j;
-                             else
-                                 newCols(j) = obj.cols(i);
-                                 newVals(j) = obj.vals(i);
-                                 i = i+1;
-                                 j = j+1;
-                             end
+                        r = subs{1};
+                        c = subs{2};
+
+                        if r == ':'
+                            r = 1:obj.m;
                         end
-                        varargout{1} = sparseSingle(newRows, newCols, newVals, length(r), length(c));
+                        if c == ':'
+                            c = 1:obj.n;
+                        end
+
+                        if length(r) * length(c) == 1
+                            i = obj.rows(r);
+                            varargout{1} = 0;
+                            while i < obj.rows(r+1)
+                                if obj.cols(i) == c
+                                    varargout{1} = obj.vals(i);
+                                    break
+                                end
+                                i = i+1;
+                            end
+                        else
+                            i = obj.rows(r(1));
+                            j = 1;
+                            newRows = zeros(1, length(r));
+                            nnz = obj.rows(r(end)+1)-obj.rows(r(1));
+                            newCols = zeros(1, nnz);
+                            newVals = zeros(1, nnz);
+                            currentRow = r(1)-1;
+                            while i < obj.rows(r(end)+1)
+                                 if i >= obj.rows(currentRow+1)
+                                     currentRow = currentRow + 1;
+                                     newRows(currentRow-r(1)+1) = j;
+                                 else
+                                     newCols(j) = obj.cols(i);
+                                     newVals(j) = obj.vals(i);
+                                     i = i+1;
+                                     j = j+1;
+                                 end
+                            end
+                            varargout{1} = sparseSingle(newRows, newCols, newVals, length(r), length(c));
+                        end
                     end
                     
                 case '.'
@@ -183,6 +195,63 @@ classdef sparseSingle
             s = sparse(r, double(self.cols), double(self.vals), self.m, self.n);
         end
         
+        
+        function [row, col, v] = find(self, n, direction)
+            
+            
+            nz = nnz(self);
+            
+            if nargin < 3
+                direction = 'first';
+                
+                if nargin < 2
+                    n = nz;
+                end
+            end
+            
+            if n > nz
+                error('n must be less than the number of non-zero elements in the matrix');
+            end
+            
+            
+            row = zeros(nz, 1);
+            col = zeros(nz, 1);
+            v = zeros(nz, 1);
+                
+            r = 1;
+            i = 1;
+            while i <= nz
+                if i >= self.rows(r+1)
+                    r = r + 1;
+                else
+                    row(i) = r;
+                    col(i) = self.cols(i);
+                    v(i)   = self.vals(i);
+                    i = i+1;
+                end
+            end
+            
+            sorted = sortrows([col, row, v]);
+            if strcmp('first', direction)
+                col = sorted(1:n, 1);
+                row = sorted(1:n, 2);
+                v   = sorted(1:n, 3);
+            else
+                col = sorted(nz-n+1:nz, 1);
+                row = sorted(nz-n+1:nz, 2);
+                v   = sorted(nz-n+1:nz, 3);
+            end
+
+            if nargout <= 1
+                row = sub2ind(size(self), row, col);
+            end
+            
+            if isrow(self)
+                row = row';
+                col = col';
+                v   = v';
+            end
+        end
     end
 end
 
