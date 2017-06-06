@@ -110,6 +110,7 @@ classdef sparseSingleTest < matlab.unittest.TestCase
             testCase.verifyEqual(ssp.vals, v);
         end
     
+        
         function testNNZ(testCase)
             testCase.verifyEqual(nnz(testCase.ssp1), 4);
 
@@ -119,6 +120,7 @@ classdef sparseSingleTest < matlab.unittest.TestCase
 
             testCase.verifyEqual(nnz(testCase.empty), 0);
         end
+        
         
         function testSizeSingleOut(testCase)
             sz = size(testCase.ssp1);
@@ -180,6 +182,7 @@ classdef sparseSingleTest < matlab.unittest.TestCase
             testCase.verifyEqual(szdim, 8);
         end
         
+        
         function testMTimesOnes(testCase)
             b = testCase.ssp1*ones(3, 1);
             testCase.verifyEqual(b, single([2; 2; 1]));
@@ -192,6 +195,18 @@ classdef sparseSingleTest < matlab.unittest.TestCase
 
             b = testCase.empty*ones(8, 1);
             testCase.verifyEqual(b, single(zeros(6, 1)));
+        end
+        
+        function testMTimes(testCase)
+            testCase.verifyEqual(testCase.ssp1*[4; 9; 6], ...
+                    single(testCase.f1*[4; 9; 6]));
+                    
+            testCase.verifyEqual(testCase.ssp2*[1.02; -3; 4.05; -.95; 10], ...
+                    single(testCase.f2)*[1.02; -3; 4.05; -.95; 10], ...
+                    'RelTol', single(1e-06))
+                
+            testCase.verifyEqual(testCase.ssp2*[-3; -4; -.002; -12.103; -3.4], ...
+                    single(testCase.f2*[-3; -4; -.002; -12.103; -3.4]));
         end
         
         function testMTimesScalard(testCase)
@@ -210,6 +225,7 @@ classdef sparseSingleTest < matlab.unittest.TestCase
             C = 8*testCase.ssp1;
             testCase.verifyEqual(C, sparseSingle(testCase.f1*8));
         end
+        
         
         function testPlusdoubled(testCase)
             testCase.verifyEqual(testCase.ssp1+testCase.ssp1, testCase.ssp1*2);
@@ -230,6 +246,7 @@ classdef sparseSingleTest < matlab.unittest.TestCase
 
             testCase.verifyEqual(1+testCase.ssp2, single(testCase.f2+1));
         end
+        
         
         function testSubsrefDot(testCase)
             testCase.verifyEqual(testCase.ssp1.rows, uint32([1; 3; 4; 5]));
@@ -256,6 +273,7 @@ classdef sparseSingleTest < matlab.unittest.TestCase
         function testSubsrefVectLinearIndexes(testCase)
             testCase.verifyEqual(testCase.ssp1([2, 8, 1]), single([0, 2, 1]));
         end
+        
         
         function testFindAllElements(testCase)
             act = find(testCase.ssp2);
@@ -379,6 +397,7 @@ classdef sparseSingleTest < matlab.unittest.TestCase
             testCase.verifyEqual(actV, expV);
         end
         
+        
         function testSparse2(testCase)
             dsp = sparse(testCase.ssp2);
             
@@ -393,6 +412,7 @@ classdef sparseSingleTest < matlab.unittest.TestCase
             testCase.verifyEqual(actV, expV);
         end
         
+        
         function testFull2(testCase)
             sf = full(testCase.ssp2);
             
@@ -401,6 +421,7 @@ classdef sparseSingleTest < matlab.unittest.TestCase
             
             testCase.verifyEqual(sf, single(testCase.f2));
         end
+        
         
         function testIssparse(testCase)
             testCase.verifyTrue(issparse(testCase.ssp1));
