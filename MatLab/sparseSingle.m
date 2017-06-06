@@ -51,18 +51,24 @@ classdef sparseSingle
                 if m <= 0 || n <= 0
                     error('Matrix dimentions must be positive')
                 end
-                if ~isequal(size(rows), [1, m])
-                    if isequal(size(rows), [m, 1])
+                if ~isequal(size(rows), [m, 1])
+                    if isequal(size(rows), [1, m])
                         rows = rows';
                     else
                         error('Incorrect number of row indices')
                     end
                 end
+                if size(cols, 2) ~= 1
+                    cols = cols';
+                end
+                if size(vals, 2) ~= 1
+                    vals = vals';
+                end
                 if size(cols) ~= size(vals)
                     error('Number of row indices does not match number of values')
                 end
 
-                self.rows = uint32([rows, length(cols)+1]);
+                self.rows = uint32([rows; length(cols)+1]);
                 self.cols = uint32(cols);
                 self.vals = single(vals);
                 self.m = m;
@@ -100,9 +106,9 @@ classdef sparseSingle
             % Computes the matrix-vector product or matrix-scalar product
 
             if isscalar(x)
-                b = A.vals*x;
+                b = sparseSingle(A.rows(1:length(A.rows)-1), A.cols(), A.vals*x, A.m, A.n);
             elseif isscalar(A);
-                b = x.vals*A;
+                b = sparseSingle(x.rows(1:length(x.rows)-1), x.cols(), x.vals*A, x.m, x.n);
             else
             
                 [aRows, aCols] = size(A);
@@ -196,6 +202,7 @@ classdef sparseSingle
                     row = zeros(self.m, 1);
                     cRow = 1;
                     i = 1;
+                    row(1) = 1;
                     while i <= size(entries, 1);
                         if r(i) > cRow
                             cRow = cRow+1;
@@ -219,9 +226,8 @@ classdef sparseSingle
                     if length(subs) == 1
                         %linear indexed, just get as list
                         [r, c] = ind2sub(size(obj), subs{1});
-                        v = zeros(length(r), 1);
+                        v = single(zeros(1, length(r)));
                         for i = 1:length(r)
-                            
                             v(i) = subsref(obj, struct('type', {'()'}, 'subs', {{r(i), c(i)}, 0}));
                         end
                         varargout{1} = v;
@@ -238,7 +244,7 @@ classdef sparseSingle
 
                         if length(r) * length(c) == 1
                             i = obj.rows(r);
-                            varargout{1} = 0;
+                            varargout{1} = single(0);
                             while i < obj.rows(r+1)
                                 if obj.cols(i) == c
                                     varargout{1} = obj.vals(i);
@@ -259,12 +265,16 @@ classdef sparseSingle
                                      currentRow = currentRow + 1;
                                      newRows(currentRow-r(1)+1) = j;
                                  else
-                                     newCols(j) = obj.cols(i);
-                                     newVals(j) = obj.vals(i);
+                                     if any(c == obj.cols(i))
+                                         newCols(j) = obj.cols(i);
+                                         newVals(j) = obj.vals(i);
+                                         j = j+1;
+                                     end
                                      i = i+1;
-                                     j = j+1;
                                  end
                             end
+                            newCols = newCols(1:j-1)-min(c)+1;
+                            newVals = newVals(1:j-1);
                             varargout{1} = sparseSingle(newRows, newCols, newVals, length(r), length(c));
                         end
                     end
@@ -289,9 +299,6 @@ classdef sparseSingle
                 if i >= self.rows(currentRow+1)
                     currentRow = currentRow + 1;
                 else
-                    if currentRow > 479
-                        disp(i);
-                    end
                     r(i) = currentRow;
                     i = i + 1;
                 end
@@ -384,14 +391,13 @@ classdef sparseSingle
             end
             %if has a dimension 0, print nothing
         end
-    end
-    
-    methods(Static)
-        function TF = issparse()
+        
+        function TF = issparse(self)
             % Checks if the matrix is sparse.
             % Will always return true.
             TF = true;
         end
+   
     end
 end
 
