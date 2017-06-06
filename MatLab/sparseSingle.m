@@ -1,5 +1,6 @@
 classdef sparseSingle
-    %Contains a sparse matrix using CSR format
+    % Contains a sparse matrix using CSR format with single precision values
+    
     properties
         rows    %the start index of each row
         cols    %the column indices that match the respective values
@@ -10,6 +11,15 @@ classdef sparseSingle
     
     methods
         function self = sparseSingle(rows, cols, vals, m, n)
+            % creates a new sparseSingle matrix
+            %
+            % s = sparseSingle(m)  - Copies a matrix as a sparseSingle matrix
+            % s = sparsesingle(rows, cols, vals, m, n)  - Creates a matrix
+            %    from data in CSR format, ie rows contains the starting
+            %    offsets of the column and value data, cols contains the
+            %    columns for the respective values, values contains the raw
+            %    data and m and n are the dimensions of the matrix
+            
             if nargin == 1
                 %matrix copy
                 org = rows;
@@ -61,11 +71,17 @@ classdef sparseSingle
         end
         
         function count = nnz(self)
+            % Gets the number of non zeros entries in the matrix
             count = size(self.vals);
             count = count(1);
         end
         
         function varargout = size(self)
+            % Gets the size of the matrix
+            % s = size(sp)  - gets an vector containing the dimensions of
+            %      the matrix
+            % [m, n] = size(sp)  - gets the individual dimensions of the
+            %      matrix
             if nargout <= 1
                 varargout{1} = [self.m self.n];
             else
@@ -76,9 +92,7 @@ classdef sparseSingle
         
         function b = mtimes(A, x)
             
-            %Computes the matrix-vector product.
-            %The matrix should be a single precision sparse matrix
-            %The vector should be a single precision dense vector
+            % Computes the matrix-vector product or matrix-scalar product
 
             if isscalar(x)
                 b = A.vals*x;
@@ -121,6 +135,11 @@ classdef sparseSingle
         end
         
         function C = plus(A, B)
+            % Adds the given values together
+            % C = plus(A, B)  - performs elementwise addition on the
+            %       matrices
+            % C = plus(A, b)  - adds b to each element in A
+            % C = plus(b, A)  - as above
             if isscalar(B)
                 if B ~= 0
                     C = full(A)+B;
@@ -256,8 +275,8 @@ classdef sparseSingle
         end
         
         function s = sparse(self)
-            %converts the single precision sparse matrix to the builtin,
-            %double precision sparse matrix
+            % Converts the single precision sparse matrix to the builtin,
+            % double precision sparse matrix
             r = zeros(size(self.cols));
             currentRow = 1;
             i = 1;
@@ -276,6 +295,9 @@ classdef sparseSingle
         end
         
         function s = full(self)
+            % Converts the sparse, single precision matrix into a dense,
+            % single precision matrix.
+            
             s = single(zeros(self.m, self.n));
             
             r = 1;
@@ -291,7 +313,8 @@ classdef sparseSingle
         end
         
         function [row, col, v] = find(self, n, direction)
-            
+            % Finds non-zero elements in the matrix.
+            % See MatLab's documentation for find
             
             nz = nnz(self);
             
@@ -360,6 +383,8 @@ classdef sparseSingle
     
     methods(Static)
         function TF = issparse()
+            % Checks if the matrix is sparse.
+            % Will always return true.
             TF = true;
         end
     end
