@@ -72,21 +72,26 @@ classdef sparseSingle
         
         function count = nnz(self)
             % Gets the number of non zeros entries in the matrix
-            count = size(self.vals);
-            count = count(1);
+            count = size(self.vals, 1);
         end
         
-        function varargout = size(self)
+        function [m, n] = size(self, dim)
             % Gets the size of the matrix
-            % s = size(sp)  - gets an vector containing the dimensions of
+            % sz = size(A)  - gets an vector containing the dimensions of
             %      the matrix
-            % [m, n] = size(sp)  - gets the individual dimensions of the
+            % szdim = size(A, dim)  - get the length of the matrix along
+            %      the given dimention
+            % [m, n] = size(A)  - gets the individual dimensions of the
             %      matrix
+            if nargin <= 1
+                dim = [1, 2];
+            end
             if nargout <= 1
-                varargout{1} = [self.m self.n];
+                m = [self.m self.n];
+                m = m(dim);
             else
-                varargout{1} = self.m;
-                varargout{2} = self.n;
+                m = self.m;
+                n = self.n;
             end
         end
         
