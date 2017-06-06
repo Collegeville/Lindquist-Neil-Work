@@ -42,14 +42,18 @@ classdef sparseSingle
                     error('Matrix dimentions must be positive')
                 end
                 if ~isequal(size(rows), [1, m])
-                    error('Incorrect number of row indices')
+                    if isequal(size(rows), [m, 1])
+                        rows = rows';
+                    else
+                        error('Incorrect number of row indices')
+                    end
                 end
                 if size(cols) ~= size(vals)
                     error('Number of row indices does not match number of values')
                 end
 
-                self.rows = [rows, m+1];
-                self.cols = cols;
+                self.rows = uint32([rows, length(cols)+1]);
+                self.cols = uint32(cols);
                 self.vals = single(vals);
                 self.m = m;
                 self.n = n;
@@ -76,37 +80,112 @@ classdef sparseSingle
             %The matrix should be a single precision sparse matrix
             %The vector should be a single precision dense vector
 
-            [aRows, aCols] = size(A);
-            [xRows, xCols] = size(x);
+            if isscalar(x)
+                b = A.vals*x;
+            elseif isscalar(A);
+                b = x.vals*A;
+            else
             
-            if aCols ~= xRows
-                error('Inner matrix dimensions must agree.');
-            end
-            if xCols ~= 1
-                error('Second operand must be a column vector');
-            end
-            
-            r = A.rows;
-            c = A.cols;
-            v = A.vals;
+                [aRows, aCols] = size(A);
+                [xRows, xCols] = size(x);
 
-            b = single(zeros(aRows, xCols));
-
-            nextEnd = r(2);
-            row = 1;
-            temp = 0;
-            i = 1;
-            while i <= nnz(A)
-                if i == nextEnd
-                    b(row) = single(temp);
-                    temp = 0;
-                    row = row + 1;
-                    nextEnd = r(row+1);
+                if aCols ~= xRows
+                    error('Inner matrix dimensions must agree.');
                 end
-                temp = temp + double(v(i))*double(x(c(i)));
-                i = i+1;
+                if xCols ~= 1
+                    error('Second operand must be a column vector');
+                end
+
+                r = A.rows;
+                c = A.cols;
+                v = A.vals;
+
+                b = single(zeros(aRows, xCols));
+
+                nextEnd = r(2);
+                row = 1;
+                temp = 0;
+                i = 1;
+                while i <= nnz(A)
+                    if i == nextEnd
+                        b(row) = single(temp);
+                        temp = 0;
+                        row = row + 1;
+                        nextEnd = r(row+1);
+                    end
+                    temp = temp + double(v(i))*double(x(c(i)));
+                    i = i+1;
+                end
+                b(row) = single(temp);
             end
-            b(row) = single(temp);
+        end
+        
+        function C = plus(A, B)
+            if isscalar(B)
+                if B ~= 0
+                    C = full(A)+B;
+                else
+                    C = sparseSingle(A);
+                end
+            elseif isscalar(A)
+                if A ~= 0
+                    C = full(B)+A;
+                else
+                    C = sparseSingle(B);
+                end
+            else
+                if issparse(A) && issparse(B)
+                    
+                    if ~isequal(size(A), size(B))
+                        error('Matrices must be the same size for addition')
+                    end
+                    
+                    if isa(A, 'sparseSingle')
+                        self = A;
+                        other = B;
+                    else
+                        self = B;
+                        other = A;
+                    end
+                    
+                    [r1, c1, v1] = find(self);
+                    [r2, c2, v2] = find(other);
+                    
+                    entries = [r1, c1, v1; r2, c2, v2];
+                    
+                    entries = sortrows(entries, [1, 2]);
+                    duplicates = 0;
+                    len = size(entries, 1);
+                    for i = 2:len
+                        if entries(i-1, 1) == entries(i, 1) && entries(i-1, 2) == entries(i, 2)
+                            entries(i-1, 3) = entries(i-1, 3)+entries(i, 3);
+                            entries(i, 1) = -1;
+                            entries(i, 2) = -1;
+                            duplicates = duplicates + 1;
+                        end
+                    end
+                    entries = sortrows(entries, [1, 2]);
+                    entries = entries(duplicates+1:len, :);
+                    r = entries(:, 1);
+                    c = entries(:, 2);
+                    v = entries(:, 3);
+                    row = zeros(self.m, 1);
+                    cRow = 1;
+                    i = 1;
+                    while i <= size(entries, 1);
+                        if r(i) > cRow
+                            cRow = cRow+1;
+                            row(cRow) = i;
+                        else
+                            i = i + 1;
+                        end
+                    end
+                    
+                    C = sparseSingle(row, c, v, self.m, self.n);
+                else
+                    C = full(A)+full(B);
+                end
+            end
         end
         
         function varargout = subsref(obj, s)
@@ -167,9 +246,10 @@ classdef sparseSingle
                     end
                     
                 case '.'
-                    varargout{1:nargout} = builtin('subsref', obj, s);
+                    
+                    varargout{1} = builtin('subsref', obj, s);
                 case '{}'
-                    varargout = builtin('subsref', obj, s);
+                    varargout{1} = builtin('subsref', obj, s);
                 otherwise
                     error('Not a valid indexing expression')
             end
@@ -195,6 +275,20 @@ classdef sparseSingle
             s = sparse(r, double(self.cols), double(self.vals), self.m, self.n);
         end
         
+        function s = full(self)
+            s = single(zeros(self.m, self.n));
+            
+            r = 1;
+            i = 1;
+            while i<=nnz(self)
+                if i >= self.rows(r+1)
+                    r = r + 1;
+                else
+                    s(r, self.cols(i)) = self.vals(i);
+                    i = i + 1;
+                end
+            end
+        end
         
         function [row, col, v] = find(self, n, direction)
             
@@ -251,6 +345,22 @@ classdef sparseSingle
                 col = col';
                 v   = v';
             end
+        end
+    
+        function disp(self)
+            if self.m ~= 0 && self.n ~= 0
+                [r, c, v] = find(self);
+                for i = 1:length(r)
+                    fprintf('   (%g,%g)     %g\n', r(i), c(i), v(i));
+                end
+            end
+            %if has a dimension 0, print nothing
+        end
+    end
+    
+    methods(Static)
+        function TF = issparse()
+            TF = true;
         end
     end
 end
