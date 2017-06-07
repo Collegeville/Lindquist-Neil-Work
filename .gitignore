@@ -1,3 +1,4 @@
+#latex processing files
 *.aux
 *.glo
 *.idx
@@ -22,4 +23,12 @@
 *.out
 *.synctex.gz
 
+#backup files
 *~
+
+#caches matrices
+MatLab/UFget/mat
+MatLab/UFget/matrices
+MatLab/UFget/MM
+MatLab/UFget/RB
+MatLab/UFget/svd
