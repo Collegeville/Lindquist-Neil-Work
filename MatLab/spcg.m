@@ -135,23 +135,23 @@ maxstagsteps = 3;
 for ii = 1 : maxit
     % no preconditioner
     if existM1
-       y = M1 \ r;
+       y = M1 \ double(r);
        if ~all(isfinite(y))
            flag = 2;
            break;
        end
     else
-        y = r;
+        y = double(r);
     end
     
     if existM2
-        z = M2 \ y;
+        z = single(M2 \ y);
         if ~all(isfinite(z))
             flag = 2;
             break
         end
     else % no preconditioner
-        z = y;
+        z = single(y);
     end
     
     
