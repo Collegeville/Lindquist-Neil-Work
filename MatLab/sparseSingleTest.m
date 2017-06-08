@@ -80,6 +80,17 @@ classdef sparseSingleTest < matlab.unittest.TestCase
             testCase.verifyEqual(ssp.vals, single([1; 1; 2; 1]));
         end
         
+        function testCopyConstructorMissedCase(testCase)
+            ssp = sparseSingle([1, 1; 0, 0]);
+            
+            testCase.verifyEqual(ssp.m, 2);
+            testCase.verifyEqual(ssp.n, 2);
+            
+            testCase.verifyEqual(ssp.rows, uint32([1; 3; 3]));
+            testCase.verifyEqual(ssp.cols, uint32([1; 2]));
+            testCase.verifyEqual(ssp.vals, single([1; 1]));
+        end
+        
         function testCSRConstructorDouble(testCase)
             r = [1; 3; 6; 10; 12;];
             c = [1; 4; 1; 2; 4; 1; 3; 4; 5; 3; 4; 5;];

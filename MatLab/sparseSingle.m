@@ -25,26 +25,48 @@ classdef sparseSingle
                 org = rows;
                 [self.m, self.n] = size(org);
                 
-                self.rows = uint32(zeros(self.m+1, 1));
                 nz = nnz(org);
+                
+                self.rows = uint32(zeros(self.m+1, 1));
                 self.cols = uint32(zeros(nz, 1));
                 self.vals = single(zeros(nz, 1));
                 
                 
                 [ogRows, ogCols, ogVals] = find(org);
                 
+
+% sort rows version runs much faster
+%                 i = 1;
+%                 for r = 1:self.m
+%                     self.rows(r) = i;
+%                     for j = 1:nz
+%                         if ogRows(j) == r
+%                             self.cols(i) = ogCols(j);
+%                             self.vals(i) = ogVals(j);
+%                             i = i+1;
+%                         end
+%                     end
+%                 end
+%                 self.rows(self.m+1) = nz+1;
+                
+
+                og = sortrows([ogRows, ogCols, ogVals]);
+                r = 1;
+                self.rows(1) = 1;
                 i = 1;
-                for r = 1:self.m
-                    self.rows(r) = i;
-                    for j = 1:nz
-                        if ogRows(j) == r
-                            self.cols(i) = ogCols(j);
-                            self.vals(i) = ogVals(j);
-                            i = i+1;
-                        end
+                while i <=nz
+                    if og(i, 1) > r
+                        r = r+1;
+                        self.rows(r) = i;
+                    else
+                        i = i+1;
                     end
                 end
-                self.rows(self.m+1) = nz+1;
+
+                self.cols = uint32(og(:, 2));
+                self.vals = single(og(:, 3));
+
+                self.rows(r+1:self.m+1) = nz+1;
                 
             else
                 %creates an mxn sparse matrix with single precision
