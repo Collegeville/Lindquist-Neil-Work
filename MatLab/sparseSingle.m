@@ -150,9 +150,9 @@ classdef sparseSingle
                 b = single(zeros(aRows, xCols));
 
                 nextEnd = r(2);
-                row = 1;
+                row = uint32(1);
                 temp = 0;
-                i = 1;
+                i = uint32(1);
                 while i <= nnz(A)
                     if i == nextEnd
                         b(row) = single(temp);
