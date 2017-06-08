@@ -167,6 +167,10 @@ classdef sparseSingle
             end
         end
         
+        function x = mldivide(A, b)
+            x = sparse(A)\double(b);
+        end
+        
         function C = plus(A, B)
             % Adds the given values together
             % C = plus(A, B)  - performs elementwise addition on the
