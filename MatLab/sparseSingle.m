@@ -143,27 +143,32 @@ classdef sparseSingle
                     error('Second operand must be a column vector');
                 end
 
-                r = A.rows;
-                c = A.cols;
-                v = A.vals;
 
-                b = single(zeros(aRows, xCols));
 
-                nextEnd = r(2);
-                row = uint32(1);
-                temp = 0;
-                i = uint32(1);
-                while i <= nnz(A)
-                    if i == nextEnd
-                        b(row) = single(temp);
-                        temp = 0;
-                        row = row + 1;
-                        nextEnd = r(row+1);
-                    end
-                    temp = temp + double(v(i))*double(x(c(i)));
-                    i = i+1;
-                end
-                b(row) = single(temp);
+                b = singleMatvec(uint32(aRows), uint32(aCols), uint32(nnz(A)), ...
+                        A.rows, A.cols, A.vals, single(x));
+                
+                    
+%                 r = A.rows;
+%                 c = A.cols;
+%                 v = A.vals;
+%                 b = single(zeros(aRows, xCols));
+                    
+%                 nextEnd = r(2);
+%                 row = uint32(1);
+%                 temp = 0;
+%                 i = uint32(1);
+%                 while i <= nnz(A)
+%                     if i == nextEnd
+%                         b(row) = single(temp);
+%                         temp = 0;
+%                         row = row + 1;
+%                         nextEnd = r(row+1);
+%                     end
+%                     temp = temp + double(v(i))*double(x(c(i)));
+%                     i = i+1;
+%                 end
+%                 b(row) = single(temp);
             end
         end
         

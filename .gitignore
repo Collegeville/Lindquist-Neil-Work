@@ -32,3 +32,6 @@ MatLab/UFget/matrices
 MatLab/UFget/MM
 MatLab/UFget/RB
 MatLab/UFget/svd
+
+#compiled mex files
+*.mexa64
