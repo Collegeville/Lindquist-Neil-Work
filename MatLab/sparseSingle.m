@@ -173,7 +173,7 @@ classdef sparseSingle
         end
         
         function x = mldivide(A, b)
-            x = sparse(A)\double(b);
+            x = single(sparse(A)\double(b));
         end
         
         function C = plus(A, B)
