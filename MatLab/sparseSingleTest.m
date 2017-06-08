@@ -224,8 +224,8 @@ classdef sparseSingleTest < matlab.unittest.TestCase
             C = testCase.ssp1*5;
             testCase.verifyEqual(C, sparseSingle(testCase.f1*5));
 
-            C = testCase.ssp1*12;
-            testCase.verifyEqual(C, sparseSingle(testCase.f1*12));
+            C = testCase.ssp2*12;
+            testCase.verifyEqual(C, sparseSingle(testCase.f2*12));
 
             C = testCase.one*9;
             testCase.verifyEqual(C, sparseSingle(45));

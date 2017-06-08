@@ -364,10 +364,12 @@ classdef sparseSingle
                 error('n must be less than the number of non-zero elements in the matrix');
             end
             
+            if n < 0
+                error('n cannot be negative');
+            end
+            
             
             row = zeros(nz, 1);
-            col = zeros(nz, 1);
-            v = zeros(nz, 1);
                 
             r = 1;
             i = 1;
@@ -376,22 +378,24 @@ classdef sparseSingle
                     r = r + 1;
                 else
                     row(i) = r;
-                    col(i) = self.cols(i);
-                    v(i)   = self.vals(i);
                     i = i+1;
                 end
             end
             
+            col = double(self.cols);
+            v   = double(self.vals);
+            
+            
             sorted = sortrows([col, row, v]);
             if strcmp('first', direction)
-                col = sorted(1:n, 1);
-                row = sorted(1:n, 2);
-                v   = sorted(1:n, 3);
+                sorted = sorted(1:n, :);
             else
-                col = sorted(nz-n+1:nz, 1);
-                row = sorted(nz-n+1:nz, 2);
-                v   = sorted(nz-n+1:nz, 3);
+                sorted = sorted(nz-n+1:nz, :);
             end
+            
+            col = sorted(:, 1);
+            row = sorted(:, 2);
+            v   = sorted(:, 3);
 
             if nargout <= 1
                 row = sub2ind(size(self), row, col);
