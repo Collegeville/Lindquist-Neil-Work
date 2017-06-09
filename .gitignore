@@ -33,5 +33,8 @@ MatLab/UFget/MM
 MatLab/UFget/RB
 MatLab/UFget/svd
 
+#pcg error test results
+MatLab/pcg results - *.mat
+
 #compiled mex files
 *.mexa64
