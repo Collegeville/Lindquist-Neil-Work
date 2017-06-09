@@ -323,18 +323,10 @@ classdef sparseSingle
         function s = sparse(self)
             % Converts the single precision sparse matrix to the builtin,
             % double precision sparse matrix
-            r = zeros(size(self.cols));
-            currentRow = 1;
-            i = 1;
-            while i <= length(self.vals)
-                if i >= self.rows(currentRow+1)
-                    currentRow = currentRow + 1;
-                else
-                    r(i) = currentRow;
-                    i = i + 1;
-                end
-            end
-            s = sparse(r, double(self.cols), double(self.vals), self.m, self.n);
+            
+            s = sparseCast_(uint32(self.m), uint32(self.n),  ...
+                        self.rows, self.cols, self.vals);
+            s = s';
         end
         
         function s = full(self)
