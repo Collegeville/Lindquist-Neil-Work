@@ -87,6 +87,9 @@ if ((nargin >= 5) && ~isempty(M1))
     if ~isequal(size(M1),[m,m])
         error(message('MATLAB:pcg:WrongPrecondSize', m));
     end
+    if isa(M1, 'sparseSingle')
+        M1 = sparse(M1);
+    end
 else
     existM1 = 0;
 end
@@ -95,6 +98,9 @@ if ((nargin >= 6) && ~isempty(M2))
     existM2 = 1;
     if ~isequal(size(M2),[m,m])
         error(message('MATLAB:pcg:WrongPrecondSize', m));
+    end
+    if isa(M2, 'sparseSingle')
+        M2 = sparse(M2);
     end
 else
     existM2 = 0;
@@ -135,7 +141,7 @@ maxstagsteps = 3;
 for ii = 1 : maxit
     % no preconditioner
     if existM1
-       y = M1 \ r;
+       y = M1 \ double(r);
        if ~all(isfinite(y))
            flag = 2;
            break;
@@ -145,13 +151,13 @@ for ii = 1 : maxit
     end
     
     if existM2
-        z = M2 \ y;
+        z = single(M2 \ y);
         if ~all(isfinite(z))
             flag = 2;
             break
         end
     else % no preconditioner
-        z = y;
+        z = single(y);
     end
     
     
