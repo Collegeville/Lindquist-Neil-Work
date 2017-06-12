@@ -67,7 +67,7 @@ L1T = L1';
 
 if continuation && exist('pcg results - 1850.mat', 'file') == 2
 	load('pcg results - 1850.mat')
-	disp(['loaded ' num2str(i) ' previous calculations']);
+	disp(['loaded ' num2str(i-1) ' previous calculations']);
 else
 	doubleErr = zeros(problemCount, 1);
 	singleErr = zeros(problemCount, 1);
@@ -84,7 +84,6 @@ while i <= problemCount
     singleErr(i) = norm(b-prob.A*double(sx));
     
     disp(i);
+    i = i+1;
     save('pcg results - 1850.mat', 'doubleErr', 'singleErr', 'i')
-
-	i = i+1;
 end
