@@ -74,10 +74,10 @@ else
 	i = 1;
 end
 while i <= problemCount
-    b = prob.b(:, 1);
+    b = prob.b(:, i);
     sb = single(full(b));
     
-    [x, f] = pcg(prob.A, b, 1e-6, 100, L1, L1T);
+    [x, ~] = pcg(prob.A, b, 1e-6, 100, L1, L1T);
     sx = spcg(sA, sb, 1e-06, 100, L1, L1T);
     
     doubleErr(i) = norm(b-prob.A*x);
