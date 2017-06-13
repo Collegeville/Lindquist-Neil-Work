@@ -10,7 +10,7 @@ index = UFget();
 
 %%%%%% single system %%%%%%%%
 problemList = [1580, 1581, 1582, 1583, 1584, 1585, 1853, 1909, 1919, 2283];
-problemAlphas=[ .05   .05   .01   .01   .01   .01   .01   .05    0    .01];
+problemAlphas=[.0001 .0001   .01 .0001 .0005 .0005 .0001 .039    0    .01];
 
 %each has a problemCount of 1
 
@@ -33,7 +33,7 @@ for i = 1:length(problemList)
 	if problemAlphas(i) == 0
 		L1 = ichol(prob.A);
 	else
-		L1 = ichol(prob.A, struct('type', 'ict', 'droptol', 1e-3, 'diagcomp', problemAlphas(i)));
+		L1 = ichol(prob.A, struct('type', 'ict', 'droptol', 1e-6, 'diagcomp', problemAlphas(i)));
 	end
 	
 	L1T = L1';
@@ -41,8 +41,8 @@ for i = 1:length(problemList)
     b = prob.b;
 	sb = single(full(b));
 
-	[x, doubleFlags] = pcg(prob.A, b, 1e-6, 100, L1, L1T);
-	sx = spcg(sA, sb, 1e-6, 100, L1, L1T);
+	[x, doubleFlags] = pcg(prob.A, b, 1e-6, 260, L1, L1T);
+	sx = spcg(sA, sb, 1e-6, 260, L1, L1T);
 
 	doubleErr = norm(b-prob.A*x);
     singleErr = norm(b-prob.A*double(sx));
@@ -61,7 +61,7 @@ problemCount = size(prob.b, 2);
 
 %40543 b's
 sA = sparseSingle(prob.A);
-L1 = ichol(prob.A, struct('type', 'ict', 'droptol', 1e-3, 'diagcomp', .05));
+L1 = ichol(prob.A, struct('type', 'ict', 'droptol', 1e-6, 'diagcomp', .0001));
 L1T = L1';
 
 
@@ -77,8 +77,8 @@ while i <= problemCount
     b = prob.b(:, i);
     sb = single(full(b));
     
-    [x, ~] = pcg(prob.A, b, 1e-6, 100, L1, L1T);
-    sx = spcg(sA, sb, 1e-06, 100, L1, L1T);
+    [x, ~] = pcg(prob.A, b, 1e-6, 200, L1, L1T);
+    sx = spcg(sA, sb, 1e-06, 200, L1, L1T);
     
     doubleErr(i) = norm(b-prob.A*x);
     singleErr(i) = norm(b-prob.A*double(sx));
