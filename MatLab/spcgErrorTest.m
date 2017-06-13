@@ -10,7 +10,7 @@ index = UFget();
 
 %%%%%% single system %%%%%%%%
 problemList = [1580, 1581, 1582, 1583, 1584, 1585, 1853, 1909, 1919, 2283];
-problemAlphas=[.0001 .0001   .01 .0001 .0005 .0005 .0001 .039    0    .01];
+problemAlphas=[.0001 .0001 .0001 .0001 .0005 .0005 .0001 .0001    0    .01];
 
 %each has a problemCount of 1
 
