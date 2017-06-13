@@ -25,8 +25,8 @@ end
 if process1850
     i = 0;
     load('pcg results - 1850.mat')
-    doubleErrTrunc = doubleErr(1:i);
-    singleErrTrunc = singleErr(1:i);
+    doubleErrTrunc = doubleErr(1:i-1);
+    singleErrTrunc = singleErr(1:i-1);
     normedErr1850 = singleErrTrunc./doubleErrTrunc;
     save('pcg results - 1850.mat', 'doubleErr', 'singleErr', 'normedErr1850', 'i')
 else
