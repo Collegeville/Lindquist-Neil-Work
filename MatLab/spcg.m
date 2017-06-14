@@ -45,13 +45,18 @@ if (nargin < 2)
     error(message('MATLAB:pcg:NotEnoughInputs'));
 end
 
+%ensure b is single
+b = single(b);
+
 
 % Check matrix and right hand side vector inputs have appropriate sizes
 [m,n] = size(A);
+m = uint32(m);
+n = uint32(n);
 if (m ~= n)
     error(message('MATLAB:pcg:NonSquareMatrix'));
 end
-if ~isequal(size(b),[m,1])
+if ~isequal(uint32(size(b)),[m,1])
     error(message('MATLAB:pcg:RSHsizeMatchCoeffMatrix', m));
 end
 
@@ -59,23 +64,27 @@ end
 % Assign default values to unspecified parameters
 if (nargin < 3) || isempty(tol)
     tol = 1e-6;
+else
+    tol = double(tol)
 end
-warned = 0;
+warned = false;
 if tol <= eps
     warning(message('MATLAB:pcg:tooSmallTolerance'));
-    warned = 1;
+    warned = true;
     tol = eps;
 elseif tol >= 1
     warning(message('MATLAB:pcg:tooBigTolerance'));
-    warned = 1;
+    warned = true;
     tol = 1-eps;
 end
 if (nargin < 4) || isempty(maxit)
-    maxit = min(n,20);
+    maxit = uint32(min(n,20));
+else
+    maxit = uint32(maxit);
 end
 
 % Check for all zero right hand side vector => all zero solution
-n2b = norm(b);                     % Norm of rhs vector, b
+n2b = norm(double(b));                     % Norm of rhs vector, b
 if (n2b == 0)                      % if    rhs vector is all zeros
     x = zeros(n,1);                % then  solution is all zeros
     return
@@ -83,45 +92,45 @@ end
 
 
 if ((nargin >= 5) && ~isempty(M1))
-    existM1 = 1;
-    if ~isequal(size(M1),[m,m])
+    existM1 = true;
+    if ~isequal(uint32(size(M1)),[m,m])
         error(message('MATLAB:pcg:WrongPrecondSize', m));
     end
     if isa(M1, 'sparseSingle')
         M1 = sparse(M1);
     end
 else
-    existM1 = 0;
+    existM1 = false;
 end
 
 if ((nargin >= 6) && ~isempty(M2))
-    existM2 = 1;
-    if ~isequal(size(M2),[m,m])
+    existM2 = true;
+    if ~isequal(uint32(size(M2)),[m,m])
         error(message('MATLAB:pcg:WrongPrecondSize', m));
     end
     if isa(M2, 'sparseSingle')
         M2 = sparse(M2);
     end
 else
-    existM2 = 0;
+    existM2 = false;
 end
 
 
 if ((nargin >= 7) && ~isempty(x0))
-    if ~isequal(size(x0),[n,1])
+    if ~isequal(uint32(size(x0)),[n,1])
         error(message('MATLAB:pcg:WrongInitGuessSize', n));
     else
-        x = x0;
+        x = single(x0);
     end
 else
-    x = zeros(n,1);
+    x = single(zeros(n,1));
 end
 
 % Set up for the method
 flag = 1;
 xmin = x;                          % Iterate which has minimal residual so far
 tolb = tol * n2b;                  % Relative tolerance
-r = b - A*x;
+r = double(b) - sparse(A)*double(x);
 normr = norm(r);                   % Norm of residual
 normr_act = normr;
 
@@ -131,14 +140,14 @@ end
 
 normrmin = normr;                  % Norm of minimum residual
 rho = 1;
-stag = 0;                          % stagnation of the method
-moresteps = 0;
-maxmsteps = min([floor(n/50),5,n-maxit]);
-maxstagsteps = 3;
+stag = uint32(0);                          % stagnation of the method
+moresteps = uint32(0);
+maxmsteps = min([floor(n/50),uint32(5),n-maxit]);
+maxstagsteps = uint32(3);
 
 % loop over maxit iterations (unless convergence or failure)
 
-for ii = 1 : maxit
+for ii = uint32(1) : uint32(maxit)
     % no preconditioner
     if existM1
        y = M1 \ double(r);
@@ -162,7 +171,7 @@ for ii = 1 : maxit
     
     
     rho1 = rho;
-    rho = r' * z;
+    rho = r' * double(z);
     if ((rho == 0) || isinf(rho))
         flag = 4;
         break
@@ -175,10 +184,10 @@ for ii = 1 : maxit
             flag = 4;
             break
         end
-        p = z + beta * p;
+        p = single(double(z) + beta * double(p));
     end
     q = A*p;
-    pq = p' * q;
+    pq = double(p') * double(q);
     if ((pq <= 0) || isinf(pq))
         flag = 4;
         break
@@ -191,27 +200,27 @@ for ii = 1 : maxit
     end
     
     % Check for stagnation of the method    
-    if (norm(p)*abs(alpha) < eps*norm(x))
+    if (norm(double(p))*abs(alpha) < eps*norm(double(x)))
         stag = stag + 1;
     else
-        stag = 0;
+        stag = uint32(0);
     end
     
-    x = x + alpha * p;             % form new iterate
-    r = r - alpha * q;
+    x = single(double(x) + alpha * double(p));             % form new iterate
+    r = r - alpha * double(q);
     normr = norm(r);
     normr_act = normr;
     
     % check for convergence
     if (normr <= tolb || stag >= maxstagsteps || moresteps)
-        r = b - A*x;
+        r = double(b) - sparse(A)*double(x);
         normr_act = norm(r);
         if (normr_act <= tolb)
             flag = 0;
             break
         else
             if stag >= maxstagsteps && moresteps == 0
-                stag = 0;
+                stag = uint32(0);
             end
             moresteps = moresteps + 1;
             if moresteps >= maxmsteps
@@ -235,7 +244,7 @@ end
 
 % returned solution is first with minimal residual
 if (flag ~= 0)
-    r_comp = b - A*xmin;
+    r_comp = double(b) - sparse(A)*double(xmin);
     if norm(r_comp) <= normr_act
         x = xmin;
     end

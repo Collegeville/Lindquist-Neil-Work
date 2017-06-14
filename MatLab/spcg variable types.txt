@@ -1,0 +1,48 @@
+A		sparseSingle	assumed
+b		single			forced
+M1		sparse double	assumed sparse, forced double
+M2		sparse double	assumed sparse, forced double
+
+m		uint32			forced
+n		uint32			forced
+
+x0		NA				All uses cast to single
+x		single			forced
+xmin	single			forced
+r		double			forced
+
+y		double			forced
+z		single			forced
+p		single			forced
+q		single			forced
+
+r_comp	double			forced
+
+
+
+
+###### scalars ######
+#a few vars could be lower precision ints, but MatLab docs don't explain how
+#mixed precision int arithmetic works
+
+tol				double	forced
+maxit			uint32	forced
+n2b				double	forced
+existM1			logical	forced
+existM2			logical	forced
+flag			???		ignored
+tolb			double	forced
+normr			double	forced
+normr_act		double	forced
+normrmin		double	forced
+rho				double	forced
+stag			uint32	forced
+moresteps		uint32	forced
+maxmsteps		uint32	forced
+maxstagsteps	uint32	forced
+ii				uint32	forced
+rho1			double	forced
+beta			double	forced
+pq				double	forced
+alpha			double	forced
+warned			logical	forced
