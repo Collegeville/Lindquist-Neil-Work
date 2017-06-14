@@ -40,7 +40,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
             row++;
             nextEnd = Ar[row+1]-1;
         }
-        temp += Av[i]*x[Ac[i]-1];
+        temp += (double)Av[i] * (double)x[Ac[i]-1];
         i++;
     }
     rawB[row] = (float)temp;
