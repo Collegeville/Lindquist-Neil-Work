@@ -150,7 +150,7 @@ maxstagsteps = uint32(3);
 for ii = uint32(1) : uint32(maxit)
     % no preconditioner
     if existM1
-       y = M1 \ double(r);
+       y = M1 \ r;
        if ~all(isfinite(y))
            flag = 2;
            break;
@@ -187,7 +187,7 @@ for ii = uint32(1) : uint32(maxit)
         p = single(double(z) + beta * double(p));
     end
     q = A*p;
-    pq = double(p') * double(q);
+    pq = dotProdSS(p, q);
     if ((pq <= 0) || isinf(pq))
         flag = 4;
         break
