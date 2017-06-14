@@ -65,7 +65,7 @@ end
 if (nargin < 3) || isempty(tol)
     tol = 1e-6;
 else
-    tol = double(tol)
+    tol = double(tol);
 end
 warned = false;
 if tol <= eps
@@ -130,7 +130,7 @@ end
 flag = 1;
 xmin = x;                          % Iterate which has minimal residual so far
 tolb = tol * n2b;                  % Relative tolerance
-r = double(b) - sparse(A)*double(x);
+r = residual(b, A.rows, A.cols, A.vals, x);%double(b) - sparse(A)*double(x);
 normr = norm(r);                   % Norm of residual
 normr_act = normr;
 
@@ -213,7 +213,7 @@ for ii = uint32(1) : uint32(maxit)
     
     % check for convergence
     if (normr <= tolb || stag >= maxstagsteps || moresteps)
-        r = double(b) - sparse(A)*double(x);
+        r = residual(b, A.rows, A.cols, A.vals, x); %double(b) - sparse(A)*double(x);
         normr_act = norm(r);
         if (normr_act <= tolb)
             flag = 0;
@@ -244,7 +244,7 @@ end
 
 % returned solution is first with minimal residual
 if (flag ~= 0)
-    r_comp = double(b) - sparse(A)*double(xmin);
+    r_comp = residual(b, A.rows, A.cols, A.vals, xmin);%double(b) - sparse(A)*double(xmin);
     if norm(r_comp) <= normr_act
         x = xmin;
     end
