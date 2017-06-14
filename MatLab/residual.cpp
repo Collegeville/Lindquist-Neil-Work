@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 void mexFunction(int nlhs, mxArray *plhs[],
-				 int nrhs, mxArray *prhs[]){
+				 int nrhs, const mxArray *prhs[]){
 
 	if(nrhs != 5){
 		mexErrMsgIdAndTxt("Neil:residual:InvalidArgCount", "Exactly 5 arguments are required");
@@ -44,7 +44,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
 	const size_t n   = mxGetM(x);
 	const size_t nnz = mxGetM(Av);
 
-	mxArray *r = mxCreateUninitNumericalMatrix(m, 1, mxDOUBLE_CLASS, mxREAL);
+	mxArray *r = mxCreateUninitNumericMatrix(m, 1, mxDOUBLE_CLASS, mxREAL);
 	double *rawR = mxGetPr(r);
 
 	//0-indexed value indexes
@@ -56,15 +56,15 @@ void mexFunction(int nlhs, mxArray *plhs[],
 	uint32_t i = 0;
 	while(i < nnz){
 		if(i == nextEnd){
-			rawR[row] = (float)(rawB[row]-temp);
+			rawR[row] = rawB[row]-temp;
 			temp = 0;
 			row++;
 			nextEnd = rawAr[row+1]-1;
 		}
-		temp += rawAv[i]*rawX[rawAc[i]-1];
+		temp += (double)rawAv[i]*(double)rawX[rawAc[i]-1];
 		i++;
 	}
-	rawR[row] = (float)(rawB[row]-temp);
+	rawR[row] = rawB[row]-temp;
 
 	plhs[0] = r;
 }
