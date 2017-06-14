@@ -84,7 +84,7 @@ else
 end
 
 % Check for all zero right hand side vector => all zero solution
-n2b = norm(double(b));                     % Norm of rhs vector, b
+n2b = normS(b);                     % Norm of rhs vector, b
 if (n2b == 0)                      % if    rhs vector is all zeros
     x = zeros(n,1);                % then  solution is all zeros
     return
@@ -200,7 +200,7 @@ for ii = uint32(1) : uint32(maxit)
     end
     
     % Check for stagnation of the method    
-    if (norm(double(p))*abs(alpha) < eps*norm(double(x)))
+    if (normS(p)*abs(alpha) < eps*normS(x))
         stag = stag + 1;
     else
         stag = uint32(0);
