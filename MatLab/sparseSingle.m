@@ -127,14 +127,14 @@ classdef sparseSingle
             
             % Computes the matrix-vector product or matrix-scalar product
 
-            if isscalar(x)
+            [aRows, aCols] = size(A, 2);
+            [xRows, xCols] = size(x);
+            
+            if xRows == 1 && xCols == 1
                 b = sparseSingle(A.rows(1:length(A.rows)-1), A.cols(), A.vals*x, A.m, A.n);
-            elseif isscalar(A);
+            elseif aRows == 1 && aCols == 1
                 b = sparseSingle(x.rows(1:length(x.rows)-1), x.cols(), x.vals*A, x.m, x.n);
             else
-            
-                [aRows, aCols] = size(A);
-                [xRows, xCols] = size(x);
 
                 if aCols ~= xRows
                     error('Inner matrix dimensions must agree.');
@@ -145,8 +145,7 @@ classdef sparseSingle
 
 
 
-                b = singleMatvec(uint32(aRows), uint32(aCols), uint32(nnz(A)), ...
-                        A.rows, A.cols, A.vals, single(x));
+                b = singleMatvec(A.rows, A.cols, A.vals, single(x));
                 
                     
 %                 r = A.rows;
