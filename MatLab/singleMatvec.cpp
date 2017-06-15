@@ -21,30 +21,36 @@ void mexFunction(int nlhs, mxArray *plhs[],
 	const uint32_t *Ac = (uint32_t*)mxGetData(prhs[1]);
 	const float *Av = (float*)mxGetData(prhs[2]);
 	
-	const float *x  = (float*)mxGetData(prhs[3]);
+	const float *x  = (float*)mxGetData(prhs[3])-1;
 
-    const size_t Am   = mxGetM(prhs[0])-1;
+    const size_t Am = mxGetM(prhs[0])-1;
     
     mxArray *b = mxCreateUninitNumericMatrix(Am, 1, mxSINGLE_CLASS, mxREAL);
     plhs[0] = b;
     float *rawB = (float*)mxGetData(b);    
     
-    uint32_t nextEnd = Ar[1]-1;
     double temp = 0;
-    uint32_t i = 0;
-    uint32_t row = 0;
-    while(row != Am){
-        if(i == nextEnd){
+    //0-indexed row-index
+    uint32_t row = Am-1;
+    //1-indexed el-index
+    uint32_t nextEnd = Ar[row];
+    //1-indexed el-index
+    uint32_t i = Ar[row+1]-1;
+    while(i > 0){
+        if(i < nextEnd){
             rawB[row] = (float)temp;
-            ++row;
-            nextEnd = Ar[row+1]-1;
+            --row;
+            nextEnd = Ar[row];
             temp = 0;
         }else{
-            temp += (double)Av[i] * (double)x[Ac[i]-1];
-            ++i;
+            --i;
+            temp += (double)Av[i] * (double)x[Ac[i]];
         }
     }
     rawB[row] = (float)temp;
+    while(row > 0){
+        rawB[--row] = 0;
+    }
 }
 
 

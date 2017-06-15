@@ -127,7 +127,7 @@ classdef sparseSingle
             
             % Computes the matrix-vector product or matrix-scalar product
 
-            [aRows, aCols] = size(A, 2);
+            [aRows, aCols] = size(A);
             [xRows, xCols] = size(x);
             
             if xRows == 1 && xCols == 1
