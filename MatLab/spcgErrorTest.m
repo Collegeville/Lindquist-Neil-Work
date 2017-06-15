@@ -8,6 +8,9 @@ end
 index = UFget();
 
 
+TARGET_ERR = 1e-5;
+
+
 %%%%%% single system %%%%%%%%
 problemList = [1580,   1581,  1582,  1583,  1584,  1585,  1853,  1909,  1919,  2283];
 problemAlphas=[.0001   .0001  .0001  .0001  .0001  .0001  .0001  .0001  .0001   .01];
@@ -38,14 +41,14 @@ for i = 1:length(problemList)
     b = prob.b;
 	sb = single(full(b));
 
-	[x, doubleFlags] = pcg(prob.A, b, 1e-6, 260, L1, L1T);
-	sx = spcg(sA, sb, 1e-6, 260, L1, L1T);
+	[x, ~, ~, dIter] = pcg(prob.A, b, TARGET_ERR, 400, L1, L1T);
+	[sx, sIter] = spcg(sA, sb, TARGET_ERR, 400, L1, L1T);
 
 	doubleErr = norm(b-prob.A*x);
     singleErr = norm(b-prob.A*double(sx));
 
 	disp(p);
-	save(['pcg results - ' num2str(p) '.mat'], 'doubleErr', 'singleErr', 'doubleFlags');	
+	save(['pcg results - ' num2str(p) '.mat'], 'doubleErr', 'singleErr', 'dIter', 'sIter', 'TARGET_ERR');	
 end
 
 
@@ -66,21 +69,26 @@ if continuation && exist('pcg results - 1850.mat', 'file') == 2
 	load('pcg results - 1850.mat')
 	disp(['loaded ' num2str(i-1) ' previous calculations']);
 else
-	doubleErr = zeros(problemCount, 1);
-	singleErr = zeros(problemCount, 1);
+	doubleErr = zeros(20, 1);
+	singleErr = zeros(20, 1);
 	i = 1;
+    dIter = zeros(20, 1);
+    sIter = zeros(20, 1);
 end
 while i <= problemCount
-    b = prob.b(:, i);
+    b = full(prob.b(:, i));
     sb = single(full(b));
     
-    [x, ~] = pcg(prob.A, b, 1e-6, 400, L1, L1T);
-    sx = spcg(sA, sb, 1e-06, 400, L1, L1T);
+    [x, ~, ~, dI] = pcg(prob.A, b, TARGET_ERR, 400, L1, L1T);
+    [sx, sI] = spcg(sA, sb, TARGET_ERR, 400, L1, L1T);
     
     doubleErr(i) = norm(b-prob.A*x);
     singleErr(i) = norm(b-prob.A*double(sx));
     
+    dIter(i) = dI;
+    sIter(i) = sI;
+    
     disp(i);
     i = i+1;
-    save('pcg results - 1850.mat', 'doubleErr', 'singleErr', 'i')
+    save('pcg results - 1850.mat', 'doubleErr', 'singleErr', 'i', 'TARGET_ERR', 'dIter', 'sIter')
 end

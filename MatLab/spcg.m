@@ -1,4 +1,4 @@
-function [x] = spcg(A,b,tol,maxit,M1,M2,x0)
+function [x, iter] = spcg(A,b,tol,maxit,M1,M2,x0)
 %SPCG   Sparse Preconditioned Conjugate Gradients Method.
 %   X = SPCG(A,B) attempts to solve the system of linear equations A*X=B for
 %   X. The N-by-N coefficient matrix A must be symmetric and positive
@@ -241,6 +241,8 @@ for ii = uint32(1) : uint32(maxit)
         break;
     end
 end
+
+iter = ii;
 
 % returned solution is first with minimal residual
 if (flag ~= 0)
