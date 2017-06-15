@@ -1,0 +1,14 @@
+1580 Schenk_AFE/af_0_k101		- 1 system
+1581 Schenk_AFE/af_1_k101		- 1 system
+1582 Schenk_AFE/af_2_k101		- 1 system
+1583 Schenk_AFE/af_3_k101		- 1 system
+1584 Schenk_AFE/af_4_k101		- 1 system
+1585 Schenk_AFE/af_5_k101		- 1 system
+1853 Wissgott/parabolic_fem		- 1 system
+1909 TKK/smt					- 1 system
+1919 Um/2cubes_sphere			- 1 system
+2283 Um/offshore				- 1 system
+			
+
+
+1850 BenElechi/BenElechi1  		- 40,543 systems
