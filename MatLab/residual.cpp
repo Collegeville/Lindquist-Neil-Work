@@ -38,35 +38,30 @@ void mexFunction(int nlhs, mxArray *plhs[],
 	const float *rawAv = (float*)mxGetData(Av);
 
 	const mxArray *x  = prhs[4];
-	const float *rawX = (float*)mxGetData(x);
+	const float *rawX = ((float*)mxGetData(x))-1;
 
 	const size_t m   = mxGetM(Ar)-1;
-	const size_t n   = mxGetM(x);
-	const size_t nnz = mxGetM(Av);
 
 	mxArray *r = mxCreateUninitNumericMatrix(m, 1, mxDOUBLE_CLASS, mxREAL);
+    plhs[0] = r;
 	double *rawR = mxGetPr(r);
-
-	//0-indexed value indexes
-	uint32_t nextEnd = rawAr[1]-1;
-	//0-indexed row indexes
-	uint32_t row = 0;
-	double temp;
-	//0-indexed value indexes
-	uint32_t i = 0;
-	while(i < nnz){
-		if(i == nextEnd){
-			rawR[row] = rawB[row]-temp;
-			temp = 0;
-			row++;
-			nextEnd = rawAr[row+1]-1;
-		}
-		temp += (double)rawAv[i]*(double)rawX[rawAc[i]-1];
-		i++;
-	}
-	rawR[row] = rawB[row]-temp;
-
-	plhs[0] = r;
+    
+    //0-indexed row-index
+    uint32_t row = m;
+    //0-indexed el-index of the value "before" i (i+1)
+    uint32_t start = rawAr[row]-1;
+    while(row-- > 0){
+        double temp = 0;
+        //0-indexed el-index of i's last value
+        uint32_t end = rawAr[row]-1;
+        //i is 1-indexed el-index
+        for(uint32_t i = start; i-- > end;){
+        	//i switches to 0-index el-index
+            temp += (double)rawAv[i] * (double)rawX[rawAc[i]];
+        }
+        rawR[row] = (double)rawB[row] - temp;
+        start = end;
+    }
 }
 
 #ifdef __cplusplus
