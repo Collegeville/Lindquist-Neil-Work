@@ -34,27 +34,21 @@ void mexFunction(int nlhs, mxArray *plhs[],
     plhs[0] = b;
     double *rawB = mxGetPr(b);    
     
-    double temp = 0;
     //0-indexed row-index
-    mwIndex row = Am-1;
-    //0-indexed el-index
-    mwIndex nextEnd = Ar[row];
-    //1-indexed el-index
-    mwIndex i = Ar[row+1];
-    while(i > 0){
-        if(i <= nextEnd){
-            rawB[row] = temp;
-            --row;
-            nextEnd = Ar[row];
-            temp = 0;
-        }else{
-            --i;
+    mwIndex row = Am;
+    
+    mwIndex start = Ar[row];
+    while(row-- > 0){
+        double temp = 0;
+        //0-indexed el-index of i's last value
+        mwIndex end = Ar[row];
+        //i is 1-indexed el-index
+        for(mwIndex i = start; i-- > end;){
+        	//i switches to 0-index el-index
             temp += Av[i] * x[Ac[i]];
         }
-    }
-    rawB[row] = temp;
-    while(row > 0){
-        rawB[--row] = 0;
+        rawB[row] = temp;
+        start = end;
     }
 }
 
