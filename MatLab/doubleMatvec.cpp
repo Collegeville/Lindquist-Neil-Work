@@ -19,13 +19,16 @@ void mexFunction(int nlhs, mxArray *plhs[],
     
 	const mxArray *A = prhs[0];
     
-    mwIndex *Ac = mxGetIr(A);
-    mwIndex *Ar = mxGetJc(A);
-    double  *Av = mxGetPr(A);
+    //0-indexed
+    const mwIndex *Ac = mxGetIr(A);
+    //0-indexed
+    const mwIndex *Ar = mxGetJc(A);
+    const double  *Av = mxGetPr(A);
 	
-	const double *x  = (double*)mxGetData(prhs[1])-1;
+	//0 indexed
+	const double *x  = mxGetPr(prhs[1]);
     
-    const size_t Am = mxGetM(A);
+    const size_t Am = mxGetN(A);
     
     mxArray *b = mxCreateUninitNumericMatrix(Am, 1, mxDOUBLE_CLASS, mxREAL);
     plhs[0] = b;
@@ -34,12 +37,12 @@ void mexFunction(int nlhs, mxArray *plhs[],
     double temp = 0;
     //0-indexed row-index
     mwIndex row = Am-1;
-    //1-indexed el-index
+    //0-indexed el-index
     mwIndex nextEnd = Ar[row];
     //1-indexed el-index
-    mwIndex i = Ar[row+1]-1;
+    mwIndex i = Ar[row+1];
     while(i > 0){
-        if(i < nextEnd){
+        if(i <= nextEnd){
             rawB[row] = temp;
             --row;
             nextEnd = Ar[row];

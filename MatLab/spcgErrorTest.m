@@ -41,7 +41,7 @@ for i = 1:length(problemList)
     b = prob.b;
 	sb = single(full(b));
 
-	[x, ~, ~, dIter] = pcg(prob.A, b, TARGET_ERR, 400, L1, L1T);
+	[x, ~, ~, dIter] = dpcg(prob.A, b, TARGET_ERR, 400, L1, L1T);
 	[sx, sIter] = spcg(sA, sb, TARGET_ERR, 400, L1, L1T);
 
 	doubleErr = norm(b-prob.A*x);
@@ -79,7 +79,7 @@ while i <= problemCount
     b = full(prob.b(:, i));
     sb = single(full(b));
     
-    [x, ~, ~, dI] = pcg(prob.A, b, TARGET_ERR, 400, L1, L1T);
+    [x, ~, ~, dI] = dpcg(prob.A, b, TARGET_ERR, 400, L1, L1T);
     [sx, sI] = spcg(sA, sb, TARGET_ERR, 400, L1, L1T);
     
     doubleErr(i) = norm(b-prob.A*x);
