@@ -11,6 +11,5 @@
     - dIter contains the number of iterations required for the double version to converge (or get stuck)
     - sIter contains the number of iterations required for the single version to converge (or get stuck) 
     - normedErr contains the result of spcgErrNormalize 
-
- 
+ - "MatLab/Results/spcg versus dpcg timing.txt" contains the results of profiling the implementations.
  

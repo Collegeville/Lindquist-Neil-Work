@@ -1,0 +1,56 @@
+max iterations 400
+requested tolarence 1e-6
+problems 1580 - 1585
+
+--total computation time--
+dpcg - 6 calls, 143.398s
+spcg - 6 calls, 144.144s
+
+0.520% increase
+
+
+--q=A*p--
+dcpg - 473 executions, 16.181s
+scpg - 504 executions, 15.986s
+
+1.205% decrease overall
+7.282% decrease normalized for number of calls
+
+--*Matvec.cpp--
+dcpg - 485 calls, 16.615s
+scpg - 504 calls, 15.966s
+
+7.529% decrease normalized for number of calls
+
+# overall decrease isn't totally accurate (and as such ignored), due to spcg using residual.cpp for some calls that dpcg uses doubleMatvec for
+
+
+
+-------------------------------------------------------------
+
+max iterations 400
+requested tolarence 1e-6
+problems 1853, 1909, 1919, 2283
+
+--total computation time--
+dpcg - 4 calls, 9.304s
+spcg - 4 calls, 10.175s
+
+9.362% increase
+
+
+--q=A*p--
+dcpg - 101 executions, 0.935s
+scpg - 111 executions, 1.130s
+
+20.856% increase overall
+ 9.968% increase normalized for number of calls
+
+--*Matvec.cpp--
+dcpg - 109 calls, 0.995s
+scpg - 111 calls, 1.126s
+
+11.127% increase normalized for number of calls
+
+# overall decrease isn't totally accurate (and as such ignored), due to spcg using residual.cpp for some calls that dpcg uses doubleMatvec for
+
