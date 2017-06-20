@@ -70,7 +70,7 @@ TOUCH        = touch
 # - HPCG Directory Structure / HPCG library ------------------------------
 # ----------------------------------------------------------------------
 #
-TOPdir       = .
+TOPdir       = ..
 SRCdir       = $(TOPdir)/src
 INCdir       = $(TOPdir)/src
 BINdir       = $(TOPdir)/bin
