@@ -16,5 +16,5 @@
 #define GENERATECOARSEPROBLEM_HPP
 #include "SparseMatrix.hpp"
 
-void GenerateCoarseProblem(const SparseMatrix & A);
+void GenerateCoarseProblem(const SparseMatrix<float> & A);
 #endif // GENERATECOARSEPROBLEM_HPP

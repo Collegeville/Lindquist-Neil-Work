@@ -36,7 +36,9 @@ typedef std::map< global_int_t, local_int_t > GlobalToLocalMap;
 using GlobalToLocalMap = std::unorderd_map< global_int_t, local_int_t >;
 #endif
 
-struct SparseMatrix_STRUCT {
+
+template<class datatype>
+struct SparseMatrix {
   char  * title; //!< name of the sparse matrix
   Geometry * geom; //!< geometry associated with this matrix
   global_int_t totalNumberOfRows; //!< total number of matrix rows across all processes
@@ -47,8 +49,8 @@ struct SparseMatrix_STRUCT {
   char  * nonzerosInRow;  //!< The number of nonzeros in a row will always be 27 or fewer
   global_int_t ** mtxIndG; //!< matrix indices as global values
   local_int_t ** mtxIndL; //!< matrix indices as local values
-  double ** matrixValues; //!< values of matrix entries
-  double ** matrixDiagonal; //!< values of matrix diagonal entries
+  datatype ** matrixValues; //!< values of matrix entries
+  datatype ** matrixDiagonal; //!< values of matrix diagonal entries
   GlobalToLocalMap globalToLocalMap; //!< global-to-local mapping
   std::vector< global_int_t > localToGlobalMap; //!< local-to-global mapping
   mutable bool isDotProductOptimized;
@@ -59,7 +61,7 @@ struct SparseMatrix_STRUCT {
    This is for storing optimized data structres created in OptimizeProblem and
    used inside optimized ComputeSPMV().
    */
-  mutable struct SparseMatrix_STRUCT * Ac; // Coarse grid matrix
+  mutable SparseMatrix<datatype> * Ac; // Coarse grid matrix
   mutable MGData * mgData; // Pointer to the coarse level data for this fine matrix
   void * optimizationData;  // pointer that can be used to store implementation-specific data
 
@@ -71,17 +73,19 @@ struct SparseMatrix_STRUCT {
   int * neighbors; //!< neighboring processes
   local_int_t * receiveLength; //!< lenghts of messages received from neighboring processes
   local_int_t * sendLength; //!< lenghts of messages sent to neighboring processes
-  double * sendBuffer; //!< send buffer for non-blocking sends
+  datatype * sendBuffer; //!< send buffer for non-blocking sends
 #endif
 };
-typedef struct SparseMatrix_STRUCT SparseMatrix;
+//typedef struct SparseMatrix_STRUCT<double> SparseMatrix;
+//typedef struct SparseMatrix_STRUCT<float> SparseMatricF;
 
 /*!
   Initializes the known system matrix data structure members to 0.
 
   @param[in] A the known system matrix
  */
-inline void InitializeSparseMatrix(SparseMatrix & A, Geometry * geom) {
+template<class datatype>
+inline void InitializeSparseMatrix(SparseMatrix<datatype> & A, Geometry * geom) {
   A.title = 0;
   A.geom = geom;
   A.totalNumberOfRows = 0;
@@ -123,9 +127,10 @@ inline void InitializeSparseMatrix(SparseMatrix & A, Geometry * geom) {
   @param[in] A the known system matrix.
   @param[inout] diagonal  Vector of diagonal values (must be allocated before call to this function).
  */
-inline void CopyMatrixDiagonal(SparseMatrix & A, Vector & diagonal) {
-    double ** curDiagA = A.matrixDiagonal;
-    double * dv = diagonal.values;
+template<class datatype>
+inline void CopyMatrixDiagonal(SparseMatrix<datatype> & A, Vector<datatype> & diagonal) {
+    datatype ** curDiagA = A.matrixDiagonal;
+    datatype * dv = diagonal.values;
     assert(A.localNumberOfRows==diagonal.localLength);
     for (local_int_t i=0; i<A.localNumberOfRows; ++i) dv[i] = *(curDiagA[i]);
   return;
@@ -136,9 +141,11 @@ inline void CopyMatrixDiagonal(SparseMatrix & A, Vector & diagonal) {
   @param[inout] A The system matrix.
   @param[in] diagonal  Vector of diagonal values that will replace existing matrix diagonal values.
  */
-inline void ReplaceMatrixDiagonal(SparseMatrix & A, Vector & diagonal) {
-    double ** curDiagA = A.matrixDiagonal;
-    double * dv = diagonal.values;
+template<class datatype>
+inline void ReplaceMatrixDiagonal(SparseMatrix<datatype> & A,
+                                  Vector<datatype> & diagonal) {
+    datatype ** curDiagA = A.matrixDiagonal;
+    datatype * dv = diagonal.values;
     assert(A.localNumberOfRows==diagonal.localLength);
     for (local_int_t i=0; i<A.localNumberOfRows; ++i) *(curDiagA[i]) = dv[i];
   return;
@@ -148,7 +155,8 @@ inline void ReplaceMatrixDiagonal(SparseMatrix & A, Vector & diagonal) {
 
   @param[in] A the known system matrix
  */
-inline void DeleteMatrix(SparseMatrix & A) {
+template<class datatype>
+inline void DeleteMatrix(SparseMatrix<datatype> & A) {
 
 #ifndef HPCG_CONTIGUOUS_ARRAYS
   for (local_int_t i = 0; i< A.localNumberOfRows; ++i) {

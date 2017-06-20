@@ -38,7 +38,7 @@
 
 */
 
-void GenerateCoarseProblem(const SparseMatrix & Af) {
+void GenerateCoarseProblem(const SparseMatrix<float> & Af) {
 
   // Make local copies of geometry information.  Use global_int_t since the RHS products in the calculations
   // below may result in global range values.
@@ -92,13 +92,13 @@ void GenerateCoarseProblem(const SparseMatrix & Af) {
   }
   GenerateGeometry(Af.geom->size, Af.geom->rank, Af.geom->numThreads, Af.geom->pz, zlc, zuc, nxc, nyc, nzc, Af.geom->npx, Af.geom->npy, Af.geom->npz, geomc);
 
-  SparseMatrix * Ac = new SparseMatrix;
+  SparseMatrix<float> * Ac = new SparseMatrix<float>;
   InitializeSparseMatrix(*Ac, geomc);
   GenerateProblem(*Ac, 0, 0, 0);
   SetupHalo(*Ac);
-  Vector *rc = new Vector;
-  Vector *xc = new Vector;
-  Vector * Axf = new Vector;
+  Vector<double> *rc = new Vector<double>;
+  Vector<float> *xc = new Vector<float>;
+  Vector<double> * Axf = new Vector<double>;
   InitializeVector(*rc, Ac->localNumberOfRows);
   InitializeVector(*xc, Ac->localNumberOfColumns);
   InitializeVector(*Axf, Af.localNumberOfColumns);

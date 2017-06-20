@@ -47,7 +47,7 @@ using std::endl;
   @see GenerateGeometry
 */
 
-void CheckProblem(SparseMatrix & A, Vector * b, Vector * x, Vector * xexact) {
+void CheckProblem(SparseMatrix<float> & A, Vector<float> * b, Vector<float> * x, Vector<float> * xexact) {
 
   // Make local copies of geometry information.  Use global_int_t since the RHS products in the calculations
   // below may result in global range values.
@@ -64,9 +64,9 @@ void CheckProblem(SparseMatrix & A, Vector * b, Vector * x, Vector * xexact) {
   local_int_t localNumberOfRows = nx*ny*nz; // This is the size of our subblock
   global_int_t totalNumberOfRows = gnx*gny*gnz; // Total number of grid points in mesh
 
-  double * bv = 0;
-  double * xv = 0;
-  double * xexactv = 0;
+  float * bv = 0;
+  float * xv = 0;
+  float * xexactv = 0;
   if (b!=0) bv = b->values; // Only compute exact solution if requested
   if (x!=0) xv = x->values; // Only compute exact solution if requested
   if (xexact!=0) xexactv = xexact->values; // Only compute exact solution if requested
@@ -89,7 +89,7 @@ void CheckProblem(SparseMatrix & A, Vector * b, Vector * x, Vector * xexact) {
         HPCG_fout << " rank, globalRow, localRow = " << A.geom->rank << " " << currentGlobalRow << " " << A.globalToLocalMap[currentGlobalRow] << endl;
 #endif
         char numberOfNonzerosInRow = 0;
-        double * currentValuePointer = A.matrixValues[currentLocalRow]; // Pointer to current value in current row
+        float * currentValuePointer = A.matrixValues[currentLocalRow]; // Pointer to current value in current row
         global_int_t * currentIndexPointerG = A.mtxIndG[currentLocalRow]; // Pointer to current index in current row
         for (int sz=-1; sz<=1; sz++) {
           if (giz+sz>-1 && giz+sz<gnz) {

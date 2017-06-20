@@ -47,8 +47,8 @@ HPCG_DEPS = src/CG.o \
 	    src/finalize.o
 
 # These header files are included in many source files, so we recompile every file if one or more of these header is modified.
-PRIMARY_HEADERS = ../$(INCdir)/Geometry.hpp ../$(INCdir)/SparseMatrix.hpp ../$(INCdir)/Vector.hpp ../$(INCdir)/CGData.hpp \
-                  ../$(INCdir)/MGData.hpp ../$(INCdir)/hpcg.hpp
+PRIMARY_HEADERS = $(INCdir)/Geometry.hpp $(INCdir)/SparseMatrix.hpp $(INCdir)/Vector.hpp \
+                  $(INCdir)/CGData.hpp $(INCdir)/MGData.hpp $(INCdir)/hpcg.hpp
 
 all: bin/xhpcg
 
@@ -60,123 +60,123 @@ clean:
 
 .PHONY: all clean
 
-src/main.o: ../src/main.cpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/main.o: $(SRCdir)/main.cpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/CG.o: ../src/CG.cpp ../src/CG.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/CG.o: $(SRCdir)/CG.cpp $(SRCdir)/CG.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/CG_ref.o: ../src/CG_ref.cpp ../src/CG_ref.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/CG_ref.o: $(SRCdir)/CG_ref.cpp $(SRCdir)/CG_ref.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/TestCG.o: ../src/TestCG.cpp ../src/TestCG.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/TestCG.o: $(SRCdir)/TestCG.cpp $(SRCdir)/TestCG.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/ComputeResidual.o: ../src/ComputeResidual.cpp ../src/ComputeResidual.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/ComputeResidual.o: $(SRCdir)/ComputeResidual.cpp $(SRCdir)/ComputeResidual.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/ExchangeHalo.o: ../src/ExchangeHalo.cpp ../src/ExchangeHalo.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/ExchangeHalo.o: $(SRCdir)/ExchangeHalo.cpp $(SRCdir)/ExchangeHalo.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/GenerateGeometry.o: ../src/GenerateGeometry.cpp ../src/GenerateGeometry.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/GenerateGeometry.o: $(SRCdir)/GenerateGeometry.cpp $(SRCdir)/GenerateGeometry.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/GenerateProblem.o: ../src/GenerateProblem.cpp ../src/GenerateProblem.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/GenerateProblem.o: $(SRCdir)/GenerateProblem.cpp $(SRCdir)/GenerateProblem.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/GenerateProblem_ref.o: ../src/GenerateProblem_ref.cpp ../src/GenerateProblem_ref.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/GenerateProblem_ref.o: $(SRCdir)/GenerateProblem_ref.cpp $(SRCdir)/GenerateProblem_ref.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/CheckProblem.o: ../src/CheckProblem.cpp ../src/CheckProblem.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/CheckProblem.o: $(SRCdir)/CheckProblem.cpp $(SRCdir)/CheckProblem.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/MixedBaseCounter.o: ../src/MixedBaseCounter.cpp ../src/MixedBaseCounter.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/MixedBaseCounter.o: $(SRCdir)/MixedBaseCounter.cpp $(SRCdir)/MixedBaseCounter.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/OptimizeProblem.o: ../src/OptimizeProblem.cpp ../src/OptimizeProblem.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/OptimizeProblem.o: $(SRCdir)/OptimizeProblem.cpp $(SRCdir)/OptimizeProblem.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/ReadHpcgDat.o: ../src/ReadHpcgDat.cpp ../src/ReadHpcgDat.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/ReadHpcgDat.o: $(SRCdir)/ReadHpcgDat.cpp $(SRCdir)/ReadHpcgDat.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/ReportResults.o: ../src/ReportResults.cpp ../src/ReportResults.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/ReportResults.o: $(SRCdir)/ReportResults.cpp $(SRCdir)/ReportResults.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/SetupHalo.o: ../src/SetupHalo.cpp ../src/SetupHalo.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/SetupHalo.o: $(SRCdir)/SetupHalo.cpp $(SRCdir)/SetupHalo.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/SetupHalo_ref.o: ../src/SetupHalo_ref.cpp ../src/SetupHalo_ref.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/SetupHalo_ref.o: $(SRCdir)/SetupHalo_ref.cpp $(SRCdir)/SetupHalo_ref.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/TestSymmetry.o: ../src/TestSymmetry.cpp ../src/TestSymmetry.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/TestSymmetry.o: $(SRCdir)/TestSymmetry.cpp $(SRCdir)/TestSymmetry.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/TestNorms.o: ../src/TestNorms.cpp ../src/TestNorms.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/TestNorms.o: $(SRCdir)/TestNorms.cpp $(SRCdir)/TestNorms.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/WriteProblem.o: ../src/WriteProblem.cpp ../src/WriteProblem.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/WriteProblem.o: $(SRCdir)/WriteProblem.cpp $(SRCdir)/WriteProblem.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/YAML_Doc.o: ../src/YAML_Doc.cpp ../src/YAML_Doc.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/YAML_Doc.o: $(SRCdir)/YAML_Doc.cpp $(SRCdir)/YAML_Doc.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/YAML_Element.o: ../src/YAML_Element.cpp ../src/YAML_Element.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/YAML_Element.o: $(SRCdir)/YAML_Element.cpp $(SRCdir)/YAML_Element.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/ComputeDotProduct.o: ../src/ComputeDotProduct.cpp ../src/ComputeDotProduct.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/ComputeDotProduct.o: $(SRCdir)/ComputeDotProduct.cpp $(SRCdir)/ComputeDotProduct.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/ComputeDotProduct_ref.o: ../src/ComputeDotProduct_ref.cpp ../src/ComputeDotProduct_ref.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/ComputeDotProduct_ref.o: $(SRCdir)/ComputeDotProduct_ref.cpp $(SRCdir)/ComputeDotProduct_ref.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/finalize.o: ../src/finalize.cpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/finalize.o: $(SRCdir)/finalize.cpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/init.o: ../src/init.cpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/init.o: $(SRCdir)/init.cpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/mytimer.o: ../src/mytimer.cpp ../src/mytimer.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/mytimer.o: $(SRCdir)/mytimer.cpp $(SRCdir)/mytimer.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/ComputeOptimalShapeXYZ.o: ../src/ComputeOptimalShapeXYZ.cpp ../src/ComputeOptimalShapeXYZ.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/ComputeOptimalShapeXYZ.o: $(SRCdir)/ComputeOptimalShapeXYZ.cpp $(SRCdir)/ComputeOptimalShapeXYZ.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/ComputeSPMV.o: ../src/ComputeSPMV.cpp ../src/ComputeSPMV.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/ComputeSPMV.o: $(SRCdir)/ComputeSPMV.cpp $(SRCdir)/ComputeSPMV.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/ComputeSPMV_ref.o: ../src/ComputeSPMV_ref.cpp ../src/ComputeSPMV_ref.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/ComputeSPMV_ref.o: $(SRCdir)/ComputeSPMV_ref.cpp $(SRCdir)/ComputeSPMV_ref.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/ComputeSYMGS.o: ../src/ComputeSYMGS.cpp ../src/ComputeSYMGS.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/ComputeSYMGS.o: $(SRCdir)/ComputeSYMGS.cpp $(SRCdir)/ComputeSYMGS.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/ComputeSYMGS_ref.o: ../src/ComputeSYMGS_ref.cpp ../src/ComputeSYMGS_ref.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/ComputeSYMGS_ref.o: $(SRCdir)/ComputeSYMGS_ref.cpp $(SRCdir)/ComputeSYMGS_ref.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/ComputeWAXPBY.o: ../src/ComputeWAXPBY.cpp ../src/ComputeWAXPBY.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/ComputeWAXPBY.o: $(SRCdir)/ComputeWAXPBY.cpp $(SRCdir)/ComputeWAXPBY.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/ComputeWAXPBY_ref.o: ../src/ComputeWAXPBY_ref.cpp ../src/ComputeWAXPBY_ref.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/ComputeWAXPBY_ref.o: $(SRCdir)/ComputeWAXPBY_ref.cpp $(SRCdir)/ComputeWAXPBY_ref.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/ComputeMG_ref.o: ../src/ComputeMG_ref.cpp ../src/ComputeMG_ref.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/ComputeMG_ref.o: $(SRCdir)/ComputeMG_ref.cpp $(SRCdir)/ComputeMG_ref.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/ComputeMG.o: ../src/ComputeMG.cpp ../src/ComputeMG.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/ComputeMG.o: $(SRCdir)/ComputeMG.cpp $(SRCdir)/ComputeMG.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/ComputeProlongation_ref.o: ../src/ComputeProlongation_ref.cpp ../src/ComputeProlongation_ref.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/ComputeProlongation_ref.o: $(SRCdir)/ComputeProlongation_ref.cpp $(SRCdir)/ComputeProlongation_ref.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/ComputeRestriction_ref.o: ../src/ComputeRestriction_ref.cpp ../src/ComputeRestriction_ref.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/ComputeRestriction_ref.o: $(SRCdir)/ComputeRestriction_ref.cpp $(SRCdir)/ComputeRestriction_ref.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/GenerateCoarseProblem.o: ../src/GenerateCoarseProblem.cpp ../src/GenerateCoarseProblem.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/GenerateCoarseProblem.o: $(SRCdir)/GenerateCoarseProblem.cpp $(SRCdir)/GenerateCoarseProblem.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/CheckAspectRatio.o: ../src/CheckAspectRatio.cpp ../src/CheckAspectRatio.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/CheckAspectRatio.o: $(SRCdir)/CheckAspectRatio.cpp $(SRCdir)/CheckAspectRatio.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 
-src/OutputFile.o: ../src/OutputFile.cpp ../src/OutputFile.hpp $(PRIMARY_HEADERS)
-	$(CXX) -c $(CXXFLAGS) -I../src $< -o $@
+src/OutputFile.o: $(SRCdir)/OutputFile.cpp $(SRCdir)/OutputFile.hpp $(PRIMARY_HEADERS)
+	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
 

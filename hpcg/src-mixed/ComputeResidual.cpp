@@ -46,10 +46,11 @@
 
   @return Returns zero on success and a non-zero value otherwise.
 */
-int ComputeResidual(const local_int_t n, const Vector & v1, const Vector & v2, double & residual) {
+int ComputeResidual(const local_int_t n, const Vector<float> & v1,
+                    const Vector<float> & v2, double & residual) {
 
-  double * v1v = v1.values;
-  double * v2v = v2.values;
+  float * v1v = v1.values;
+  float * v2v = v2.values;
   double local_residual = 0.0;
 
 #ifndef HPCG_NO_OPENMP
@@ -68,7 +69,7 @@ int ComputeResidual(const local_int_t n, const Vector & v1, const Vector & v2, d
   }
 #else // No threading
   for (local_int_t i=0; i<n; i++) {
-    double diff = std::fabs(v1v[i] - v2v[i]);
+    double diff = std::fabs((double)v1v[i] - (double)v2v[i]);
     if (diff > local_residual) local_residual = diff;
 #ifdef HPCG_DETAILED_DEBUG
     HPCG_fout << " Computed, exact, diff = " << v1v[i] << " " << v2v[i] << " " << diff << std::endl;

@@ -47,7 +47,8 @@ using std::endl;
   @see GenerateGeometry
 */
 
-void GenerateProblem_ref(SparseMatrix & A, Vector * b, Vector * x, Vector * xexact) {
+void GenerateProblem_ref(SparseMatrix<float> & A, Vector<float> * b,
+                         Vector<float> * x, Vector<float> * xexact) {
 
   // Make local copies of geometry information.  Use global_int_t since the RHS products in the calculations
   // below may result in global range values.
@@ -75,15 +76,15 @@ void GenerateProblem_ref(SparseMatrix & A, Vector * b, Vector * x, Vector * xexa
   char * nonzerosInRow = new char[localNumberOfRows];
   global_int_t ** mtxIndG = new global_int_t*[localNumberOfRows];
   local_int_t  ** mtxIndL = new local_int_t*[localNumberOfRows];
-  double ** matrixValues = new double*[localNumberOfRows];
-  double ** matrixDiagonal = new double*[localNumberOfRows];
+  float ** matrixValues = new float*[localNumberOfRows];
+  float ** matrixDiagonal = new float*[localNumberOfRows];
 
   if (b!=0) InitializeVector(*b, localNumberOfRows);
   if (x!=0) InitializeVector(*x, localNumberOfRows);
   if (xexact!=0) InitializeVector(*xexact, localNumberOfRows);
-  double * bv = 0;
-  double * xv = 0;
-  double * xexactv = 0;
+  float * bv = 0;
+  float * xv = 0;
+  float * xexactv = 0;
   if (b!=0) bv = b->values; // Only compute exact solution if requested
   if (x!=0) xv = x->values; // Only compute exact solution if requested
   if (xexact!=0) xexactv = xexact->values; // Only compute exact solution if requested
@@ -106,14 +107,14 @@ void GenerateProblem_ref(SparseMatrix & A, Vector * b, Vector * x, Vector * xexa
   for (local_int_t i=0; i< localNumberOfRows; ++i)
     mtxIndL[i] = new local_int_t[numberOfNonzerosPerRow];
   for (local_int_t i=0; i< localNumberOfRows; ++i)
-    matrixValues[i] = new double[numberOfNonzerosPerRow];
+    matrixValues[i] = new float[numberOfNonzerosPerRow];
   for (local_int_t i=0; i< localNumberOfRows; ++i)
    mtxIndG[i] = new global_int_t[numberOfNonzerosPerRow];
 
 #else
   // Now allocate the arrays pointed to
   mtxIndL[0] = new local_int_t[localNumberOfRows * numberOfNonzerosPerRow];
-  matrixValues[0] = new double[localNumberOfRows * numberOfNonzerosPerRow];
+  matrixValues[0] = new float[localNumberOfRows * numberOfNonzerosPerRow];
   mtxIndG[0] = new global_int_t[localNumberOfRows * numberOfNonzerosPerRow];
 
   for (local_int_t i=1; i< localNumberOfRows; ++i) {
@@ -147,7 +148,7 @@ void GenerateProblem_ref(SparseMatrix & A, Vector * b, Vector * x, Vector * xexa
         HPCG_fout << " rank, globalRow, localRow = " << A.geom->rank << " " << currentGlobalRow << " " << A.globalToLocalMap[currentGlobalRow] << endl;
 #endif
         char numberOfNonzerosInRow = 0;
-        double * currentValuePointer = matrixValues[currentLocalRow]; // Pointer to current value in current row
+        float * currentValuePointer = matrixValues[currentLocalRow]; // Pointer to current value in current row
         global_int_t * currentIndexPointerG = mtxIndG[currentLocalRow]; // Pointer to current index in current row
         for (int sz=-1; sz<=1; sz++) {
           if (giz+sz>-1 && giz+sz<gnz) {

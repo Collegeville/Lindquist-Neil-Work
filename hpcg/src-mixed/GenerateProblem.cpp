@@ -41,7 +41,7 @@
   @see GenerateGeometry
 */
 
-void GenerateProblem(SparseMatrix & A, Vector * b, Vector * x, Vector * xexact) {
+void GenerateProblem(SparseMatrix<float> & A, Vector<float> * b, Vector<float> * x, Vector<float> * xexact) {
 
   // The call to this reference version of GenerateProblem can be replaced with custom code.
   // However, the data structures must remain unchanged such that the CheckProblem function is satisfied.

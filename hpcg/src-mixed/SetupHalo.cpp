@@ -39,7 +39,7 @@
 
   @see ExchangeHalo
 */
-void SetupHalo(SparseMatrix & A) {
+void SetupHalo(SparseMatrix<float> & A) {
 
   // The call to this reference version of SetupHalo can be replaced with custom code.
   // However, any code must work for general unstructured sparse matrices.  Special knowledge about the
