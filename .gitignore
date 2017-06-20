@@ -38,3 +38,8 @@ MatLab/pcg results - *.mat
 
 #compiled mex files
 *.mexa64
+
+
+#bin for hpcg
+hpcg/Linux_Serial_Mixed/*
+hpcg/Linux_Serial_Double/*
