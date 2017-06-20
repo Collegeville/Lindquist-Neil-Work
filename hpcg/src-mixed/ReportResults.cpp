@@ -117,18 +117,18 @@ void ReportResults(const SparseMatrix<float> & A, int numberOfMgLevels, int numb
       double fnrow_Af = Af->totalNumberOfRows;
       double fnumberOfPresmootherSteps = Af->mgData->numberOfPresmootherSteps;
       double fnumberOfPostsmootherSteps = Af->mgData->numberOfPostsmootherSteps;
-      fnreads_precond += fnumberOfPresmootherSteps*fniters*(2.0*fnnz_Af*(sizeof(double)+sizeof(local_int_t)) + fnrow_Af*sizeof(double)); // number of presmoother reads
+      fnreads_precond += fnumberOfPresmootherSteps*fniters*(2.0*fnnz_Af*(sizeof(float)+sizeof(local_int_t)) + fnrow_Af*sizeof(float)); // number of presmoother reads
       fnwrites_precond += fnumberOfPresmootherSteps*fniters*fnrow_Af*sizeof(double); // number of presmoother writes
-      fnreads_precond += fniters*(fnnz_Af*(sizeof(double)+sizeof(local_int_t)) + fnrow_Af*sizeof(double)); // Number of reads for fine grid residual calculation
+      fnreads_precond += fniters*(fnnz_Af*(sizeof(float)+sizeof(local_int_t)) + fnrow_Af*sizeof(float)); // Number of reads for fine grid residual calculation
       fnwrites_precond += fniters*fnnz_Af*sizeof(double); // Number of writes for fine grid residual calculation
-      fnreads_precond += fnumberOfPostsmootherSteps*fniters*(2.0*fnnz_Af*(sizeof(double)+sizeof(local_int_t)) + fnrow_Af*sizeof(double));  // number of postsmoother reads
-      fnwrites_precond += fnumberOfPostsmootherSteps*fniters*fnnz_Af*sizeof(double);  // number of postsmoother writes
+      fnreads_precond += fnumberOfPostsmootherSteps*fniters*(2.0*fnnz_Af*(sizeof(float)+sizeof(local_int_t)) + fnrow_Af*sizeof(float));  // number of postsmoother reads
+      fnwrites_precond += fnumberOfPostsmootherSteps*fniters*fnnz_Af*sizeof(float);  // number of postsmoother writes
       Af = Af->Ac; // Go to next coarse level
     }
 
     double fnnz_Af = Af->totalNumberOfNonzeros;
     double fnrow_Af = Af->totalNumberOfRows;
-    fnreads_precond += fniters*(2.0*fnnz_Af*(sizeof(double)+sizeof(local_int_t)) + fnrow_Af*sizeof(double));; // One symmetric GS sweep at the coarsest level
+    fnreads_precond += fniters*(2.0*fnnz_Af*(sizeof(float)+sizeof(local_int_t)) + fnrow_Af*sizeof(float));; // One symmetric GS sweep at the coarsest level
     fnwrites_precond += fniters*fnrow_Af*sizeof(double); // One symmetric GS sweep at the coarsest level
     double fnreads = fnreads_ddot+fnreads_waxpby+fnreads_sparsemv+fnreads_precond;
     double fnwrites = fnwrites_ddot+fnwrites_waxpby+fnwrites_sparsemv+fnwrites_precond;
@@ -150,17 +150,18 @@ void ReportResults(const SparseMatrix<float> & A, int numberOfMgLevels, int numb
     fnbytes += fnrow*sizeof(char);      // array nonzerosInRow
     fnbytes += fnrow*((double) sizeof(global_int_t*)); // mtxIndG
     fnbytes += fnrow*((double) sizeof(local_int_t*));  // mtxIndL
-    fnbytes += fnrow*((double) sizeof(double*));      // matrixValues
-    fnbytes += fnrow*((double) sizeof(double*));      // matrixDiagonal
+    fnbytes += fnrow*((double) sizeof(float*));      // matrixValues
+    fnbytes += fnrow*((double) sizeof(float*));      // matrixDiagonal
     fnbytes += fnrow*numberOfNonzerosPerRow*((double) sizeof(local_int_t));  // mtxIndL[1..nrows]
-    fnbytes += fnrow*numberOfNonzerosPerRow*((double) sizeof(double));       // matrixValues[1..nrows]
+    fnbytes += fnrow*numberOfNonzerosPerRow*((double) sizeof(float));       // matrixValues[1..nrows]
     fnbytes += fnrow*numberOfNonzerosPerRow*((double) sizeof(global_int_t)); // mtxIndG[1..nrows]
-    fnbytes += fnrow*((double) 3*sizeof(double)); // x, b, xexact
+    fnbytes += fnrow*((double) 3*sizeof(float)); // x, b, xexact
 
     // Model for CGData.hpp
     double fncol = ((global_int_t) A.localNumberOfColumns) * size; // Estimate of the global number of columns using the value from rank 0
-    fnbytes += fnrow*((double) 2*sizeof(double)); // r, Ap
-    fnbytes += fncol*((double) 2*sizeof(double)); // z, p
+    fnbytes += fnrow*((double)  sizeof(double)); // r
+    fnbytes += fnrow*((double)  sizeof(float));  // Ap
+    fnbytes += fncol*((double) 2*sizeof(float)); // z, p
 
     std::vector<double> fnbytesPerLevel(numberOfMgLevels); // Count byte usage per level (level 0 is main CG level)
     fnbytesPerLevel[0] = fnbytes;
@@ -177,17 +178,18 @@ void ReportResults(const SparseMatrix<float> & A, int numberOfMgLevels, int numb
       // Model for GenerateCoarseProblem.cpp
       fnbytes_Af += fnrow_Af*((double) sizeof(local_int_t)); // f2cOperator
       fnbytes_Af += fnrow_Af*((double) sizeof(double)); // rc
-      fnbytes_Af += 2.0*fncol_Af*((double) sizeof(double)); // xc, Axf are estimated based on the size of these arrays on rank 0
+      fnbytes_Af += fncol_Af*((double) sizeof(double)); // Axf are estimated based on the size of these arrays on rank 0
+      fnbytes_Af += fncol_Af*((double) sizeof(double)); // xc  ditto
       fnbytes_Af += ((double) (sizeof(Geometry)+sizeof(SparseMatrix<float>)+3*sizeof(Vector<float>)+sizeof(MGData))); // Account for structs geomc, Ac, rc, xc, Axf - (minor)
 
       // Model for GenerateProblem.cpp (called within GenerateCoarseProblem.cpp)
       fnbytes_Af += fnrow_Af*sizeof(char);      // array nonzerosInRow
       fnbytes_Af += fnrow_Af*((double) sizeof(global_int_t*)); // mtxIndG
       fnbytes_Af += fnrow_Af*((double) sizeof(local_int_t*));  // mtxIndL
-      fnbytes_Af += fnrow_Af*((double) sizeof(double*));      // matrixValues
-      fnbytes_Af += fnrow_Af*((double) sizeof(double*));      // matrixDiagonal
+      fnbytes_Af += fnrow_Af*((double) sizeof(float*));      // matrixValues
+      fnbytes_Af += fnrow_Af*((double) sizeof(float*));      // matrixDiagonal
       fnbytes_Af += fnrow_Af*numberOfNonzerosPerRow*((double) sizeof(local_int_t));  // mtxIndL[1..nrows]
-      fnbytes_Af += fnrow_Af*numberOfNonzerosPerRow*((double) sizeof(double));       // matrixValues[1..nrows]
+      fnbytes_Af += fnrow_Af*numberOfNonzerosPerRow*((double) sizeof(float));       // matrixValues[1..nrows]
       fnbytes_Af += fnrow_Af*numberOfNonzerosPerRow*((double) sizeof(global_int_t)); // mtxIndG[1..nrows]
 
       // Model for SetupHalo_ref.cpp
