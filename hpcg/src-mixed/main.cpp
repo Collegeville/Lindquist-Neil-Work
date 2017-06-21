@@ -130,14 +130,14 @@ int main(int argc, char * argv[]) {
 
   double setup_time = mytimer();
 
-  SparseMatrix<float> A;
+  SparseMatrix A;
   InitializeSparseMatrix(A, geom);
 
   Vector<float> b, x, xexact;
   GenerateProblem(A, &b, &x, &xexact);
   SetupHalo(A);
   int numberOfMgLevels = 4; // Number of levels including first
-  SparseMatrix<float> * curLevelMatrix = &A;
+  SparseMatrix * curLevelMatrix = &A;
   for (int level = 1; level< numberOfMgLevels; ++level) {
     GenerateCoarseProblem(*curLevelMatrix);
     curLevelMatrix = curLevelMatrix->Ac; // Make the just-constructed coarse grid the next level

@@ -51,7 +51,7 @@
   @see ComputeSYMGS_ref
 */
 template<class datatype1, class datatype2>
-int ComputeSYMGS(const SparseMatrix<float> & A, const Vector<datatype1> & r, Vector<datatype2> & x) {
+int ComputeSYMGS(const SparseMatrix & A, const Vector<datatype1> & r, Vector<datatype2> & x) {
 
   // This line and the next two lines should be removed and your version of ComputeSYMGS should be used.
   return ComputeSYMGS_ref(A, r, x);

@@ -39,7 +39,7 @@
   @return Returns zero on success and a non-zero value otherwise.
 */
 template<class datatype>
-int ComputeProlongation_ref(const SparseMatrix<float> & Af, Vector<datatype> & xf) {
+int ComputeProlongation_ref(const SparseMatrix & Af, Vector<datatype> & xf) {
 
   datatype * xfv = xf.values;
   float * xcv = Af.mgData->xc->values;

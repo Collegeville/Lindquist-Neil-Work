@@ -50,7 +50,7 @@ using std::endl;
 
   @see YAML_Doc
 */
-void ReportResults(const SparseMatrix<float> & A, int numberOfMgLevels, int numberOfCgSets, int refMaxIters,int optMaxIters, double times[],
+void ReportResults(const SparseMatrix & A, int numberOfMgLevels, int numberOfCgSets, int refMaxIters,int optMaxIters, double times[],
     const TestCGData & testcg_data, const TestSymmetryData & testsymmetry_data, const TestNormsData & testnorms_data, int global_failure, bool quickPath) {
 
   double minOfficialTime = 1800; // Any official benchmark result must run at least this many seconds
@@ -83,7 +83,7 @@ void ReportResults(const SparseMatrix<float> & A, int numberOfMgLevels, int numb
     double fnops_sparsemv = (fniters+fNumberOfCgSets)*2.0*fnnz; // 1 SpMV with nnz adds and nnz mults
     // Op counts from the multigrid preconditioners
     double fnops_precond = 0.0;
-    const SparseMatrix<float> * Af = &A;
+    const SparseMatrix * Af = &A;
     for (int i=1; i<numberOfMgLevels; ++i) {
       double fnnz_Af = Af->totalNumberOfNonzeros;
       double fnumberOfPresmootherSteps = Af->mgData->numberOfPresmootherSteps;
@@ -180,7 +180,7 @@ void ReportResults(const SparseMatrix<float> & A, int numberOfMgLevels, int numb
       fnbytes_Af += fnrow_Af*((double) sizeof(double)); // rc
       fnbytes_Af += fncol_Af*((double) sizeof(double)); // Axf are estimated based on the size of these arrays on rank 0
       fnbytes_Af += fncol_Af*((double) sizeof(double)); // xc  ditto
-      fnbytes_Af += ((double) (sizeof(Geometry)+sizeof(SparseMatrix<float>)+3*sizeof(Vector<float>)+sizeof(MGData))); // Account for structs geomc, Ac, rc, xc, Axf - (minor)
+      fnbytes_Af += ((double) (sizeof(Geometry)+sizeof(SparseMatrix)+3*sizeof(Vector<float>)+sizeof(MGData))); // Account for structs geomc, Ac, rc, xc, Axf - (minor)
 
       // Model for GenerateProblem.cpp (called within GenerateCoarseProblem.cpp)
       fnbytes_Af += fnrow_Af*sizeof(char);      // array nonzerosInRow

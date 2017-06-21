@@ -38,7 +38,7 @@ typedef struct CGData_STRUCT CGData;
  @param[in]  A    the data structure that describes the problem matrix and its structure
  @param[out] data the data structure for CG vectors that will be allocated to get it ready for use in CG iterations
  */
-inline void InitializeSparseCGData(SparseMatrix<float> & A, CGData & data) {
+inline void InitializeSparseCGData(SparseMatrix & A, CGData & data) {
   local_int_t nrow = A.localNumberOfRows;
   local_int_t ncol = A.localNumberOfColumns;
   InitializeVector(data.r, nrow);

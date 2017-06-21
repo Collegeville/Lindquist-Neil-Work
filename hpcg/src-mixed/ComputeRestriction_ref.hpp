@@ -41,7 +41,7 @@
   @return Returns zero on success and a non-zero value otherwise.
 */
 template<class datatype>
-int ComputeRestriction_ref(const SparseMatrix<float> & A, const Vector<datatype> & rf) {
+int ComputeRestriction_ref(const SparseMatrix & A, const Vector<datatype> & rf) {
 
   double * Axfv = A.mgData->Axf->values;
   datatype * rfv = rf.values;

@@ -37,7 +37,7 @@
 
   @see ComputeSPMV_ref
 */
-int ComputeSPMV( const SparseMatrix<float> & A, Vector<float> & x, Vector<float> & y) {
+int ComputeSPMV( const SparseMatrix & A, Vector<float> & x, Vector<float> & y) {
 
   // This line and the next two lines should be removed and your version of ComputeSPMV should be used.
   A.isSpmvOptimized = false;

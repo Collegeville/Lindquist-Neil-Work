@@ -19,7 +19,7 @@
 #include "Vector.hpp"
 #include "CGData.hpp"
 
-int CG(const SparseMatrix<float> & A, CGData & data, const Vector<float> & b, Vector<float> & x,
+int CG(const SparseMatrix & A, CGData & data, const Vector<float> & b, Vector<float> & x,
     const int max_iter, const double tolerance, int & niters, double & normr,  double & normr0,
     double * times, bool doPreconditioning);
 

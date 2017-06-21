@@ -49,7 +49,7 @@
 
   @see GenerateProblem
 */
-int WriteProblem( const Geometry & geom, const SparseMatrix<float> & A,
+int WriteProblem( const Geometry & geom, const SparseMatrix & A,
     const Vector<float> b, const Vector<float> x, const Vector<float> xexact) {
 
   if (geom.size!=1) return -1; //TODO Only works on one processor.  Need better error handler

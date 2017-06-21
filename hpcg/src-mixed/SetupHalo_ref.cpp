@@ -46,7 +46,7 @@ using std::endl;
 
   @see ExchangeHalo
 */
-void SetupHalo_ref(SparseMatrix<float> & A) {
+void SetupHalo_ref(SparseMatrix & A) {
 
   // Extract Matrix pieces
 

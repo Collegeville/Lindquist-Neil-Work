@@ -49,7 +49,7 @@ using std::endl;
 
   @see CG()
  */
-int TestCG(SparseMatrix<float> & A, CGData & data, Vector<float> & b, Vector<float> & x, TestCGData & testcg_data) {
+int TestCG(SparseMatrix & A, CGData & data, Vector<float> & b, Vector<float> & x, TestCGData & testcg_data) {
 
 
   // Use this array for collecting timing information

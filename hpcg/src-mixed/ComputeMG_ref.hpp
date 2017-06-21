@@ -41,7 +41,7 @@
   @see ComputeMG
 */
 template<class datatype1, class datatype2>
-int ComputeMG_ref(const SparseMatrix<float> & A, const Vector<datatype1> & r, Vector<datatype2> & x) {
+int ComputeMG_ref(const SparseMatrix & A, const Vector<datatype1> & r, Vector<datatype2> & x) {
   assert(x.localLength==A.localNumberOfColumns); // Make sure x contain space for halo values
 
   ZeroVector(x); // initialize x to zero

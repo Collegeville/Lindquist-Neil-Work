@@ -57,7 +57,7 @@ using std::endl;
   @see ComputeMG
   @see ComputeMG_ref
 */
-int TestSymmetry(SparseMatrix<float> & A, Vector<float> & b, Vector<float> & xexact, TestSymmetryData & testsymmetry_data) {
+int TestSymmetry(SparseMatrix & A, Vector<float> & b, Vector<float> & xexact, TestSymmetryData & testsymmetry_data) {
 
  local_int_t nrow = A.localNumberOfRows;
  local_int_t ncol = A.localNumberOfColumns;

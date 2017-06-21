@@ -34,7 +34,7 @@
   @see GenerateGeometry
   @see GenerateProblem
 */
-int OptimizeProblem(SparseMatrix<float> & A, CGData & data, Vector<float> & b, Vector<float> & x, Vector<float> & xexact) {
+int OptimizeProblem(SparseMatrix & A, CGData & data, Vector<float> & b, Vector<float> & x, Vector<float> & xexact) {
 
   // This function can be used to completely transform any part of the data structures.
   // Right now it does nothing, so compiling with a check for unused variables results in complaints
@@ -99,7 +99,7 @@ int OptimizeProblem(SparseMatrix<float> & A, CGData & data, Vector<float> & b, V
 }
 
 // Helper function (see OptimizeProblem.hpp for details)
-double OptimizeProblemMemoryUse(const SparseMatrix<float> & A) {
+double OptimizeProblemMemoryUse(const SparseMatrix & A) {
 
   return 0.0;
 

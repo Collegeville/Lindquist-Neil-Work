@@ -48,7 +48,7 @@
   @see ComputeSPMV
 */
 template<class datatype>
-int ComputeSPMV_ref( const SparseMatrix<float> & A, Vector<float> & x, Vector<datatype> & y) {
+int ComputeSPMV_ref( const SparseMatrix & A, Vector<float> & x, Vector<datatype> & y) {
 
   assert(x.localLength>=A.localNumberOfColumns); // Test vector lengths
   assert(y.localLength>=A.localNumberOfRows);

@@ -56,7 +56,7 @@
   @see ComputeSYMGS
 */
 template<class datatype1, class datatype2>
-int ComputeSYMGS_ref( const SparseMatrix<float> & A, const Vector<datatype1> & r, Vector<datatype2> & x) {
+int ComputeSYMGS_ref( const SparseMatrix & A, const Vector<datatype1> & r, Vector<datatype2> & x) {
 
   assert(x.localLength==A.localNumberOfColumns); // Make sure x contain space for halo values
 
