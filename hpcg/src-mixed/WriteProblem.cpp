@@ -50,7 +50,7 @@
   @see GenerateProblem
 */
 int WriteProblem( const Geometry & geom, const SparseMatrix & A,
-    const Vector<float> b, const Vector<float> x, const Vector<float> xexact) {
+    const Vector b, const Vector x, const Vector xexact) {
 
   if (geom.size!=1) return -1; //TODO Only works on one processor.  Need better error handler
   const global_int_t nrow = A.totalNumberOfRows;

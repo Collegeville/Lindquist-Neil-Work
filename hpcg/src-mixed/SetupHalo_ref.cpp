@@ -116,7 +116,7 @@ void SetupHalo_ref(SparseMatrix & A) {
 #endif
 
   // Build the arrays and lists needed by the ExchangeHalo function.
-  double * sendBuffer = new double[totalToBeSent];
+  float * sendBuffer = new float[totalToBeSent];
   local_int_t * elementsToSend = new local_int_t[totalToBeSent];
   int * neighbors = new int[sendList.size()];
   local_int_t * receiveLength = new local_int_t[receiveList.size()];

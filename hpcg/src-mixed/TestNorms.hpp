@@ -23,9 +23,9 @@
 
 
 struct TestNormsData_STRUCT {
-  double * values; //!< sample values
-  double   mean;   //!< mean of all sampes
-  double variance; //!< variance of mean
+  float * values; //!< sample values
+  float   mean;   //!< mean of all sampes
+  float variance; //!< variance of mean
   int    samples;  //!< number of samples
   bool   pass;     //!< pass/fail indicator
 };

@@ -15,5 +15,5 @@
 #ifndef COMPUTERESIDUAL_HPP
 #define COMPUTERESIDUAL_HPP
 #include "Vector.hpp"
-int ComputeResidual(const local_int_t n, const Vector<float> & v1, const Vector<float> & v2, double & residual);
+int ComputeResidual(const local_int_t n, const Vector & v1, const Vector & v2, float & residual);
 #endif // COMPUTERESIDUAL_HPP

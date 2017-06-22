@@ -47,8 +47,7 @@ using std::endl;
   @see GenerateGeometry
 */
 
-void GenerateProblem_ref(SparseMatrix & A, Vector<float> * b,
-                         Vector<float> * x, Vector<float> * xexact) {
+void GenerateProblem_ref(SparseMatrix & A, Vector * b, Vector * x, Vector * xexact) {
 
   // Make local copies of geometry information.  Use global_int_t since the RHS products in the calculations
   // below may result in global range values.
@@ -176,7 +175,7 @@ void GenerateProblem_ref(SparseMatrix & A, Vector<float> * b,
         #pragma omp critical
 #endif
         localNumberOfNonzeros += numberOfNonzerosInRow; // Protect this with an atomic
-        if (b!=0)      bv[currentLocalRow] = 26.0 - ((double) (numberOfNonzerosInRow-1));
+        if (b!=0)      bv[currentLocalRow] = 26.0 - ((float) (numberOfNonzerosInRow-1));
         if (x!=0)      xv[currentLocalRow] = 0.0;
         if (xexact!=0) xexactv[currentLocalRow] = 1.0;
       } // end ix loop

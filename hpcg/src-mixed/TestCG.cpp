@@ -49,13 +49,13 @@ using std::endl;
 
   @see CG()
  */
-int TestCG(SparseMatrix & A, CGData & data, Vector<float> & b, Vector<float> & x, TestCGData & testcg_data) {
+int TestCG(SparseMatrix & A, CGData & data, Vector & b, Vector & x, TestCGData & testcg_data) {
 
 
   // Use this array for collecting timing information
   std::vector< double > times(8,0.0);
   // Temporary storage for holding original diagonal and RHS
-  Vector<float> origDiagA, exaggeratedDiagA, origB;
+  Vector origDiagA, exaggeratedDiagA, origB;
   InitializeVector(origDiagA, A.localNumberOfRows);
   InitializeVector(exaggeratedDiagA, A.localNumberOfRows);
   InitializeVector(origB, A.localNumberOfRows);
@@ -68,7 +68,7 @@ int TestCG(SparseMatrix & A, CGData & data, Vector<float> & b, Vector<float> & x
   for (local_int_t i=0; i< A.localNumberOfRows; ++i) {
     global_int_t globalRowID = A.localToGlobalMap[i];
     if (globalRowID<9) {
-      double scale = (globalRowID+2)*1.0e6;
+      float scale = (globalRowID+2)*1.0e6;
       ScaleVectorValue(exaggeratedDiagA, i, scale);
       ScaleVectorValue(b, i, scale);
     } else {
@@ -79,11 +79,11 @@ int TestCG(SparseMatrix & A, CGData & data, Vector<float> & b, Vector<float> & x
   ReplaceMatrixDiagonal(A, exaggeratedDiagA);
 
   int niters = 0;
-  double normr = 0.0;
-  double normr0 = 0.0;
+  float normr = 0.0;
+  float normr0 = 0.0;
   int maxIters = 50;
   int numberOfCgCalls = 2;
-  double tolerance = 1.0e-12; // Set tolerance to reasonable value for grossly scaled diagonal terms
+  float tolerance = 1.0e-12; // Set tolerance to reasonable value for grossly scaled diagonal terms
   testcg_data.expected_niters_no_prec = 12; // For the unpreconditioned CG call, we should take about 10 iterations, permit 12
   testcg_data.expected_niters_prec = 2;   // For the preconditioned case, we should take about 1 iteration, permit 2
   testcg_data.niters_max_no_prec = 0;

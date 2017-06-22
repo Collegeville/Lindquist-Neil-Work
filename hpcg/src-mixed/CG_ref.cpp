@@ -18,14 +18,13 @@
  HPCG routine
  */
 
-#include "CG_ref.hpp"
-
 #include <fstream>
 
 #include <cmath>
 
 #include "hpcg.hpp"
 
+#include "CG_ref.hpp"
 #include "mytimer.hpp"
 #include "ComputeSPMV_ref.hpp"
 #include "ComputeMG_ref.hpp"
@@ -36,19 +35,6 @@
 // Use TICK and TOCK to time a code section in MATLAB-like fashion
 #define TICK()  t0 = mytimer() //!< record current time in 't0'
 #define TOCK(t) t += mytimer() - t0 //!< store time difference in 't' using time in 't0'
-
-// this function will compute the Conjugate Gradient iterations.
-// geom - Domain and processor topology information
-// A - Matrix
-// b - constant
-// x - used for return value
-// max_iter - how many times we iterate
-// tolerance - Stopping tolerance for preconditioned iterations.
-// niters - number of iterations performed
-// normr - computed residual norm
-// normr0 - Original residual
-// times - array of timing information
-// doPreconditioning - bool to specify whether or not symmetric GS will be applied.
 
 /*!
   Reference routine to compute an approximate solution to Ax = b
@@ -69,13 +55,13 @@
 
   @see CG()
 */
-int CG_ref(const SparseMatrix & A, CGData & data, const Vector<float> & b, Vector<float> & x,
-    const int max_iter, const double tolerance, int & niters, double & normr, double & normr0,
+int CG_ref(const SparseMatrix & A, CGData & data, const Vector & b, Vector & x,
+    const int max_iter, const float tolerance, int & niters, float & normr, float & normr0,
     double * times, bool doPreconditioning) {
 
   double t_begin = mytimer();  // Start timing right away
   normr = 0.0;
-  double rtz = 0.0, oldrtz = 0.0, alpha = 0.0, beta = 0.0, pAp = 0.0;
+  float rtz = 0.0, oldrtz = 0.0, alpha = 0.0, beta = 0.0, pAp = 0.0;
 
 
   double t0 = 0.0, t1 = 0.0, t2 = 0.0, t3 = 0.0, t4 = 0.0, t5 = 0.0;
@@ -85,10 +71,10 @@ int CG_ref(const SparseMatrix & A, CGData & data, const Vector<float> & b, Vecto
 
   local_int_t nrow = A.localNumberOfRows;
 
-  Vector<double> & r  = data.r; // Residual vector
-  Vector<float>  & z  = data.z; // Preconditioned residual vector
-  Vector<float>  & p  = data.p; // Direction vector (in MPI mode ncol>=nrow)
-  Vector<float>  & Ap = data.Ap;
+  Vector & r = data.r; // Residual vector
+  Vector & z = data.z; // Preconditioned residual vector
+  Vector & p = data.p; // Direction vector (in MPI mode ncol>=nrow)
+  Vector & Ap = data.Ap;
 
   if (!doPreconditioning && A.geom->rank==0) HPCG_fout << "WARNING: PERFORMING UNPRECONDITIONED ITERATIONS" << std::endl;
 

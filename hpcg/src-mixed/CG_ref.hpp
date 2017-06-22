@@ -11,7 +11,7 @@
 //
 // ***************************************************
 //@HEADER
- 
+
 #ifndef CG_REF_HPP
 #define CG_REF_HPP
 
@@ -19,9 +19,21 @@
 #include "Vector.hpp"
 #include "CGData.hpp"
 
-int CG_ref(const SparseMatrix & A, CGData & data, const Vector<float> & b, Vector<float> & x,
-    const int max_iter, const double tolerance, int & niters, double & normr, double & normr0,
+int CG_ref(const SparseMatrix & A, CGData & data, const Vector & b, Vector & x,
+    const int max_iter, const float tolerance, int & niters, float & normr,  float & normr0,
     double * times, bool doPreconditioning);
 
+// this function will compute the Conjugate Gradient iterations.
+// geom - Domain and processor topology information
+// A - Matrix
+// b - constant
+// x - used for return value
+// max_iter - how many times we iterate
+// tolerance - Stopping tolerance for preconditioned iterations.
+// niters - number of iterations performed
+// normr - computed residual norm
+// normr0 - Original residual
+// times - array of timing information
+// doPreconditioning - bool to specify whether or not symmetric GS will be applied.
 
 #endif  // CG_REF_HPP

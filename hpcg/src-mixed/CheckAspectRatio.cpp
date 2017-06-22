@@ -28,8 +28,8 @@
 #include "CheckAspectRatio.hpp"
 
 int
-CheckAspectRatio(double smallest_ratio, int x, int y, int z, const char *what, bool DoIo) {
-  double current_ratio = std::min(std::min(x, y), z) / double(std::max(std::max(x, y), z));
+CheckAspectRatio(float smallest_ratio, int x, int y, int z, const char *what, bool DoIo) {
+  float current_ratio = std::min(std::min(x, y), z) / float(std::max(std::max(x, y), z));
 
   if (current_ratio < smallest_ratio) { // ratio of the smallest to the largest
     if (DoIo) {

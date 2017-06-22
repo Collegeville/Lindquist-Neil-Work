@@ -34,11 +34,11 @@ struct TestCGData_STRUCT {
   int expected_niters_prec; //!< expected number of test CG iterations with preconditioning and with diagonally dominant matrix (~1-2)
   int niters_max_no_prec; //!< maximum number of test CG iterations without predictitioner
   int niters_max_prec; //!< maximum number of test CG iterations without predictitioner
-  double normr; //!< residual norm achieved during test CG iterations
+  float normr; //!< residual norm achieved during test CG iterations
 };
 typedef struct TestCGData_STRUCT TestCGData;
 
-extern int TestCG(SparseMatrix & A, CGData & data, Vector<float> & b, Vector<float> & x, TestCGData & testcg_data);
+extern int TestCG(SparseMatrix & A, CGData & data, Vector & b, Vector & x, TestCGData & testcg_data);
 
 #endif  // TESTCG_HPP
 

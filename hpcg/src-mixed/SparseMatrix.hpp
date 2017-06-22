@@ -36,8 +36,7 @@ typedef std::map< global_int_t, local_int_t > GlobalToLocalMap;
 using GlobalToLocalMap = std::unorderd_map< global_int_t, local_int_t >;
 #endif
 
-
-struct SparseMatrix {
+struct SparseMatrix_STRUCT {
   char  * title; //!< name of the sparse matrix
   Geometry * geom; //!< geometry associated with this matrix
   global_int_t totalNumberOfRows; //!< total number of matrix rows across all processes
@@ -60,7 +59,7 @@ struct SparseMatrix {
    This is for storing optimized data structres created in OptimizeProblem and
    used inside optimized ComputeSPMV().
    */
-  mutable SparseMatrix * Ac; // Coarse grid matrix
+  mutable struct SparseMatrix_STRUCT * Ac; // Coarse grid matrix
   mutable MGData * mgData; // Pointer to the coarse level data for this fine matrix
   void * optimizationData;  // pointer that can be used to store implementation-specific data
 
@@ -75,8 +74,7 @@ struct SparseMatrix {
   float * sendBuffer; //!< send buffer for non-blocking sends
 #endif
 };
-//typedef struct SparseMatrix_STRUCT<double> SparseMatrix;
-//typedef struct SparseMatrix_STRUCT<float> SparseMatricF;
+typedef struct SparseMatrix_STRUCT SparseMatrix;
 
 /*!
   Initializes the known system matrix data structure members to 0.
@@ -125,7 +123,7 @@ inline void InitializeSparseMatrix(SparseMatrix & A, Geometry * geom) {
   @param[in] A the known system matrix.
   @param[inout] diagonal  Vector of diagonal values (must be allocated before call to this function).
  */
-inline void CopyMatrixDiagonal(SparseMatrix & A, Vector<float> & diagonal) {
+inline void CopyMatrixDiagonal(SparseMatrix & A, Vector & diagonal) {
     float ** curDiagA = A.matrixDiagonal;
     float * dv = diagonal.values;
     assert(A.localNumberOfRows==diagonal.localLength);
@@ -138,8 +136,7 @@ inline void CopyMatrixDiagonal(SparseMatrix & A, Vector<float> & diagonal) {
   @param[inout] A The system matrix.
   @param[in] diagonal  Vector of diagonal values that will replace existing matrix diagonal values.
  */
-inline void ReplaceMatrixDiagonal(SparseMatrix & A,
-                                  Vector<float> & diagonal) {
+inline void ReplaceMatrixDiagonal(SparseMatrix & A, Vector & diagonal) {
     float ** curDiagA = A.matrixDiagonal;
     float * dv = diagonal.values;
     assert(A.localNumberOfRows==diagonal.localLength);

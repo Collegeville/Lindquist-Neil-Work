@@ -133,7 +133,7 @@ int main(int argc, char * argv[]) {
   SparseMatrix A;
   InitializeSparseMatrix(A, geom);
 
-  Vector<float> b, x, xexact;
+  Vector b, x, xexact;
   GenerateProblem(A, &b, &x, &xexact);
   SetupHalo(A);
   int numberOfMgLevels = 4; // Number of levels including first
@@ -147,9 +147,9 @@ int main(int argc, char * argv[]) {
   times[9] = setup_time; // Save it for reporting
 
   curLevelMatrix = &A;
-  Vector<float> * curb = &b;
-  Vector<float> * curx = &x;
-  Vector<float> * curxexact = &xexact;
+  Vector * curb = &b;
+  Vector * curx = &x;
+  Vector * curxexact = &xexact;
   for (int level = 0; level< numberOfMgLevels; ++level) {
      CheckProblem(*curLevelMatrix, curb, curx, curxexact);
      curLevelMatrix = curLevelMatrix->Ac; // Make the nextcoarse grid the next level
@@ -173,7 +173,7 @@ int main(int argc, char * argv[]) {
   local_int_t nrow = A.localNumberOfRows;
   local_int_t ncol = A.localNumberOfColumns;
 
-  Vector<float> x_overlap, b_computed;
+  Vector x_overlap, b_computed;
   InitializeVector(x_overlap, ncol); // Overlapped copy of x vector
   InitializeVector(b_computed, nrow); // Computed RHS vector
 
@@ -207,14 +207,14 @@ int main(int argc, char * argv[]) {
 
   int niters = 0;
   int totalNiters_ref = 0;
-  double normr = 0.0;
-  double normr0 = 0.0;
+  float normr = 0.0;
+  float normr0 = 0.0;
   int refMaxIters = 50;
   numberOfCalls = 1; // Only need to run the residual reduction analysis once
 
   // Compute the residual reduction for the natural ordering and reference kernels
   std::vector< double > ref_times(9,0.0);
-  double tolerance = 0.0; // Set tolerance to zero to make all runs do maxIters iterations
+  float tolerance = 0.0; // Set tolerance to zero to make all runs do maxIters iterations
   int err_count = 0;
   for (int i=0; i< numberOfCalls; ++i) {
     ZeroVector(x);
@@ -223,7 +223,7 @@ int main(int argc, char * argv[]) {
     totalNiters_ref += niters;
   }
   if (rank == 0 && err_count) HPCG_fout << err_count << " error(s) in call(s) to reference CG." << endl;
-  double refTolerance = normr / normr0;
+  float refTolerance = normr / normr0;
 
   // Call user-tunable set up function.
   double t7 = mytimer();
@@ -326,10 +326,10 @@ int main(int argc, char * argv[]) {
   /* This is the timed run for a specified amount of time. */
 
   optMaxIters = optNiters;
-  double optTolerance = 0.0;  // Force optMaxIters iterations
+  float optTolerance = 0.0;  // Force optMaxIters iterations
   TestNormsData testnorms_data;
   testnorms_data.samples = numberOfCgSets;
-  testnorms_data.values = new double[numberOfCgSets];
+  testnorms_data.values = new float[numberOfCgSets];
 
   for (int i=0; i< numberOfCgSets; ++i) {
     ZeroVector(x); // Zero out x
@@ -342,7 +342,7 @@ int main(int argc, char * argv[]) {
   // Compute difference between known exact solution and computed solution
   // All processors are needed here.
 #ifdef HPCG_DEBUG
-  double residual = 0;
+  float residual = 0;
   ierr = ComputeResidual(A.localNumberOfRows, x, xexact, residual);
   if (ierr) HPCG_fout << "Error in call to compute_residual: " << ierr << ".\n" << endl;
   if (rank==0) HPCG_fout << "Difference between computed and exact  = " << residual << ".\n" << endl;
