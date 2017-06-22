@@ -39,8 +39,8 @@
 
   @see ComputeWAXPBY
 */
-int ComputeWAXPBY_ref(const local_int_t n, const float alpha, const Vector & x,
-    const float beta, const Vector & y, Vector & w) {
+int ComputeWAXPBY_ref(const local_int_t n, const double alpha, const Vector & x,
+    const double beta, const Vector & y, Vector & w) {
 
   assert(x.localLength>=n); // Test vector lengths
   assert(y.localLength>=n);
