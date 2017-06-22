@@ -41,6 +41,8 @@ MatLab/pcg results - *.mat
 
 
 #bin for hpcg
+hpcg/Linux_Serial_Double/*
 hpcg/Linux_Serial_Mixed/*/*
 hpcg/Linux_Serial_Single/*/*
-hpcg/Linux_Serial_Double/*
+hpcg/MPI_GCC_OMP_Double/*
+hpcg/MPI_GCC_OMP_Single/*/*
