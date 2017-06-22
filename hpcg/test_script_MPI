@@ -1,0 +1,20 @@
+echo
+echo ---starting double---
+echo
+
+cd /home/nslindquist/cs_research/Lindquist-Neil-Work/hpcg/MPI_GCC_OMP_Double/bin
+xhpcg
+
+#echo
+#echo ---starting mixed---
+#echo
+#
+#cd /home/nslindquist/cs_research/Lindquist-Neil-Work/hpcg/MPI_GCC_OMP_Mixed/bin
+#xhpcg
+
+echo
+echo ---starting single---
+echo
+
+cd /home/nslindquist/cs_research/Lindquist-Neil-Work/hpcg/MPI_GCC_OMP_Single/bin
+xhpcg
