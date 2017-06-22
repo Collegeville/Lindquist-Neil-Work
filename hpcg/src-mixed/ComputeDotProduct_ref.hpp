@@ -16,6 +16,6 @@
 #define COMPUTEDOTPRODUCT_REF_HPP
 #include "Vector.hpp"
 int ComputeDotProduct_ref(const local_int_t n, const Vector & x, const Vector & y,
-    float & result, double & time_allreduce);
+    double & result, double & time_allreduce);
 
 #endif // COMPUTEDOTPRODUCT_REF_HPP

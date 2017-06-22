@@ -20,7 +20,7 @@
 #include "CGData.hpp"
 
 int CG(const SparseMatrix & A, CGData & data, const Vector & b, Vector & x,
-    const int max_iter, const float tolerance, int & niters, float & normr,  float & normr0,
+    const int max_iter, const float tolerance, int & niters, double & normr,  double & normr0,
     double * times, bool doPreconditioning);
 
 // this function will compute the Conjugate Gradient iterations.

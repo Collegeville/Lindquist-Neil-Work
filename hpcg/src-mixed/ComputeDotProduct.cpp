@@ -39,7 +39,7 @@
   @see ComputeDotProduct_ref
 */
 int ComputeDotProduct(const local_int_t n, const Vector & x, const Vector & y,
-    float & result, double & time_allreduce, bool & isOptimized) {
+    double & result, double & time_allreduce, bool & isOptimized) {
 
   // This line and the next two lines should be removed and your version of ComputeDotProduct should be used.
   isOptimized = false;

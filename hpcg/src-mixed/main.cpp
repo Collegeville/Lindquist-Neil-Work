@@ -207,8 +207,8 @@ int main(int argc, char * argv[]) {
 
   int niters = 0;
   int totalNiters_ref = 0;
-  float normr = 0.0;
-  float normr0 = 0.0;
+  double normr = 0.0;
+  double normr0 = 0.0;
   int refMaxIters = 50;
   numberOfCalls = 1; // Only need to run the residual reduction analysis once
 

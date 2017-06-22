@@ -79,8 +79,8 @@ int TestCG(SparseMatrix & A, CGData & data, Vector & b, Vector & x, TestCGData &
   ReplaceMatrixDiagonal(A, exaggeratedDiagA);
 
   int niters = 0;
-  float normr = 0.0;
-  float normr0 = 0.0;
+  double normr = 0.0;
+  double normr0 = 0.0;
   int maxIters = 50;
   int numberOfCgCalls = 2;
   float tolerance = 1.0e-12; // Set tolerance to reasonable value for grossly scaled diagonal terms

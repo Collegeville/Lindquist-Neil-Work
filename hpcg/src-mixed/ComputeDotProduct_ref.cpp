@@ -44,30 +44,30 @@
   @see ComputeDotProduct
 */
 int ComputeDotProduct_ref(const local_int_t n, const Vector & x, const Vector & y,
-    float & result, double & time_allreduce) {
+    double & result, double & time_allreduce) {
   assert(x.localLength>=n); // Test vector lengths
   assert(y.localLength>=n);
 
-  float local_result = 0.0;
+  double local_result = 0.0;
   float * xv = x.values;
   float * yv = y.values;
   if (yv==xv) {
 #ifndef HPCG_NO_OPENMP
     #pragma omp parallel for reduction (+:local_result)
 #endif
-    for (local_int_t i=0; i<n; i++) local_result += xv[i]*xv[i];
+    for (local_int_t i=0; i<n; i++) local_result += double(xv[i])*double(xv[i]);
   } else {
 #ifndef HPCG_NO_OPENMP
     #pragma omp parallel for reduction (+:local_result)
 #endif
-    for (local_int_t i=0; i<n; i++) local_result += xv[i]*yv[i];
+    for (local_int_t i=0; i<n; i++) local_result += double(xv[i])*double(yv[i]);
   }
 
 #ifndef HPCG_NO_MPI
   // Use MPI's reduce function to collect all partial sums
   double t0 = mytimer();
-  float global_result = 0.0;
-  MPI_Allreduce(&local_result, &global_result, 1, MPI_FLOAT, MPI_SUM,
+  double global_result = 0.0;
+  MPI_Allreduce(&local_result, &global_result, 1, MPI_DOUBLE, MPI_SUM,
       MPI_COMM_WORLD);
   result = global_result;
   time_allreduce += mytimer() - t0;

@@ -56,12 +56,12 @@
   @see CG()
 */
 int CG_ref(const SparseMatrix & A, CGData & data, const Vector & b, Vector & x,
-    const int max_iter, const float tolerance, int & niters, float & normr, float & normr0,
+    const int max_iter, const float tolerance, int & niters, double & normr, double & normr0,
     double * times, bool doPreconditioning) {
 
   double t_begin = mytimer();  // Start timing right away
   normr = 0.0;
-  float rtz = 0.0, oldrtz = 0.0, pAp = 0.0;
+  double rtz = 0.0, oldrtz = 0.0, pAp = 0.0;
   double alpha = 0.0, beta = 0.0;
 
 
