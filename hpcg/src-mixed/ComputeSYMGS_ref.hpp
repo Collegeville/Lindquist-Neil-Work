@@ -17,6 +17,7 @@
 #include "SparseMatrix.hpp"
 #include "Vector.hpp"
 
-int ComputeSYMGS_ref( const SparseMatrix  & A, const Vector & r, Vector & x);
+template<class datatype>
+int ComputeSYMGS_ref(const SparseMatrix  & A, const Vector<datatype> & r, Vector<float> & x);
 
 #endif // COMPUTESYMGS_REF_HPP

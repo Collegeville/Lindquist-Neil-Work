@@ -43,15 +43,16 @@
 
   @see ComputeDotProduct
 */
-int ComputeDotProduct_ref(const local_int_t n, const Vector & x, const Vector & y,
-    double & result, double & time_allreduce) {
+template<class datatype1, class datatype2>
+int ComputeDotProduct_ref(const local_int_t n, const Vector<datatype1> & x,
+    const Vector<datatype2> & y, double & result, double & time_allreduce) {
   assert(x.localLength>=n); // Test vector lengths
   assert(y.localLength>=n);
 
   double local_result = 0.0;
-  float * xv = x.values;
-  float * yv = y.values;
-  if (yv==xv) {
+  datatype1 * xv = x.values;
+  datatype2 * yv = y.values;
+  if ((void*)yv==(void*)xv) {
 #ifndef HPCG_NO_OPENMP
     #pragma omp parallel for reduction (+:local_result)
 #endif
@@ -78,3 +79,14 @@ int ComputeDotProduct_ref(const local_int_t n, const Vector & x, const Vector & 
 
   return 0;
 }
+
+
+template int ComputeDotProduct_ref<float, float>(const local_int_t n,
+    const Vector<float> & x, const Vector<float> & y, double & result,
+    double & time_allreduce);
+template int ComputeDotProduct_ref<double, float>(const local_int_t n,
+    const Vector<double> & x, const Vector<float> & y, double & result,
+    double & time_allreduce);
+template int ComputeDotProduct_ref<double, double>(const local_int_t n,
+    const Vector<double> & x, const Vector<double> & y, double & result,
+    double & time_allreduce);

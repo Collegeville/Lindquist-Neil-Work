@@ -39,10 +39,32 @@
 
   @see ComputeWAXPBY_ref
 */
-int ComputeWAXPBY(const local_int_t n, const double alpha, const Vector & x,
-    const double beta, const Vector & y, Vector & w, bool & isOptimized) {
+template<class datatype1, class datatype2, class datatype3>
+int ComputeWAXPBY(const local_int_t n, const double alpha,
+    const Vector<datatype1> & x, const double beta, const Vector<datatype2> & y,
+    Vector<datatype3> & w, bool & isOptimized) {
 
   // This line and the next two lines should be removed and your version of ComputeWAXPBY should be used.
   isOptimized = false;
   return ComputeWAXPBY_ref(n, alpha, x, beta, y, w);
 }
+
+template int ComputeWAXPBY<float, float, float>(const local_int_t n,
+    const double alpha, const Vector<float> & x, const double beta,
+    const Vector<float> & y, Vector<float> & w, bool & isOptimized);
+    
+template int ComputeWAXPBY<float, float, double>(const local_int_t n,
+    const double alpha, const Vector<float> & x, const double beta,
+    const Vector<float> & y, Vector<double> & w, bool & isOptimized);
+    
+template int ComputeWAXPBY<double, float, float>(const local_int_t n,
+    const double alpha, const Vector<double> & x, const double beta,
+    const Vector<float> & y, Vector<float> & w, bool & isOptimized);
+    
+template int ComputeWAXPBY<double, float, double>(const local_int_t n,
+    const double alpha, const Vector<double> & x, const double beta,
+    const Vector<float> & y, Vector<double> & w, bool & isOptimized);
+    
+template int ComputeWAXPBY<double, double, float>(const local_int_t n,
+    const double alpha, const Vector<double> & x, const double beta,
+    const Vector<double> & y, Vector<float> & w, bool & isOptimized);

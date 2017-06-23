@@ -51,7 +51,8 @@
 
   @see ComputeSYMGS
 */
-int ComputeSYMGS_ref( const SparseMatrix & A, const Vector & r, Vector & x) {
+template<class datatype>
+int ComputeSYMGS_ref(const SparseMatrix & A, const Vector<datatype> & r, Vector<float> & x) {
 
   assert(x.localLength==A.localNumberOfColumns); // Make sure x contain space for halo values
 
@@ -61,7 +62,7 @@ int ComputeSYMGS_ref( const SparseMatrix & A, const Vector & r, Vector & x) {
 
   const local_int_t nrow = A.localNumberOfRows;
   float ** matrixDiagonal = A.matrixDiagonal;  // An array of pointers to the diagonal entries A.matrixValues
-  const float * const rv = r.values;
+  const datatype * const rv = r.values;
   float * const xv = x.values;
 
   for (local_int_t i=0; i< nrow; i++) {
@@ -69,11 +70,11 @@ int ComputeSYMGS_ref( const SparseMatrix & A, const Vector & r, Vector & x) {
     const local_int_t * const currentColIndices = A.mtxIndL[i];
     const int currentNumberOfNonzeros = A.nonzerosInRow[i];
     const float  currentDiagonal = matrixDiagonal[i][0]; // Current diagonal value
-    float sum = rv[i]; // RHS value
+    double sum = rv[i]; // RHS value
 
     for (int j=0; j< currentNumberOfNonzeros; j++) {
       local_int_t curCol = currentColIndices[j];
-      sum -= currentValues[j] * xv[curCol];
+      sum -= currentValues[j] * double(xv[curCol]);
     }
     sum += xv[i]*currentDiagonal; // Remove diagonal contribution from previous loop
 
@@ -88,11 +89,11 @@ int ComputeSYMGS_ref( const SparseMatrix & A, const Vector & r, Vector & x) {
     const local_int_t * const currentColIndices = A.mtxIndL[i];
     const int currentNumberOfNonzeros = A.nonzerosInRow[i];
     const float  currentDiagonal = matrixDiagonal[i][0]; // Current diagonal value
-    float sum = rv[i]; // RHS value
+    double sum = rv[i]; // RHS value
 
     for (int j = 0; j< currentNumberOfNonzeros; j++) {
       local_int_t curCol = currentColIndices[j];
-      sum -= currentValues[j]*xv[curCol];
+      sum -= currentValues[j]*double(xv[curCol]);
     }
     sum += xv[i]*currentDiagonal; // Remove diagonal contribution from previous loop
 
@@ -102,3 +103,8 @@ int ComputeSYMGS_ref( const SparseMatrix & A, const Vector & r, Vector & x) {
   return 0;
 }
 
+
+template int ComputeSYMGS_ref<float>(const SparseMatrix & A,
+    const Vector<float> & r, Vector<float> & x);
+template int ComputeSYMGS_ref<double>(const SparseMatrix & A,
+    const Vector<double> & r, Vector<float> & x);

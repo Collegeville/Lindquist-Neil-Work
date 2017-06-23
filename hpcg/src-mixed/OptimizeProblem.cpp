@@ -34,7 +34,7 @@
   @see GenerateGeometry
   @see GenerateProblem
 */
-int OptimizeProblem(SparseMatrix & A, CGData & data, Vector & b, Vector & x, Vector & xexact) {
+int OptimizeProblem(SparseMatrix & A, CGData & data, Vector<float> & b, Vector<float> & x, Vector<float> & xexact) {
 
   // This function can be used to completely transform any part of the data structures.
   // Right now it does nothing, so compiling with a check for unused variables results in complaints

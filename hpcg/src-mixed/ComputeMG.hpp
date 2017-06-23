@@ -16,7 +16,7 @@
 #define COMPUTEMG_HPP
 #include "SparseMatrix.hpp"
 #include "Vector.hpp"
-
-int ComputeMG(const SparseMatrix  & A, const Vector & r, Vector & x);
+template<class datatype>
+int ComputeMG(const SparseMatrix  & A, const Vector<datatype> & r, Vector<float> & x);
 
 #endif // COMPUTEMG_HPP

@@ -46,7 +46,8 @@
 
   @return Returns zero on success and a non-zero value otherwise.
 */
-int ComputeResidual(const local_int_t n, const Vector & v1, const Vector & v2, double & residual) {
+int ComputeResidual(const local_int_t n, const Vector<float> & v1,
+                    const Vector<float> & v2, double & residual) {
 
   float * v1v = v1.values;
   float * v2v = v2.values;

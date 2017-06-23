@@ -17,6 +17,7 @@
 #include "Vector.hpp"
 #include "SparseMatrix.hpp"
 
-int ComputeSPMV( const SparseMatrix & A, Vector & x, Vector & y);
+template<class datatype>
+int ComputeSPMV( const SparseMatrix & A, Vector<float> & x, Vector<datatype> & y);
 
 #endif  // COMPUTESPMV_HPP

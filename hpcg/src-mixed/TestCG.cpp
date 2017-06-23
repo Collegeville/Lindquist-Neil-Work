@@ -49,13 +49,13 @@ using std::endl;
 
   @see CG()
  */
-int TestCG(SparseMatrix & A, CGData & data, Vector & b, Vector & x, TestCGData & testcg_data) {
+int TestCG(SparseMatrix & A, CGData & data, Vector<float> & b, Vector<float> & x, TestCGData & testcg_data) {
 
 
   // Use this array for collecting timing information
   std::vector< double > times(8,0.0);
   // Temporary storage for holding original diagonal and RHS
-  Vector origDiagA, exaggeratedDiagA, origB;
+  Vector<float> origDiagA, exaggeratedDiagA, origB;
   InitializeVector(origDiagA, A.localNumberOfRows);
   InitializeVector(exaggeratedDiagA, A.localNumberOfRows);
   InitializeVector(origB, A.localNumberOfRows);

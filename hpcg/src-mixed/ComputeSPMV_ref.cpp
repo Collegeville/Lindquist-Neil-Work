@@ -44,7 +44,8 @@
 
   @see ComputeSPMV
 */
-int ComputeSPMV_ref( const SparseMatrix & A, Vector & x, Vector & y) {
+template<class datatype>
+int ComputeSPMV_ref( const SparseMatrix & A, Vector<float> & x, Vector<datatype> & y) {
 
   assert(x.localLength>=A.localNumberOfColumns); // Test vector lengths
   assert(y.localLength>=A.localNumberOfRows);
@@ -53,7 +54,7 @@ int ComputeSPMV_ref( const SparseMatrix & A, Vector & x, Vector & y) {
     ExchangeHalo(A,x);
 #endif
   const float * const xv = x.values;
-  float * const yv = y.values;
+  datatype * const yv = y.values;
   const local_int_t nrow = A.localNumberOfRows;
 #ifndef HPCG_NO_OPENMP
   #pragma omp parallel for
@@ -66,7 +67,14 @@ int ComputeSPMV_ref( const SparseMatrix & A, Vector & x, Vector & y) {
 
     for (int j=0; j< cur_nnz; j++)
       sum += double(cur_vals[j])*double(xv[cur_inds[j]]);
-    yv[i] = float(sum);
+    yv[i] = (datatype)sum;
   }
   return 0;
 }
+
+
+
+
+template int ComputeSPMV_ref<float>(const SparseMatrix & A, Vector<float> & x,
+ Vector<float> & y);
+template int ComputeSPMV_ref<double>(const SparseMatrix & A, Vector<float> & x, Vector<double> & y);

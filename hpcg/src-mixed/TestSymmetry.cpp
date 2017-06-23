@@ -57,12 +57,12 @@ using std::endl;
   @see ComputeMG
   @see ComputeMG_ref
 */
-int TestSymmetry(SparseMatrix & A, Vector & b, Vector & xexact, TestSymmetryData & testsymmetry_data) {
+int TestSymmetry(SparseMatrix & A, Vector<float> & b, Vector<float> & xexact, TestSymmetryData & testsymmetry_data) {
 
  local_int_t nrow = A.localNumberOfRows;
  local_int_t ncol = A.localNumberOfColumns;
 
- Vector x_ncol, y_ncol, z_ncol;
+ Vector<float> x_ncol, y_ncol, z_ncol;
  InitializeVector(x_ncol, ncol);
  InitializeVector(y_ncol, ncol);
  InitializeVector(z_ncol, ncol);

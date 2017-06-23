@@ -37,9 +37,13 @@
 
   @see ComputeSPMV_ref
 */
-int ComputeSPMV( const SparseMatrix & A, Vector & x, Vector & y) {
+template<class datatype>
+int ComputeSPMV( const SparseMatrix & A, Vector<float> & x, Vector<datatype> & y) {
 
   // This line and the next two lines should be removed and your version of ComputeSPMV should be used.
   A.isSpmvOptimized = false;
   return ComputeSPMV_ref(A, x, y);
 }
+
+template int ComputeSPMV<float>(const SparseMatrix & A, Vector<float> & x, Vector<float> & y);
+template int ComputeSPMV<double>(const SparseMatrix & A, Vector<float> & x, Vector<double> & y);

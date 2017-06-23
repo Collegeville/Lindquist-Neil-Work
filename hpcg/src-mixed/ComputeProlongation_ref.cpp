@@ -35,7 +35,7 @@
 
   @return Returns zero on success and a non-zero value otherwise.
 */
-int ComputeProlongation_ref(const SparseMatrix & Af, Vector & xf) {
+int ComputeProlongation_ref(const SparseMatrix & Af, Vector<float> & xf) {
 
   float * xfv = xf.values;
   float * xcv = Af.mgData->xc->values;

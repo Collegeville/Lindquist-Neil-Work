@@ -123,7 +123,7 @@ inline void InitializeSparseMatrix(SparseMatrix & A, Geometry * geom) {
   @param[in] A the known system matrix.
   @param[inout] diagonal  Vector of diagonal values (must be allocated before call to this function).
  */
-inline void CopyMatrixDiagonal(SparseMatrix & A, Vector & diagonal) {
+inline void CopyMatrixDiagonal(SparseMatrix & A, Vector<float> & diagonal) {
     float ** curDiagA = A.matrixDiagonal;
     float * dv = diagonal.values;
     assert(A.localNumberOfRows==diagonal.localLength);
@@ -136,7 +136,7 @@ inline void CopyMatrixDiagonal(SparseMatrix & A, Vector & diagonal) {
   @param[inout] A The system matrix.
   @param[in] diagonal  Vector of diagonal values that will replace existing matrix diagonal values.
  */
-inline void ReplaceMatrixDiagonal(SparseMatrix & A, Vector & diagonal) {
+inline void ReplaceMatrixDiagonal(SparseMatrix & A, Vector<float> & diagonal) {
     float ** curDiagA = A.matrixDiagonal;
     float * dv = diagonal.values;
     assert(A.localNumberOfRows==diagonal.localLength);

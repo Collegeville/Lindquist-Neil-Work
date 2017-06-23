@@ -37,11 +37,12 @@
 
   @return Returns zero on success and a non-zero value otherwise.
 */
-int ComputeRestriction_ref(const SparseMatrix & A, const Vector & rf) {
+template<class datatype>
+int ComputeRestriction_ref(const SparseMatrix & A, const Vector<datatype> & rf) {
 
-  float * Axfv = A.mgData->Axf->values;
-  float * rfv = rf.values;
-  float * rcv = A.mgData->rc->values;
+  double * Axfv = A.mgData->Axf->values;
+  datatype * rfv = rf.values;
+  double * rcv = A.mgData->rc->values;
   local_int_t * f2c = A.mgData->f2cOperator;
   local_int_t nc = A.mgData->rc->localLength;
 
@@ -52,3 +53,9 @@ int ComputeRestriction_ref(const SparseMatrix & A, const Vector & rf) {
 
   return 0;
 }
+
+
+template int ComputeRestriction_ref<float>(const SparseMatrix & A,
+    const Vector<float> & rf);
+template int ComputeRestriction_ref<double>(const SparseMatrix & A,
+    const Vector<double> & rf);

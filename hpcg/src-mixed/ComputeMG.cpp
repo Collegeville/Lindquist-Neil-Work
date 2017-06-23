@@ -30,9 +30,15 @@
 
   @see ComputeMG_ref
 */
-int ComputeMG(const SparseMatrix  & A, const Vector & r, Vector & x) {
+template<class datatype>
+int ComputeMG(const SparseMatrix  & A, const Vector<datatype> & r, Vector<float> & x) {
 
   // This line and the next two lines should be removed and your version of ComputeSYMGS should be used.
   A.isMgOptimized = false;
   return ComputeMG_ref(A, r, x);
 }
+
+template int ComputeMG<float>(const SparseMatrix  & A, const Vector<float> & r,
+                               Vector<float> & x);
+template int ComputeMG<double>(const SparseMatrix  & A, const Vector<double> & r,
+                                Vector<float> & x);

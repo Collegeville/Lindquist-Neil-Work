@@ -17,5 +17,5 @@
 #include "Geometry.hpp"
 #include "SparseMatrix.hpp"
 
-int WriteProblem( const Geometry & geom, const SparseMatrix & A, const Vector b, const Vector x, const Vector xexact);
+int WriteProblem( const Geometry & geom, const SparseMatrix & A, const Vector<float> b, const Vector<float> x, const Vector<float> xexact);
 #endif // WRITEPROBLEM_HPP

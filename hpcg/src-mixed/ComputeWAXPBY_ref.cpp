@@ -39,15 +39,17 @@
 
   @see ComputeWAXPBY
 */
-int ComputeWAXPBY_ref(const local_int_t n, const double alpha, const Vector & x,
-    const double beta, const Vector & y, Vector & w) {
+template<class datatype1, class datatype2, class datatype3>
+int ComputeWAXPBY_ref(const local_int_t n, const double alpha,
+    const Vector<datatype1> & x, const double beta, const Vector<datatype2> & y,
+    Vector<datatype3> & w) {
 
   assert(x.localLength>=n); // Test vector lengths
   assert(y.localLength>=n);
 
-  const float * const xv = x.values;
-  const float * const yv = y.values;
-  float * const wv = w.values;
+  const datatype1 * const xv = x.values;
+  const datatype2 * const yv = y.values;
+  datatype3 * const wv = w.values;
 
   if (alpha==1.0) {
 #ifndef HPCG_NO_OPENMP
@@ -68,3 +70,24 @@ int ComputeWAXPBY_ref(const local_int_t n, const double alpha, const Vector & x,
 
   return 0;
 }
+
+
+template int ComputeWAXPBY_ref<float, float, float>(const local_int_t n,
+    const double alpha, const Vector<float> & x, const double beta,
+    const Vector<float> & y, Vector<float> & w);
+    
+template int ComputeWAXPBY_ref<float, float, double>(const local_int_t n,
+    const double alpha, const Vector<float> & x, const double beta,
+    const Vector<float> & y, Vector<double> & w);
+    
+template int ComputeWAXPBY_ref<double, float, float>(const local_int_t n,
+    const double alpha, const Vector<double> & x, const double beta,
+    const Vector<float> & y, Vector<float> & w);
+    
+template int ComputeWAXPBY_ref<double, float, double>(const local_int_t n,
+    const double alpha, const Vector<double> & x, const double beta,
+    const Vector<float> & y, Vector<double> & w);
+    
+template int ComputeWAXPBY_ref<double, double, float>(const local_int_t n,
+    const double alpha, const Vector<double> & x, const double beta,
+    const Vector<double> & y, Vector<float> & w);

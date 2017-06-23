@@ -24,17 +24,18 @@
 #include <cstdlib>
 #include "Geometry.hpp"
 
-struct Vector_STRUCT {
+template<class datatype>
+struct Vector {
   local_int_t localLength;  //!< length of local portion of the vector
-  float * values;          //!< array of values
+  datatype * values;          //!< array of values
   /*!
    This is for storing optimized data structures created in OptimizeProblem and
    used inside optimized ComputeSPMV().
    */
-  void * optimizationData;
+  datatype * optimizationData;
 
 };
-typedef struct Vector_STRUCT Vector;
+
 
 /*!
   Initializes input vector.
@@ -42,9 +43,10 @@ typedef struct Vector_STRUCT Vector;
   @param[in] v
   @param[in] localLength Length of local portion of input vector
  */
-inline void InitializeVector(Vector & v, local_int_t localLength) {
+template<class datatype>
+inline void InitializeVector(Vector<datatype> & v, local_int_t localLength) {
   v.localLength = localLength;
-  v.values = new float[localLength];
+  v.values = new datatype[localLength];
   v.optimizationData = 0;
   return;
 }
@@ -54,9 +56,10 @@ inline void InitializeVector(Vector & v, local_int_t localLength) {
 
   @param[inout] v - On entrance v is initialized, on exit all its values are zero.
  */
-inline void ZeroVector(Vector & v) {
+template<class datatype>
+inline void ZeroVector(Vector<datatype> & v) {
   local_int_t localLength = v.localLength;
-  float * vv = v.values;
+  datatype * vv = v.values;
   for (int i=0; i<localLength; ++i) vv[i] = 0.0;
   return;
 }
@@ -67,9 +70,10 @@ inline void ZeroVector(Vector & v) {
   @param[in] index Local index of entry to scale
   @param[in] value Value to scale by
  */
-inline void ScaleVectorValue(Vector & v, local_int_t index, float value) {
+template<class datatype1, class datatype2>
+inline void ScaleVectorValue(Vector<datatype1> & v, local_int_t index, datatype2 value) {
   assert(index>=0 && index < v.localLength);
-  float * vv = v.values;
+  datatype1 * vv = v.values;
   vv[index] *= value;
   return;
 }
@@ -78,10 +82,11 @@ inline void ScaleVectorValue(Vector & v, local_int_t index, float value) {
 
   @param[in] v
  */
-inline void FillRandomVector(Vector & v) {
+template<class datatype>
+inline void FillRandomVector(Vector<datatype> & v) {
   local_int_t localLength = v.localLength;
-  float * vv = v.values;
-  for (int i=0; i<localLength; ++i) vv[i] = rand() / (float)(RAND_MAX) + 1.0;
+  datatype * vv = v.values;
+  for (int i=0; i<localLength; ++i) vv[i] = rand() / (datatype)(RAND_MAX) + 1.0;
   return;
 }
 /*!
@@ -90,12 +95,13 @@ inline void FillRandomVector(Vector & v) {
   @param[in] v Input vector
   @param[in] w Output vector
  */
-inline void CopyVector(const Vector & v, Vector & w) {
+template<class datatype1, class datatype2>
+inline void CopyVector(const Vector<datatype1> & v, Vector<datatype2> & w) {
   local_int_t localLength = v.localLength;
   assert(w.localLength >= localLength);
-  float * vv = v.values;
-  float * wv = w.values;
-  for (int i=0; i<localLength; ++i) wv[i] = vv[i];
+  datatype1 * vv = v.values;
+  datatype2 * wv = w.values;
+  for (int i=0; i<localLength; ++i) wv[i] = (datatype2)vv[i];
   return;
 }
 
@@ -105,7 +111,8 @@ inline void CopyVector(const Vector & v, Vector & w) {
 
   @param[in] A the known system matrix
  */
-inline void DeleteVector(Vector & v) {
+template<class datatype>
+inline void DeleteVector(Vector<datatype> & v) {
 
   delete [] v.values;
   v.localLength = 0;

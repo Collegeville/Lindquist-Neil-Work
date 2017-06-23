@@ -31,7 +31,7 @@
   @param[in]    A The known system matrix
   @param[inout] x On entry: the local vector entries followed by entries to be communicated; on exit: the vector with non-local entries updated by other processors
  */
-void ExchangeHalo(const SparseMatrix & A, Vector & x) {
+void ExchangeHalo(const SparseMatrix & A, Vector<float> & x) {
 
   // Extract Matrix pieces
 

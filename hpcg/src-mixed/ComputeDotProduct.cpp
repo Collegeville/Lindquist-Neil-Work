@@ -38,10 +38,24 @@
 
   @see ComputeDotProduct_ref
 */
-int ComputeDotProduct(const local_int_t n, const Vector & x, const Vector & y,
-    double & result, double & time_allreduce, bool & isOptimized) {
+template<class datatype1, class datatype2>
+int ComputeDotProduct(const local_int_t n, const Vector<datatype1> & x,
+    const Vector<datatype2> & y, double & result, double & time_allreduce,
+    bool & isOptimized) {
 
   // This line and the next two lines should be removed and your version of ComputeDotProduct should be used.
   isOptimized = false;
   return ComputeDotProduct_ref(n, x, y, result, time_allreduce);
 }
+
+
+
+template int ComputeDotProduct<float, float>(const local_int_t n,
+    const Vector<float> & x, const Vector<float> & y, double & result,
+    double & time_allreduce, bool & isOptimized);
+template int ComputeDotProduct<double, float>(const local_int_t n,
+    const Vector<double> & x, const Vector<float> & y, double & result,
+    double & time_allreduce, bool & isOptimized);
+template int ComputeDotProduct<double, double>(const local_int_t n,
+    const Vector<double> & x, const Vector<double> & y, double & result,
+    double & time_allreduce, bool & isOptimized);
