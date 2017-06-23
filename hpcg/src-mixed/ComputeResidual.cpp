@@ -46,19 +46,19 @@
 
   @return Returns zero on success and a non-zero value otherwise.
 */
-int ComputeResidual(const local_int_t n, const Vector & v1, const Vector & v2, float & residual) {
+int ComputeResidual(const local_int_t n, const Vector & v1, const Vector & v2, double & residual) {
 
   float * v1v = v1.values;
   float * v2v = v2.values;
-  float local_residual = 0.0;
+  double local_residual = 0.0;
 
 #ifndef HPCG_NO_OPENMP
   #pragma omp parallel default(none) shared(local_residual, v1v, v2v)
   {
-    float threadlocal_residual = 0.0;
+    double threadlocal_residual = 0.0;
     #pragma omp for
     for (local_int_t i=0; i<n; i++) {
-      float diff = std::fabs(v1v[i] - v2v[i]);
+      double diff = std::fabs(v1v[i] - v2v[i]);
       if (diff > threadlocal_residual) threadlocal_residual = diff;
     }
     #pragma omp critical
@@ -68,7 +68,7 @@ int ComputeResidual(const local_int_t n, const Vector & v1, const Vector & v2, f
   }
 #else // No threading
   for (local_int_t i=0; i<n; i++) {
-    float diff = std::fabs(v1v[i] - v2v[i]);
+    double diff = std::fabs(v1v[i] - v2v[i]);
     if (diff > local_residual) local_residual = diff;
 #ifdef HPCG_DETAILED_DEBUG
     HPCG_fout << " Computed, exact, diff = " << v1v[i] << " " << v2v[i] << " " << diff << std::endl;
@@ -78,8 +78,8 @@ int ComputeResidual(const local_int_t n, const Vector & v1, const Vector & v2, f
 
 #ifndef HPCG_NO_MPI
   // Use MPI's reduce function to collect all partial sums
-  float global_residual = 0;
-  MPI_Allreduce(&local_residual, &global_residual, 1, MPI_FLOAT, MPI_MAX, MPI_COMM_WORLD);
+  double global_residual = 0;
+  MPI_Allreduce(&local_residual, &global_residual, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
   residual = global_residual;
 #else
   residual = local_residual;
