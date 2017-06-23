@@ -1,20 +1,34 @@
+cd /home/nslindquist/cs_research/Lindquist-Neil-Work/hpcg/
+
+if [ $# != 0 ]; then
+	sed 3s/.\*/$1\ $1\ $1/ -i MPI_GCC_OMP_Double/bin/hpcg.dat
+	sed 3s/.\*/$1\ $1\ $1/ -i MPI_GCC_OMP_Mixed/bin/hpcg.dat
+	sed 3s/.\*/$1\ $1\ $1/ -i MPI_GCC_OMP_Single/bin/hpcg.dat
+fi
+
+
 echo
 echo ---starting double---
 echo
 
-cd /home/nslindquist/cs_research/Lindquist-Neil-Work/hpcg/MPI_GCC_OMP_Double/bin
+cd MPI_GCC_OMP_Double/bin
 xhpcg
+cd ../..
+
 
 echo
 echo ---starting mixed---
 echo
 
-cd /home/nslindquist/cs_research/Lindquist-Neil-Work/hpcg/MPI_GCC_OMP_Mixed/bin
+cd MPI_GCC_OMP_Mixed/bin
 xhpcg
+cd ../..
+
 
 echo
 echo ---starting single---
 echo
 
-cd /home/nslindquist/cs_research/Lindquist-Neil-Work/hpcg/MPI_GCC_OMP_Single/bin
+cd MPI_GCC_OMP_Single/bin
 xhpcg
+cd ../..
