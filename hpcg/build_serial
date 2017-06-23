@@ -1,0 +1,11 @@
+cd Linux_Serial_Double
+rm src/*
+make
+
+cd Linux_Serial_Mixed
+rm src/*
+make
+
+cd Linux_Serial_Single
+rm src/*
+make

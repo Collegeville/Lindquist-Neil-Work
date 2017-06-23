@@ -1,0 +1,11 @@
+cd MPI_GCC_OMP_Double
+rm src/*
+make
+
+cd MPI_GCC_OMP_Mixed
+rm src/*
+make
+
+cd MPI_GCC_OMP_Single
+rm src/*
+make
