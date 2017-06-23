@@ -45,4 +45,5 @@ hpcg/Linux_Serial_Double/*
 hpcg/Linux_Serial_Mixed/*/*
 hpcg/Linux_Serial_Single/*/*
 hpcg/MPI_GCC_OMP_Double/*
+hpcg/MPI_GCC_OMP_Mixed/*/*
 hpcg/MPI_GCC_OMP_Single/*/*
