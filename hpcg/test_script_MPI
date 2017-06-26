@@ -12,17 +12,17 @@ echo ---starting double---
 echo
 
 cd MPI_GCC_OMP_Double/bin
-xhpcg
+/opt/intel-openmpi/bin/mpiexec xhpcg
 cd ../..
 
 
-echo
-echo ---starting mixed---
-echo
-
-cd MPI_GCC_OMP_Mixed/bin
-xhpcg
-cd ../..
+#echo
+#echo ---starting mixed---
+#echo
+#
+#cd MPI_GCC_OMP_Mixed/bin
+#/opt/intel-openmpi/bin/mpiexec xhpcg
+#cd ../..
 
 
 echo
@@ -30,5 +30,5 @@ echo ---starting single---
 echo
 
 cd MPI_GCC_OMP_Single/bin
-xhpcg
+/opt/intel-openmpi/bin/mpiexec xhpcg
 cd ../..

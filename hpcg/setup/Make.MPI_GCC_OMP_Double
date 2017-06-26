@@ -117,13 +117,13 @@ HPCG_DEFS     = $(HPCG_OPTS) $(HPCG_INCLUDES)
 # - Compilers / linkers - Optimization flags ---------------------------
 # ----------------------------------------------------------------------
 #
-CXX          = mpicxx
-CXXFLAGS     = $(HPCG_DEFS) -O3 -ffast-math -ftree-vectorize -ftree-vectorizer-verbose=0 -fopenmp
+CXX          = /opt/intel-openmpi/bin/mpicxx
+CXXFLAGS     = $(HPCG_DEFS) -O3 -ffast-math -ftree-vectorize -ftree-vectorizer-verbose=0 -qopenmp -xAVX -ipo
 #
 LINKER       = $(CXX)
 LINKFLAGS    = $(CXXFLAGS)
 #
-ARCHIVER     = ar
+ARCHIVER     = xiar
 ARFLAGS      = r
 RANLIB       = echo
 #
