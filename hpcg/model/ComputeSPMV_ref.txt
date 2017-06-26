@@ -62,3 +62,21 @@ bytes stored (excluding counters)
 	theoretical  - 50% decrease
 	
 
+solve for proportions	
+	lS ≈ .6149*lD  #load time
+	sS = .5*sD     #store time
+	mS = mD		   #miscellanious time
+	lS + sS + mS ≈ .74*(lD+sD+mD)
+	
+	0 < lS < 1
+	0 < lD < 1
+	0 < sS < 1
+	0 < sD < 1
+	0 < mS < 1
+	0 < mD < 1
+	
+	.6149*lD + .5*sD + mD ≈ .74*lD+.74*sD +.74*mD
+	-.1251*lD + .24*sD + .26*mD ≈ 0
+	
+
+
