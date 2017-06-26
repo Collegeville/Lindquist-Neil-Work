@@ -35,15 +35,15 @@ bytes loaded (excluding counters, assuming all pointers are the same size)
 		
 		with 32 bit float
 			20 + 20*nrow + 12*nnz
-			~ (12+10/13)*nnz
-			~ (166/13)*nnz
-			~ 12*nnz
+			≈ (12+10/13)*nnz
+			≈ (166/13)*nnz
+			≈ 12*nnz
 		with 64 bit float
 			20 + 20*nrow + 20*nnz
-			=20*(1+nrow+nnz)
-			~ 20*(27/26)*nnz
-			~ (270/13)*nnz
-			~ 20*nnz
+			= 20*(1+nrow+nnz)
+			≈ 20*(27/26)*nnz
+			≈ (270/13)*nnz
+			≈ 20*nnz
 			
 		experimental - 28.65% decrease in overall time (06-26 9:53/10:06)
 					 - 26.83% decrease in overall time (06-26 13:48/14:10)
