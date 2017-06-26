@@ -1,0 +1,23 @@
+problem details
+	nnz ≈ 26*nrow
+	
+compiler specs
+	sizeof(int) = 4
+	sizeof(long) = 8
+	sizeof(long long) = 8
+	sizeof(void*) = 8
+	sizeof(float*) = 8
+	sizeof(double*) = 8
+	sizeof(int*) = 8
+	sizeof(float) = 4
+	sizeof(double) = 8
+
+
+Xeon E5-2420 specs	
+	L1 cache access 4 clocks best-case latency, 2x16 bytes bandwidth
+	L2 cache access 11 clocks best-case latency, 1x32 bytes bandwidth
+	L3 cache access 26-31 clocks (depending on product), 1x32 bytes bandwidth
+	256-bit/cycle ring bus interconnect between cores, graphics, cache and System Agent Domain
+	
+	processor speed 1.9 GHz
+	max memory bandwidth 32GB/s (~16.8 bytes/cycle)
