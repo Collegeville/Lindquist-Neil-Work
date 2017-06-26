@@ -1,0 +1,61 @@
+operations
+	1x compare
+	2x access struct field
+	2x load pointer
+	1x store <datatype> to local
+	2x store <datatype> to accumulator
+	
+	#if MPI
+		1x MPI_Allreduce
+		1x subtract
+		1x store <datatype> to local
+	#end if
+	
+	loop n times:
+		1x compare counter, const
+		1x incr counter
+		1x mult
+		1x add
+		1x load <datatype> from accumulator
+		1x store <datatype> to accumulator
+		#if x dot x
+			1x index array
+			1x load <datatype>
+		#else
+			2x index array
+			2x load <datatype>
+		#end if
+	
+	
+bytes loaded (excluding counters, assuming all pointers are the same size)
+	#if x dot x
+		2*sizeof(void*) + n*sizeof(<datatype>)
+	#else
+		2*sizeof(void*) + n*2*sizeof(<datatype>)
+	#end if
+	
+	calculated for actual setup (sizeof(void*) -> 8 bytes)
+		#if x dot x
+			16 + n*sizeof(<datatype>)
+		#else
+			16 + 2*n*sizeof(<datatype>)
+		#end if
+		
+		with 32 bit float
+			#if x dot x
+				16 + 4*n
+			#else
+				16 + 8*n
+			#end if
+			
+		with 64 bit float
+			#if x dot x
+				16 + 8*n
+			#else
+				16 + 16*n
+			#end if
+			
+		expiremental - 57.00% decrease overall time (06-26 15:28/16:17)
+					 - 41.23% decrease overall time (06-26 13:48/14:10)
+		theoretical  - 50% decrease
+		
