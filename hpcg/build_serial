@@ -1,3 +1,5 @@
+#! /bin/sh
+
 cd Linux_Serial_Double
 rm src/*
 make
