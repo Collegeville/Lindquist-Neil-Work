@@ -1,0 +1,45 @@
+Ran top while "test_script_MPI 104" was running.
+%cpu sat at or just below 2400 for most of the time after it warmed up
+
+total cpu time 0% waiting for I/O completion
+	"	"	   ~95.5% waiting for user process
+	"	"	   ~4.5% waiting for kernal process
+	
+
+State is always R (running) and never D (uninterruptible sleep)
+
+
+----------------------------------------------
+Ran top while "test_script_MPI 160" was running.
+--double--
+%cpu running 1500 ± 200
+
+total cpu time ~60% waiting for user process
+	"	"		0% waiting for I/O completion
+	"	"		~2.5% system
+
+--single--
+%cpu running 1750 ± 200
+
+total cpu time ~70% waiting for user process
+	"	"		0% waiting for I/O completion
+	"	"		~3% system
+
+
+----------------------------------------------
+Ran top while "test_script_MPI 200" was running.
+--double--
+%cpu running 1200 ± 300
+
+--single--
+%cpu running 1300 ± 300
+
+----------------------------------------------
+Ran top while "test_script_MPI 256" was running
+--double--
+%cpu running seemed to bounce around between a few hundred to mid 1000s with a few jumps to 2000s
+
+--single--
+%cpu running seemed to stay between 600 and 1200
+
+
