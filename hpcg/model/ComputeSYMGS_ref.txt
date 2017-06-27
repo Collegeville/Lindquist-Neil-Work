@@ -1,0 +1,68 @@
+operations
+	4x access struct field
+	2x store local_int_t to counter
+	1x subtract
+	1x load local_int_t
+	3x load pointer
+	loop nrow times:
+		1x compare counter, const
+		1x compare counter, 0
+		1x incr counter
+		1x decr counter
+		14x index array
+		6x access struct field
+		4x store <datatype> to acumulator
+		2x load <datatype> from accumulator
+		2x store int to counter
+		2x mult
+		2x add
+		2x divide
+		4x load pointer
+		2x load int
+		4x load <datatype>
+		2x store <datatype>
+		
+	loop nnz times:
+		2x compare counter, const
+		2x incr counter
+		6x index array
+		2x mult
+		2x subtract
+		2x load <datatype> from accumulator
+		2x store <datatype> to accumulator
+		2x load local_int_t
+		4x load <datatype>
+			
+			
+bytes loaded (excluding counters and accumulators, assuming all pointers are the same size)
+	3*sizeof(void*) + sizeof(local_int_t)
+	+ nrow*(4*sizeof(void*) + 2*sizeof(int) + 4*sizeof(<datatype>))
+	+ nnz*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
+
+	calculated for actual setup (sizeof(void*) -> 8 bytes, sizeof(local_int_t) -> sizeof(int) -> 4 bytes)
+		28 + nrow*(40 + 4*sizeof(<datatype>)) + nnz*(8 + 4*sizeof(<datatype>))
+		
+		with 32-bit floats
+			28 + nrow*(48) + nnz*(24)
+			≈ 28 + (336/13)*nnz
+			≈ (336/13)*nnz
+			
+		with 64-bit floats
+			28 + nrow*(72) + nnz*(40)
+			≈ 28 + (556/13)*nnz
+			≈ (556/13)*nnz
+			
+		theoretical  - 39.57% decrease
+		
+		
+		
+		
+bytes stored (excluding counters and accumulators)
+	nrow * 2 * sizeof(<datatype>)
+	
+	with 32 bit float
+		8 * nrow
+	with 64 bit float
+		16 * nrow
+		
+	theoretical  - 50% decrease
