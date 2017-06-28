@@ -2,6 +2,7 @@ operations
 	1x fill vector with 0's
 	1x access struct field
 	1x compare accumulator, 0
+	2x load int
 	#if A.mgData == 0 (if next coarse level is not defined)
 		1x call ComputeSYMGS_ref
 	#else
@@ -23,7 +24,8 @@ operations
 	
 bytes loaded (excluding counters and accumulators, assuming all pointers are the same size)
 	
-	bytesLoaded(ComputeSYMGS_ref)
+	8
+	+ bytesLoaded(ComputeSYMGS_ref)
 	*(1 
 		+ numberOfCoarseLevels
 		*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
@@ -32,7 +34,8 @@ bytes loaded (excluding counters and accumulators, assuming all pointers are the
 		*(bytesLoaded(ComputeRestriction_ref)
 		+ bytesLoaded(ComputeProlongation_ref))
 		
-	= (3*sizeof(void*) + sizeof(local_int_t)
+	= 8
+	+ (3*sizeof(void*) + sizeof(local_int_t)
 		+ nrow*(4*sizeof(void*) + 2*sizeof(int) + 4*sizeof(<datatype>))
 		+ nnz*(2*sizeof(local_int_t) + 4*sizeof(<datatype>)))
 	*(1
@@ -44,7 +47,8 @@ bytes loaded (excluding counters and accumulators, assuming all pointers are the
 		+ (3*sizeof(void*) + sizeof(local_int_t)
 			+ nc*(sizeof(local_int_t) + 2*sizeof(<datatype>))))
 	
-	= (3*sizeof(void*) + sizeof(local_int_t)
+	= 8
+	+ (3*sizeof(void*) + sizeof(local_int_t)
 		+ nrow*(4*sizeof(void*) + 2*sizeof(int) + 4*sizeof(<datatype>))
 		+ nnz*(2*sizeof(local_int_t) + 4*sizeof(<datatype>)))
 	*(1
@@ -56,7 +60,7 @@ bytes loaded (excluding counters and accumulators, assuming all pointers are the
 		
 		
 	calculated for actual setup (sizeof(void*) -> 8 bytes, sizeof(local_int_t) -> sizeof(int) -> 4 bytes)
-		(28 + nrow*(40 + 4*sizeof(<datatype>)) + nnz*(8 + 4*sizeof(<datatype>)))
+		8 + (28 + nrow*(40 + 4*sizeof(<datatype>)) + nnz*(8 + 4*sizeof(<datatype>)))
 		*(1
 			+ numberOfCoarseLevels
 			*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
@@ -64,36 +68,36 @@ bytes loaded (excluding counters and accumulators, assuming all pointers are the
 			*(64 + nc*(8 + 4*sizeof(<datatype>)))
 			
 		with 32-bit floats
-			(28 + 56*nrow + 24*nnz)
+			8 + (28 + 56*nrow + 24*nnz)
 			*(1
 				+ numberOfCoarseLevels
 				*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
 			+ numberOfCoarseLevels
 				*(64 + 24*nc)
 			
-			≈ numberOfCoarseLevels
+			≈ 8 + numberOfCoarseLevels
 			*((28 + 56*nrow + 24*nnz)
 				*(numberOfPresmootherSteps+numberOfPostsmootherSteps)
 				+ 64 + 24*nc)
 			
-			≈ numberOfCoarseLevels
+			≈ 8 + numberOfCoarseLevels
 			*((340/13)*nnz
 				*(numberOfPresmootherSteps+numberOfPostsmootherSteps)
 				+ 24*nc)
 		with 64-bit floats
-			(28 + 72*nrow + 40*nnz)
+			8 + (28 + 72*nrow + 40*nnz)
 			*(1
 				+ numberOfCoarseLevels
 				*(numberOfPresmootherSteps+numberOfPostsmootherSteps)
 			+ numberOfCoarseLevels
 				*(64 + 40*nc)
 				
-			≈ numberOfCoarseLevels
+			≈ 8 + numberOfCoarseLevels
 			*((28 + 72*nrow + 40*nnz)
 				*(numberOfPresmootherSteps+numberOfPostsmootherSteps)
 				+ 64 + 40*nc)
 				
-			≈ numberOfCoarseLevels
+			≈ 8 + numberOfCoarseLevels
 			*((556/13)*nnz
 				*(numberOfPresmootherSteps+numberOfPostsmootherSteps)
 				+ 40*nc)
