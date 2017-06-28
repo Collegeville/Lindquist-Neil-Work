@@ -1,0 +1,26 @@
+Operations
+	4x access struct field
+	1x load local_int_t
+	2x load pointer
+	1x store int to counter
+	loop localLength times:
+		1x compare counter, local
+		1x incr counter
+		2x index array
+		1x load <datatype>
+		1x store <datatype>
+		
+bytes loaded (excluding counters and locals, assuming all pointers are the same size)
+	sizeof(local_int_t) + 2*sizeof(void*) + localLength*sizeof(<datatype>)
+	
+	calculated for actual setup (sizeof(void*) -> 8 bytes, sizeof(local_int_t) -> sizeof(int) -> 4 bytes)
+		20 + localLength*sizeof(<datatype>)
+		
+		with 32-bit floats
+			20 + 4*localLength
+			
+		with 64-bit floats
+			20 + 8*localLength
+			
+			
+		theoretical  - ~50% decrease

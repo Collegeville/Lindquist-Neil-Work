@@ -1,0 +1,13 @@
+
+
+bytes loaded (excluding counters and accumulators, assuming all pointers are the same size)
+	3*sizeof(void*) + n*2*sizeof(<datatype>)
+	
+	calculated for actual setup (sizeof(void*) -> 8 bytes, sizeof(local_int_t) -> sizeof(int) -> 4 bytes)
+		24 + 2*n*sizeof(<datatype>)
+		
+		with 32-bit floats
+			24 + 8*n
+			
+		with 64-bit floats
+			24 + 16*n	

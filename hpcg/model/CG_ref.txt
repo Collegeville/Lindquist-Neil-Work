@@ -1,0 +1,186 @@
+operations
+	4x timer
+	7x store double to local (timers)
+	7x access struct field
+	1x compare bool
+	1x compare value, 0
+	2x call CopyVector
+	1x call ComputeSPMV_ref
+	1x call ComputeWAXPBY_ref
+	1x call ComputeDotProduct_ref<x dot x>
+	1x sqrt
+	6x add
+	1x subtract
+	6x index array
+	6x load double from local
+	2x store <datatype> to local
+	1x store int to counter
+	1x store int
+	6x store double 
+	6x store <datatype> to local
+	loop until convergance:
+		1x compare counter, const
+		1x compare counter, 1
+		1x compare result, const
+		1x incr counter
+		2x divide
+		1x sqrt
+		7x timer
+		2x call ComputeDotProduct_ref<x dot y>
+		1x call ComputeDotProduct_ref<x dot x>
+		1x call ComputeSPMV_ref
+		2x call ComputeWAXPBY_ref
+		2x store <datatype> to local
+		#if not first iteration
+			1x divide
+			1x store <datatype> to local
+			1x call ComputeWAXPBY_ref
+		#endif
+		#if preconditioned
+			1x call ComputeMG_ref
+		#else
+			1x call ComputeWAXPBY_ref
+		#endif
+		
+		
+bytes loaded (excluding counters and locals, assuming all pointers are the same size, assuming all vectors are the same length: n)
+	2*bytesLoaded(CopyVector) + bytesLoaded(ComputeSPMV_ref) + bytesLoaded(ComputeWAXPBY_ref)
+	+ bytesLoaded(ComputeDotProduct_ref<x dot x>) 
+	+ iterationCount*(2*bytesLoaded(ComputeDotProduct_ref<x dot y>)
+		+ bytesLoaded(ComputeDotProduct_ref<x dot x>)
+		+ bytesLoaded(ComputeSPMV_ref) + 2*bytesLoaded(ComputeWAXPBY_ref)
+		+ (preconditioned?bytesLoaded(ComputeMG_ref):bytesLoaded(ComputeWAXPBY_ref)))
+	+ (iterationCount - 1)*bytesLoaded(ComputeWAXPBY_ref)
+	
+	= 2*bytesLoaded(CopyVector) + bytesLoaded(ComputeSPMV_ref)
+	+ bytesLoaded(ComputeDotProduct_ref<x dot x>) 
+	+ iterationCount*(2*bytesLoaded(ComputeDotProduct_ref<x dot y>)
+		+ bytesLoaded(ComputeDotProduct_ref<x dot x>)
+		+ bytesLoaded(ComputeSPMV_ref) + 3*bytesLoaded(ComputeWAXPBY_ref)
+		+ (preconditioned?bytesLoaded(ComputeMG_ref):bytesLoaded(ComputeWAXPBY_ref)))
+		
+	calculated for actual setup (sizeof(void*) -> 8 bytes, sizeof(local_int_t) -> sizeof(int) -> 4 bytes)
+		2*bytesLoaded(CopyVector) + bytesLoaded(ComputeSPMV_ref)
+		+ bytesLoaded(ComputeDotProduct_ref<x dot x>) 
+		+ iterationCount*(2*bytesLoaded(ComputeDotProduct_ref<x dot y>)
+			+ bytesLoaded(ComputeDotProduct_ref<x dot x>)
+			+ bytesLoaded(ComputeSPMV_ref) + 3*bytesLoaded(ComputeWAXPBY_ref)
+			+ (preconditioned?bytesLoaded(ComputeMG_ref):bytesLoaded(ComputeWAXPBY_ref)))
+			
+		= 2*(20 + localLength*sizeof(<datatype>)) + 20 + 20 * n + nnz * (4+2*sizeof(<datatype>))
+		+ 16 + n*sizeof(<datatype>)
+		+ iterationCount*(2*(16 + 2*n*sizeof(<datatype>)) + 16 + n*sizeof(<datatype>)
+			+ 20 + 20 * nrow + nnz * (4+2*sizeof(<datatype>))
+			+ 3*(24 + 2*n*sizeof(<datatype>))
+			+ (preconditioned?
+				(28 + nrow*(40 + 4*sizeof(<datatype>)) + nnz*(8 + 4*sizeof(<datatype>)))
+				*(1
+					+ numberOfCoarseLevels
+					*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
+				+ numberOfCoarseLevels
+					*(64 + n*(8 + 4*sizeof(<datatype>)))
+				:(24 + 2*n*sizeof(<datatype>))))
+				
+				
+		= 76 + n*(20 + 3*sizeof(<datatype>)) + nnz * (4+2*sizeof(<datatype>))
+		+ iterationCount
+			*(164 + n*(20 + 13*sizeof(<datatype>)) + nnz * (4+2*sizeof(<datatype>))
+			+ (preconditioned?
+				(4 + n*(40 + 2*sizeof(<datatype>)) + nnz*(8 + 4*sizeof(<datatype>)))
+				*(1
+					+ numberOfCoarseLevels
+					*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
+				+ numberOfCoarseLevels
+					*(64 + n*(8 + 4*sizeof(<datatype>)))
+				:0))
+				
+				
+		#if preconditioned
+			= 76 + n*(20 + 3*sizeof(<datatype>)) + nnz * (4+2*sizeof(<datatype>))
+			+ iterationCount
+				*(168 + n*(60 + 15*sizeof(<datatype>)) + nnz*(12 + 6*sizeof(<datatype>))
+				+ nnz*(8 + 4*sizeof(<datatype>)))
+					*(numberOfCoarseLevels*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
+				+ numberOfCoarseLevels
+					*(64 + n*(8 + 4*sizeof(<datatype>))))
+		#else
+			= 76 + n*(20 + 3*sizeof(<datatype>)) + nnz * (4+2*sizeof(<datatype>))
+			+ iterationCount
+				*(164 + n*(20 + 13*sizeof(<datatype>)) + nnz*(4+2*sizeof(<datatype>)))
+		#endif
+		
+		
+		with 32-bit float
+			#if preconditioned
+				= 76 + 32*n + 12*nnz
+				+ iterationCount
+					*(168 + 120*n + 36*nnz
+					+ 24*nnz*(numberOfCoarseLevels*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
+					+ numberOfCoarseLevels
+						*(64 + 24*n))
+						
+				= 76 + 32*n + 12*nnz
+				+ iterationCount
+					*(424 + 216*n + 228*nnz)
+					
+				≈ 76 + (172/13)*nnz
+				+ iterationsCount
+					*(424 + (3072/13)*nnz)
+					
+				≈ (172/13)*nnz
+				+ iterationsCount*(3072/13)*nnz
+					
+			#else
+				= 76 + 32*n + 12*nnz
+				+ iterationCount
+					*(164 + 72*n + 12*nnz)
+					
+				≈ 76 + (172/13)*nnz
+				+ iterationCount*(164 + (188/13)*nnz)
+
+
+				≈ (172/13)*nnz
+				+ iterationCount*(188/13)*nnz
+									
+			#endif
+	
+		with 64-bit float
+			#if preconditioned
+				= 76 + 44*n + 20*nnz
+				+ iterationCount
+					*(168 + 180*n + 60*nnz
+					+ 40*nnz*(numberOfCoarseLevels*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
+					+ numberOfCoarseLevels
+						*(64 + 40*n))
+						
+				= 76 + 44*n + 20*nnz
+				+ iterationCount
+					*(424 + 340*n + 380*nnz)
+					
+					
+				≈ 76 + (282/13)*nnz
+				+ iterationCount*(424 + (5110/13)*nnz)
+				
+				≈ (282/13)*nnz
+				+ iterationCount*(5110/13)*nnz
+			#else
+				= 76 + 44*n + 20*nnz
+				+ iterationCount
+					*(164 + 124*n + 20*nnz)
+					
+				≈ 76 + (282/13)*nnz
+				+ iterationCount*(164 + (322/13)*nnz)
+				
+				≈ (282/13)*nnz
+				+ iterationCount*(322/13)*nnz
+			#endif
+	
+	
+		#if preconditioned
+			theoretical  - ~((86 + iterationsCount*1536)/(141 + iterationCount*2555) - 1)
+							≈ 39.9% decrease
+		#else
+			theorietical - ~((86 + 94*iterationCount)/(141 + 161*iterationCount) - 1)
+							≈ 41.6% decrease
+		#endif
+	

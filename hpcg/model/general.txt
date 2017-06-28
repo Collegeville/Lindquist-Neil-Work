@@ -1,5 +1,8 @@
 problem details
 	nnz ≈ 26*nrow
+	numberOfCoarseLevels = 4
+	numberOfPresmootherSteps = 1
+	numberOfPostsmootherSteps = 1
 	
 compiler specs
 	sizeof(int) = 4
