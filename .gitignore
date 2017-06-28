@@ -47,3 +47,7 @@ hpcg/Linux_Serial_Single/*/*
 hpcg/MPI_GCC_OMP_Double/*
 hpcg/MPI_GCC_OMP_Mixed/*/*
 hpcg/MPI_GCC_OMP_Single/*/*
+
+
+#libreoffice lock files
+.~lock*#
