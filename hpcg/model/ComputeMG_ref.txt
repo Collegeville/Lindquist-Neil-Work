@@ -67,40 +67,19 @@ bytes loaded (excluding counters and accumulators, assuming all pointers are the
 		+ numberOfCoarseLevels
 			*(64 + nc*(8 + 4*sizeof(<datatype>)))
 			
+		= 516 + n*(392 + 52*sizeof(<datatype>)) + nnz*(72 + 36*sizeof(<datatype>))
+		
+		≈ 516 + nnz*(1132/13 + 38*sizeof(<datatype>))
+			
 		with 32-bit floats
-			8 + (28 + 56*nrow + 24*nnz)
-			*(1
-				+ numberOfCoarseLevels
-				*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
-			+ numberOfCoarseLevels
-				*(64 + 24*nc)
+			≈ 516 + nnz*(3108/13)
 			
-			≈ 8 + numberOfCoarseLevels
-			*((28 + 56*nrow + 24*nnz)
-				*(numberOfPresmootherSteps+numberOfPostsmootherSteps)
-				+ 64 + 24*nc)
+			≈ nnz*(3108/13)
 			
-			≈ 8 + numberOfCoarseLevels
-			*((340/13)*nnz
-				*(numberOfPresmootherSteps+numberOfPostsmootherSteps)
-				+ 24*nc)
 		with 64-bit floats
-			8 + (28 + 72*nrow + 40*nnz)
-			*(1
-				+ numberOfCoarseLevels
-				*(numberOfPresmootherSteps+numberOfPostsmootherSteps)
-			+ numberOfCoarseLevels
-				*(64 + 40*nc)
-				
-			≈ 8 + numberOfCoarseLevels
-			*((28 + 72*nrow + 40*nnz)
-				*(numberOfPresmootherSteps+numberOfPostsmootherSteps)
-				+ 64 + 40*nc)
-				
-			≈ 8 + numberOfCoarseLevels
-			*((556/13)*nnz
-				*(numberOfPresmootherSteps+numberOfPostsmootherSteps)
-				+ 40*nc)
+			≈ 516 + nnz*(5084/13)
+			
+			≈ nnz*(5084/13)
 			
 				
-		theoretical  - ~38.85% decrease
+		theoretical  - ~38.86% decrease

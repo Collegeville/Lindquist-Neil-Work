@@ -72,37 +72,21 @@ bytes loaded (excluding counters and locals, assuming all pointers are the same 
 		+ iterationCount*(2*(16 + 2*n*sizeof(<datatype>)) + 16 + n*sizeof(<datatype>)
 			+ 20 + 20 * nrow + nnz * (4+2*sizeof(<datatype>))
 			+ 3*(24 + 2*n*sizeof(<datatype>))
-			+ (preconditioned?(8 +
-				(28 + nrow*(40 + 4*sizeof(<datatype>)) + nnz*(8 + 4*sizeof(<datatype>)))
-				*(1
-					+ numberOfCoarseLevels
-					*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
-				+ numberOfCoarseLevels
-					*(64 + n*(8 + 4*sizeof(<datatype>))))
+			+ (preconditioned?(516 + n*(392 + 52*sizeof(<datatype>)) + nnz*(72 + 36*sizeof(<datatype>)))
 				:(24 + 2*n*sizeof(<datatype>))))
 				
 				
 		= 76 + n*(20 + 3*sizeof(<datatype>)) + nnz * (4+2*sizeof(<datatype>))
 		+ iterationCount
 			*(164 + n*(20 + 13*sizeof(<datatype>)) + nnz * (4+2*sizeof(<datatype>))
-			+ (preconditioned?(8 + 
-				(4 + n*(40 + 2*sizeof(<datatype>)) + nnz*(8 + 4*sizeof(<datatype>)))
-				*(1
-					+ numberOfCoarseLevels
-					*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
-				+ numberOfCoarseLevels
-					*(64 + n*(8 + 4*sizeof(<datatype>)))
+			+ (preconditioned?(516 + n*(392 + 52*sizeof(<datatype>)) + nnz*(72 + 36*sizeof(<datatype>)))
 				:0))
 				
 				
 		#if preconditioned
 			= 76 + n*(20 + 3*sizeof(<datatype>)) + nnz * (4+2*sizeof(<datatype>))
 			+ iterationCount
-				*(176 + n*(60 + 15*sizeof(<datatype>)) + nnz*(12 + 6*sizeof(<datatype>))
-				+ nnz*(8 + 4*sizeof(<datatype>)))
-					*(numberOfCoarseLevels*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
-				+ numberOfCoarseLevels
-					*(64 + n*(8 + 4*sizeof(<datatype>))))
+				*(680 + n*(412 + 65*sizeof(<datatype>)) + nnz * (76 + 38*sizeof(<datatype>)))
 		#else
 			= 76 + n*(20 + 3*sizeof(<datatype>)) + nnz * (4+2*sizeof(<datatype>))
 			+ iterationCount
@@ -113,22 +97,13 @@ bytes loaded (excluding counters and locals, assuming all pointers are the same 
 		with 32-bit float
 			#if preconditioned
 				= 76 + 32*n + 12*nnz
-				+ iterationCount
-					*(176 + 120*n + 36*nnz
-					+ 24*nnz*(numberOfCoarseLevels*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
-					+ numberOfCoarseLevels
-						*(64 + 24*n))
-						
-				= 76 + 32*n + 12*nnz
-				+ iterationCount
-					*(432 + 216*n + 228*nnz)
+				+ iterationCount*(680 + 672*n + 228*nnz)
 					
-				≈ 76 + (172/13)*nnz
-				+ iterationsCount
-					*(432 + (3072/13)*nnz)
+				≈ 76 + 172/13*nnz
+				+ iterationCount*(680 + 3300/13*nnz)
 					
 				≈ (172/13)*nnz
-				+ iterationsCount*(3072/13)*nnz
+				+ iterationsCount*(3300/13)*nnz
 					
 			#else
 				= 76 + 32*n + 12*nnz
@@ -147,22 +122,11 @@ bytes loaded (excluding counters and locals, assuming all pointers are the same 
 		with 64-bit float
 			#if preconditioned
 				= 76 + 44*n + 20*nnz
-				+ iterationCount
-					*(176 + 180*n + 60*nnz
-					+ 40*nnz*(numberOfCoarseLevels*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
-					+ numberOfCoarseLevels
-						*(64 + 40*n))
-						
-				= 76 + 44*n + 20*nnz
-				+ iterationCount
-					*(432 + 340*n + 380*nnz)
+				+ iterationCount*(680 + 932*n + 380*nnz)
 					
-					
-				≈ 76 + (282/13)*nnz
-				+ iterationCount*(432 + (5110/13)*nnz)
+				≈ 76 + 282/13*nnz + iterationCount*(680 + 5406/13*nnz)
 				
-				≈ (282/13)*nnz
-				+ iterationCount*(5110/13)*nnz
+				≈ (282/13)*nnz + iterationCount*(5406/13)*nnz
 			#else
 				= 76 + 44*n + 20*nnz
 				+ iterationCount
@@ -177,7 +141,7 @@ bytes loaded (excluding counters and locals, assuming all pointers are the same 
 	
 	
 		#if preconditioned
-			theoretical  - ~39.9% decrease
+			theoretical  - ~39.96% decrease
 		#else
 			theorietical - ~41.6% decrease
 		#endif
