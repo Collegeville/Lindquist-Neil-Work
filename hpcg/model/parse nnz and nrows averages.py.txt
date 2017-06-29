@@ -1,0 +1,67 @@
+#the key commands used to calculate the average nnz for different levels if
+#coarseness as well as the average nnz_n/nnz_0
+
+import os
+import glob
+
+os.chdir('../../../MPI_GCC_OMP_Double/bin/benchmark runs')
+doubleBenchmarks = glob.glob('HPCG-Benchmark*')
+doubleBenchmarks = list(os.getcwd()+"/"+path for path in doubleBenchmarks)
+doubleBenchmarks[0]
+os.chdir('../../../MPI_GCC_OMP_Single/bin/benchmark runs')
+singleBenchmarks = glob.glob('HPCG-Benchmark*')
+singleBenchmarks = list(os.getcwd()+"/"+path for path in singleBenchmarks)
+singleBenchmarks[0]
+for f in singleBenchmarks:
+  with open(f) as file:
+    singleContents.append(f.readlines())
+for f in singleBenchmarks:
+  with open(f) as file:
+    singleContents.append(file.readlines())
+doubleContents = []
+for f in doubleBenchmarks:
+  with open(f) as file:
+    doubleContents.append(file.readlines())
+
+doubleContents[0][0]
+fullSingleContent = singleContent
+fullSingleContents = singleContents
+fullDoubleContents = doubleContents
+
+singleContents = [[line.strip() for line in c] for c in singleContents]
+doubleContents = [[line.strip() for line in c] for c in doubleContents]
+singleContents = [c[24:42] for c in singleContents]
+doubleContents = [c[24:42] for c in doubleContents]
+singleContents[0][0]
+singleContents[0][1][51:]
+singleContents[0][0][45:]
+singleContents[0][0][47:]
+
+doubleNNZ = sum(float(c[1][51:])/float(c[0][47:]) for c in doubleContents)/len(doubleContents)
+doubleNNZ
+singleNNZ = sum(float(c[1][51:])/float(c[0][47:]) for c in singleContents)/len(singleContents)
+singleNNZ
+singleNNZ_1 = sum(float(c[7][61:])/float(c[6][57:]) for c in singleContents)/len(singleContents)
+doubleNNZ_1 = sum(float(c[7][61:])/float(c[6][57:]) for c in doubleContents)/len(doubleContents)
+singleNNZ_2 = sum(float(c[12][61:])/float(c[11][57:]) for c in singleContents)/len(singleContents)
+doubleNNZ_2 = sum(float(c[12][61:])/float(c[11][57:]) for c in doubleContents)/len(doubleContents)
+singleNNZ_3 = sum(float(c[17][61:])/float(c[16][57:]) for c in singleContents)/len(singleContents)
+doubleNNZ_3 = sum(float(c[17][61:])/float(c[16][57:]) for c in doubleContents)/len(doubleContents)
+singleNNZ_1
+singleNNZ_2
+singleNNZ_3
+doubleNNZ_1
+doubleNNZ_2
+doubleNNZ_3
+doubleCoarseRatio_1 = sum(float(c[7][61:])/float(c[1][51:]) for c in doubleContents)/len(doubleContents)
+singleCoarseRatio_1 = sum(float(c[7][61:])/float(c[1][51:]) for c in singleContents)/len(singleContents)
+singleCoarseRatio_2 = sum(float(c[12][61:])/float(c[1][51:]) for c in singleContents)/len(singleContents)
+singleCoarseRatio_3 = sum(float(c[17][61:])/float(c[1][51:]) for c in singleContents)/len(singleContents)
+doubleCoarseRatio_2 = sum(float(c[12][61:])/float(c[1][51:]) for c in doubleContents)/len(doubleContents)
+doubleCoarseRatio_3 = sum(float(c[17][61:])/float(c[1][51:]) for c in doubleContents)/len(doubleContents)
+singleCoarseRatio_1
+singleCoarseRatio_2
+singleCoarseRatio_3
+doubleCoarseRatio_1
+doubleCoarseRatio_2
+doubleCoarseRatio_3

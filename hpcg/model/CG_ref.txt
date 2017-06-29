@@ -72,21 +72,43 @@ bytes loaded (excluding counters and locals, assuming all pointers are the same 
 		+ iterationCount*(2*(16 + 2*n*sizeof(<datatype>)) + 16 + n*sizeof(<datatype>)
 			+ 20 + 20 * nrow + nnz * (4+2*sizeof(<datatype>))
 			+ 3*(24 + 2*n*sizeof(<datatype>))
-			+ (preconditioned?(516 + n*(392 + 52*sizeof(<datatype>)) + nnz*(72 + 36*sizeof(<datatype>)))
+			+ (preconditioned?(432
+					+ n_0*(124 + 14*sizeof(<datatype>))
+					+ n_1*(44 + 6*sizeof(<datatype>))
+					+ n_2*(44 + 6*sizeof(<datatype>))
+					+ n_3*(44 + 6*sizeof(<datatype>))	
+					+ nnz_0*(24 + 12*sizeof(<datatype>))
+					+ nnz_1*(8 + 4*sizeof(<datatype>))
+					+ nnz_2*(8 + 4*sizeof(<datatype>))
+					+ nnz_3*(8 + 4*sizeof(<datatype>)))
 				:(24 + 2*n*sizeof(<datatype>))))
 				
 				
 		= 76 + n*(20 + 3*sizeof(<datatype>)) + nnz * (4+2*sizeof(<datatype>))
 		+ iterationCount
 			*(164 + n*(20 + 13*sizeof(<datatype>)) + nnz * (4+2*sizeof(<datatype>))
-			+ (preconditioned?(516 + n*(392 + 52*sizeof(<datatype>)) + nnz*(72 + 36*sizeof(<datatype>)))
+			+ (preconditioned?(432
+				+ n_0*(124 + 14*sizeof(<datatype>))
+				+ n_1*(44 + 6*sizeof(<datatype>))
+				+ n_2*(44 + 6*sizeof(<datatype>))
+				+ n_3*(44 + 6*sizeof(<datatype>))	
+				+ nnz_0*(24 + 12*sizeof(<datatype>))
+				+ nnz_1*(8 + 4*sizeof(<datatype>))
+				+ nnz_2*(8 + 4*sizeof(<datatype>))
+				+ nnz_3*(8 + 4*sizeof(<datatype>)))
 				:0))
 				
 				
 		#if preconditioned
 			= 76 + n*(20 + 3*sizeof(<datatype>)) + nnz * (4+2*sizeof(<datatype>))
 			+ iterationCount
-				*(680 + n*(412 + 65*sizeof(<datatype>)) + nnz * (76 + 38*sizeof(<datatype>)))
+				*(596 + n*(144 + 27*sizeof(<datatype>)) + nnz * (28+12*sizeof(<datatype>))
+					+ n_1*(44 + 6*sizeof(<datatype>))
+					+ n_2*(44 + 6*sizeof(<datatype>))
+					+ n_3*(44 + 6*sizeof(<datatype>))	
+					+ nnz_1*(8 + 4*sizeof(<datatype>))
+					+ nnz_2*(8 + 4*sizeof(<datatype>))
+					+ nnz_3*(8 + 4*sizeof(<datatype>)))
 		#else
 			= 76 + n*(20 + 3*sizeof(<datatype>)) + nnz * (4+2*sizeof(<datatype>))
 			+ iterationCount
@@ -97,13 +119,18 @@ bytes loaded (excluding counters and locals, assuming all pointers are the same 
 		with 32-bit float
 			#if preconditioned
 				= 76 + 32*n + 12*nnz
-				+ iterationCount*(680 + 672*n + 228*nnz)
+				+ iterationCount
+					*(596 + 252*n + 76*nnz
+						+ 68*(n_1 + n_2 + n_3)
+						+ 24*(nnz_1 + nnz_2 + nnz_3))
 					
 				≈ 76 + 172/13*nnz
-				+ iterationCount*(680 + 3300/13*nnz)
+				+ iterationCount
+					*(596 + 1114/13*nnz
+						+ 346/13*(nnz_1 + nnz_2 + nnz_3))
 					
 				≈ (172/13)*nnz
-				+ iterationsCount*(3300/13)*nnz
+				+ iterationsCount*(1114/13*nnz + 346/13*(nnz_1 + nnz_2 + nnz_3))
 					
 			#else
 				= 76 + 32*n + 12*nnz
@@ -122,11 +149,17 @@ bytes loaded (excluding counters and locals, assuming all pointers are the same 
 		with 64-bit float
 			#if preconditioned
 				= 76 + 44*n + 20*nnz
-				+ iterationCount*(680 + 932*n + 380*nnz)
+				+ iterationCount
+					*(596 + 360*n + 124*nnz
+						+ 92*(n_1 + n_2 + n_3)
+						+ 40*(nnz_1 + nnz_2 + nnz_3)
 					
-				≈ 76 + 282/13*nnz + iterationCount*(680 + 5406/13*nnz)
+				≈ 76 + 282/13*nnz
+				+ iterationCount
+					*(596 + 1792/13*nnz + 566/13*(nnz_1 + nnz_2 + nnz_3))
 				
-				≈ (282/13)*nnz + iterationCount*(5406/13)*nnz
+				≈ (282/13)*nnz 
+				+ iterationCount*((1792/13)*nnz + (566/13)*(nnz_1 + nnz_2 + nnz_3))
 			#else
 				= 76 + 44*n + 20*nnz
 				+ iterationCount
@@ -141,7 +174,7 @@ bytes loaded (excluding counters and locals, assuming all pointers are the same 
 	
 	
 		#if preconditioned
-			theoretical  - ~39.96% decrease
+			theoretical  - ~37.89% decrease
 		#else
 			theorietical - ~41.6% decrease
 		#endif

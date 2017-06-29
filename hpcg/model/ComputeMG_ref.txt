@@ -22,64 +22,104 @@ operations
 	#end if
 	
 	
-bytes loaded (excluding counters and accumulators, assuming all pointers are the same size)
+bytes loaded (excluding counters and accumulators, assuming all pointers are the same size, A_n is the nth coarsifid version of the matrix)
 	
 	8
-	+ bytesLoaded(ComputeSYMGS_ref)
-	*(1 
-		+ numberOfCoarseLevels
-		*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
+	+ bytesLoaded(ComputeSYMGS_ref(A_0)
+		*(1 + numberOfPresmootherSteps+numberOfPostsmootherSteps)
+	+ bytesLoaded(ComputeSYMGS_ref(A_1)
+	+ bytesLoaded(ComputeSYMGS_ref(A_2)
+	+ bytesLoaded(ComputeSYMGS_ref(A_3)
 	
-	+ numberOfCoarseLevels
-		*(bytesLoaded(ComputeRestriction_ref)
-		+ bytesLoaded(ComputeProlongation_ref))
+	+ bytesLoaded(ComputeRestriction_ref(A_0))
+	+ bytesLoaded(ComputeRestriction_ref(A_1))
+	+ bytesLoaded(ComputeRestriction_ref(A_2))
+	+ bytesLoaded(ComputeRestriction_ref(A_3))
+	
+	+ bytesLoaded(ComputeProlongation_ref(A_0))
+	+ bytesLoaded(ComputeProlongation_ref(A_1))
+	+ bytesLoaded(ComputeProlongation_ref(A_2))
+	+ bytesLoaded(ComputeProlongation_ref(A_3))
 		
 	= 8
 	+ (3*sizeof(void*) + sizeof(local_int_t)
-		+ nrow*(4*sizeof(void*) + 2*sizeof(int) + 4*sizeof(<datatype>))
-		+ nnz*(2*sizeof(local_int_t) + 4*sizeof(<datatype>)))
-	*(1
-		+ numberOfCoarseLevels
-		*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
-	+ numberOfCoarseLevels
-		*((4*sizeof(void*) + sizeof(local_int_t)
-			+ nc*(sizeof(local_int_t) + 2*sizeof(<datatype>)))
-		+ (3*sizeof(void*) + sizeof(local_int_t)
-			+ nc*(sizeof(local_int_t) + 2*sizeof(<datatype>))))
+		+ n_0*(4*sizeof(void*) + 2*sizeof(int) + 4*sizeof(<datatype>))
+		+ nnz_0*(2*sizeof(local_int_t) + 4*sizeof(<datatype>)))
+	  *(1 + numberOfPresmootherSteps+numberOfPostsmootherSteps)
+	+ 3*sizeof(void*) + sizeof(local_int_t)
+		+ n_1*(4*sizeof(void*) + 2*sizeof(int) + 4*sizeof(<datatype>))
+		+ nnz_1*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
+	+ 3*sizeof(void*) + sizeof(local_int_t)
+		+ n_2*(4*sizeof(void*) + 2*sizeof(int) + 4*sizeof(<datatype>))
+		+ nnz_2*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
+	+ 3*sizeof(void*) + sizeof(local_int_t)
+		+ n_3*(4*sizeof(void*) + 2*sizeof(int) + 4*sizeof(<datatype>))
+		+ nnz_3*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
+		
+	+ 4*sizeof(void*) + sizeof(local_int_t) + n_0*(sizeof(local_int_t) + 2*sizeof(<datatype>))
+	+ 4*sizeof(void*) + sizeof(local_int_t) + n_1*(sizeof(local_int_t) + 2*sizeof(<datatype>))
+	+ 4*sizeof(void*) + sizeof(local_int_t) + n_2*(sizeof(local_int_t) + 2*sizeof(<datatype>))
+	+ 4*sizeof(void*) + sizeof(local_int_t) + n_3*(sizeof(local_int_t) + 2*sizeof(<datatype>))
 	
+	+ 3*sizeof(void*) + sizeof(local_int_t) + n_0*(sizeof(local_int_t) + 2*sizeof(<datatype>))
+	+ 3*sizeof(void*) + sizeof(local_int_t) + n_1*(sizeof(local_int_t) + 2*sizeof(<datatype>))
+	+ 3*sizeof(void*) + sizeof(local_int_t) + n_2*(sizeof(local_int_t) + 2*sizeof(<datatype>))
+	+ 3*sizeof(void*) + sizeof(local_int_t) + n_3*(sizeof(local_int_t) + 2*sizeof(<datatype>))
+		
+		
+		
 	= 8
 	+ (3*sizeof(void*) + sizeof(local_int_t)
-		+ nrow*(4*sizeof(void*) + 2*sizeof(int) + 4*sizeof(<datatype>))
-		+ nnz*(2*sizeof(local_int_t) + 4*sizeof(<datatype>)))
-	*(1
-		+ numberOfCoarseLevels
-		*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
-	+ numberOfCoarseLevels
-		*((7*sizeof(void*) + 2*sizeof(local_int_t)
-			+ 2*nc*(sizeof(local_int_t) + 2*sizeof(<datatype>))))
-		
-		
+		+ n_0*(4*sizeof(void*) + 2*sizeof(int) + 4*sizeof(<datatype>))
+		+ nnz_0*(2*sizeof(local_int_t) + 4*sizeof(<datatype>)))
+	  *(numberOfPresmootherSteps+numberOfPostsmootherSteps)
+	 	
+	+ 40*sizeof(void*) + 12*sizeof(local_int_t)
+	
+	+ n_0*(4*sizeof(void*) + sizeof(local_int_t) + 2*sizeof(int) + 6*sizeof(<datatype>))
+	+ n_1*(4*sizeof(void*) + sizeof(local_int_t) + 2*sizeof(int) + 6*sizeof(<datatype>))
+	+ n_2*(4*sizeof(void*) + sizeof(local_int_t) + 2*sizeof(int) + 6*sizeof(<datatype>))
+	+ n_3*(4*sizeof(void*) + sizeof(local_int_t) + 2*sizeof(int) + 6*sizeof(<datatype>))
+				
+	+ nnz_0*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
+	+ nnz_1*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
+	+ nnz_2*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
+	+ nnz_3*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
+	
+	
+	
 	calculated for actual setup (sizeof(void*) -> 8 bytes, sizeof(local_int_t) -> sizeof(int) -> 4 bytes)
-		8 + (28 + nrow*(40 + 4*sizeof(<datatype>)) + nnz*(8 + 4*sizeof(<datatype>)))
-		*(1
-			+ numberOfCoarseLevels
-			*(numberOfPresmootherSteps+numberOfPostsmootherSteps))
-		+ numberOfCoarseLevels
-			*(64 + nc*(8 + 4*sizeof(<datatype>)))
 			
-		= 516 + n*(392 + 52*sizeof(<datatype>)) + nnz*(72 + 36*sizeof(<datatype>))
-		
-		≈ 516 + nnz*(1132/13 + 38*sizeof(<datatype>))
+		432
+		+ n_0*(124 + 14*sizeof(<datatype>))
+		+ n_1*(44 + 6*sizeof(<datatype>))
+		+ n_2*(44 + 6*sizeof(<datatype>))
+		+ n_3*(44 + 6*sizeof(<datatype>))	
+		+ nnz_0*(24 + 12*sizeof(<datatype>))
+		+ nnz_1*(8 + 4*sizeof(<datatype>))
+		+ nnz_2*(8 + 4*sizeof(<datatype>))
+		+ nnz_3*(8 + 4*sizeof(<datatype>))
 			
 		with 32-bit floats
-			≈ 516 + nnz*(3108/13)
-			
-			≈ nnz*(3108/13)
-			
+			432
+			+ n_0*(180)
+			+ n_1*(68)
+			+ n_2*(68)
+			+ n_3*(68)	
+			+ nnz_0*(72)
+			+ nnz_1*(24)
+			+ nnz_2*(24)
+			+ nnz_3*(24)
+		
 		with 64-bit floats
-			≈ 516 + nnz*(5084/13)
-			
-			≈ nnz*(5084/13)
-			
+			432
+			+ n_0*(236)
+			+ n_1*(92)
+			+ n_2*(92)
+			+ n_3*(92)	
+			+ nnz_0*(120)
+			+ nnz_1*(40)
+			+ nnz_2*(40)
+			+ nnz_3*(40)
 				
-		theoretical  - ~38.86% decrease
+		theoretical  - ~38.88% decrease

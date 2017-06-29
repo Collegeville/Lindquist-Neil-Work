@@ -1,8 +1,17 @@
 problem details
-	nnz ≈ 26*nrow
 	numberOfCoarseLevels = 4
 	numberOfPresmootherSteps = 1
 	numberOfPostsmootherSteps = 1
+	
+	
+	nnz ≈ n * 26.52
+	nnz_1 ≈ n_1 * 26.05
+	nnz_2 ≈ n_2 * 25.15
+	nnz_3 ≈ n_3 * 23.50
+
+	nnz_1 ≈ .1227 * nnz
+	nnz_2 ≈ .01480 * nnz
+	nnz_3 ≈ .00173 * nnz
 	
 compiler specs
 	sizeof(int) = 4
