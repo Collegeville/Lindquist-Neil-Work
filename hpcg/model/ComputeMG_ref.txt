@@ -43,57 +43,57 @@ bytes loaded (excluding counters and accumulators, assuming all pointers are the
 	+ bytesLoaded(ComputeSYMGS_ref(A_3))
 	
 	
-	= 8*sizeof(int) + 24*sizeof(void*) + 7*sizeof(local_int_t) 
+	= 8*sizeof(int) + 24*sizeof(void*) + 7*sizeof(local_int_t)
 	
 	+ n_0*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
 	+ n_1*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
 	+ n_2*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
 	
-	+ n_3*(4*sizeof(void*) + 2*sizeof(int) + 4*sizeof(<datatype>))
+	+ n_3*(6*sizeof(void*) + 2*sizeof(int) + 6*sizeof(<datatype>))
 	+ nnz_3*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
 	
 	+ (numberOfPresmootherSteps+numberOfPostsmootherSteps)
 		*(9*sizeof(void*) + 3*sizeof(local_int_t)
-		+ n_0*(4*sizeof(void*) + 2*sizeof(int) + 4*sizeof(<datatype>))
-		+ n_1*(4*sizeof(void*) + 2*sizeof(int) + 4*sizeof(<datatype>))
-		+ n_2*(4*sizeof(void*) + 2*sizeof(int) + 4*sizeof(<datatype>))
+		+ n_0*(6*sizeof(void*) + 2*sizeof(int) + 6*sizeof(<datatype>))
 		+ nnz_0*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
+		+ n_1*(6*sizeof(void*) + 2*sizeof(int) + 6*sizeof(<datatype>))
 		+ nnz_1*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
+		+ n_2*(6*sizeof(void*) + 2*sizeof(int) + 6*sizeof(<datatype>))
 		+ nnz_2*(2*sizeof(local_int_t) + 4*sizeof(<datatype>)))
 	
 	
 	calculated for actual setup (sizeof(void*) -> 8 bytes, sizeof(local_int_t) -> sizeof(int) -> 4 bytes)
 			
-		= 420
-		+ n_0*(88 + 12*sizeof(<datatype>))
-		+ n_1*(88 + 12*sizeof(<datatype>))
-		+ n_2*(88 + 12*sizeof(<datatype>))
-		+ n_3*(40 + 4*sizeof(<datatype>))	
+		420
+		+ n_0*(120 + 16*sizeof(<datatype>))
+		+ n_1*(120 + 16*sizeof(<datatype>))
+		+ n_2*(120 + 16*sizeof(<datatype>))
+		+ n_3*(56 + 6*sizeof(<datatype>))
 		+ nnz_0*(16 + 8*sizeof(<datatype>))
 		+ nnz_1*(16 + 8*sizeof(<datatype>))
 		+ nnz_2*(16 + 8*sizeof(<datatype>))
 		+ nnz_3*(8 + 4*sizeof(<datatype>))
 			
 		with 32-bit floats
-			= 420
-			+ n_0*(136)
-			+ n_1*(136)
-			+ n_2*(136)
-			+ n_3*(56)	
+			420
+			+ n_0*(184)
+			+ n_1*(184)
+			+ n_2*(184)
+			+ n_3*(80)
 			+ nnz_0*(48)
 			+ nnz_1*(48)
 			+ nnz_2*(48)
 			+ nnz_3*(24)
 		
 		with 64-bit floats
-			= 420
-			+ n_0*(184)
-			+ n_1*(184)
-			+ n_2*(184)
-			+ n_3*(72)	
+			420
+			+ n_0*(248)
+			+ n_1*(248)
+			+ n_2*(248)
+			+ n_3*(104)
 			+ nnz_0*(80)
 			+ nnz_1*(80)
 			+ nnz_2*(80)
 			+ nnz_3*(40)
 				
-		theoretical  - ~38.89% decrease
+		theoretical  - ~38.51% decrease
