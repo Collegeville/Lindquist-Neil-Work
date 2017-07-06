@@ -1,0 +1,9 @@
+templated: <datatype>
+
+bytes loaded (excluding counters, assuming all pointers are the same size)
+	2*sizeof(void*) + sizeof(local_int_t)
+	+ nrow * (2*sizeof(void*) + sizeof(int))
+	+ nnz * (sizeof(local_int_t)+2*sizeof(float))
+	
+	calculated for actual setup (sizeof(void*) -> 8 bytes, sizeof(local_int_t) -> sizeof(int) -> 4 bytes)
+		20 + 20*nrow + 12*nnz

@@ -1,0 +1,16 @@
+templated: <datatype1, datatype2, datatype3>
+
+bytes loaded (excluding counters and accumulators, assuming all pointers are the same size)
+	3*sizeof(void*) + n*(sizeof(<datatype1>) + sizeof(<datatype2>))
+
+	calculated for actual setup (sizeof(void*) -> 8 bytes, sizeof(local_int_t) -> sizeof(int) -> 4 bytes)
+	24 + n*(sizeof(<datatype1>) + sizeof(<datatype2>))
+
+	for <float, float, *>
+		24 + 8*n
+
+	for <float, double, *> or <double, float, *>
+		24 + 12*n
+
+	for <double, double, *>
+		24 + 16*n

@@ -1,0 +1,27 @@
+templated: <datatype1, datatype2>		
+		
+
+bytes loaded (excluding counters, assuming all pointers are the same size)
+	#if x dot x
+		16 + n*sizeof(<datatype1>)
+	#else
+		16 + n*sizeof(<datatype1>) + n*sizeof(<datatype2>)
+	#endif
+	
+	for <float, float>
+		#if x dot x
+			16 + 4*n
+		#else
+			16 + 8*n
+		#end if
+		
+	for <double, double>
+		#if x dot x
+			16 + 8*n
+		#else
+			16 + 16*n
+		#end if
+		
+	for <float, double> or <double, float>
+		note: cannot be x dot x
+		16 + 12*n

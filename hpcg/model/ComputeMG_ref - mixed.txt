@@ -1,0 +1,46 @@
+templated: <datatype>
+
+
+bytes loaded (excluding counters and accumulators, assuming all pointers are the same size, A_n is the nth coarsifid version of the matrix)
+	
+	2*sizeof(int)
+	+ bytesLoaded(ComputeSPMV_ref<double>(A_0))
+	+ bytesLoaded(ComputeRestriction_ref<datatype>(A_0))
+	+ bytesLoaded(ComputeProlongation_ref(A_0))
+	+ (numberOfPresmootherSteps+numberOfPostsmootherSteps)*bytesLoaded(ComputeSYMGS_ref<datatype>(A_0))
+	
+	+ 2*sizeof(int)
+	+ bytesLoaded(ComputeSPMV_ref<double>(A_1))
+	+ bytesLoaded(ComputeRestriction_ref<double>(A_1))
+	+ bytesLoaded(ComputeProlongation_ref(A_1))
+	+ (numberOfPresmootherSteps+numberOfPostsmootherSteps)*bytesLoaded(ComputeSYMGS_ref<double>(A_1))
+	
+	+ 2*sizeof(int)
+	+ bytesLoaded(ComputeSPMV_ref<double>(A_2))
+	+ bytesLoaded(ComputeRestriction_ref<double>(A_2))
+	+ bytesLoaded(ComputeProlongation_ref(A_2))
+	+ (numberOfPresmootherSteps+numberOfPostsmootherSteps)*bytesLoaded(ComputeSYMGS_ref(A_2))
+	
+	+ 2*sizeof(int)
+	+ bytesLoaded(ComputeSYMGS_ref<double>(A_3))
+
+	calculated for actual setup (sizeof(void*) -> 8 bytes, sizeof(local_int_t) -> sizeof(int) -> 4 bytes)
+		480
+		+ n_0*(156 + 5*sizeof(<datatype>))  + 60*nnz_0
+		+ 196*n_1 + 60*nnz_1
+		+ 196*n_2 + 60*nnz_2
+		+ 72*n_3 + 24*nnz_3
+		
+		for <float>
+			480
+			+ 176*n_0 + 60*nnz_0
+			+ 196*n_1 + 60*nnz_1	
+			+ 196*n_2 + 60*nnz_2
+			+ 72*n_3 + 24*nnz_3
+			
+		for <double>
+			480
+			+ 196*n_0 + 60*nnz_0
+			+ 196*n_1 + 60*nnz_1
+			+ 196*n_2 + 60*nnz_2
+			+ 72*n_3 + 24*nnz_3
