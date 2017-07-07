@@ -9,6 +9,7 @@ operations
 		6x access struct field
 		2x store int to counter
 		3x compare accumulator, 0
+		1x call ComputeSPMV_ref
 		1x call ComputeRestriction_ref
 		1x call ComputeProlongation_ref
 		1x recurse to next coarse level
@@ -25,16 +26,19 @@ operations
 bytes loaded (excluding counters and accumulators, assuming all pointers are the same size, A_n is the nth coarsifid version of the matrix)
 	
 	2*sizeof(int)
+	+ bytesLoaded(ComputeSPMV_ref(A_0))
 	+ bytesLoaded(ComputeRestriction_ref(A_0))
 	+ bytesLoaded(ComputeProlongation_ref(A_0))
 	+ (numberOfPresmootherSteps+numberOfPostsmootherSteps)*bytesLoaded(ComputeSYMGS_ref(A_0))
 	
 	+ 2*sizeof(int)
+	+ bytesLoaded(ComputeSPMV_ref(A_1))
 	+ bytesLoaded(ComputeRestriction_ref(A_1))
 	+ bytesLoaded(ComputeProlongation_ref(A_1))
 	+ (numberOfPresmootherSteps+numberOfPostsmootherSteps)*bytesLoaded(ComputeSYMGS_ref(A_1))
 	
 	+ 2*sizeof(int)
+	+ bytesLoaded(ComputeSPMV_ref(A_2))
 	+ bytesLoaded(ComputeRestriction_ref(A_2))
 	+ bytesLoaded(ComputeProlongation_ref(A_2))
 	+ (numberOfPresmootherSteps+numberOfPostsmootherSteps)*bytesLoaded(ComputeSYMGS_ref(A_2))
@@ -43,13 +47,16 @@ bytes loaded (excluding counters and accumulators, assuming all pointers are the
 	+ bytesLoaded(ComputeSYMGS_ref(A_3))
 	
 	
-	= 8*sizeof(int) + 24*sizeof(void*) + 7*sizeof(local_int_t)
+	= 8*sizeof(int) + 30*sizeof(void*) + 10*sizeof(local_int_t)
 	
-	+ n_0*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
-	+ n_1*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
-	+ n_2*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
-	
+	+ n_0*(2*sizeof(void*) + sizeof(int) + 2*sizeof(local_int_t) + 4*sizeof(<datatype>))
+	+ n_1*(2*sizeof(void*) + sizeof(int) + 2*sizeof(local_int_t) + 4*sizeof(<datatype>))
+	+ n_2*(2*sizeof(void*) + sizeof(int) + 2*sizeof(local_int_t) + 4*sizeof(<datatype>))
 	+ n_3*(6*sizeof(void*) + 2*sizeof(int) + 6*sizeof(<datatype>))
+	
+	+ nnz_0*(sizeof(local_int_t)+2*sizeof(<datatype>))
+	+ nnz_1*(sizeof(local_int_t)+2*sizeof(<datatype>))
+	+ nnz_2*(sizeof(local_int_t)+2*sizeof(<datatype>))
 	+ nnz_3*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
 	
 	+ (numberOfPresmootherSteps+numberOfPostsmootherSteps)
@@ -64,36 +71,54 @@ bytes loaded (excluding counters and accumulators, assuming all pointers are the
 	
 	calculated for actual setup (sizeof(void*) -> 8 bytes, sizeof(local_int_t) -> sizeof(int) -> 4 bytes)
 			
-		420
-		+ n_0*(120 + 16*sizeof(<datatype>))
-		+ n_1*(120 + 16*sizeof(<datatype>))
-		+ n_2*(120 + 16*sizeof(<datatype>))
+		480
+	
+		+ n_0*(130 + 16*sizeof(<datatype>))
+		+ n_1*(130 + 16*sizeof(<datatype>))
+		+ n_2*(130 + 16*sizeof(<datatype>))
 		+ n_3*(56 + 6*sizeof(<datatype>))
-		+ nnz_0*(16 + 8*sizeof(<datatype>))
-		+ nnz_1*(16 + 8*sizeof(<datatype>))
-		+ nnz_2*(16 + 8*sizeof(<datatype>))
+	
+		+ nnz_0*(20 + 10*sizeof(<datatype>))
+		+ nnz_1*(20 + 10*sizeof(<datatype>))
+		+ nnz_2*(20 + 10*sizeof(<datatype>))
 		+ nnz_3*(8 + 4*sizeof(<datatype>))
 			
 		with 32-bit floats
-			420
-			+ n_0*(184)
-			+ n_1*(184)
-			+ n_2*(184)
+			480
+			+ n_0*(178)
+			+ n_1*(178)
+			+ n_2*(178)
 			+ n_3*(80)
-			+ nnz_0*(48)
-			+ nnz_1*(48)
-			+ nnz_2*(48)
+			+ nnz_0*(60)
+			+ nnz_1*(60)
+			+ nnz_2*(60)
 			+ nnz_3*(24)
+			
+			≈480
+			+ nnz_0*44230/663
+			+ nnz_1*34820/521
+			+ nnz_2*33740/503
+			+ nnz_3*1288/47
+		
+			≈75.059*nnz
 		
 		with 64-bit floats
-			420
-			+ n_0*(248)
-			+ n_1*(248)
-			+ n_2*(248)
-			+ n_3*(104)
-			+ nnz_0*(80)
-			+ nnz_1*(80)
-			+ nnz_2*(80)
-			+ nnz_3*(40)
+			480
+			+ n_0*258
+			+ n_1*258
+			+ n_2*258
+			+ n_3*104
+			+ nnz_0*100
+			+ nnz_1*100
+			+ nnz_2*100
+			+ nnz_3*40
+			
+			≈480
+			+ nnz_0*72750/663
+			+ nnz_1*57260/521
+			+ nnz_2*55460/503
+			+ nnz_3*2088/47
+			
+			≈ nnz*124.922
 				
-		theoretical  - ~38.51% decrease
+		theoretical  - 39.9153072% decrease

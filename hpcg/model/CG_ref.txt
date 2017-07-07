@@ -67,115 +67,113 @@ bytes loaded (excluding counters and locals, assuming all pointers are the same 
 			+ bytesLoaded(ComputeSPMV_ref) + 3*bytesLoaded(ComputeWAXPBY_ref)
 			+ (preconditioned?bytesLoaded(ComputeMG_ref):bytesLoaded(ComputeWAXPBY_ref)))
 			
-		= 2*(20 + localLength*sizeof(<datatype>)) + 20 + 20 * n + nnz * (4+2*sizeof(<datatype>))
+		= 2*(20 + n*sizeof(<datatype>)) + 20 + 20 * n + nnz * (4+2*sizeof(<datatype>))
 		+ 16 + n*sizeof(<datatype>)
 		+ iterationCount*(2*(16 + 2*n*sizeof(<datatype>)) + 16 + n*sizeof(<datatype>)
-			+ 20 + 20 * nrow + nnz * (4+2*sizeof(<datatype>))
+			+ 20 + 20 * n + nnz * (4+2*sizeof(<datatype>))
 			+ 3*(24 + 2*n*sizeof(<datatype>))
-			+ (preconditioned?(432
-					+ n_0*(124 + 14*sizeof(<datatype>))
-					+ n_1*(44 + 6*sizeof(<datatype>))
-					+ n_2*(44 + 6*sizeof(<datatype>))
-					+ n_3*(44 + 6*sizeof(<datatype>))	
-					+ nnz_0*(24 + 12*sizeof(<datatype>))
-					+ nnz_1*(8 + 4*sizeof(<datatype>))
-					+ nnz_2*(8 + 4*sizeof(<datatype>))
+			+ (preconditioned(480
+					+ n_0*(130 + 16*sizeof(<datatype>))
+					+ n_1*(130 + 16*sizeof(<datatype>))
+					+ n_2*(130 + 16*sizeof(<datatype>))
+					+ n_3*(56 + 6*sizeof(<datatype>))
+					+ nnz_0*(20 + 10*sizeof(<datatype>))
+					+ nnz_1*(20 + 10*sizeof(<datatype>))
+					+ nnz_2*(20 + 10*sizeof(<datatype>))
 					+ nnz_3*(8 + 4*sizeof(<datatype>)))
 				:(24 + 2*n*sizeof(<datatype>))))
 				
 				
-		= 76 + n*(20 + 3*sizeof(<datatype>)) + nnz * (4+2*sizeof(<datatype>))
+		= 76 + 3*n*sizeof(<datatype>) + 20*n + nnz*(4+2*sizeof(<datatype>))
 		+ iterationCount
-			*(164 + n*(20 + 13*sizeof(<datatype>)) + nnz * (4+2*sizeof(<datatype>))
-			+ (preconditioned?(432
-				+ n_0*(124 + 14*sizeof(<datatype>))
-				+ n_1*(44 + 6*sizeof(<datatype>))
-				+ n_2*(44 + 6*sizeof(<datatype>))
-				+ n_3*(44 + 6*sizeof(<datatype>))	
-				+ nnz_0*(24 + 12*sizeof(<datatype>))
-				+ nnz_1*(8 + 4*sizeof(<datatype>))
-				+ nnz_2*(8 + 4*sizeof(<datatype>))
-				+ nnz_3*(8 + 4*sizeof(<datatype>)))
+			*(164 + n*(20 + 13*sizeof(<datatype>))
+			+ nnz*(4+2*sizeof(<datatype>))
+			+ (preconditioned
+				?(456
+					+ n_0*(130 + 14*sizeof(<datatype>))
+					+ n_1*(130 + 16*sizeof(<datatype>))
+					+ n_2*(130 + 16*sizeof(<datatype>))
+					+ n_3*(56 + 6*sizeof(<datatype>))
+					+ nnz_0*(20 + 10*sizeof(<datatype>))
+					+ nnz_1*(20 + 10*sizeof(<datatype>))
+					+ nnz_2*(20 + 10*sizeof(<datatype>))
+					+ nnz_3*(8 + 4*sizeof(<datatype>)))
 				:0))
 				
-				
 		#if preconditioned
-			= 76 + n*(20 + 3*sizeof(<datatype>)) + nnz * (4+2*sizeof(<datatype>))
+			76 + n*(20 + 3*sizeof(<datatype>)) + nnz*(4+2*sizeof(<datatype>))
 			+ iterationCount
-				*(596 + n*(144 + 27*sizeof(<datatype>)) + nnz * (28+12*sizeof(<datatype>))
-					+ n_1*(44 + 6*sizeof(<datatype>))
-					+ n_2*(44 + 6*sizeof(<datatype>))
-					+ n_3*(44 + 6*sizeof(<datatype>))	
-					+ nnz_1*(8 + 4*sizeof(<datatype>))
-					+ nnz_2*(8 + 4*sizeof(<datatype>))
-					+ nnz_3*(8 + 4*sizeof(<datatype>)))
+				*(620
+				+ n_0*(150 + 27*sizeof(<datatype>))
+				+ n_1*(130 + 16*sizeof(<datatype>))
+				+ n_2*(130 + 16*sizeof(<datatype>))
+				+ n_3*(56 + 6*sizeof(<datatype>))
+				+ nnz_0*(24 + 12*sizeof(<datatype>))
+				+ nnz_1*(20 + 10*sizeof(<datatype>))
+				+ nnz_2*(20 + 10*sizeof(<datatype>))
+				+ nnz_3*(8 + 4*sizeof(<datatype>)))
 		#else
-			= 76 + n*(20 + 3*sizeof(<datatype>)) + nnz * (4+2*sizeof(<datatype>))
+			= 76 + n*(20 + 3*sizeof(<datatype>)) + nnz*(4+2*sizeof(<datatype>))
 			+ iterationCount
-				*(164 + n*(20 + 13*sizeof(<datatype>)) + nnz*(4+2*sizeof(<datatype>)))
+				*(164 + n*(20 + 13*sizeof(<datatype>))
+				+ nnz*(4+2*sizeof(<datatype>)))
 		#endif
 		
 		
 		with 32-bit float
 			#if preconditioned
-				= 76 + 32*n + 12*nnz
-				+ iterationCount
-					*(596 + 252*n + 76*nnz
-						+ 68*(n_1 + n_2 + n_3)
-						+ 24*(nnz_1 + nnz_2 + nnz_3))
-					
-				≈ 76 + 172/13*nnz
-				+ iterationCount
-					*(596 + 1114/13*nnz
-						+ 346/13*(nnz_1 + nnz_2 + nnz_3))
-					
-				≈ (172/13)*nnz
-				+ iterationsCount*(1114/13*nnz + 346/13*(nnz_1 + nnz_2 + nnz_3))
-					
-			#else
-				= 76 + 32*n + 12*nnz
-				+ iterationCount
-					*(164 + 72*n + 12*nnz)
-					
-				≈ 76 + (172/13)*nnz
-				+ iterationCount*(164 + (188/13)*nnz)
-
-
-				≈ (172/13)*nnz
-				+ iterationCount*(188/13)*nnz
-									
-			#endif
+			76 + 32*n + 12*nnz
+			+ iterationCount
+				*(620
+				+ n_0*258 + nnz_0*72
+				+ n_1*194 + nnz_1*60
+				+ n_2*194 + nnz_2*60
+				+ n_3*80 + nnz_3*24)
+				
+			≈76 + 8756/663*nnz
+			+ iterationCount
+				*(620
+				+ nnz_0*54186/663
+				+ nnz_1*35140/521
+				+ nnz_2*34060/503
+				+ nnz_3*1288/47)
+				
+			≈iterationCount*nnz*91.054
+		#else
+			= 76 + 32*n + 12*nnz
+			+ iterationCount*(164 + 72n + 12*nnz)
+			
+			≈iterationCount*9756/663*nnz
+			≈iterationCount*nnz*14.715
+		#endif
 	
 		with 64-bit float
 			#if preconditioned
-				= 76 + 44*n + 20*nnz
+				76 + n*44 + nnz*20
 				+ iterationCount
-					*(596 + 360*n + 124*nnz
-						+ 92*(n_1 + n_2 + n_3)
-						+ 40*(nnz_1 + nnz_2 + nnz_3)
+					*(620
+					+ n_0*366
+					+ n_1*258
+					+ n_2*258
+					+ n_3*104
+					+ nnz_0*120
+					+ nnz_1*100
+					+ nnz_2*100
+					+ nnz_3*40)
 					
-				≈ 76 + 282/13*nnz
-				+ iterationCount
-					*(596 + 1792/13*nnz + 566/13*(nnz_1 + nnz_2 + nnz_3))
-				
-				≈ (282/13)*nnz 
-				+ iterationCount*((1792/13)*nnz + (566/13)*(nnz_1 + nnz_2 + nnz_3))
+				≈ iterationCount*nnz*148.995
 			#else
-				= 76 + 44*n + 20*nnz
-				+ iterationCount
-					*(164 + 124*n + 20*nnz)
-					
-				≈ 76 + (282/13)*nnz
-				+ iterationCount*(164 + (322/13)*nnz)
+				= 76 + n*44 + nnz*20
+				+ iterationCount*(164 + n*124 + nnz*20)
 				
-				≈ (282/13)*nnz
-				+ iterationCount*(322/13)*nnz
+				≈ iterationCount*nnz*16360/663
+				≈ iterationCount*nnz*24.676
 			#endif
 	
 	
 		#if preconditioned
-			theoretical  - ~37.89% decrease
+			theoretical  - ~38.89% decrease
 		#else
-			theorietical - ~41.6% decrease
+			theorietical - ~40.37% decrease
 		#endif
 	
