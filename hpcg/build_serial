@@ -13,14 +13,14 @@ make
 cd ..
 
 
-#echo
-#echo Starting Mixed
-#echo
-#cd Linux_Serial_Mixed
-#touch src/garbage
-#rm src/*
-#make
-#cd ..
+echo
+echo Starting Mixed
+echo
+cd Linux_Serial_Mixed
+touch src/garbage
+rm src/*
+make
+cd ..
 
 
 echo

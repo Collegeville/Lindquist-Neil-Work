@@ -19,7 +19,7 @@
  */
 
 #include <fstream>
-
+#include <iostream>
 #include <cmath>
 
 #include "hpcg.hpp"
@@ -97,8 +97,8 @@ int CG_ref(const SparseMatrix & A, CGData & data, const Vector & b, Vector & x,
   normr0 = normr;
 
   // Start iterations
-
-  for (int k=1; k<=max_iter && normr/normr0 > tolerance; k++ ) {
+  int k=1;
+  for (; k<=max_iter && normr/normr0 > tolerance; k++ ) {
     TICK();
     if (doPreconditioning)
       ComputeMG_ref(A, r, z); // Apply preconditioner
@@ -129,6 +129,8 @@ int CG_ref(const SparseMatrix & A, CGData & data, const Vector & b, Vector & x,
 #endif
     niters = k;
   }
+  
+  std::cout << "Total iterations: " << k << std::endl;
 
   // Store times
   times[1] += t1; // dot product time

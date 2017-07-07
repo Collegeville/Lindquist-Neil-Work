@@ -18,13 +18,13 @@ cd MPI_Intel_OMP_Double/bin
 cd ../..
 
 
-#echo
-#echo ---starting mixed---
-#echo
-#
-#cd MPI_Intel_OMP_Mixed/bin
-#/opt/intel-openmpi/bin/mpiexec xhpcg
-#cd ../..
+echo
+echo ---starting mixed---
+echo
+
+cd MPI_Intel_OMP_Mixed/bin
+/opt/intel-openmpi/bin/mpiexec xhpcg
+cd ../..
 
 
 echo

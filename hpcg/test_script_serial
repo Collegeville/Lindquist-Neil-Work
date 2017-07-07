@@ -18,13 +18,13 @@ xhpcg
 cd ../..
 
 
-#echo
-#echo ---starting mixed---
-#echo
-#
-#cd Linux_Serial_Mixed/bin
-#xhpcg
-#cd ../..
+echo
+echo ---starting mixed---
+echo
+
+cd Linux_Serial_Mixed/bin
+xhpcg
+cd ../..
 
 
 echo
