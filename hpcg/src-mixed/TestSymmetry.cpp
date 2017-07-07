@@ -122,7 +122,7 @@ int TestSymmetry(SparseMatrix & A, Vector & b, Vector & xexact, TestSymmetryData
  CopyVector(xexact, x_ncol); // Copy exact answer into overlap vector
 
  int numberOfCalls = 2;
- float residual = 0.0;
+ double residual = 0.0;
  for (int i=0; i< numberOfCalls; ++i) {
    ierr = ComputeSPMV(A, x_ncol, z_ncol); // b_computed = A*x_overlap
    if (ierr) HPCG_fout << "Error in call to SpMV: " << ierr << ".\n" << endl;

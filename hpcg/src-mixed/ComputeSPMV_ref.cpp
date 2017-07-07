@@ -59,14 +59,14 @@ int ComputeSPMV_ref( const SparseMatrix & A, Vector & x, Vector & y) {
   #pragma omp parallel for
 #endif
   for (local_int_t i=0; i< nrow; i++)  {
-    float sum = 0.0;
+    double sum = 0.0;
     const float * const cur_vals = A.matrixValues[i];
     const local_int_t * const cur_inds = A.mtxIndL[i];
     const int cur_nnz = A.nonzerosInRow[i];
 
     for (int j=0; j< cur_nnz; j++)
-      sum += cur_vals[j]*xv[cur_inds[j]];
-    yv[i] = sum;
+      sum += double(cur_vals[j])*double(xv[cur_inds[j]]);
+    yv[i] = float(sum);
   }
   return 0;
 }
