@@ -121,4 +121,4 @@ bytes loaded (excluding counters and accumulators, assuming all pointers are the
 			
 			≈ nnz*124.922
 				
-		theoretical  - 39.9153072% decrease
+		theoretical  - 39.92% decrease
