@@ -3,16 +3,27 @@
 #terminate script on failure
 set -e
 
+echo
+echo Starting double
+echo
 cd Linux_Serial_Double
 rm src/*
 make
 cd ..
 
-cd Linux_Serial_Mixed
-rm src/*
-make
-cd ..
 
+#echo
+#echo Starting Mixed
+#echo
+#cd Linux_Serial_Mixed
+#rm src/*
+#make
+#cd ..
+
+
+echo
+echo Starting Single
+echo
 cd Linux_Serial_Single
 rm src/*
 make

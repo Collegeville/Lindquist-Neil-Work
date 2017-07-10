@@ -3,16 +3,27 @@
 #terminate script on failure
 set -e
 
+echo
+echo Starting Mixed
+echo
 cd MPI_GCC_OMP_Double
 rm src/*
 make
 cd ..
 
+
+#echo
+#echo Starting Mixed
+#echo
 #cd MPI_GCC_OMP_Mixed
 #rm src/*
 #make
 #cd ..
 
+
+echo
+echo Starting Single
+echo
 cd MPI_GCC_OMP_Single
 rm src/*
 make
