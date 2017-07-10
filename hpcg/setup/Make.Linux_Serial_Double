@@ -118,7 +118,7 @@ HPCG_DEFS     = $(HPCG_OPTS) $(HPCG_INCLUDES)
 # ----------------------------------------------------------------------
 #
 CXX          = /opt/intel/bin/icpc
-CXXFLAGS     = $(HPCG_DEFS) -fomit-frame-pointer -O3 -funroll-loops -W -Wall -pedantic -profile-functions -profile-loops=all -profile-loops-report=2
+CXXFLAGS     = $(HPCG_DEFS) -fomit-frame-pointer -O3 -funroll-loops -W -Wall -pedantic
 #
 LINKER       = $(CXX)
 LINKFLAGS    = $(CXXFLAGS)
