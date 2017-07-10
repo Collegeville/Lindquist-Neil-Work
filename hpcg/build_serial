@@ -1,5 +1,8 @@
 #! /bin/sh
 
+#terminate script on failure
+set -e
+
 cd Linux_Serial_Double
 rm src/*
 make

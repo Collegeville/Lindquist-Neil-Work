@@ -1,5 +1,8 @@
 #! /bin/sh
 
+#terminate script on failure
+set -e
+
 cd MPI_GCC_OMP_Double
 rm src/*
 make
