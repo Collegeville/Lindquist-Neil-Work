@@ -23,6 +23,12 @@
 #endif
 #include "ComputeSYMGS_ref.hpp"
 #include <cassert>
+#include "mytimer.hpp"
+
+double inner_time = 0;
+double first_inner_time = 0;
+double second_inner_time = 0;
+int calls = 0;
 
 /*!
   Computes one step of symmetric Gauss-Seidel:
@@ -52,7 +58,8 @@
   @see ComputeSYMGS
 */
 int ComputeSYMGS_ref( const SparseMatrix & A, const Vector & r, Vector & x) {
-
+  calls++;
+  double startTime = mytimer();
   assert(x.localLength==A.localNumberOfColumns); // Make sure x contain space for halo values
 
 #ifndef HPCG_NO_MPI
@@ -63,7 +70,8 @@ int ComputeSYMGS_ref( const SparseMatrix & A, const Vector & r, Vector & x) {
   double ** matrixDiagonal = A.matrixDiagonal;  // An array of pointers to the diagonal entries A.matrixValues
   const double * const rv = r.values;
   double * const xv = x.values;
-
+  
+  double first_start_time = mytimer();
   for (local_int_t i=0; i< nrow; i++) {
     const double * const currentValues = A.matrixValues[i];
     const local_int_t * const currentColIndices = A.mtxIndL[i];
@@ -80,9 +88,12 @@ int ComputeSYMGS_ref( const SparseMatrix & A, const Vector & r, Vector & x) {
     xv[i] = sum/currentDiagonal;
 
   }
+  
+  first_inner_time += mytimer()-first_start_time;
 
   // Now the back sweep.
 
+  double second_start = mytimer();
   for (local_int_t i=nrow-1; i>=0; i--) {
     const double * const currentValues = A.matrixValues[i];
     const local_int_t * const currentColIndices = A.mtxIndL[i];
@@ -98,7 +109,10 @@ int ComputeSYMGS_ref( const SparseMatrix & A, const Vector & r, Vector & x) {
 
     xv[i] = sum/currentDiagonal;
   }
+  
+  second_inner_time += mytimer() - second_start;
 
+  inner_time += mytimer()-startTime;
   return 0;
 }
 

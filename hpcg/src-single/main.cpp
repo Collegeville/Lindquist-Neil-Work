@@ -61,6 +61,8 @@ using std::endl;
 #include "TestSymmetry.hpp"
 #include "TestNorms.hpp"
 
+#include "ComputeSYMGS_ref.hpp"
+
 /*!
   Main driver program: Construct synthetic problem, run V&V tests, compute benchmark parameters, run benchmark, report results.
 
@@ -331,6 +333,12 @@ int main(int argc, char * argv[]) {
   testnorms_data.samples = numberOfCgSets;
   testnorms_data.values = new float[numberOfCgSets];
 
+  inner_time = 0;
+  first_inner_time = 0;
+  second_inner_time = 0;
+  calls = 0;
+  double total_start = mytimer();
+
   for (int i=0; i< numberOfCgSets; ++i) {
     ZeroVector(x); // Zero out x
     ierr = CG( A, data, b, x, optMaxIters, optTolerance, niters, normr, normr0, &times[0], true);
@@ -338,6 +346,13 @@ int main(int argc, char * argv[]) {
     if (rank==0) HPCG_fout << "Call [" << i << "] Scaled Residual [" << normr/normr0 << "]" << endl;
     testnorms_data.values[i] = normr/normr0; // Record scaled residual from this run
   }
+  
+  std::cout << "Total time:  " << (mytimer() - total_start) << std::endl;
+  std::cout << "Total calls: " << numberOfCgSets << std::endl;
+  std::cout << "SYMGS time:  " << inner_time << std::endl;
+  std::cout << "SYMGS calls: " << calls << std::endl;
+  std::cout << "First half SYMGS:  " << first_inner_time << std::endl;
+  std::cout << "Second half SYMGS: " << second_inner_time << std::endl;
 
   // Compute difference between known exact solution and computed solution
   // All processors are needed here.
@@ -376,5 +391,6 @@ int main(int argc, char * argv[]) {
 #ifndef HPCG_NO_MPI
   MPI_Finalize();
 #endif
+
   return 0;
 }

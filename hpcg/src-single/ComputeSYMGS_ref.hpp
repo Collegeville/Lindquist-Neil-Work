@@ -17,6 +17,11 @@
 #include "SparseMatrix.hpp"
 #include "Vector.hpp"
 
+extern double inner_time;
+extern double first_inner_time;
+extern double second_inner_time;
+extern int calls;
+
 int ComputeSYMGS_ref( const SparseMatrix  & A, const Vector & r, Vector & x);
 
 #endif // COMPUTESYMGS_REF_HPP
