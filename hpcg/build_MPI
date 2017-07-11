@@ -4,7 +4,7 @@
 set -e
 
 echo
-echo Starting Mixed
+echo Starting Double
 echo
 cd MPI_GCC_OMP_Double
 rm src/*
