@@ -7,6 +7,7 @@ echo
 echo Starting double
 echo
 cd Linux_Serial_Double
+touch src/garbage
 rm src/*
 make
 cd ..
@@ -16,6 +17,7 @@ cd ..
 #echo Starting Mixed
 #echo
 #cd Linux_Serial_Mixed
+#touch src/garbage
 #rm src/*
 #make
 #cd ..
@@ -25,6 +27,7 @@ echo
 echo Starting Single
 echo
 cd Linux_Serial_Single
+touch src/garbage
 rm src/*
 make
 cd ..
