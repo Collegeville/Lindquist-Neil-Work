@@ -1,0 +1,33 @@
+#! /bin/sh
+
+#terminate script on failure
+set -e
+
+echo
+echo Starting Double
+echo
+cd MPI_gprof_OMP_Double
+touch src/garbage
+rm src/*
+make
+cd ..
+
+
+#echo
+#echo Starting Mixed
+#echo
+#cd MPI_gprof_OMP_Mixed
+#touch src/garbage
+#rm src/*
+#make
+#cd ..
+
+
+echo
+echo Starting Single
+echo
+cd MPI_gprof_OMP_Single
+touch src/garbage
+rm src/*
+make
+cd ..
