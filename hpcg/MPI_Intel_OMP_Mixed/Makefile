@@ -1,6 +1,6 @@
 # -*- Makefile -*-
 
-arch = MPI_GCC_OMP_Mixed
+arch = MPI_Intel_OMP_Mixed
 setup_file = setup/Make.$(arch)
 
 include $(setup_file)
@@ -179,4 +179,3 @@ src/CheckAspectRatio.o: $(SRCdir)/CheckAspectRatio.cpp $(SRCdir)/CheckAspectRati
 
 src/OutputFile.o: $(SRCdir)/OutputFile.cpp $(SRCdir)/OutputFile.hpp $(PRIMARY_HEADERS)
 	$(CXX) -c $(CXXFLAGS) -I$(INCdir) $< -o $@
-
