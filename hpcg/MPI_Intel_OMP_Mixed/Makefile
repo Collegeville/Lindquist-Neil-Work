@@ -1,6 +1,6 @@
 # -*- Makefile -*-
 
-arch = MPI_GCC_OMP_Mixed
+arch = MPI_GCC_Intel_Mixed
 setup_file = setup/Make.$(arch)
 
 include $(setup_file)

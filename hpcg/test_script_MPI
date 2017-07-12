@@ -3,9 +3,9 @@
 cd /home/nslindquist/cs_research/Lindquist-Neil-Work/hpcg/
 
 if [ $# != 0 ]; then
-	sed 3s/.\*/$1\ $1\ $1/ -i MPI_GCC_OMP_Double/bin/hpcg.dat
-	sed 3s/.\*/$1\ $1\ $1/ -i MPI_GCC_OMP_Mixed/bin/hpcg.dat
-	sed 3s/.\*/$1\ $1\ $1/ -i MPI_GCC_OMP_Single/bin/hpcg.dat
+	sed 3s/.\*/$1\ $1\ $1/ -i MPI_Intel_OMP_Double/bin/hpcg.dat
+	sed 3s/.\*/$1\ $1\ $1/ -i MPI_Intel_OMP_Mixed/bin/hpcg.dat
+	sed 3s/.\*/$1\ $1\ $1/ -i MPI_Intel_OMP_Single/bin/hpcg.dat
 fi
 
 
@@ -13,7 +13,7 @@ echo
 echo ---starting double---
 echo
 
-cd MPI_GCC_OMP_Double/bin
+cd MPI_Intel_OMP_Double/bin
 /opt/intel-openmpi/bin/mpiexec xhpcg
 cd ../..
 
@@ -22,7 +22,7 @@ cd ../..
 #echo ---starting mixed---
 #echo
 #
-#cd MPI_GCC_OMP_Mixed/bin
+#cd MPI_Intel_OMP_Mixed/bin
 #/opt/intel-openmpi/bin/mpiexec xhpcg
 #cd ../..
 
@@ -31,6 +31,6 @@ echo
 echo ---starting single---
 echo
 
-cd MPI_GCC_OMP_Single/bin
+cd MPI_Intel_OMP_Single/bin
 /opt/intel-openmpi/bin/mpiexec xhpcg
 cd ../..
