@@ -54,3 +54,7 @@ hpcg/MPI_Intel_OMP_Single/*/*
 
 #libreoffice lock files
 .~lock*#
+
+
+#Julia auto-saves
+Julia/.ipynb_checkpoints/*
