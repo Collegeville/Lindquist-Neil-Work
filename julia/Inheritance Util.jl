@@ -171,3 +171,8 @@ Gets the supertypes of a type created through these macros
 function mi_supertypes(sym::Symbol)
     parent_map[sym]
 end
+
+function get_decendants(sym::Symbol)
+    direct = [k for (k, v) in parent_map if sym in v]
+    unique(vcat(direct, reduce(vcat, [], [get_decendants(child) for child in direct])))
+end
