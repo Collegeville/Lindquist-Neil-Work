@@ -48,6 +48,18 @@ macro create_function_generator(name, functions)
 end
 
 
+macro apply_generator_to_decendants(gen, parent)
+    decendants = vcat([parent], get_decendants(parent))
+    
+    macro_name = gen.args[1]
+    
+    return quote
+            for d in $(esc(decendants))
+                d = eval(d)
+                $(Expr(:macrocall, esc(macro_name), :d))
+            end
+        end
+end
 
 
 #The following methods are based off https://github.com/abeschneider/AbstractFields.jl/blob/master/src/AbstractFields.jl
