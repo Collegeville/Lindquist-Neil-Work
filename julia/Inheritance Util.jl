@@ -63,31 +63,45 @@ end
 
 
 # global registry of all abstract classes defined
-abstract_declarations = Dict{Symbol, Array}()
+abstract_declarations = Dict{Symbol, Array{Expr}}()
+
+# graph to find supertypes of implemented types
+parent_map = Dict{Symbol, Array{Symbol}}()
 
 macro _abstract(sym, parents, block)
     abstract_body(sym, parents, block)
 end
 
 macro _abstract(sym, block)
-    abstract_body(sym, (), block)
+    abstract_body(sym, (:Any,), block)
 end
 
 function abstract_body(sym, parents, block)
-    declarations = combine_declarations(parents, block)
-    
     sym_name = get_symbol_name(sym)
     
+    declarations = combine_declarations(parents, block)
     abstract_declarations[sym_name] = declarations
+        
+    register_parents(sym_name, parents)
     
     Expr(:abstract, esc(sym_name), abstract_declarations[sym_name])
 end
 
 
 macro _type(sym, parents, block)
+    concrete_body(sym, parents, block, true)
+end
+
+macro _immutable(sym, parents, block)
+    concrete_body(sym, parents, block, false)
+end
+
+function concrete_body(sym, parents, block, mutable)
     declarations = combine_declarations(parents, block)
 
     sym_name = get_symbol_name(sym)
+    
+    register_parents(sym_name, parents)
     
     if isa(parents, Symbol)
         parent = parents
@@ -95,30 +109,37 @@ macro _type(sym, parents, block)
         parent = eval(parents)[1]
     end
     
-    Expr(:type, true, Expr(:<:, esc(sym_name), esc(parent)), Expr(:block, declarations...))
-end
-
-
-macro _immutable(sym, parents, block)
-    declarations = combine_declarations(parents, block)
-
-    sym_name = get_symbol_name(sym)
-    
-    Expr(:type, false, Expr(:<:, esc(sym_name), esc(parents)), Expr(:block, declarations...))
+    Expr(:type, mutable, Expr(:<:, esc(sym_name), esc(parent)), Expr(:block, declarations...))
 end
 
 
 function combine_declarations(parents, block)
     if isa(parents, Symbol)
-        parent_declarations = abstract_declarations[parents]
+        parent_declarations = get(abstract_declarations, parents, [])
     else
         #is tuple or something
         parents = eval(parents)
-        parent_declarations = reduce(vcat, [], [abstract_declarations[get_symbol_name(p)] for p in parents])
+        parent_declarations = reduce(vcat, [],
+                                [get(abstract_declarations, get_symbol_name(p), [])
+                                    for p in parents])
     end
     child_declarations = [Expr(:(::), get_symbol_name(var.args[1]), var.args[2])
                                 for var in block.args[2:2:end]]
     return unique(vcat(parent_declarations, child_declarations))
+end
+
+
+function register_parents(sym_name, parents)
+    if isa(parents, Symbol)
+        parent_map[sym_name] = [parents]
+    else
+        raw_parents = eval(parents)
+        parent_symbols = Array{Symbol}(length(raw_parents))
+        for p_index = 1:length(raw_parents)
+            parent_symbols[p_index] = get_symbol_name(raw_parents[p_index])
+        end
+        parent_map[sym_name] = parent_symbols
+    end
 end
 
 
@@ -127,11 +148,26 @@ If the given value is a symbol, returns the symbol.
 If the given value is a globalref Expr, returns the local name
 """
 function get_symbol_name(sym)::Symbol
-    if isa(sym, Type)
+    if isa(sym, Type) || isa(sym, DataType)
         Symbol(sym)
     elseif isa(sym, Expr) && sym.head == :globalref
         sym.args[2]
     else
         sym
     end
+end
+
+
+"""
+Gets the supertypes of a type created through these macros
+"""
+function mi_supertypes(typ::Type)
+    parent_map[Symbol(typ)]
+end
+
+"""
+Gets the supertypes of a type created through these macros
+"""
+function mi_supertypes(sym::Symbol)
+    parent_map[sym]
 end
