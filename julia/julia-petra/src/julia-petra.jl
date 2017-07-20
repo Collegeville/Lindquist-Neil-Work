@@ -1,7 +1,10 @@
 module julia-petra
 
-# package code goes here
 
-include(Comm)
+# Communication interface
+
+include("Comm.jl")
+include("Directory.jl")
+include("Distributor.jl")
 
 end # module
