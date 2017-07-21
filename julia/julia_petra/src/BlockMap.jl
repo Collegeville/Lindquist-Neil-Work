@@ -1,5 +1,5 @@
 
-export Map
+export BlockMap
 export remoteIDList, lid, gid, findLocalElementID
 export minAllGID, maxAllGID, minMyGID, maxMyGID, minLID, maxLID
 export numGlobalElements, myGlobalElements, numGlobalPoints, numMyPoints
@@ -7,17 +7,14 @@ export uniqueGIDs, globalIndicesType, sameBlockMapDataAs, sameAs, pointSameAs
 export linearMap, myGlobalElementIDs, pointToElementList, Comm
 export myGID, myLID, distributedGlobal, numMyElements
 
+# TODO implement BlockMap
 
 
+# methods and docs based straight off Epetra_BlockMap to match Comm
 
-
-# methods and docs based straight off Epetra_Map to match Comm
-
-# ignoring indexBase methods
+# ignoring indexBase methods and sticking with 1-based indexing
 # ignoring elementSize methods since, type information is carried anyways
 
-# This class is the abstract parent for julia implmentations of Epetra_BlockMap,
-    # Epetra_Map and Epetra_LocalMap
 
 # TODO figure out firstPointInElement and related
 # TODO figure out expert users and developers only functions
@@ -78,7 +75,7 @@ uniqueGIDs(map::MapImpl)::Bool
 globalIndicesType(map::MapImpl)::Type{GID} where GID <: Integer
     - Return the type used for global indices in the map
 
-sameBlockMapDataAs(this::MapImpl, other::Map)::Bool
+sameBlockMapDataAs(this::MapImpl, other::BlockMap)::Bool
     - Return true if the maps have the same data 
 
 sameAs(this::MapImpl, other::Map)::Bool
@@ -103,14 +100,14 @@ pointToElementList(map::MapImpl)::Array{LID} where LID <: Integer
 
 Comm(map::MapImpl)::Comm - Return the Comm for the map
 """
-abstract type Map{T}
+type BlockMap{T}
 end
 
 """
 Return true if the GID passed in belongs to the calling processor in this
 map, otherwise returns false.
 """
-function myGID(map::Map, gid::GID) where GID <: Integer
+function myGID(map::BlockMap, gid::GID) where GID <: Integer
     return GID(map, gid) != 0
 end
 
@@ -118,34 +115,34 @@ end
 Return true if the LID passed in belongs to the calling processor in this
 map, otherwise returns false.
 """
-function myLID(map::Map, lid::LID) where LID <: Integer
+function myLID(map::BlockMap, lid::LID) where LID <: Integer
     return LID(map, lid) != 0
 end
 
 """
 Return true if map is defined across more than one processor
 """
-function distributedGlobal(map::Map)
+function distributedGlobal(map::BlockMap)
     return numGlobalElements(map) != numLocalElements(map)
 end
 
 """
 Return the number of elements across the calling processor
 """
-function numMyElements(map::Map)::Integer #::LID where LID <: Integer
+function numMyElements(map::BlockMap)::Integer #::LID where LID <: Integer
     length(myGlobalElementIDs(map))
 end
 
 """
 Return the minimum global ID owned by this processor
 """
-function minMyGID(map::Map)::Integer #::GID where GID <: Integer
+function minMyGID(map::BlockMap)::Integer #::GID where GID <: Integer
     minimum(myGlobalElementsIDs(map))
 end
     
 """
 Return the maximum global ID owned by this processor
 """
-function maxMyGID(map::Map)::Integer #::GID where GID <: Integer
+function maxMyGID(map::BlockMap)::Integer #::GID where GID <: Integer
     maximum(myGlobalElementsIDs(map))
 end
