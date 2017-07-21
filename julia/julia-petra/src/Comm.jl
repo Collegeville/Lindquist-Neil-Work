@@ -46,8 +46,8 @@ numProc(comm::CommImpl)::Integer - Returns the total number of processes
 
 createDistributor(comm::CommImpl)::Distributor - Create a distributor object
 
-createDirectory(comm::CommImpl, map::BlockMap)::Directory
-    - Create a directory object for the given BlockMap
+createDirectory(comm::CommImpl, map::Map)::Directory
+    - Create a directory object for the given Map
 
 """
 abstract type Comm

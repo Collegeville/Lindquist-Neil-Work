@@ -2,6 +2,12 @@
 type SerialComm <: Comm
 end
 
+const serialCommInstance = SerialComm()
+
+function SerialComm()
+    serialCommInstance
+end
+
 
 # most of these functions are no-ops or identify functions since there is only
 # one processor
@@ -46,9 +52,9 @@ function numProc(comm::SerialComm)::UInt8
 end
 
 function createDistributor(comm::SerialComm)::SerialDistributor
-    return SerialDistributor()
+    SerialDistributor()
 end
 
-function createDirectory(comm::SerialComm, map::BlockMap)::SerialDirectory
-    error("Not yet implemented")
+function createDirectory(comm::SerialComm, map::Map)::SerialDirectory
+    BasicDirectory(map)
 end

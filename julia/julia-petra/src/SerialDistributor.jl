@@ -2,7 +2,12 @@
 type SerialDistributor <: Distributor
     post::Array
     reversePost::Array
+    
+    function SerialDistributor()
+        this(nothing, nothing)
+    end
 end
+
 
 function createFromSends(dist::SerialDistributor,
         exportPIDs::Array{PID})::Integer where PID <:Integer
@@ -40,6 +45,9 @@ function resolvePosts(dist::SerialDistributor, exportObjs::Array)
 end
 
 function resolveWaits(dist::SerialDistributor)::Array
+    if dist.post == nothing
+        error("Must post before waiting")
+    end
     result = dist.post
     dist.post = nothing
     result
@@ -50,6 +58,9 @@ function resolveReversePosts(dist::SerialDistributor, exportObjs::Array)
 end
 
 function resolveReverseWaits(dist::SerialDistributor)::Array
+    if dist.reversePost == nothing
+        error("Must reverse post before reverse waiting")
+    end
     result = dist.reversePost
     dist.reversePost = nothing
     result
