@@ -1,4 +1,8 @@
 
+export Comm
+export barrier, broadcast, gatherAll, sumAll, maxAll, minAll, scanSum
+export myPid, numProc, createDistributor, createDirectory
+
 # methods (and docs) are currently based straight off Epetra_Comm
 # tpetra's equivalent seemed to be a wrapper to other Trilinos packages
 

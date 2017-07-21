@@ -1,4 +1,6 @@
 
+export SerialComm
+
 type SerialComm <: Comm
 end
 
@@ -17,9 +19,7 @@ end
 
 
 function broadcast(comm::SerialComm, myvals::Array{T}, root::Integer)::Array{T} where T
-    if root != 1
-        error("SerialComm can only accept PID of 1")
-    end
+    @assert root != 1 "SerialComm can only accept PID of 1"
     myVals
 end
 

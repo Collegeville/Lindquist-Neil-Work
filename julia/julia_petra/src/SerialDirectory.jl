@@ -1,4 +1,5 @@
 
+export SerialDirectory
 
 type SerialDirectory <: Directory
     map::Map

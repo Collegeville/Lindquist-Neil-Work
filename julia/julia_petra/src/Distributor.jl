@@ -1,5 +1,10 @@
 
 
+export Distributor
+export createFromSends, createFromRecvs
+export resolve, resolveReverse, resolveWaits
+export resolvePosts, resolveReversePosts, resolveReverseWaits
+
 # methods (and docs) are currently based straight off Epetra_Distributor to match Comm
 
 # TODO resolve any limitations on PID/GID/LID as decided
@@ -21,26 +26,26 @@ createFromRecvs(dist::DistributorImpl, remoteGIDs::Array{GID},
         corresponding PIDs.  Returns a tuple with the global IDs and their
         respective processor IDs being sent to me.
 
-do(dist::DistributorImpl, exportObjs::Array{T})::Array{T} where T
+resolve(dist::DistributorImpl, exportObjs::Array{T})::Array{T} where T
     - Execute the current plan on buffer of export objects and return the
         objects set to this processor
 
-doReverse(dist::DistributorImpl, exportObjs::Array{T})::Array{T} where T
+resolveReverse(dist::DistributorImpl, exportObjs::Array{T})::Array{T} where T
     - Execute the reverse of the current plan on buffer of export objects and
         return the objects set to this processor
 
-doPosts(dist::DistributorImpl, exportObjs::Array)
+resolvePosts(dist::DistributorImpl, exportObjs::Array)
     - Post buffer of export objects (can do other local work before executing
         Waits).  Otherwise, as do(::DistributorImpl, ::Array{T})::Array{T}
 
-doWaits(dist::DistributorImpl)::Array - wait on a set of posts
+resolveWaits(dist::DistributorImpl)::Array - wait on a set of posts
 
-doReversePosts(dist::DistributorImpl, exportObjs::Array)
+resolveReversePosts(dist::DistributorImpl, exportObjs::Array)
     - Do reverse post of buffer of export objects (can do other local work
         before executing Waits).  Otherwise, as
         doReverse(::DistributorImpl, ::Array{T})::Array{T}
 
-doReverseWaits(dist::DistributorImpl)::Array - wait on a reverse set of posts
+resolveReverseWaits(dist::DistributorImpl)::Array - wait on a reverse set of posts
 
 """
 abstract type Distributor

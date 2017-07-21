@@ -1,4 +1,7 @@
 
+export Directory
+export getDirectoryEntries, gidsAllUniquelyOwned
+
 # methods and docs based straight off Epetra_Directory to match Comm
 
 

@@ -1,4 +1,6 @@
 
+export SerialDistributor
+
 type SerialDistributor <: Distributor
     post::Array
     reversePost::Array
@@ -19,11 +21,10 @@ function createFromSends(dist::SerialDistributor,
     numExportIDs
 end
 
-function createFromRecvs(dist::SerialDistributor, remoteGIDs::Array{GID},
-        remotePIDs::Array{PID})::Tuple{Array{GID}, Array{PID}}
-        where GID <: Integer where PID <: Integer
+function createFromRecvs(
+        dist::SerialDistributor, remoteGIDs::Array{GID}, remotePIDs::Array{PID}
+        )::Tuple{Array{GID}, Array{PID}} where GID <: Integer where PID <: Integer
     
-    # DECISION: check if GIDs exist?
     for id in remotePIDs
         if id != 1
             error("SerialDistributor can only accept PID of 1")

@@ -1,4 +1,16 @@
 
+export Map
+export remoteIDList, lid, gid, findLocalElementID
+export minAllGID, maxAllGID, minMyGID, maxMyGID, minLID, maxLID
+export numGlobalElements, myGlobalElements, numGlobalPoints, numMyPoints
+export uniqueGIDs, globalIndicesType, sameBlockMapDataAs, sameAs, pointSameAs
+export linearMap, myGlobalElementIDs, pointToElementList, Comm
+export myGID, myLID, distributedGlobal, numMyElements
+
+
+
+
+
 # methods and docs based straight off Epetra_Map to match Comm
 
 # ignoring indexBase methods
@@ -15,7 +27,7 @@ All subtypes must have the following methods, with MapImpl standing in for the s
 
 --local/global ID accessor methods--
 
-removeIDList(map::MapImpl, gidList::Array{GID})::Tuple{Array{PID}, Array{LID}}
+remoteIDList(map::MapImpl, gidList::Array{GID})::Tuple{Array{PID}, Array{LID}}
         where GID <: Integer where PID <: Integer where LID <: Integer
     - Return the processor ID and local index value for a given list of global indices
 
