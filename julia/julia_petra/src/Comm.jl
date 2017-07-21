@@ -1,6 +1,6 @@
 
 export Comm
-export barrier, broadcast, gatherAll, sumAll, maxAll, minAll, scanSum
+export barrier, broadcastAll, gatherAll, sumAll, maxAll, minAll, scanSum
 export myPid, numProc, createDistributor, createDirectory
 
 # methods (and docs) are currently based straight off Epetra_Comm
@@ -18,7 +18,7 @@ All subtypes must have the following methods, with CommImpl standing in for the 
 
 barrier(comm::CommImpl) - Each processor must wait until all processors have arrived
 
-broadcast(comm::CommImpl, myvals::Array{T}, Root::Integer)::Array{T} where T
+broadcastAll(comm::CommImpl, myvals::Array{T}, Root::Integer)::Array{T} where T
     - Takes a list of input values from the root processor and sends to all
         other processors.  The values are returned (including on the root process)
 
@@ -58,6 +58,6 @@ abstract type Comm
 end
 
 function Base.show(io::IO, comm::Comm)
-    println(typeof(comm)," with PID ", myPid(comm),
+    print(io, split(String(Symbol(typeof(comm))), ".")[2]," with PID ", myPid(comm),
                 " and ", numProc(comm), " processes")
 end

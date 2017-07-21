@@ -4,12 +4,6 @@ export SerialComm
 type SerialComm <: Comm
 end
 
-const serialCommInstance = SerialComm()
-
-function SerialComm()
-    serialCommInstance
-end
-
 
 # most of these functions are no-ops or identify functions since there is only
 # one processor
@@ -18,8 +12,8 @@ function barrier(comm::SerialComm)
 end
 
 
-function broadcast(comm::SerialComm, myvals::Array{T}, root::Integer)::Array{T} where T
-    @assert root != 1 "SerialComm can only accept PID of 1"
+function broadcastAll(comm::SerialComm, myVals::Array{T}, root::Integer)::Array{T} where T
+    @assert root == 1 "SerialComm can only accept PID of 1"
     myVals
 end
 
