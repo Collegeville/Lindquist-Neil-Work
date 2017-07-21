@@ -10,7 +10,7 @@ elements.
 All subtypes must have the following methods, with DirectoryImpl standing in for
 the subtype:
 
-getDirectoryEntries(directory::DirectoryImpl, Map::BlockMap, globalEntries::Array{GID},
+getDirectoryEntries(directory::DirectoryImpl, map::Map, globalEntries::Array{GID},
         high_rank_sharing_procs::Bool)::Tuple{Array{PID}, Array{LID}}
         where GID <: Integer where PID <: Integer where LID <:Integer
     - Returns processor and local id infor for non-local map entries.  Returns a tuple
@@ -18,14 +18,15 @@ getDirectoryEntries(directory::DirectoryImpl, Map::BlockMap, globalEntries::Arra
             1 - an Array of processors owning the global ID's in question
             2 - an Array of local IDs of the global on the owning processor
 
-gidsAllUniquelyOwned()
+gidsAllUniquelyOwned(directory::DirectoryImpl)
     - Returns true if all GIDs appear on just one processor
 """
 abstract type Directory
 end
 
 
-getDirectoryEntries(directory::Directory, map::BlockMap, globalEntries::Array{GID})
-        where GID <: Integer
+function getDirectoryEntries(directory::Directory, map::Map, globalEntries::Array{GID}
+        )::Tuple{Array, Array} where GID <: Integer
+        # where PID <: Integer where LID <: Integer
     getDirectoryEntries(directory, map, globalEntries, false)
 end

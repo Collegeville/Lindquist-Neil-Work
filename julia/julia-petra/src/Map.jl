@@ -91,7 +91,7 @@ pointToElementList(map::MapImpl)::Array{LID} where LID <: Integer
 
 Comm(map::MapImpl)::Comm - Return the Comm for the map
 """
-abstract type Map{T} where {T}
+abstract type Map{T}
 end
 
 """

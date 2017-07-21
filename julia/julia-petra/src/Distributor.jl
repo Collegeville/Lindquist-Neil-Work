@@ -9,13 +9,14 @@ All subtypes must have the following methods, with DistributorImpl standing
 in for the subtype:
 
 createFromSends(dist::DistributorImpl, numExportIDs::Integer,
-        exportPIDs::Array{PID})::Integer
+        exportPIDs::Array{PID})::Integer where PID <:Integer
     - sets up the Distributor object using a list of process IDs to which we
         export and the number of IDs being exported.  Returns the number of
         IDs this processor will be reciving
 
 createFromRecvs(dist::DistributorImpl, remoteGIDs::Array{GID},
         removePIDs::Array{PID})::Tuple{Array{GID}, Array{PID}}
+        where GID <: Integer where PID <: Integer
     - sets up the Distributor object using a list of remote global IDs and
         corresponding PIDs.  Returns a tuple with the global IDs and their
         respective processor IDs being sent to me.

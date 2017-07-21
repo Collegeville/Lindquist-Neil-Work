@@ -3,9 +3,9 @@ module julia_petra
 
 # Communication interface
 
-include("Comm.jl")
+include("Map.jl")
 include("Directory.jl")
 include("Distributor.jl")
-include("Map.jl")
+include("Comm.jl")
 
 end # module
