@@ -8,8 +8,8 @@ The base type for gather/scatter setup.
 All subtypes must have the following methods, with DistributorImpl standing
 in for the subtype:
 
-createFromSends(dist::DistributorImpl, numExportIDs::Integer,
-        exportPIDs::Array{PID})::Integer where PID <:Integer
+createFromSends(dist::DistributorImpl,exportPIDs::Array{PID})
+        ::Integer where PID <:Integer
     - sets up the Distributor object using a list of process IDs to which we
         export and the number of IDs being exported.  Returns the number of
         IDs this processor will be reciving
@@ -29,18 +29,18 @@ doReverse(dist::DistributorImpl, exportObjs::Array{T})::Array{T} where T
     - Execute the reverse of the current plan on buffer of export objects and
         return the objects set to this processor
 
-doPosts(dist::DistributorImpl, exportObjs::Array{T})::Array{T} where T
+doPosts(dist::DistributorImpl, exportObjs::Array)
     - Post buffer of export objects (can do other local work before executing
         Waits).  Otherwise, as do(::DistributorImpl, ::Array{T})::Array{T}
 
-doWaits(dist::DistributorImpl) - wait on a set of posts
+doWaits(dist::DistributorImpl)::Array - wait on a set of posts
 
-doReversePosts(dist::DistributorImpl, exportObjs::Array{T})::Array{T} where T
+doReversePosts(dist::DistributorImpl, exportObjs::Array)
     - Do reverse post of buffer of export objects (can do other local work
         before executing Waits).  Otherwise, as
         doReverse(::DistributorImpl, ::Array{T})::Array{T}
 
-doReverseWaits(dist::DistributorImpl) - wait on a reverse set of posts
+doReverseWaits(dist::DistributorImpl)::Array - wait on a reverse set of posts
 
 """
 abstract type Distributor
