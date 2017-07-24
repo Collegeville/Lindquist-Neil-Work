@@ -57,4 +57,4 @@ hpcg/MPI_Intel_OMP_Single/*/*
 
 
 #Julia auto-saves
-julia/.ipynb_checkpoints/*
+*/.ipynb_checkpoints/*

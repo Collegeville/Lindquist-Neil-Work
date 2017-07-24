@@ -1,6 +1,5 @@
 
 export Directory
-export getDirectoryEntries, gidsAllUniquelyOwned
 
 # methods and docs based straight off Epetra_Directory to match Comm
 
@@ -13,7 +12,7 @@ elements.
 All subtypes must have the following methods, with DirectoryImpl standing in for
 the subtype:
 
-getDirectoryEntries(directory::DirectoryImpl, map::Map, globalEntries::Array{GID},
+getDirectoryEntries(directory::DirectoryImpl, map::BlockMap, globalEntries::Array{GID},
         high_rank_sharing_procs::Bool)::Tuple{Array{PID}, Array{LID}}
         where GID <: Integer where PID <: Integer where LID <:Integer
     - Returns processor and local id infor for non-local map entries.  Returns a tuple
@@ -25,11 +24,4 @@ gidsAllUniquelyOwned(directory::DirectoryImpl)
     - Returns true if all GIDs appear on just one processor
 """
 abstract type Directory
-end
-
-
-function getDirectoryEntries(directory::Directory, map::Map, globalEntries::Array{GID}
-        )::Tuple{Array, Array} where GID <: Integer
-        # where PID <: Integer where LID <: Integer
-    getDirectoryEntries(directory, map, globalEntries, false)
 end

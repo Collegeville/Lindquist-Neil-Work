@@ -2,10 +2,10 @@
 export SerialDirectory
 
 type SerialDirectory <: Directory
-    map::Map
+    map::BlockMap
 end
 
-function getDirectoryEntries(directory::SerialDirectory, map::Map,
+function getDirectoryEntries(directory::SerialDirectory, map::BlockMap,
         globalEntries::Array{GID}, high_rank_sharing_procs::Bool
         )::Tuple{Array{Integer}, Array{Integer}} where GID <: Integer
         #where PID <: Integer where LID <:Integer
