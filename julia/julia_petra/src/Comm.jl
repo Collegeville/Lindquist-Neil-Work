@@ -61,3 +61,28 @@ function Base.show(io::IO, comm::Comm)
     print(io, split(String(Symbol(typeof(comm))), ".")[2]," with PID ", myPid(comm),
                 " and ", numProc(comm), " processes")
 end
+
+function broadcastAll(comm::Comm, myVal::T, root::Integer)::T where {T}
+    broadcastAll(comm, [myVal], root)[1]
+end
+
+function gatherAll(comm::Comm, myVal::T)::Array{T} where {T}
+    gatherAll(comm, [myVal])
+end
+
+function sumAll(comm::Comm, val::T)::T where {T}
+    sumAll(comm, [val])[1]
+end
+
+function maxAll(comm::Comm, val::T)::T where {T}
+    maxAll(comm, [val])[1]
+end
+
+function minAll(comm::Comm, val::T)::T where {T}
+    minAll(comm, [val])[1]
+end
+
+function scanSum(comm::Comm, val::T)::T where {T}
+    scanSum(comm, [val])[1]
+end
+
