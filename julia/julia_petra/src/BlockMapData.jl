@@ -6,13 +6,12 @@ type BlockMapData
     directory::Nullable{Directory}
     lid::Array{Integer}
     myGlobalElements::Array{Integer}
-    firstPointInElementList::Array{Integer}
+#    firstPointInElementList::Array{Integer}
 #    elementSizeList::Array{Integer}
-    pointToElementList::Array{Integer}
+#    pointToElementList::Array{Integer}
     
     numGlobalElements::Integer
     numMyElements::Integer
-    indexBase::Integer
 #    elementSize::Integer
 #    minMyElementSize::Integer
 #    maxMyElementSize::Integer
@@ -24,8 +23,8 @@ type BlockMapData
     maxMyGID::Integer
     minLID::Integer
     maxLID::Integer
-    numGlobalPoints::Integer
-    numMyPoints::Integer
+#    numGlobalPoints::Integer
+#    numMyPoints::Integer
     
 #    constantElementSize::Bool
     linearMap::Bool
@@ -35,4 +34,29 @@ type BlockMapData
     lastContiguousGID::Integer
     lastContiguousGIDLoc::Integer
     LIDHash::Dict{Integer, Integer}
+end
+
+function BlockMapData(numGlobalElements::Integer, comm::Comm)
+    BlockMapData(
+        comm,
+        Nullable{Directory}(),
+        [],
+        [],
+        
+        numGlobalElements,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        
+        false,
+        false,
+        false,
+        0,
+        0,
+        Dict{Integer, Integer}()
+    )
 end
