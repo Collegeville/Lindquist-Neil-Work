@@ -1,6 +1,3 @@
-
-#TODO test errors
-
 #### Test BlockMap with SerialComm ####
 
 macro SerialMapTests()
@@ -78,32 +75,63 @@ commVal = SerialComm()
 
 
 ## constructor 1 ##
+@test_throws InvalidArgumentError BlockMap(-8, commVal)
+@test_throws InvalidArgumentError BlockMap(-1, commVal)
+
+BlockMap(0, commVal)
+BlockMap(1, commVal)
+
 map = BlockMap(5, commVal)
 map2 = BlockMap(5, commVal)
 diffMap = BlockMap(6, commVal)
-
 @SerialMapTests
 
 ## constructor 2 ##
+@test_throws InvalidArgumentError BlockMap(-8, 4, commVal)
+@test_throws InvalidArgumentError BlockMap(-2, 4, commVal)
+@test_throws InvalidArgumentError BlockMap(5, -6, commVal)
+@test_throws InvalidArgumentError BlockMap(4, -1, commVal)
+
+BlockMap(0, 0, commVal)
+BlockMap(1, 1, commVal)
+
 map = BlockMap(5, 5, commVal)
 map2 = BlockMap(5, 5, commVal)
 diffMap = BlockMap(6, 6, commVal)
-
 @SerialMapTests
 
+map = BlockMap(-1, 5, commVal)
+map2 = BlockMap(-1, 5, commVal)
+diffMap = BlockMap(-1, 6, commVal)
+@SerialMapTests
+
+
 ## constructor 3 ##
+@test_throws InvalidArgumentError BlockMap(-8, 4, [1, 2, 3, 4], commVal)
+@test_throws InvalidArgumentError BlockMap(-2, 4, [1, 2, 3, 4], commVal)
+@test_throws InvalidArgumentError BlockMap(5, -6, [1, 2, 3, 4, 5], commVal)
+@test_throws InvalidArgumentError BlockMap(4, -1, [1, 2, 3, 4], commVal)
+
+BlockMap(0, 0, Integer[], commVal)
+BlockMap(1, 1, [1], commVal)
+
 map = BlockMap(5, 5, [1, 2, 3, 4, 5], commVal)
 map2 = BlockMap(5, 5, [1, 2, 3, 4, 5], commVal)
 diffMap = BlockMap(6, 6, [1, 2, 3, 4, 5, 6], commVal)
-
 @SerialMapTests
 
 ## constructor 4 ##
+@test_throws InvalidArgumentError BlockMap(-8, 4, [1, 2, 3, 4], false, 1, 4, commVal)
+@test_throws InvalidArgumentError BlockMap(-2, 4, [1, 2, 3, 4], false, 1, 4, commVal)
+@test_throws InvalidArgumentError BlockMap(5, -6, [1, 2, 3, 4, 5], false, 1, 5, commVal)
+@test_throws InvalidArgumentError BlockMap(4, -1, [1, 2, 3, 4], false, 1, 4, commVal)
+
+BlockMap(0, 0, Integer[], false, 1, 0, commVal)
+BlockMap(1, 1, [1], false, 1, 1, commVal)
 
 map = BlockMap(5, 5, [1, 2, 3, 4, 5], false, 1, 5, commVal)
 map2 = BlockMap(5, 5, [1, 2, 3, 4, 5], false, 1, 5, commVal)
 diffMap = BlockMap(6, 6, [1, 2, 3, 4, 5, 6], false, 1, 6, commVal)
-
 @SerialMapTests
 
 #TODO test BlockMap with parallel Comm

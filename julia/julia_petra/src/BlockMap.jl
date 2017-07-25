@@ -331,9 +331,10 @@ end
 
 function checkValidNGE(map::BlockMap, numGlobalElements::Integer)
     if (numGlobalElements != -1) && (numGlobalElements != map.data.numGlobalElements)
-        throw(AssertionError("Invalid NumGlobalElements.  NumGlobalElements = $(numGlobalElements)" +
-          ".  Should equal $(map.data.numGlobalElements)" +
-          ", or be set to -1 to compute automatically"))
+        throw(InvalidArgumentError("Invalid NumGlobalElements.  "
+              * "NumGlobalElements = $(numGlobalElements)"
+              * ".  Should equal $(map.data.numGlobalElements)"
+              * ", or be set to -1 to compute automatically"))
     end
 end
 
