@@ -33,7 +33,7 @@ type BlockMapData
     oneToOne::Bool
     lastContiguousGID::Integer
     lastContiguousGIDLoc::Integer
-    LIDHash::Dict{Integer, Integer}
+    lidHash::Dict{Integer, Integer}
 end
 
 function BlockMapData(numGlobalElements::Integer, comm::Comm)
@@ -52,6 +52,7 @@ function BlockMapData(numGlobalElements::Integer, comm::Comm)
         0,
         0,
         
+        false,
         false,
         false,
         false,

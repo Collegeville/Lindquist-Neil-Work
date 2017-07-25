@@ -14,18 +14,18 @@ function getDirectoryEntries(directory::SerialDirectory, map::BlockMap,
     localEntries = Array{Integer}(numEntries)
     
     for i = 1:numEntries
-        lid = map.lid(globalEntries[i])
+        lidVal = lid(map, globalEntries[i])
         
-        if lid == 0
+        if lidVal == 0
             procs[i] = 0
-            warn("GID $globalEntries[i] is not part of this map")
+            warn("GID $(globalEntries[i]) is not part of this map")
         else
             procs[i] = 1
         end
-        localEntries[i] = lid
+        localEntries[i] = lidVal
     end
     
-    procs, localEntries
+    (procs, localEntries)
 end
     
 

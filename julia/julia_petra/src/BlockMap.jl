@@ -4,7 +4,7 @@ export remoteIDList, lid, gid, findLocalElementID
 export minAllGID, maxAllGID, minMyGID, maxMyGID, minLID, maxLID
 export numGlobalElements, myGlobalElements
 export uniqueGIDs, globalIndicesType, sameBlockMapDataAs, sameAs
-export linearMap, myGlobalElementIDs, Comm
+export linearMap, myGlobalElementIDs, comm
 export myGID, myLID, distributedGlobal, numMyElements
 #export pointToElementList, numGlobalPoints, numMyPoints, pointSameAs
 
@@ -25,8 +25,12 @@ export myGID, myLID, distributedGlobal, numMyElements
 """
 A type for partitioning block element vectors and matrices
 """
-type BlockMap{T}
+type BlockMap
     data::BlockMapData
+    
+    function BlockMap(data::BlockMapData)
+        new(data)
+    end
 end
 
 
@@ -39,20 +43,20 @@ function BlockMap(numGlobalElements::Integer, comm::Comm)
     const data = BlockMapData(numGlobalElements, comm)
     const map = BlockMap(data)
     
-    numProc = numProc(comm)
+    numProcVal = numProc(comm)
     data.linearMap = true
     
-    myPID = myPID(comm)
+    myPIDVal = myPid(comm) - 1
     
-    data.numMyElements = floor(typeof(blockMapData.numGlobalElements),
-        blockMapData.numGlobalElements/numProc)
-    remainder = data.numGlobalElements % numProc
-    startIndex = myPID * (data.numMyElements+1)
+    data.numMyElements = floor(typeof(data.numGlobalElements),
+        data.numGlobalElements/numProcVal)
+    remainder = data.numGlobalElements % numProcVal
+    startIndex = myPIDVal * (data.numMyElements+1)
     
-    if myPID < remainder
+    if myPIDVal < remainder
         data.numMyElements += 1
     else
-        startIndex -= (myPID - remainder)
+        startIndex -= (myPIDVal - remainder)
     end
     
     data.minAllGID = 1
@@ -79,16 +83,14 @@ function BlockMap(numGlobalElements::Integer, numMyElements::Integer, comm::Comm
     data.numMyElements = numMyElements
     data.linearMap = true
     
-    numProc = numProc(comm)
-    
     data.distributedGlobal = isDistributedGlobal(map, numGlobalElements, numMyElements)
     
     #Local Map and uniprocessor case: Each processor gets a complete copy of all elements
-    if !data.distributedGlobal || numProc == 1
+    if !data.distributedGlobal || numProc(comm) == 1
         data.numGlobalElements = data.numMyElements
         
         data.minAllGID = 1
-        data.MaxAllGID = data.minAllGID + data.numGlobalElements - 1
+        data.maxAllGID = data.minAllGID + data.numGlobalElements - 1
         data.minMyGID = 1
         data.maxMyGID = data.minMyGID + data.numMyElements - 1
     else
@@ -107,7 +109,7 @@ function BlockMap(numGlobalElements::Integer, numMyElements::Integer, comm::Comm
     end
     checkValidNGE(map, numGlobalElements)
     
-    EndOfConstructorOps()
+    EndOfConstructorOps(map)
     map
 end
 
@@ -116,7 +118,7 @@ end
 constructor for user-defined arbitrary distribution of elements
 """
 function BlockMap(numGlobalElements::Integer, numMyElements::Integer,
-        myGlobalElements::Array{Integer}, comm::Comm)
+        myGlobalElements::Array{GID}, comm::Comm) where GID <: Integer
     @assert numGlobalElements >= -1 "numGlobalElements = $(numGlobalElements). Should be >= -1"
     @assert numMyElements >= 0 "numMyElements = $(numMyElements). Should be >= 0"
     
@@ -124,27 +126,34 @@ function BlockMap(numGlobalElements::Integer, numMyElements::Integer,
     const map = BlockMap(data)
     
     data.numMyElements = numMyElements
-    data.linearMap = false
-        
-    numProc = numProc(comm)
     
+    linear = 1
     if numMyElements > 0
+        data.myGlobalElements = Array{eltype(myGlobalElements)}(numMyElements)
+        
+        data.myGlobalElements[1] = myGlobalElements[1]
         data.minMyGID = myGlobalElements[1]
         data.maxMyGID = myGlobalElements[1]
         
-        for i = 1:numMyElements
+        for i = 2:numMyElements
             data.myGlobalElements[i] = myGlobalElements[i]
             data.minMyGID = min(data.minMyGID, myGlobalElements[i])
             data.maxMyGID = max(data.maxMyGID, myGlobalElements[i])
+            
+            if myGlobalElements[i] != myGlobalElements[i-1] + 1
+                linear = 0
+            end
         end
     else
         data.minMyGID = 1
         data.maxMyGID = 0
     end
     
+    data.linearMap = Bool(minAll(data.comm, linear))
+    
     data.distributedGlobal = isDistributedGlobal(map, numGlobalElements, numMyElements)
     
-    if !data.distributedGlobal || numProc == 1
+    if !data.distributedGlobal || numProc(comm) == 1
         data.numGlobalElements = data.numMyElements
         checkValidNGE(map, numGlobalElements)
         data.minAllGID = data.minMyGID
@@ -168,7 +177,7 @@ function BlockMap(numGlobalElements::Integer, numMyElements::Integer,
             
     end
        
-    endOfConstructorOps()
+    EndOfConstructorOps(map)
     map
 end
 
@@ -177,8 +186,8 @@ constructor for user-defined arbitrary distribution of elements
 will all information on globals provided by the user
 """
 function BlockMap(numGlobalElements::Integer, numMyElements::Integer,
-        myGlobalElements::Array{Integer}, comm::Comm, userIsDistributedGlobal::Bool,
-        userMinAllGID::Integer, userMaxAllGID::Integer)
+        myGlobalElements::Array{GID}, userIsDistributedGlobal::Bool,
+        userMinAllGID::Integer, userMaxAllGID::Integer, comm::Comm) where GID <: Integer
     @assert numGlobalElements >= -1 "numGlobalElements = $(numGlobalElements). Should be >= -1"
     @assert numMyElements >= 0 "numMyElements = $(numMyElements). Should be >= 0"
     
@@ -186,17 +195,23 @@ function BlockMap(numGlobalElements::Integer, numMyElements::Integer,
     const map = BlockMap(data)
     
     data.numMyElements = numMyElements
-    data.linearMap = false
     
-    numProc = numProc(comm)
-    
+    linear = 1
     if numMyElements > 0
+        data.myGlobalElements = Array{eltype(myGlobalElements)}(numMyElements)
+        
+        data.myGlobalElements[1] = myGlobalElements[1]
         data.minMyGID = myGlobalElements[1]
         data.maxMyGID = myGlobalElements[1]
-        for i = 1:numMyElements
+        
+        for i = 2:numMyElements
             data.myGlobalElements[i] = myGlobalElements[i]
             data.minMyGID = min(data.minMyGID, myGlobalElements[i])
             data.maxMyGID = max(data.maxMyGID, myGlobalElements[i])
+            
+            if myGlobalElements[i] != myGlobalElements[i-1] + 1
+                linear = 0
+            end
         end
         
     else
@@ -204,9 +219,11 @@ function BlockMap(numGlobalElements::Integer, numMyElements::Integer,
         data.maxMyGID = 0
     end
     
-    data.distributedGlobal = userIsdistributedGlobal
+    data.linearMap = Bool(minAll(comm, linear))
     
-     if !data.distributedGlobal || numProc == 1
+    data.distributedGlobal = userIsDistributedGlobal
+    
+     if !data.distributedGlobal || numProc(comm) == 1
         data.numGlobalElements = data.numMyElements
         checkValidNGE(map, numGlobalElements)
         data.minAllGID = data.minMyGID
@@ -223,7 +240,7 @@ function BlockMap(numGlobalElements::Integer, numMyElements::Integer,
         data.maxAllGID = userMaxAllGID
         @assert data.minAllGID >= 1 "Minimum global element index = $(data.minAllGID).  Should be >= 1"
     end
-    EndOfCustructorOps()
+    EndOfConstructorOps(map)
     map
 end
 
@@ -240,7 +257,7 @@ end
 function isDistributedGlobal(map::BlockMap, numGlobalElements::Integer,
         numMyElements::Integer)
     data = map.data
-    if data.comm.numProc > 1 
+    if numProc(data.comm) > 1 
         localReplicated = numGlobalElements == numMyElements
         !Bool(minAll(data.comm, localReplicated))
     else
@@ -252,7 +269,7 @@ function EndOfConstructorOps(map::BlockMap)
     map.data.minLID = 1
     map.data.maxLID = max(map.data.numMyElements, 1)
     
-    GlobalToLocalSetup();
+    GlobalToLocalSetup(map);
 end
 
 function GlobalToLocalSetup(map::BlockMap)
@@ -260,14 +277,16 @@ function GlobalToLocalSetup(map::BlockMap)
     numMyElements = data.numMyElements
     myGlobalElements = data.myGlobalElements
     
-    if data.numGlobalElements == 0
-        return map
-    end
     if data.linearMap || numMyElements == 0
         return map
     end
+    if length(data.numGlobalElements) == 0
+        return map
+    end
+    
     
     val = myGlobalElements[1]
+    i = 1
     for i = 1:numMyElements
         if val != myGlobalElements[i]
             break
@@ -275,9 +294,9 @@ function GlobalToLocalSetup(map::BlockMap)
         val += 1
     end
     
-    data.lastContigiousGIDLoc = i-1
-    if data.lastContigiousGIDLoc <= 0
-        data.lastContiguousGID = myGlobalElements[0]
+    data.lastContiguousGIDLoc = i
+    if data.lastContiguousGIDLoc <= 1
+        data.lastContiguousGID = myGlobalElements[1]
     else
         data.lastContiguousGID = myGlobalElements[data.lastContiguousGIDLoc]
     end
@@ -308,16 +327,16 @@ end
 Return true if the GID passed in belongs to the calling processor in this
 map, otherwise returns false.
 """
-function myGID(map::BlockMap, gid::GID) where GID <: Integer
-    GID(map, gid) != 0
+function myGID(map::BlockMap, gidVal::GID) where GID <: Integer
+    lid(map, gidVal) != 0
 end
 
 """
 Return true if the LID passed in belongs to the calling processor in this
 map, otherwise returns false.
 """
-function myLID(map::BlockMap, lid::LID) where LID <: Integer
-    LID(map, lid) != 0
+function myLID(map::BlockMap, lidVal::LID) where LID <: Integer
+    gid(map, lidVal) != 0
 end
 
 """
@@ -369,7 +388,7 @@ function remoteIDList(map::BlockMap, gidList::Array{GID}
         data.directory = createDirectory(data.comm, map)
     end
     
-    getDirectoryEntries(map, gidList)
+    getDirectoryEntries(get(data.directory), map, gidList)
 end
 
 """
@@ -382,12 +401,16 @@ function lid(map::BlockMap, gid::GID)::Integer where GID <: Integer
         return 0
     end
     if data.linearMap
-        return gid-data.minMyGID
+        return gid - data.minMyGID + 1
     end
     if gid >= data.myGlobalElements[1] && gid <= data.lastContiguousGID
-        return gid - data.myGlobalElements[1]
+        return gid - data.myGlobalElements[1] + 1
     end
     
+    println(data.lidHash)
+    println("gid = $(gid)")
+    println("first element = $(data.myGlobalElements[1])")
+    println("last element  = $(data.lastContiguousGID)")
     return data.lidHash[gid]
 end
 
@@ -402,7 +425,7 @@ function gid(map::BlockMap, lid::LID)::Integer where LID <: Integer
     end
     
     if data.linearMap
-        return lid + data.minMyGID
+        return lid + data.minMyGID - 1
     end
     return data.myGlobalElements[lid]
 end
@@ -460,7 +483,17 @@ end
 Return a list of global elements on this processor
 """
 function myGlobalElements(map::BlockMap)::Array{Integer}
-    map.data.myGlobalElements
+    data = map.data
+    
+    if length(data.myGlobalElements) == 0
+        myGlobalElements = Array{Integer}(data.numMyElements)
+        for i = 1:data.numMyElements
+            myGlobalElements[i] = data.minMyGID + i - 1
+        end
+        data.myGlobalElements = myGlobalElements
+    else
+        data.myGlobalElements
+    end
 end
 
 #"""
@@ -531,14 +564,14 @@ function sameAs(this::BlockMap, other::BlockMap)::Bool
         end
     else
         for i = 1:tData.numMyElements
-            if gid(this, i) == gid(other, i)
+            if gid(this, i) != gid(other, i)
                 mySameMap = 0
                 break
             end
         end
     end
     
-    Bool(minAll(tData.comm, [mySameMap])[1])
+    Bool(minAll(tData.comm, mySameMap))
 end
     
 #"""
@@ -587,9 +620,7 @@ function myGlobalElementIDs(map::BlockMap)::Array{Integer}
             myGlobalElements[i] = data.minMyGID + i
         end
     else
-        for i = 1:data.numMyElements
-            myGlobalElements[i] = data.myGlobalElements[i]
-        end
+        myGlobalElements .= data.myGlobalElements
     end
     
     myGlobalElements
@@ -614,7 +645,7 @@ end
 function isOneToOne(map::BlockMap)::Bool
     data = map.data
     if !(data.oneToOneIsDetermined)
-        data.oneToOne = determineIsOneToOne()
+        data.oneToOne = determineIsOneToOne(map)
         data.oneToOneIsDetermined = true
     end
     data.oneToOne
@@ -635,6 +666,6 @@ end
 """
 Return the Comm for the map                                                    
 """
-function Comm(map::BlockMap)::Comm
+function comm(map::BlockMap)::Comm
     map.data.comm
 end

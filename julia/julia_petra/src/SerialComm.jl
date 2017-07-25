@@ -50,5 +50,5 @@ function createDistributor(comm::SerialComm)::SerialDistributor
 end
 
 function createDirectory(comm::SerialComm, map::BlockMap)::SerialDirectory
-    BasicDirectory(map)
+    SerialDirectory(map)
 end
