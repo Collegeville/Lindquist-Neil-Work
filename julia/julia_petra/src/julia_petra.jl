@@ -1,5 +1,8 @@
 module julia_petra
 
+# Internal Utilities
+
+include("Error.jl")
 
 # Communication interface
 

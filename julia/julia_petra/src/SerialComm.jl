@@ -13,7 +13,9 @@ end
 
 
 function broadcastAll(comm::SerialComm, myVals::Array{T}, root::Integer)::Array{T} where T
-    @assert root == 1 "SerialComm can only accept PID of 1"
+    if root != 1 
+        throw(InvalidArgumentError("SerialComm can only accept PID of 1"))
+    end
     myVals
 end
 

@@ -1,5 +1,4 @@
 
-#TODO stop using assert for routine validation
 #TODO test errors
 
 #### Test BlockMap with SerialComm ####

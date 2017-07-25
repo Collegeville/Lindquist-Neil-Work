@@ -14,7 +14,7 @@ show(io, serialComm)
 # ensure no errors or hangs
 barrier(serialComm)
 
-@test_throws AssertionError broadcastAll(serialComm, [1, 2, 3], 2)
+@test_throws InvalidArgumentError broadcastAll(serialComm, [1, 2, 3], 2)
 @test [1, 2, 3] == broadcastAll(serialComm, [1, 2, 3], 1)
 @test ['a', 'b', 'c'] == broadcastAll(serialComm, ['a', 'b', 'c'], 1)
 
@@ -45,22 +45,22 @@ serialDistributor = createDistributor(serialComm)
 
 ### test Serial Distributor ###
 
-@test_throws AssertionError createFromSends(serialDistributor, [1, 1, 1, 2])
-@test_throws AssertionError createFromSends(serialDistributor, [1, 1, 2, 1])
-@test_throws AssertionError createFromSends(serialDistributor, [2, 1, 1])
+@test_throws InvalidArgumentError createFromSends(serialDistributor, [1, 1, 1, 2])
+@test_throws InvalidArgumentError createFromSends(serialDistributor, [1, 1, 2, 1])
+@test_throws InvalidArgumentError createFromSends(serialDistributor, [2, 1, 1])
 @test 1 == createFromSends(serialDistributor, [1])
 @test 2 == createFromSends(serialDistributor, [1, 1])
 @test 5 == createFromSends(serialDistributor, [1, 1, 1, 1, 1])
 @test 8 == createFromSends(serialDistributor, [1, 1, 1, 1, 1, 1, 1, 1])
 
 
-@test_throws AssertionError createFromRecvs(serialDistributor, [1, 2, 3, 4], [1, 1, 1, 2])
-@test_throws AssertionError createFromRecvs(serialDistributor, [1, 2, 3, 4, 5], [2, 1, 1, 1, 1])
-@test_throws AssertionError createFromRecvs(serialDistributor, [1, 2, 3, 4, 5, 6], [1, 1, 1, 2, 1, 1])
-@test_throws AssertionError createFromRecvs(serialDistributor, [1, 2], [1])
-@test_throws AssertionError createFromRecvs(serialDistributor, [1, 2, 3], [1])
-@test_throws AssertionError createFromRecvs(serialDistributor, [1], [1, 1])
-@test_throws AssertionError createFromRecvs(serialDistributor, [1], [1, 2, 3])
+@test_throws InvalidArgumentError createFromRecvs(serialDistributor, [1, 2, 3, 4], [1, 1, 1, 2])
+@test_throws InvalidArgumentError createFromRecvs(serialDistributor, [1, 2, 3, 4, 5], [2, 1, 1, 1, 1])
+@test_throws InvalidArgumentError createFromRecvs(serialDistributor, [1, 2, 3, 4, 5, 6], [1, 1, 1, 2, 1, 1])
+@test_throws InvalidArgumentError createFromRecvs(serialDistributor, [1, 2], [1])
+@test_throws InvalidArgumentError createFromRecvs(serialDistributor, [1, 2, 3], [1])
+@test_throws InvalidArgumentError createFromRecvs(serialDistributor, [1], [1, 1])
+@test_throws InvalidArgumentError createFromRecvs(serialDistributor, [1], [1, 2, 3])
 @test ([2], [1]) == createFromRecvs(serialDistributor, [2], [1])
 @test ([2, 3, 4, 5], [1, 1, 1, 1]) == createFromRecvs(serialDistributor, [2, 3, 4, 5], [1, 1, 1, 1])
 
@@ -75,15 +75,15 @@ serialDistributor = createDistributor(serialComm)
 @test ['a', 'b', 'c', 'k'] == resolveReverse(serialDistributor, ['a', 'b', 'c', 'k'])
 
 
-@test_throws AssertionError resolveWaits(serialDistributor)
-@test_throws AssertionError resolveReverseWaits(serialDistributor)
+@test_throws InvalidStateException resolveWaits(serialDistributor)
+@test_throws InvalidStateException resolveReverseWaits(serialDistributor)
 
 resolvePosts(serialDistributor, [1, 2, 3])
 resolvePosts(serialDistributor, [6, 7, 8, 9])
 @test [6, 7, 8, 9] == resolveWaits(serialDistributor)
-@test_throws AssertionError resolveWaits(serialDistributor)
+@test_throws InvalidStateException resolveWaits(serialDistributor)
 
 resolveReversePosts(serialDistributor, [11, 12, 13])
 resolveReversePosts(serialDistributor, [16, 17, 81, 19])
 @test [16, 17, 81, 19] == resolveReverseWaits(serialDistributor)
-@test_throws AssertionError resolveReverseWaits(serialDistributor)
+@test_throws InvalidStateException resolveReverseWaits(serialDistributor)

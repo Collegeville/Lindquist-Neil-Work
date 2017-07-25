@@ -14,7 +14,9 @@ end
 function createFromSends(dist::SerialDistributor,
         exportPIDs::Array{PID})::Integer where PID <:Integer
     for id in exportPIDs
-        @assert id == 1 "SerialDistributor can only accept PID of 1"
+        if id != 1
+            throw(InvalidArgumentError("SerialDistributor can only accept PID of 1"))
+        end
     end
     length(exportPIDs)
 end
@@ -22,10 +24,13 @@ end
 function createFromRecvs(
         dist::SerialDistributor, remoteGIDs::Array{GID}, remotePIDs::Array{PID}
         )::Tuple{Array{GID}, Array{PID}} where GID <: Integer where PID <: Integer
-    @assert(length(remoteGIDs) == length(remotePIDs),
-        "Number of GIDs and PIDs must be the same")
+    if length(remoteGIDs) != length(remotePIDs)
+        throw(InvalidArgumentError("Number of GIDs and PIDs must be the same"))
+    end
     for id in remotePIDs
-        @assert id == 1 "SerialDistributor can only accept PID of 1"
+        if id != 1
+            throw(InvalidArgumentError("SerialDistributor can only accept PID of 1"))
+        end
     end
     remoteGIDs,remotePIDs
 end
@@ -43,7 +48,9 @@ function resolvePosts(dist::SerialDistributor, exportObjs::Array)
 end
 
 function resolveWaits(dist::SerialDistributor)::Array
-    @assert !isnull(dist.post) "Must post before waiting"
+    if isnull(dist.post)
+        throw(InvalidStateException("Must post before waiting", :SerialDistributor))
+    end
     
     result = get(dist.post)
     dist.post = Nullable{Array}()
@@ -55,7 +62,10 @@ function resolveReversePosts(dist::SerialDistributor, exportObjs::Array)
 end
 
 function resolveReverseWaits(dist::SerialDistributor)::Array
-    @assert !isnull(dist.reversePost) "Must reverse post before reverse waiting"
+     if isnull(dist.reversePost)
+        throw(InvalidStateException("Must reverse post before reverse waiting",
+                :SerialDistributor))
+    end
     
     result = get(dist.reversePost)
     dist.reversePost = Nullable{Array}()

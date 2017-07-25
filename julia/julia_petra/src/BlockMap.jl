@@ -38,7 +38,9 @@ end
 constructor for Epetra-defined uniform linear distribution of elements
 """
 function BlockMap(numGlobalElements::Integer, comm::Comm)
-    @assert numGlobalElements >= 0 "NumGlobalElements = $(numGlobalElements).  Should be >= 0"
+    if numGlobalElements < 0 
+        throw(InvalidArgumentError("NumGlobalElements = $(numGlobalElements).  Should be >= 0"))
+    end
     
     const data = BlockMapData(numGlobalElements, comm)
     const map = BlockMap(data)
@@ -74,8 +76,12 @@ end
 constructor for user-defined linear distribution of elements
 """
 function BlockMap(numGlobalElements::Integer, numMyElements::Integer, comm::Comm)
-    @assert numGlobalElements >= -1 "NumGlobalElements = $(numGlobalElements).  Should be >= -1"
-    @assert numMyElements >= 0 "NumMyElements = $(numMyElements). Should be >= 0"
+    if numGlobalElements < -1 
+        throw(InvalidArgumentError("NumGlobalElements = $(numGlobalElements).  Should be >= -1"))
+    end
+    if numMyElements < 0
+        throw(InvalidArgumentError("NumMyElements = $(numMyElements). Should be >= 0"))
+    end
     
     const data = BlockMapData(numGlobalElements, comm)
     const map = BlockMap(data)
@@ -119,8 +125,12 @@ constructor for user-defined arbitrary distribution of elements
 """
 function BlockMap(numGlobalElements::Integer, numMyElements::Integer,
         myGlobalElements::Array{GID}, comm::Comm) where GID <: Integer
-    @assert numGlobalElements >= -1 "numGlobalElements = $(numGlobalElements). Should be >= -1"
-    @assert numMyElements >= 0 "numMyElements = $(numMyElements). Should be >= 0"
+    if numGlobalElements < -1 
+        throw(InvalidArgumentError("NumGlobalElements = $(numGlobalElements).  Should be >= -1"))
+    end
+    if numMyElements < 0
+        throw(InvalidArgumentError("NumMyElements = $(numMyElements). Should be >= 0"))
+    end
     
     const data = BlockMapData(numGlobalElements, comm)
     const map = BlockMap(data)
@@ -188,8 +198,15 @@ will all information on globals provided by the user
 function BlockMap(numGlobalElements::Integer, numMyElements::Integer,
         myGlobalElements::Array{GID}, userIsDistributedGlobal::Bool,
         userMinAllGID::Integer, userMaxAllGID::Integer, comm::Comm) where GID <: Integer
-    @assert numGlobalElements >= -1 "numGlobalElements = $(numGlobalElements). Should be >= -1"
-    @assert numMyElements >= 0 "numMyElements = $(numMyElements). Should be >= 0"
+    if numGlobalElements < -1 
+        throw(InvalidArgumentError("NumGlobalElements = $(numGlobalElements).  Should be >= -1"))
+    end
+    if numMyElements < 0
+        throw(InvalidArgumentError("NumMyElements = $(numMyElements). Should be >= 0"))
+    end
+    if userMinAllGID < 1 
+        throw(InvalidArgumentError("Minimum global element index = $(data.minAllGID).  Should be >= 1"))
+    end
     
     const data = BlockMapData(numGlobalElements, comm)
     const map = BlockMap(data)
@@ -238,7 +255,6 @@ function BlockMap(numGlobalElements::Integer, numMyElements::Integer,
         
         data.minAllGID = userMinAllGID
         data.maxAllGID = userMaxAllGID
-        @assert data.minAllGID >= 1 "Minimum global element index = $(data.minAllGID).  Should be >= 1"
     end
     EndOfConstructorOps(map)
     map
