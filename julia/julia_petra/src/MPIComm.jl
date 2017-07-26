@@ -6,7 +6,7 @@ import MPI
 An implementation of Comm using MPI
 The no argument constructor uses MPI.COMM_WORLD
 """
-type MPIComm <: Comm
+type MPIComm{GID <: Integer, PID <:Integer, LID <: Integer} <: Comm{GID, PID, LID}
     mpiComm::MPI.Comm
 end
 
@@ -19,7 +19,7 @@ function barrier(comm::MPIComm)
     MPI.Barrier(comm.mpiComm)
 end
 
-function broadcastAll(comm::MPIComm, myvals::Array{T}, root::Integer)::Array{T}
+function broadcastAll(comm::MPIComm{GID, PID}, myvals::Array{T}, root::PID)::Array{T} where GID <: Integer where PID <: Integer
     vals = copy(myvals)
     
     MPI.Bcast!(vals, root, comm.mpiComm)
@@ -45,7 +45,7 @@ function scanSum(comm::MPIComm, myvals::Array{T})::Array{T} where T
     MPI.scan(myvals, length(myvals), +, comm.mpiComm)
 end
 
-function myPid(comm::MPIComm)::Integer
+function myPid(comm::MPIComm{GID, PID})::PID where GID <: Integer where PID <: Integer
     MPI.Comm_rank(comm.mpiComm) + 1
 end
 
@@ -53,7 +53,5 @@ function numProc(comm::MPIComm)::Integer
     MPI.Comm_size(comm.mpiComm)
 end
 
+#TODO implement this
 createDistributor(comm::MPIComm)::Distributor - Create a distributor object
-
-createDirectory(comm::MPIComm, map::BlockMap)::Directory
-    - Create a directory object for the given Map

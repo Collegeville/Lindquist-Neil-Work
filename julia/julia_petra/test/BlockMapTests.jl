@@ -2,7 +2,7 @@
 
 macro SerialMapTests()
     quote
-        mapCopy = BlockMap(map)
+        mapCopy = BlockMap{Int, Int, Int}(map)
         
         @test uniqueGIDs(map)
 
@@ -71,7 +71,7 @@ macro SerialMapTests()
     end
 end
 
-commVal = SerialComm()
+commVal = SerialComm{Int, Int, Int}()
 
 
 ## constructor 1 ##
@@ -112,7 +112,7 @@ diffMap = BlockMap(-1, 6, commVal)
 @test_throws InvalidArgumentError BlockMap(5, -6, [1, 2, 3, 4, 5], commVal)
 @test_throws InvalidArgumentError BlockMap(4, -1, [1, 2, 3, 4], commVal)
 
-BlockMap(0, 0, Integer[], commVal)
+BlockMap(0, 0, Int[], commVal)
 BlockMap(1, 1, [1], commVal)
 
 map = BlockMap(5, 5, [1, 2, 3, 4, 5], commVal)
@@ -126,7 +126,7 @@ diffMap = BlockMap(6, 6, [1, 2, 3, 4, 5, 6], commVal)
 @test_throws InvalidArgumentError BlockMap(5, -6, [1, 2, 3, 4, 5], false, 1, 5, commVal)
 @test_throws InvalidArgumentError BlockMap(4, -1, [1, 2, 3, 4], false, 1, 4, commVal)
 
-BlockMap(0, 0, Integer[], false, 1, 0, commVal)
+BlockMap(0, 0, Int[], false, 1, 0, commVal)
 BlockMap(1, 1, [1], false, 1, 1, commVal)
 
 map = BlockMap(5, 5, [1, 2, 3, 4, 5], false, 1, 5, commVal)

@@ -3,13 +3,13 @@ using julia_petra
 
 ### test Serial Comm ###
 
-serialComm = SerialComm()
-@test typeof(serialComm) == SerialComm
-@test typeof(SerialComm()) == SerialComm
+serialComm = SerialComm{Int, Int, Int}()
+@test typeof(serialComm) == SerialComm{Int, Int, Int}
+@test typeof(SerialComm{Int, Int, Int}()) == SerialComm{Int, Int, Int}
 
 io = IOBuffer()
 show(io, serialComm)
-@test "SerialComm with PID 1 and 1 processes" == String(take!(io))
+@test "SerialComm{$(String(Symbol(Int))),$(String(Symbol(Int))),$(String(Symbol(Int)))} with PID 1 and 1 processes" == String(take!(io))
 
 # ensure no errors or hangs
 barrier(serialComm)
@@ -40,7 +40,6 @@ serialDistributor = createDistributor(serialComm)
 @test typeof(serialDistributor) <: Distributor
 
 # TODO test createDirectory
-# TODO test SerialDirectory
 
 
 ### test Serial Distributor ###

@@ -48,5 +48,5 @@ resolveReversePosts(dist::DistributorImpl, exportObjs::Array)
 resolveReverseWaits(dist::DistributorImpl)::Array - wait on a reverse set of posts
 
 """
-abstract type Distributor
+abstract type Distributor{GID <: Integer, PID <: Integer, LID <: Integer} #where GID <: Integer where PID <: Integer where LID <: Integer
 end

@@ -5,20 +5,20 @@
 Creates a BasicDirectory, which implements the methods of Directory with
 basic implmentations
 """
-type BasicDirectory <: Directory
-    map::BlockMap
+type BasicDirectory{GID <: Integer, PID <:Integer, LID <: Integer} <: Directory{GID, PID, LID}
+    map::BlockMap{GID, PID, LID}
     
     directoryMap::Nullable{BlockMap}
     
-    procList::Array{Integer}
-    procListLists::Array{Integer}
+    procList::Array{PID}
+    procListLists::Array{Array{PID}}
     
     entryOnMultipleProcs::Bool
     
-    localIndexList::Array{Integer}
-    allMinGIDs::Array{Integer}
+    localIndexList::Array{LID}
+    allMinGIDs::Array{GID}
     
-    function BasicDirectory(map::BlockMap)
+    function BasicDirectory{GID, PID, LID}(map::BlockMap{GID, PID, LID}) where GID <: Integer where PID <:Integer where LID <: Integer
         if !(distributedGlobal(map))
             new(map, Nullable{BlockMap}(), [], [], false, [], [])
         elseif linearMap(map)
@@ -37,7 +37,7 @@ type BasicDirectory <: Directory
     end
 end
 
-function generateContent(dir::BasicDirectory, map::BlockMap)
+function generateContent(dir::BasicDirectory{GID, PID, LID}, map::BlockMap{GID, PID, LID}) where GID <: Integer where PID <: Integer where LID <: Integer
     minAllGID = minAllGID(map)
     maxAllGID = maxAllGID(map)
 
@@ -49,8 +49,8 @@ function generateContent(dir::BasicDirectory, map::BlockMap)
     dirNumMyElements = numMyElements(dir.directoryMap)
 
     if dirNumMyElements > 0
-        dir.procList = Array{Integer}(dirNumMyElements)
-        dir.localIndexList = Array{Integer}(dirNumMyElements)
+        dir.procList = Array{PID}(dirNumMyElements)
+        dir.localIndexList = Array{LID}(dirNumMyElements)
 
         fill!(dir.procList, -1)
         fill!(dir.localIndexList, -1)
@@ -67,7 +67,7 @@ function generateContent(dir::BasicDirectory, map::BlockMap)
     distributor = createDistributor(commObj)
     numRecvs = createFromSends(distributor, map_numMyElements, sendProcs)
 
-    exportElements = Array{Tuple{Integer, Integer, Integer}}(numMyElements)
+    exportElements = Array{Tuple{GID, PID, LID}}(numMyElements)
 
     myPIDVal = myPID(commObj)
     for i = 1:numMyElements
@@ -86,7 +86,7 @@ function generateContent(dir::BasicDirectory, map::BlockMap)
             if dir.procList[currLID] != proc
                 if dir.procLists == []
                     numProcLists = numMyElements(directoryMap)
-                    procListLists = Array{Array{Integer}}(numProcLists)
+                    procListLists = Array{Array{PID}}(numProcLists)
                     fill!(procListLists, [])
                 end
 
@@ -119,12 +119,11 @@ end
 #        containing
 #            1 - an Array of processors owning the global ID's in question
 #            2 - an Array of local IDs of the global on the owning processor
-function getDirectoryEntries(directory::BasicDirectory, map::BlockMap, globalEntries::Array{GID},
-        high_rank_sharing_procs::Bool)::Tuple{Array{Integer}, Array{Integer}} where GID <: Integer
-        #where PID <: Integer where LID <:Integer
+function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::BlockMap{GID, PID, LID}, globalEntries::Array{GID},
+        high_rank_sharing_procs::Bool)::Tuple{Array{PID}, Array{LID}} where GID <: Integer where PID <: Integer where LID <: Integer
     numEntries = length(globalEntries)
-    procs = Array{Integer}(numEntries)
-    localEntries = Array{Integer}(numEntries)
+    procs = Array{PID}(numEntries)
+    localEntries = Array{LID}(numEntries)
     
     if !distributedGlobal(map)
         myPIDVal = myPid(comm(map))
@@ -149,7 +148,7 @@ function getDirectoryEntries(directory::BasicDirectory, map::BlockMap, globalEnt
         n_over_p = numGlobalElements(map)/numProcVal
         
         for i = 1:numEntries
-            LID  = 0
+            lid  = 0
             Proc = 0
             
             gid = globalEntries[i]
@@ -199,7 +198,7 @@ function getDirectoryEntries(directory::BasicDirectory, map::BlockMap, globalEnt
         numSends = length(sendGIDs)
         
         if numSends > 0
-            exports = Array{Tuple{GID, Integer, Integer}}(numSends)
+            exports = Array{Tuple{GID, PID, LID}}(numSends)
             for i = 1:numSends
                 currGID = sendGIDs[i]
                 exports[i][1] = currGID

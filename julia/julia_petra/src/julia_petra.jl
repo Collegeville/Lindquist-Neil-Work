@@ -18,7 +18,7 @@ include("BasicDirectory.jl")
 
 # Serial Communication
 include("SerialDistributor.jl")
-include("SerialDirectory.jl")
+#include("SerialDirectory.jl")
 include("SerialComm.jl")
 
 end # module

@@ -23,5 +23,5 @@ getDirectoryEntries(directory::DirectoryImpl, map::BlockMap, globalEntries::Arra
 gidsAllUniquelyOwned(directory::DirectoryImpl)
     - Returns true if all GIDs appear on just one processor
 """
-abstract type Directory
+abstract type Directory{GID <: Integer, PID <:Integer, LID <: Integer}
 end

@@ -1,7 +1,7 @@
 
 export SerialComm
 
-type SerialComm <: Comm
+type SerialComm{GID <: Integer, PID <:Integer, LID <: Integer} <: Comm{GID, PID, LID}
 end
 
 
@@ -12,7 +12,7 @@ function barrier(comm::SerialComm)
 end
 
 
-function broadcastAll(comm::SerialComm, myVals::Array{T}, root::Integer)::Array{T} where T
+function broadcastAll(comm::SerialComm{GID, PID}, myVals::Array{T}, root::PID)::Array{T} where T where GID <: Integer where PID <: Integer
     if root != 1 
         throw(InvalidArgumentError("SerialComm can only accept PID of 1"))
     end
@@ -39,7 +39,7 @@ function scanSum(comm::SerialComm, myvals::Array{T})::Array{T} where T
     myvals
 end
 
-function myPid(comm::SerialComm)::UInt8
+function myPid(comm::SerialComm{GID, PID})::PID where GID <: Integer where PID <: Integer
     1
 end
 
@@ -47,6 +47,6 @@ function numProc(comm::SerialComm)::UInt8
     1
 end
 
-function createDistributor(comm::SerialComm)::SerialDistributor
-    SerialDistributor()
+function createDistributor(comm::SerialComm{GID, PID, LID})::SerialDistributor{GID, PID, LID} where GID <: Integer where PID <: Integer where LID <: Integer
+    SerialDistributor{GID, PID, LID}()
 end

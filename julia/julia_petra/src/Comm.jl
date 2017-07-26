@@ -51,7 +51,7 @@ numProc(comm::CommImpl)::Integer - Returns the total number of processes
 createDistributor(comm::CommImpl)::Distributor - Create a distributor object
 
 """
-abstract type Comm
+abstract type Comm{GID <: Integer, PID <:Integer, LID <: Integer}
 end
 
 function Base.show(io::IO, comm::Comm)

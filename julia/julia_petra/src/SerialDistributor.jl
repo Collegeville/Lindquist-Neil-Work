@@ -1,18 +1,18 @@
 
 export SerialDistributor
 
-type SerialDistributor <: Distributor
+type SerialDistributor{GID <: Integer, PID <:Integer, LID <: Integer} <: Distributor{GID, PID, LID}
     post::Nullable{Array}
     reversePost::Nullable{Array}
     
-    function SerialDistributor()
+    function SerialDistributor{GID, PID, LID}() where GID <: Integer where PID <: Integer where LID <: Integer
         new(nothing, nothing)
     end
 end
 
 
-function createFromSends(dist::SerialDistributor,
-        exportPIDs::Array{PID})::Integer where PID <:Integer
+function createFromSends(dist::SerialDistributor{GID, PID, LID},
+        exportPIDs::Array{PID})::Integer where GID <: Integer where PID <: Integer where LID <: Integer
     for id in exportPIDs
         if id != 1
             throw(InvalidArgumentError("SerialDistributor can only accept PID of 1"))
@@ -22,8 +22,8 @@ function createFromSends(dist::SerialDistributor,
 end
 
 function createFromRecvs(
-        dist::SerialDistributor, remoteGIDs::Array{GID}, remotePIDs::Array{PID}
-        )::Tuple{Array{GID}, Array{PID}} where GID <: Integer where PID <: Integer
+        dist::SerialDistributor{GID, PID, LID}, remoteGIDs::Array{GID}, remotePIDs::Array{PID}
+        )::Tuple{Array{GID}, Array{PID}} where GID <: Integer where PID <: Integer where LID <: Integer
     if length(remoteGIDs) != length(remotePIDs)
         throw(InvalidArgumentError("Number of GIDs and PIDs must be the same"))
     end
