@@ -11,7 +11,10 @@ type MPIComm{GID <: Integer, PID <:Integer, LID <: Integer} <: Comm{GID, PID, LI
 end
 
 function MPIComm()
+    MPI.Init()
     MPIComm(MPI.COMM_WORLD)
+    
+    finalizer(comm, x -> MPI.Finalize())
 end
 
 
@@ -19,7 +22,7 @@ function barrier(comm::MPIComm)
     MPI.Barrier(comm.mpiComm)
 end
 
-function broadcastAll(comm::MPIComm{GID, PID}, myvals::Array{T}, root::PID)::Array{T} where GID <: Integer where PID <: Integer
+function broadcastAll(comm::MPIComm{GID, PID}, myvals::Array{T}, root::PID)::Array{T} where GID <: Integer where PID <: Integer where T
     vals = copy(myvals)
     
     MPI.Bcast!(vals, root, comm.mpiComm)
@@ -54,4 +57,6 @@ function numProc(comm::MPIComm)::Integer
 end
 
 #TODO implement this
-createDistributor(comm::MPIComm)::Distributor - Create a distributor object
+function createDistributor(comm::MPIComm{GID, PID, LID})::MPIDistributor{GID, PID, LID}  where GID <: Integer where PID <: Integer where LID <: Integer
+    MPIDistributor(comm)
+end

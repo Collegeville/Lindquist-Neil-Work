@@ -21,4 +21,9 @@ include("SerialDistributor.jl")
 #include("SerialDirectory.jl")
 include("SerialComm.jl")
 
+# MPI Communication
+include("MPIUtil.jl")
+include("MPIComm.jl")
+include("MPIDistributor.jl")
+
 end # module
