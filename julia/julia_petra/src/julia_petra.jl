@@ -14,7 +14,7 @@ include("BlockMapData.jl")
 include("BlockMap.jl")
 
 include("DirectoryMethods.jl")
-
+include("BasicDirectory.jl")
 
 # Serial Communication
 include("SerialDistributor.jl")

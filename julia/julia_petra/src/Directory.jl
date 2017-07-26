@@ -6,7 +6,7 @@ export Directory
 
 # DECISION: figure out types for global and local IDs
 """
-A base type as an interface to allow Map and BlockMap objects to reerence non-local
+A base type as an interface to allow Map and BlockMap objects to reference non-local
 elements.
 
 All subtypes must have the following methods, with DirectoryImpl standing in for

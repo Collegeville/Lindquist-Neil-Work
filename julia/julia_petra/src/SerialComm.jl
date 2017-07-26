@@ -50,7 +50,3 @@ end
 function createDistributor(comm::SerialComm)::SerialDistributor
     SerialDistributor()
 end
-
-function createDirectory(comm::SerialComm, map::BlockMap)::SerialDirectory
-    SerialDirectory(map)
-end

@@ -1,7 +1,7 @@
 
 export Comm
 export barrier, broadcastAll, gatherAll, sumAll, maxAll, minAll, scanSum
-export myPid, numProc, createDistributor, createDirectory
+export myPid, numProc, createDistributor
 
 # methods (and docs) are currently based straight off Epetra_Comm
 # tpetra's equivalent seemed to be a wrapper to other Trilinos packages
@@ -49,9 +49,6 @@ myPid(comm::CommImpl)::Integer - Returns the process rank
 numProc(comm::CommImpl)::Integer - Returns the total number of processes
 
 createDistributor(comm::CommImpl)::Distributor - Create a distributor object
-
-createDirectory(comm::CommImpl, map::BlockMap)::Directory
-    - Create a directory object for the given Map
 
 """
 abstract type Comm
