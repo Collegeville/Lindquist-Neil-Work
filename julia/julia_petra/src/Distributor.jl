@@ -26,14 +26,6 @@ createFromRecvs(dist::DistributorImpl, remoteGIDs::Array{GID},
         corresponding PIDs.  Returns a tuple with the global IDs and their
         respective processor IDs being sent to me.
 
-resolve(dist::DistributorImpl, exportObjs::Array{T})::Array{T} where T
-    - Execute the current plan on buffer of export objects and return the
-        objects set to this processor
-
-resolveReverse(dist::DistributorImpl, exportObjs::Array{T})::Array{T} where T
-    - Execute the reverse of the current plan on buffer of export objects and
-        return the objects set to this processor
-
 resolvePosts(dist::DistributorImpl, exportObjs::Array)
     - Post buffer of export objects (can do other local work before executing
         Waits).  Otherwise, as do(::DistributorImpl, ::Array{T})::Array{T}
@@ -49,4 +41,22 @@ resolveReverseWaits(dist::DistributorImpl)::Array - wait on a reverse set of pos
 
 """
 abstract type Distributor{GID <: Integer, PID <: Integer, LID <: Integer} #where GID <: Integer where PID <: Integer where LID <: Integer
+end
+
+"""
+Execute the current plan on buffer of export objects and return the
+objects set to this processor
+"""
+function resolve(dist::Distributor, exportObjs::Array{T})::Array{T} where T
+    resolvePosts(dist, exportObjs)
+    resolveWaits(dist)
+end
+
+"""
+Execute the reverse of the current plan on buffer of export objects and
+return the objects set to this processor
+"""
+function resolveReverse(dist::Distributor, exportObjs::Array{T})::Array{T} where T
+    resolveReversePosts(dist, exportObjs)
+    resolveReverseWaits(dist)
 end
