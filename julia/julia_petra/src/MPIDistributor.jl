@@ -1,6 +1,8 @@
 
 import MPI
 
+export MPIDistributor
+
 """
     MPIDistributor{GID, PID, LID}(comm::MPIComm{GID, PID, LID})
 Creates an Distributor to work with MPIComm.  Created by
@@ -53,10 +55,10 @@ type MPIDistributor{GID <: Integer, PID <: Integer, LID <: Integer} <: Distribut
     #lastRoundBytesSend::Integer
     #lastRoundBytesRecv::Integer
     
-    function MPIDistrbutor{GID <: Integer, PID <: Integer, LID <: Integer}(comm::MPIComm{GID, PID, LID})
+    function MPIDistributor{GID, PID, LID}(comm::MPIComm{GID, PID, LID}) where GID <: Integer where PID <: Integer where LID <: Integer
         new{GID, PID, LID}(comm, [], [], [], [], [], [], false, [], [], [], [], [],
-            0, 0, 0, 0, 0, 0,[], [],  Nullable{MPIDistributor}(),
-            Nullable{Array{Int}}(), Nullable{Array{UInt8}}())
+            0, 0, 0, 0, 0, 0, 0, [], [],  Nullable{MPIDistributor}(),
+            Nullable{Array{UInt8}}())
     end
 end
 

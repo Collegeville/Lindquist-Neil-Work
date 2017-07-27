@@ -1,6 +1,8 @@
 
 import MPI
 
+export MPIComm
+
 """
     MPIComm()
 An implementation of Comm using MPI
@@ -10,11 +12,13 @@ type MPIComm{GID <: Integer, PID <:Integer, LID <: Integer} <: Comm{GID, PID, LI
     mpiComm::MPI.Comm
 end
 
-function MPIComm()
+function MPIComm(GID::Type, PID::Type, LID::Type)
     MPI.Init()
-    MPIComm(MPI.COMM_WORLD)
+    comm = MPIComm{GID, PID, LID}(MPI.COMM_WORLD)
     
     finalizer(comm, x -> MPI.Finalize())
+    
+    comm
 end
 
 
@@ -22,14 +26,14 @@ function barrier(comm::MPIComm)
     MPI.Barrier(comm.mpiComm)
 end
 
-function broadcastAll(comm::MPIComm{GID, PID}, myvals::Array{T}, root::PID)::Array{T} where GID <: Integer where PID <: Integer where T
+function broadcastAll(comm::MPIComm{GID, PID}, myvals::Array{T}, root::Integer)::Array{T} where GID <: Integer where PID <: Integer where T
     vals = copy(myvals)
-    
-    MPI.Bcast!(vals, root, comm.mpiComm)
+    result = MPI.Bcast!(vals, root-1, comm.mpiComm)
+    result
 end
 
 function gatherAll(comm::MPIComm, myVals::Array{T})::Array{T} where T
-    MPI.Allgather(myVals, comm)
+    MPI.Allgather(myVals, comm.mpiComm)
 end
 
 function sumAll(comm::MPIComm, partialsums::Array{T})::Array{T} where T
@@ -37,26 +41,25 @@ function sumAll(comm::MPIComm, partialsums::Array{T})::Array{T} where T
 end
 
 function maxAll(comm::MPIComm, partialmaxes::Array{T})::Array{T} where T
-    MPI.allreduce(partialsums, max, comm.mpiComm)
+    MPI.allreduce(partialmaxes, max, comm.mpiComm)
 end
 
 function minAll(comm::MPIComm, partialmins::Array{T})::Array{T} where T
-    MPI.allreduce(partialsums, min, comm.mpiComm)
+    MPI.allreduce(partialmins, min, comm.mpiComm)
 end
 
 function scanSum(comm::MPIComm, myvals::Array{T})::Array{T} where T
-    MPI.scan(myvals, length(myvals), +, comm.mpiComm)
+    MPI.Scan(myvals, length(myvals), MPI.SUM, comm.mpiComm)
 end
 
 function myPid(comm::MPIComm{GID, PID})::PID where GID <: Integer where PID <: Integer
     MPI.Comm_rank(comm.mpiComm) + 1
 end
 
-function numProc(comm::MPIComm)::Integer
+function numProc(comm::MPIComm{GID, PID})::PID where GID <: Integer where PID <:Integer
     MPI.Comm_size(comm.mpiComm)
 end
 
-#TODO implement this
 function createDistributor(comm::MPIComm{GID, PID, LID})::MPIDistributor{GID, PID, LID}  where GID <: Integer where PID <: Integer where LID <: Integer
-    MPIDistributor(comm)
+    MPIDistributor{GID, PID, LID}(comm)
 end
