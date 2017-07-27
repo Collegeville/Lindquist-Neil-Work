@@ -47,13 +47,16 @@ type MPIDistributor{GID <: Integer, PID <: Integer, LID <: Integer} <: Distribut
     
     planReverse::Nullable{MPIDistributor}
     
+    importObjs::Nullable{Array{Array{UInt8}}}
+    
     #never seem to be used
     #lastRoundBytesSend::Integer
     #lastRoundBytesRecv::Integer
     
     function MPIDistrbutor{GID <: Integer, PID <: Integer, LID <: Integer}(comm::MPIComm{GID, PID, LID})
         new{GID, PID, LID}(comm, [], [], [], [], [], [], false, [], [], [], [], [],
-            0, 0, 0, 0, 0, 0,[], [],  Nullable{MPIDistributor}())
+            0, 0, 0, 0, 0, 0,[], [],  Nullable{MPIDistributor}(),
+            Nullable{Array{Int}}(), Nullable{Array{UInt8}}())
     end
 end
 
@@ -263,6 +266,72 @@ function computeRecvs(dist::MPIDistributor{GID, PID, LID}, myProc::PID, nProcs::
     dist        
 end
 
+function computeSends(dist::MPIDistributor{GID, PID, LID}, remoteGIDs::Array{GID}, remotePIDs::Array{PID})::Tuple{Array{GID}, Array{PID}} where GID <:Integer where PID <:Integer where LID <:Integer
+    numImports = length(remoteGIDs)
+
+    tmpPlan = MPIDistributor(dist.comm)
+    
+    procList = copy(remotePIDs)
+    importObjs = Array{Tuple{GID, PID}}(numImports)
+    for i = 1:numImports
+        importObjs[i] = (remoteGIDs[i], remotePIDs[i])
+    end
+    
+    numExports = createFromSends(tmpPlan, procList)
+    
+    exportIDs = Array{GID}(numExports)
+    exportProcs = Array{PID}(numExports)
+    
+    exportObjs = resolve(tmpPlan, importObjs)
+    for i = 1:numExports
+        exportIDs[i] = exportObjs[i][1]
+        exportProcs[i] = exportObjs[i][2]
+    end
+    (exportIDs, exportProcs)
+end
+
+"""
+Creates a reverse distributor for the given MPIDistributor
+"""
+function createReverseDistributor(dist::MPIDistributor)
+    myProc = myPid(dist.comm)
+    
+    if isnull(dist.planReverse)
+        totalSendLength = reduce(+, dist.lengths_to)
+        
+        maxRecvLength = 0
+        for i = 1:dist.nRecvs
+            if dist.procs_from[i] != myProc
+                maxRecvLength = max(maxRecvLength, dist.lengths_from[i])
+            end
+        end
+        
+        reverse = MPIDistributor(dist.comm)
+        dist.planReverse = Nullable(reverse)
+        
+        reverse.lengths_to = dist.lengths_from
+        reverse.procs_to = dist.procs_from
+        reverse.indices_to = dist.indicies_from
+        reverse.starts_to = dist.starts_from
+        
+        reverse.lengths_from = dist.lengths_to
+        reverse.procs_from = dist.procs_to
+        reverse.indices_from = dist.indicies_to
+        reverse.starts_from = dist.starts_to
+        
+        reverse.nSends = dist.nRecvs
+        reverse.nRecvs = dist.nSends
+        reverse.selfMsg = dist.selfMsg
+        
+        reverse.maxSendLength = dist.maxRecvLength
+        reverse.totalRecvLength = dist.totalSendLength
+        
+        reverse.request = Array{MPI.Request}(reverse.nRecvs)
+        reverse.status  = Array{MPI.Status}(reverse.nRecvs)
+    end
+end
+
+
 #### Distributor interface ####
 
 function createFromSends(dist::MPIDistributor{GID, PID, LID}, exportPIDs::Array{PID})::Integer where GID <:Integer where PID <:Integer where LID <:Integer
@@ -280,26 +349,152 @@ function createFromSends(dist::MPIDistributor{GID, PID, LID}, exportPIDs::Array{
     dist.totalRecvLength
 end
 
-"""
-createFromRecvs(dist::MPIDistributor, remoteGIDs::Array{GID},
-        removePIDs::Array{PID})::Tuple{Array{GID}, Array{PID}}
-        where GID <: Integer where PID <: Integer
-    - sets up the Distributor object using a list of remote global IDs and
-        corresponding PIDs.  Returns a tuple with the global IDs and their
-        respective processor IDs being sent to me.
 
-resolvePosts(dist::MPIDistributor, exportObjs::Array)
-    - Post buffer of export objects (can do other local work before executing
-        Waits).  Otherwise, as do(::DistributorImpl, ::Array{T})::Array{T}
+function createFromRecvs(dist::MPIDistributor{GID, PID}, remoteGIDs::Array{GID}, remotePIDs::Array{PID})::Tuple{Array{GID}, Array{PID}} where GID <: Integer where PID <: Integer
+    if length(remoteGIDs) == length(remotePIDs)
+        throw(InvalidArgumentError("remote lists must be the same length"))
+    end
+    (exportGIDs, exportPIDs) = ComputeSends(dist, remoteGIDs, remotePIDs, myPid(dist.comm))
+    
+    createFromSends(dist, exportPIDs)
+end
 
-resolveWaits(dist::MPIDistributor)::Array - wait on a set of posts
+function resolvePosts(dist::MPIDistributor, exportObjs::Array)
+    myProc = myPid(dist.comm) 
+    
+    selfRecvAddress = 0
+    
+    #TODO handle when data not grouped by processor
+    
+    exportBytes = Array{Array{UInt8}}(dist.nRecvs + dist.selfMsg)
+    j = 0
+    buffer = IOBuffer()
+    for i = 1:(dist.nRecvs + dist.selfMsg)
+        Serializer.serialize(buffer, exportObjs[j:j+dist.length_to[i]])
+        j += dist.length_to[i]
+        exportBytes[i] = take!(buffer)
+    end
+    
+    
+    ## get sizes of data begin received ##
+    lengthRequests = Array{MPI.Request}(dist.nRecvs + dist.selfMsg)
+    lengths = Array{Array{Int, 1}}(dist.nRecvs + dist.selfMsg)
+    for i = 1:(dist.nRecvs + dist.selfMsg)
+        lengths[i] = Array{Int}(1)
+    end
 
-resolveReversePosts(dist::MPIDistributor, exportObjs::Array)
-    - Do reverse post of buffer of export objects (can do other local work
-        before executing Waits).  Otherwise, as
-        doReverse(::DistributorImpl, ::Array{T})::Array{T}
+    for i = 1:(dist.nRecvs + dist.selfMsg)
+        if dist.procs_from[i] != myProc
+            lengthRequests[i] = MPI.IRecv(lengths[i], dist.procs_from[i], dist.tag, dist.comm.MPIComm)
+        end
+    end
+    
+    barrier(dist.comm)
+           
+    for i = 1:(dist.nsends + dist.selfMsg)
+        if dist.procs_to[i] != myProc
+            MPI.RSend(length(exportBytes[i]), dist.procs_to[i], dist.tag, dist.comm.MPIComm)
+        else
+            lengths[i] = length(exportBytes[i])
+        end
+    end
+    
+    MPI.Waitall!(lengthRequests)
+    #at this point `lengths` should contain the sizes of incoming data
+    
+    importObjs = Array{Array{UInt8}}(dist.nRecvs+dist.selfMsg)
+    for i = 1:length(importObjs)
+        importObjs[i] = Array{UInt8}(lengths[i])
+    end
+    
+    dist.importObjs = importObjs
+    
+    ## back to the regularly scheduled program ##
+    
+    k = 0
+    j = 0
+    for i = 1:(dist.nRecvs + dist.selfMsg)
+        if dist.procs_from[i] != myProc
+            MPI.IRecv(importObjs[i], dist.procs_from[i], dist.tag, dist.comm.MPIComm)
+        else
+            selfRecvAddress = i
+        end
+    end
+    
+    barrier(dist.comm)
+    
+    
+    nBlocks = dist.nsends + dist.selfMsg
+    procIndex = 1
+    while procIndex <= nBlocks && dist.procs_to[procIndex] < myProc
+        procIndex += 1
+    end
+    if procIndex == nBlocks
+        procIndex = 1
+    end
+    
+    selfNum = 1
+    selfIndex = 1
+    
+    #line 844
+    
+    if dist.indices_to == [] #data already grouped by processor
+        for i = 1:nBlocks
+            p = i + procIndex
+            if p > nBlocks
+                p -= nBlocks
+            end
+            if dist.procs_to[nBlocks] != myProc
+                MPI_RSend(exportBytes[i], dist.procs_to[p], dist.tag, dist.comm.MPIComm)
+            else
+                selfNum = p
+            end
+        end
+        
+        if dist.selfMsg
+            importObjs[selfRecvAddress] = exportBytes[selfNum]
+        end
+        
+    else #data not grouped by proc, use send buffer
+        #TODO transcribe lines 880-936
+        error("Not Yet Implemented")
+    end
+end
 
-resolveReverseWaits(dist::MPIDistributor)::Array - wait on a reverse set of posts
-"""
-function asdf()#dummy function to allow me to "block comment" the other stubs
+            
+
+function resolveWaits(dist::MPIDistributor)::Array
+    if dist.nRecvs> 0
+        dist.status = MPI.Waitall!(dist.request)
+    end
+    
+    importObjs = dist.importObjs
+    deserializedObjs = Array(length(importObjs))
+    for i = 1:length(importObjs)
+        deserializedObjs[i] = Serializer.deserialize(dist.importObjs[i])
+    end
+    
+    reduce(vcat, [], deserializedObjs)
+end
+
+
+function resolveReversePosts(dist::MPIDistributor, exportObjs::Array)
+    if dist.indices_to != []
+        throw(InvalidStateException("Cannot do reverse comm when data is not blocked by processor"))
+    end
+    
+    if isnull(dist.planReverse)
+        createReverseDistributor(dist)
+    end
+    
+    resolvePosts(get(dist.planReverse), exportObjs)
+end
+
+
+function resolveReverseWaits(dist::MPIDistributor)::Array
+    if isnull(dist.planReverse)
+        throw(InvalidStateException("Cannot resolve reverse waits if there is no reverse plan"))
+    end
+    
+    resolveWaits(get(dist.planReverse))
 end
