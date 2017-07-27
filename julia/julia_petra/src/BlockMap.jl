@@ -513,22 +513,6 @@ function myGlobalElements(map::BlockMap{GID})::Array{GID} where GID <: Integer
     end
 end
 
-#"""
-#Return the number of global points for this map
-#"""
-#function numGlobalPoints(map::BlockMap)::Integer
-#        #::GID where GID <: Integer
-#    map.data.numGlobalPoints
-#end
-#
-#"""
-#Return the number of local points for this map
-#"""
-#function numMyPoints(map::BlockMap)::Integer
-#        #::LID where LID <: Integer
-#    map.data.numMyPoints
-#end
-
 
 ##Miscellaneous boolean tests##
 
@@ -573,8 +557,6 @@ function sameAs(this::BlockMap{GID, PID, LID}, other::BlockMap{GID, PID, LID})::
         
     mySameMap = 1
     
-    #TODO add checks for element size if added
-    
     if tData.numMyElements != oData.numMyElements
         mySameMap = 0
     end
@@ -595,28 +577,6 @@ function sameAs(this::BlockMap{GID, PID, LID}, other::BlockMap{GID, PID, LID})::
     
     Bool(minAll(tData.comm, mySameMap))
 end
-    
-#"""
-#Return true if this and other have identical point-wise structure
-#"""
-#function pointSameAs(this::BlockMap, other::BlockMap)::Bool
-#    tData = this.data
-#    oData = this.data
-#    if tData == oData
-#        return true
-#    end
-#    
-#    if tData.numGlobalPoints != oData.numGlobalPoints
-#        return false
-#    end
-#    
-#    mySameMap = 1
-#    if tData.numMyPoints != oData.numMyPoints
-#        mySameMap = 0
-#    end
-#    
-#    Bool(minAll(tData.comm, [mySameMap])[1])
-#end
 
 
 """
@@ -645,21 +605,6 @@ function myGlobalElementIDs(map::BlockMap{GID})::Array{GID} where GID <: Integer
     
     myGlobalElements
 end
-
-
-
-#"""
-#Return list where for each local point, indicates the local
-#element ID that the point belongs to
-#"""
-#function pointToElementList(map::BlockMap)::Array{Integer}
-#        #::Array{LID} where LID <: Integer
-#    data = map.data
-#    
-#    firstPointInElementList = Array{Integer}(data.numMyElements)
-#    
-#    if length(data.firstPointInElementList) == 0
-#        firstPointInElementList[0] = 0
 
 
 function isOneToOne(map::BlockMap)::Bool

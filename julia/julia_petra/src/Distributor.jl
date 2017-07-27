@@ -7,7 +7,6 @@ export resolvePosts, resolveReversePosts, resolveReverseWaits
 
 # methods (and docs) are currently based straight off Epetra_Distributor to match Comm
 
-# TODO resolve any limitations on PID/GID/LID as decided
 """
 The base type for gather/scatter setup.
 All subtypes must have the following methods, with DistributorImpl standing
@@ -40,7 +39,7 @@ resolveReversePosts(dist::DistributorImpl, exportObjs::Array)
 resolveReverseWaits(dist::DistributorImpl)::Array - wait on a reverse set of posts
 
 """
-abstract type Distributor{GID <: Integer, PID <: Integer, LID <: Integer} #where GID <: Integer where PID <: Integer where LID <: Integer
+abstract type Distributor{GID <: Integer, PID <: Integer, LID <: Integer}
 end
 
 """

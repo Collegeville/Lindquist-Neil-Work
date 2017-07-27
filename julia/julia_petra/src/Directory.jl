@@ -3,8 +3,6 @@ export Directory
 
 # methods and docs based straight off Epetra_Directory to match Comm
 
-
-# DECISION: figure out types for global and local IDs
 """
 A base type as an interface to allow Map and BlockMap objects to reference non-local
 elements.

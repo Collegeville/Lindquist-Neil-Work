@@ -9,9 +9,6 @@ export myPid, numProc, createDistributor
 # following julia's convention, n processors are labled 1 through n
 # count variables are removed, since that information is contained in the arrays
 
-# DECISION: limit T to T <: Number? or continue to allow any value?
-# DECISION: use specific datatype for process rank? UInt16 (UInt8?) is big enough
-    # Apply decision to return value specs for getDirectoryEntries
 """
 The base type for types that represent communication in parallel computing.
 All subtypes must have the following methods, with CommImpl standing in for the subtype:
