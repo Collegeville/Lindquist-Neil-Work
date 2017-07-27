@@ -44,8 +44,16 @@ function maxAll(comm::MPIComm, partialmaxes::Array{T})::Array{T} where T
     MPI.allreduce(partialmaxes, max, comm.mpiComm)
 end
 
+function maxAll(comm::MPIComm, partialmaxes::Array{Bool})::Array{Bool}
+    Array{Bool}(maxAll(comm, Array{UInt8}(partialmaxes)))
+end
+
 function minAll(comm::MPIComm, partialmins::Array{T})::Array{T} where T
     MPI.allreduce(partialmins, min, comm.mpiComm)
+end
+
+function minAll(comm::MPIComm, partialmins::Array{Bool})::Array{Bool}
+    Array{Bool}(minAll(comm, Array{UInt8}(partialmins)))
 end
 
 function scanSum(comm::MPIComm, myvals::Array{T})::Array{T} where T

@@ -133,5 +133,3 @@ map = BlockMap(5, 5, [1, 2, 3, 4, 5], false, 1, 5, commVal)
 map2 = BlockMap(5, 5, [1, 2, 3, 4, 5], false, 1, 5, commVal)
 diffMap = BlockMap(6, 6, [1, 2, 3, 4, 5, 6], false, 1, 6, commVal)
 @SerialMapTests
-
-#TODO test BlockMap with parallel Comm

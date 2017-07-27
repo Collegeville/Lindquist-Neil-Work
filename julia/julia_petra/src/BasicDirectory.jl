@@ -19,19 +19,21 @@ type BasicDirectory{GID <: Integer, PID <:Integer, LID <: Integer} <: Directory{
     allMinGIDs::Array{GID}
     
     function BasicDirectory{GID, PID, LID}(map::BlockMap{GID, PID, LID}) where GID <: Integer where PID <:Integer where LID <: Integer
+        
         if !(distributedGlobal(map))
             new(map, Nullable{BlockMap}(), [], [], false, [], [])
         elseif linearMap(map)
             commObj = comm(map)
             
-            minMyGID = minMyGID(map)
-            allMinGIDs = gatherAll(commObj, minMyGID)
+            minMyGIDVal = minMyGID(map)
+            allMinGIDs = gatherAll(commObj, minMyGIDVal)
             allMinGIDs = vcat(allMinGIDs, [1+maxAllGID(map)])
             
-            new(map, Nullabl{BlockMap}, [], [], false, [], allMinGIDs)
+            
+            new(map, Nullable{BlockMap}(), [], [], false, [], allMinGIDs)
         else
             generateContent(
-                new(map, Nullable{BlockMap}, [], [], false, [], []),
+                new(map, Nullable{BlockMap}(), [], [], false, [], []),
                 map)
         end
     end
@@ -149,20 +151,20 @@ function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::Bloc
         
         for i = 1:numEntries
             lid  = 0
-            Proc = 0
+            proc = 0
             
             gid = globalEntries[i]
-            if gid < minAllGID || gid > maxAllGID
-                throw(InvalidArgumentError("GID out of valid range"))
+            if gid < minAllGIDVal || gid > maxAllGIDVal
+                throw(InvalidArgumentError("GID=$gid out of valid range [$minAllGIDVal, $maxAllGIDVal]"))
             end
             #guess uniform distribution and start a little above it
-            proc1 = min(gid/max(n_over_p, 1) + 2, numProcVal)
+            proc1 = min(GID(fld(gid, max(n_over_p, 1)) + 2), numProcVal)
             found = false
             allMinGIDs_list = directory.allMinGIDs
             
-            while proc1 >= 0 && proc1 < numProcVal
+            while proc1 >= 1 && proc1 <= numProcVal
                 if allMinGIDs_list[proc1] <= gid
-                    if (gid < allMinGIDS_list[proc1 + 1])
+                    if (gid < allMinGIDs_list[proc1+1])
                         found = true
                         break
                     else
@@ -174,7 +176,7 @@ function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::Bloc
             end
             if found
                 proc = proc1
-                lid = gid - AllMinGIDs_list[proc]
+                lid = gid - allMinGIDs_list[proc] + 1
             end
             
             procs[i] = proc
@@ -243,5 +245,5 @@ function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::Bloc
 end
 
 function gidsAllUniquelyOwned(directory::BasicDirectory)
-    !directory.entryOnMultiplProcs
+    !directory.entryOnMultipleProcs
 end

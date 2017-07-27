@@ -34,6 +34,10 @@ end
 """
 constructor for Epetra-defined uniform linear distribution of elements
 """
+function BlockMap(numGlobalElements::Integer, comm::Comm{GID, PID, LID}) where GID <: Integer where PID <: Integer where LID <: Integer
+    BlockMap(GID(numGlobalElements), comm)
+end
+
 function BlockMap(numGlobalElements::GID, comm::Comm{GID, PID, LID}) where GID <: Integer where PID <: Integer where LID <: Integer
     if numGlobalElements < 0 
         throw(InvalidArgumentError("NumGlobalElements = $(numGlobalElements).  Should be >= 0"))
@@ -72,6 +76,10 @@ end
 """
 constructor for user-defined linear distribution of elements
 """
+function BlockMap(numGlobalElements::Integer, numMyElements::Integer, comm::Comm{GID, PID, LID}) where GID <: Integer where PID <: Integer where LID <: Integer
+    BlockMap(GID(numGlobalElements), LID(numMyElements), comm)
+end
+
 function BlockMap(numGlobalElements::GID, numMyElements::LID, comm::Comm{GID, PID, LID}) where GID <: Integer where PID <: Integer where LID <: Integer
     if numGlobalElements < -1 
         throw(InvalidArgumentError("NumGlobalElements = $(numGlobalElements).  Should be >= -1"))
@@ -101,7 +109,7 @@ function BlockMap(numGlobalElements::GID, numMyElements::LID, comm::Comm{GID, PI
         data.numGlobalElements = sumAll(data.comm, tmp_numMyElements)
         
         data.minAllGID = 1
-        data.maxAllGID = data.minMyGID + data.numGlobalElements - 1
+        data.maxAllGID = data.minAllGID + data.numGlobalElements - 1
         
         tmp_numMyElements = data.numMyElements
         data.maxMyGID = scanSum(data.comm, tmp_numMyElements)
@@ -120,6 +128,11 @@ end
 """
 constructor for user-defined arbitrary distribution of elements
 """
+function BlockMap(numGlobalElements::Integer, numMyElements::Integer,
+        myGlobalElements::Array{<:Integer}, comm::Comm{GID, PID,LID}) where GID <: Integer where PID <: Integer where LID <: Integer
+    BlockMap(GID(numGlobalElements), LID(numMyElements), Array{GID}(myGlobalElements), comm)
+end
+
 function BlockMap(numGlobalElements::GID, numMyElements::LID,
         myGlobalElements::Array{GID}, comm::Comm{GID, PID,LID}) where GID <: Integer where PID <: Integer where LID <: Integer
     if numGlobalElements < -1 
@@ -167,7 +180,7 @@ function BlockMap(numGlobalElements::GID, numMyElements::LID,
         data.maxAllGID = data.maxMyGID
     else
         data.numGlobalElements = sumAll(data.comm, data.numMyElements)
-        checkValidNGE(numGlobalElements)
+        checkValidNGE(map, numGlobalElements)
         
         tmp_send = [
             -((data.numMyElements > 0
@@ -177,13 +190,13 @@ function BlockMap(numGlobalElements::GID, numMyElements::LID,
         
         tmp_recv = maxAll(data.comm, tmp_send)
         
-        @assert !(typeof(tmp_recv[1]) <: Integer) "Result type is $(typeof(tmp_recv[1])), should be subtype of Integer"
+        @assert typeof(tmp_recv[1]) <: Integer "Result type is $(typeof(tmp_recv[1])), should be subtype of Integer"
             
         data.minAllGID = -tmp_recv[1]
         data.maxAllGID =  tmp_recv[2]
             
     end
-       
+    
     EndOfConstructorOps(map)
     map
 end
@@ -192,6 +205,13 @@ end
 constructor for user-defined arbitrary distribution of elements
 will all information on globals provided by the user
 """
+function BlockMap(numGlobalElements::Integer, numMyElements::Integer,
+        myGlobalElements::Array{GID}, userIsDistributedGlobal::Bool,
+        userMinAllGID::Integer, userMaxAllGID::Integer, comm::Comm{GID, PID, LID}) where GID <: Integer where PID <: Integer where LID <: Integer
+    BlockMap(GID(numGlobalElements), LID(numMyElements), Array{GID}(myGlobalElements), userIsDistributedGlobal,
+        GID(userMinAllGID), GID(userMaxAllGID), comm)
+end
+
 function BlockMap(numGlobalElements::GID, numMyElements::LID,
         myGlobalElements::Array{GID}, userIsDistributedGlobal::Bool,
         userMinAllGID::GID, userMaxAllGID::GID, comm::Comm{GID, PID, LID}) where GID <: Integer where PID <: Integer where LID <: Integer
@@ -341,7 +361,7 @@ end
 Return true if the GID passed in belongs to the calling processor in this
 map, otherwise returns false.
 """
-function myGID(map::BlockMap{GID, PID, LID}, gidVal::GID) where GID <: Integer where PID <: Integer where LID <: Integer
+function myGID(map::BlockMap{GID, PID, LID}, gidVal::Integer) where GID <: Integer where PID <: Integer where LID <: Integer
     lid(map, gidVal) != 0
 end
 
@@ -349,7 +369,7 @@ end
 Return true if the LID passed in belongs to the calling processor in this
 map, otherwise returns false.
 """
-function myLID(map::BlockMap{GID, PID, LID}, lidVal::LID) where GID <: Integer where PID <: Integer where LID <: Integer
+function myLID(map::BlockMap{GID, PID, LID}, lidVal::Integer) where GID <: Integer where PID <: Integer where LID <: Integer
     gid(map, lidVal) != 0
 end
 
@@ -357,7 +377,6 @@ end
 Return true if map is defined across more than one processor
 """
 function distributedGlobal(map::BlockMap)
-    #numGlobalElements(map) != numLocalElements(map)
     map.data.distributedGlobal
 end
 
@@ -365,15 +384,13 @@ end
 Return the number of elements across the calling processor
 """
 function numMyElements(map::BlockMap{GID, PID, LID})::LID where GID <: Integer where PID <: Integer where LID <: Integer
-    #length(myGlobalElementIDs(map))
     map.data.numMyElements
 end
 
 """
 Return the minimum global ID owned by this processor
 """
-function minMyGID(map::BlockMap)::Integer #::GID where GID <: Integer
-    #minimum(myGlobalElementsIDs(map))
+function minMyGID(map::BlockMap{GID, PID, LID})::GID where GID <: Integer where PID <: Integer where LID <: Integer
     map.data.minMyGID
 end
     
@@ -381,7 +398,6 @@ end
 Return the maximum global ID owned by this processor
 """
 function maxMyGID(map::BlockMap{GID, PID, LID})::GID where GID <: Integer where PID <: Integer where LID <: Integer
-    #maximum(myGlobalElementsIDs(map))
     map.data.maxMyGID
 end
 
@@ -394,20 +410,25 @@ The returned value is a tuple containing
     1 - an Array of processors owning the global ID's in question
     2 - an Array of local IDs of the global on the owning processor
 """
+function remoteIDList(map::BlockMap{GID, PID, LID}, gidList::Array{<:Integer}
+        )::Tuple{Array{PID}, Array{LID}} where GID <: Integer where PID <: Integer where LID <: Integer
+    remoteIDList(map, Array{GID}(gidList))
+end
+
 function remoteIDList(map::BlockMap{GID, PID, LID}, gidList::Array{GID}
         )::Tuple{Array{PID}, Array{LID}} where GID <: Integer where PID <: Integer where LID <: Integer
     data = map.data
     if isnull(data.directory)
         data.directory = createDirectory(data.comm, map)
     end
-    
+
     getDirectoryEntries(get(data.directory), map, gidList)
 end
 
 """
 Return local ID of global ID, or 0 if not found on this processor
 """
-function lid(map::BlockMap{GID, PID, LID}, gid::GID)::LID where GID <: Integer where PID <: Integer where LID <: Integer
+function lid(map::BlockMap{GID, PID, LID}, gid::Integer)::LID where GID <: Integer where PID <: Integer where LID <: Integer
     data = map.data
     if (gid < data.minMyGID) || (gid > data.maxMyGID)
         return 0
@@ -425,7 +446,7 @@ end
 """
 Return global ID of local ID, or 0 if not found on this processor
 """
-function gid(map::BlockMap{GID, PID, LID}, lid::LID)::GID where GID <: Integer where PID <: Integer where LID <: Integer 
+function gid(map::BlockMap{GID, PID, LID}, lid::Integer)::GID where GID <: Integer where PID <: Integer where LID <: Integer 
     data = map.data
     if (data.numMyElements == 0) || (lid < data.minLID) || (lid > data.maxLID)
         return 0
@@ -613,15 +634,13 @@ end
 Return list of global IDs assigned to the calling processor
 """
 function myGlobalElementIDs(map::BlockMap{GID})::Array{GID} where GID <: Integer
-    #::Array{GID} where GID <: Integer
     data = map.data
-    myGlobalElements = Array{GID}(data.numMyElements)
     if length(data.myGlobalElements) == 0
-        for i = 1:data.numMyElements
-            myGlobalElements[i] = data.minMyGID + i
-        end
+        base = 0:data.numMyElements-1
+        rng = data.minMyGID + base
+        myGlobalElements = collect(rng)
     else
-        myGlobalElements .= data.myGlobalElements
+        myGlobalElements = copy(data.myGlobalElements)
     end
     
     myGlobalElements
@@ -660,7 +679,7 @@ function determineIsOneToOne(map::BlockMap)::Bool
         if isnull(data.directory)
             data.directory = Nullable(createDirectory(data.comm, map))
         end
-       gidsAllUniquelyOwned(data.directory)
+       gidsAllUniquelyOwned(get(data.directory))
     end 
 end
                                                     

@@ -44,20 +44,20 @@ function BlockMapData(numGlobalElements::GID, comm::Comm{GID, PID, LID}) where G
         GID[],
         
         numGlobalElements,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
+        LID(0),
+        GID(0),
+        GID(0),
+        GID(0),
+        GID(0),
+        LID(0),
+        LID(0),
         
         false,
         false,
         false,
         false,
-        0,
-        0,
+        GID(0),
+        GID(0),
         Dict{GID, LID}()
     )
 end
