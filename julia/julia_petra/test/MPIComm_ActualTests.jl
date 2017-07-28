@@ -7,12 +7,12 @@ comm = MPIComm(UInt64, UInt16, UInt32)
 pid = myPid(comm)
 
 #only print errors from one process
-if pid != 3
+if pid != 1
     #redirect_stdout()
     #redirect_stderr()
 end
 
-try
+#try
 
 @test 4 == numProc(comm)
 @test isa(numProc(comm), UInt16)
@@ -55,19 +55,24 @@ dist = createDistributor(comm)
 resolvePosts(dist, [pid, 2*pid, 3*pid, 4*pid])
 @test pid*[1, 2, 3, 4] == resolveWaits(dist)
 
-#test distributor when elements not blocked by processor
 
 barrier(comm)
 
+#test distributor when elements not blocked by processor
 dist2 = createDistributor(comm)
 @test 8 == createFromSends(dist, [1, 2, 3, 4, 1, 2, 3, 4])
 
 @test (reduce(vcat, [], [[(pid-1)*5+j, (pid+3)*5+j] for j in 1:4])
         == resolve(dist, [pid, 5+pid, 10+pid, 15+pid, 20+pid, 25+pid, 30+pid, 35+pid]))
     
+barrier(comm)
+
+#test distributore createFromRecvs
+@test ([(pid-1)*5+j for j in 1:4], [1, 2, 3, 4]) == createFromRecvs(dist, [pid, 5+pid, 10+pid, 15+pid], [1, 2, 3, 4])
+    
 include("MPIBlockMapTests.jl")
 
-catch err
-    sleep(10)
-    throw(err)
-end
+#catch err
+#    sleep(10)
+#    throw(err)
+#end

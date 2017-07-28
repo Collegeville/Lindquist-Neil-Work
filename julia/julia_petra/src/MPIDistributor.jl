@@ -280,12 +280,12 @@ end
 function computeSends(dist::MPIDistributor{GID, PID, LID}, remoteGIDs::Array{GID}, remotePIDs::Array{PID})::Tuple{Array{GID}, Array{PID}} where GID <:Integer where PID <:Integer where LID <:Integer
     numImports = length(remoteGIDs)
 
-    tmpPlan = MPIDistributor(dist.comm)
+    tmpPlan = MPIDistributor{GID, PID, LID}(dist.comm)
     
     procList = copy(remotePIDs)
     importObjs = Array{Tuple{GID, PID}}(numImports)
     for i = 1:numImports
-        importObjs[i] = (remoteGIDs[i], remotePIDs[i])
+        importObjs[i] = (remoteGIDs[i], myPid(dist.comm))#remotePIDs[i])
     end
     
     numExports = createFromSends(tmpPlan, procList)
@@ -361,12 +361,14 @@ end
 
 
 function createFromRecvs(dist::MPIDistributor{GID, PID}, remoteGIDs::Array{GID}, remotePIDs::Array{PID})::Tuple{Array{GID}, Array{PID}} where GID <: Integer where PID <: Integer
-    if length(remoteGIDs) == length(remotePIDs)
+    if length(remoteGIDs) != length(remotePIDs)
         throw(InvalidArgumentError("remote lists must be the same length"))
     end
-    (exportGIDs, exportPIDs) = ComputeSends(dist, remoteGIDs, remotePIDs, myPid(dist.comm))
+    (exportGIDs, exportPIDs) = computeSends(dist, remoteGIDs, remotePIDs)
     
     createFromSends(dist, exportPIDs)
+    
+    exportGIDs, exportPIDs
 end
 
 function resolvePosts(dist::MPIDistributor, exportObjs::Array{T}) where T

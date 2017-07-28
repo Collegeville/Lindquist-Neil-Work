@@ -23,7 +23,7 @@ createFromRecvs(dist::DistributorImpl, remoteGIDs::Array{GID},
         where GID <: Integer where PID <: Integer
     - sets up the Distributor object using a list of remote global IDs and
         corresponding PIDs.  Returns a tuple with the global IDs and their
-        respective processor IDs being sent to me.
+        respective processor IDs being sent by me.
 
 resolvePosts(dist::DistributorImpl, exportObjs::Array)
     - Post buffer of export objects (can do other local work before executing
