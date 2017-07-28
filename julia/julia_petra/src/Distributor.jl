@@ -42,6 +42,15 @@ resolveReverseWaits(dist::DistributorImpl)::Array - wait on a reverse set of pos
 abstract type Distributor{GID <: Integer, PID <: Integer, LID <: Integer}
 end
 
+function createFromSends(dist::Distributor{GID, PID, LID}, exportPIDs::Array{<:Integer}) where GID <: Integer where PID <: Integer where LID <: Integer
+    createFromSends(dist, Array{PID}(exportPIDs))
+end
+
+function createFromRecvs(dist::Distributor{GID, PID, LID}, remoteGIDs::Array{<:Integer},
+        remotePIDs::Array{<:Integer}) where GID <: Integer where PID <: Integer where LID <: Integer
+    createFromRecvs(dist, Array{GID}(remoteGIDs), Array{PID}(remotePIDs))
+end
+
 """
 Execute the current plan on buffer of export objects and return the
 objects set to this processor

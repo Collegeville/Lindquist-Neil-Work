@@ -4,13 +4,15 @@ using Base.Test
 #use distinct types
 comm = MPIComm(UInt64, UInt16, UInt32)
 
+pid = myPid(comm)
+
 #only print errors from one process
-if myPid(comm) != 1
+if pid != 1
     #redirect_stdout()
     #redirect_stderr()
 end
 
-try
+#try
     @test 4 == numProc(comm)
     @test isa(numProc(comm), UInt16)
     
@@ -42,14 +44,20 @@ try
     @test ([myPid(comm)*5, sum(-2:-2:(-2*Int(myPid(comm)))), myPid(comm)*3] 
             == scanSum(comm, [5, -2*Int(myPid(comm)), 3]))
     
+    #test distributor
+
     dist = createDistributor(comm)
-    
     @test isa(dist, Distributor{UInt64, UInt16, UInt32})
+    
+    @test 4 == createFromSends(dist, [1, 2, 3, 4])
+    
+    resolvePosts(dist, [pid, 2*pid, 3*pid, 4*pid])
+    @test pid*[1, 2, 3, 4] == resolveWaits(dist)
     
     include("MPIBlockMapTests.jl")
     
-catch err
-    println("error on pid=$(myPid(comm))")
-    sleep(1)
-    throw(err)
-end
+#catch err
+#    println("error on pid=$(myPid(comm))")
+#    sleep(1)
+#    throw(err)
+#end
