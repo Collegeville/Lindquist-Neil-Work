@@ -65,6 +65,7 @@ end
 
 #### internal methods ####
 function createSendStructure(dist::MPIDistributor{GID, PID}, pid::PID, nProcs::PID, exportPIDs::Array{PID}) where GID <: Integer where PID <: Integer
+    
     numExports = length(exportPIDs)
     dist.numExports = numExports
     
@@ -78,7 +79,7 @@ function createSendStructure(dist::MPIDistributor{GID, PID}, pid::PID, nProcs::P
     
     for i = 1:numExports
         if noSendBuff && i > 1 && exportPIDs[i] < exportPIDs[i-1]
-            noSendBuff == false
+            noSendBuff = false
         end
         if exportPIDs[i] >= 1
             starts[exportPIDs[i]] += 1
@@ -138,15 +139,16 @@ function createSendStructure(dist::MPIDistributor{GID, PID}, pid::PID, nProcs::P
             starts[i] += starts[i-1]
         end
 
-        for i = nprocs:-1:1
-            starts[i] = starts[i-1]
+        for i = nProcs:-1:2
+            starts[i] = starts[i-1] + 1
         end
-        starts[1] = 0
+        starts[1] = 1
 
         if nactive > 0
             dist.indices_to = Array{Integer}(nactive)
         end
 
+        
         for i = 1:numExports
             if exportPIDs[i] >= 1
                 dist.indices_to[starts[exportPIDs[i]]] = i
@@ -156,19 +158,20 @@ function createSendStructure(dist::MPIDistributor{GID, PID}, pid::PID, nProcs::P
 
         #reconstruct starts array to index into indices_to
 
-        for i = nprocs:-1:1
+        for i = nProcs:-1:2
             starts[i] = starts[i-1]
         end
-        starts[1] = 0
-        starts[nProcs] = nactive
+        starts[1] = 1
+        starts[nProcs+1] = nactive+1
 
+        
         if dist.numSends > 0
             dist.lengths_to = Array{Integer}(dist.numSends)
             dist.procs_to = Array{PID}(dist.numSends)
             dist.starts_to = Array{Integer}(dist.numSends)
         end
 
-        j = 0
+        j = 1
         dist.maxSendLength = 0
         for i = 1:nProcs
             if starts[i+1] != starts[i]
@@ -200,6 +203,7 @@ function computeRecvs(dist::MPIDistributor{GID, PID, LID}, myProc::PID, nProcs::
         msgCount[dist.procs_to[i]] += 1
     end
     
+    
     #bug fix for reduce-scatter bug applied since no reduce_scatter is present in julia's MPI
     counts = MPI.Reduce(msgCount, MPI.SUM, 0, dist.comm.mpiComm)
     if counts == nothing
@@ -222,7 +226,6 @@ function computeRecvs(dist::MPIDistributor{GID, PID, LID}, myProc::PID, nProcs::
     #line 616
     
     lengthWrappers = [Array{Int, 1}(1) for i in 1:(dist.numRecvs - dist.selfMsg)]
-    
     for i = 1:(dist.numRecvs - dist.selfMsg)
         dist.request[i] = MPI.Irecv!(lengthWrappers[i], MPI.ANY_SOURCE, dist.tag, dist.comm.mpiComm)
     end
@@ -366,20 +369,41 @@ function createFromRecvs(dist::MPIDistributor{GID, PID}, remoteGIDs::Array{GID},
     createFromSends(dist, exportPIDs)
 end
 
-function resolvePosts(dist::MPIDistributor, exportObjs::Array)
+function resolvePosts(dist::MPIDistributor, exportObjs::Array{T}) where T
     myProc = myPid(dist.comm) 
     
     selfRecvAddress = 0
     
-    #TODO handle when data not grouped by processor
+    nBlocks = dist.numSends + dist.selfMsg
+    procIndex = 1
+    while procIndex <= nBlocks && dist.procs_to[procIndex] < myProc
+        procIndex += 1
+    end
+    if procIndex == nBlocks
+        procIndex = 1
+    end
+    
     
     exportBytes = Array{Array{UInt8}}(dist.numRecvs + dist.selfMsg)
-    j = 1
+    
     buffer = IOBuffer()
-    for i = 1:(dist.numRecvs + dist.selfMsg)
-        Serializer.serialize(buffer, exportObjs[j:j+dist.lengths_to[i]-1])
-        j += dist.lengths_to[i]
-        exportBytes[i] = take!(buffer)
+    if dist.indices_to == [] #data already grouped by processor
+        j = 1
+        for i = 1:nBlocks
+            Serializer.serialize(buffer, exportObjs[j:j+dist.lengths_to[i]-1])
+            j += dist.lengths_to[i]
+            exportBytes[i] = take!(buffer)
+        end
+    else #data not grouped by proc, must be grouped first
+        for i = 1:nBlocks
+            j = dist.starts_to[i]
+            sendArray = Array{T}(dist.lengths_to[i])
+            for k = 1:dist.lengths_to[i]
+                sendArray[k] = exportObjs[dist.indices_to[j+k-1]]
+            end
+            Serializer.serialize(buffer, sendArray)
+            exportBytes[i] = take!(buffer)
+        end
     end
     
     
@@ -401,6 +425,7 @@ function resolvePosts(dist::MPIDistributor, exportObjs::Array)
     barrier(dist.comm)
            
     for i = 1:(dist.numSends + dist.selfMsg)
+        #TODO use p & procIndex to better group traffic
         if dist.procs_to[i] != myProc
             MPI_Rsend(length(exportBytes[i]), dist.procs_to[i]-1, dist.tag, dist.comm.mpiComm)
         else
@@ -432,42 +457,32 @@ function resolvePosts(dist::MPIDistributor, exportObjs::Array)
     
     barrier(dist.comm)
     
-    
-    nBlocks = dist.numSends + dist.selfMsg
-    procIndex = 1
-    while procIndex <= nBlocks && dist.procs_to[procIndex] < myProc
-        procIndex += 1
-    end
-    if procIndex == nBlocks
-        procIndex = 1
-    end
-    
     selfNum = 1
     selfIndex = 1
     
     #line 844
     
-    if dist.indices_to == [] #data already grouped by processor
-        for i = 1:nBlocks
-            #p = i + procIndex
-            #if p > nBlocks
-            #    p -= nBlocks
-            #end
-            if dist.procs_to[i] != myProc #p] != myProc
-                MPI_Rsend(exportBytes[i], dist.procs_to[i]-1, dist.tag, dist.comm.mpiComm)#p]-1, dist.tag, dist.comm.mpiComm)
-            else
-                selfNum = i#p
-            end
+#    if dist.indices_to == [] #data already grouped by processor
+    for i = 1:nBlocks
+        p = i + procIndex - 1
+        if p > nBlocks
+            p -= nBlocks
         end
-        
-        if dist.selfMsg
-            importObjs[selfRecvAddress] = exportBytes[selfNum]
+        if dist.procs_to[p] != myProc
+            MPI_Rsend(exportBytes[p], dist.procs_to[p]-1, dist.tag, dist.comm.mpiComm)
+        else
+            selfNum = p
         end
-        
-    else #data not grouped by proc, use send buffer
-        #TODO transcribe lines 880-936
-        error("Not Yet Implemented")
     end
+
+    if dist.selfMsg
+        importObjs[selfRecvAddress] = exportBytes[selfNum]
+    end
+
+#    else #data not grouped by proc, use send buffer
+#        #TODO transcribe lines 880-936
+#        error("Not Yet Implemented")
+#    end
 end
 
             
