@@ -28,7 +28,7 @@ function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
     numGIDS = min(numSrcGIDs, numTgtGIDs)
     
     numSameGIDs = 1
-    while numSameGIDS < numGIDs && sourceGIDs[numSameGIDs] == targetGIDs[numSameGIDs]
+    while numSameGIDS <= numGIDs && sourceGIDs[numSameGIDs] == targetGIDs[numSameGIDs]
         numSameGIDs += 1
     end
     numSameGIDs -= 1
@@ -116,34 +116,34 @@ function Import{GID, PID, LID}(source::BlockMap{GID, PID, LID}, target::BlockMap
 end
 
 function Import{GID, PID, LID}(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{Array{PID}}, plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
-        const debug = get(plist, :debug, false)
-        
-        if debug
-            print("$(myPid(comm(source))): Import ctor\n")
-        end
-        
-        impor = Import{GID, PID, LID}(debug, importData(source, target))
-        
-        remoteGIDs = setupSamePermuteRemote(impor)
-        
-        if debug
-            print("$(myPid(comm(source))): Import ctor: setupSamePermuteRemote done\n")
-        end
-        if isDistributed(source)
-            setupExport(impor, remoteGIDs, remotePIDs)
-        end
-        if debug
-            print("$(myPid(comm(source))): Import ctor: done\n")
-        end
-        
-        impor
+    const debug = get(plist, :debug, false)
+
+    if debug
+        print("$(myPid(comm(source))): Import ctor\n")
     end
+
+    impor = Import{GID, PID, LID}(debug, ImportExportData(source, target))
+
+    remoteGIDs = setupSamePermuteRemote(impor)
+
+    if debug
+        print("$(myPid(comm(source))): Import ctor: setupSamePermuteRemote done\n")
+    end
+    if isDistributed(source)
+        setupExport(impor, remoteGIDs, remotePIDs)
+    end
+    if debug
+        print("$(myPid(comm(source))): Import ctor: done\n")
+    end
+
+    impor
+end
 
 ## internal construction methods ##
 
 function setupSamePermuteRemote(impor::Import{GID, PID, LID}) where {GID <: Integer, PID <: Integer, LID <: Integer} 
     
-    data = impor.data
+    data = impor.importData
     
     remoteGIDs = Array{GID, 1}(0)
     
@@ -190,7 +190,6 @@ function setupSamePermuteRemote(impor::Import{GID, PID, LID}) where {GID <: Inte
     remoteGIDs
 end
 
-#TODO implement setupExport
 function setupExpert(impor::Import{GID, PID, LID}, remoteGIDs::Array{GID}, useRemotePIDs::Bool, userRemotePIDs::Array{PID}) where {GID <: Integer, PID <: Integer, LID <: Integer}
     
     const source = sourceMap(impor)
@@ -301,56 +300,56 @@ end
 Get the source map for the given ImportExportData
 """
 function sourceMap(impor::Import{GID, PID, LID})::BlockMap{GID, PID, LID} where GID <: Integer where PID <:Integer where LID <: Integer
-    impor.data.source
+    impor.importData.source
 end
 
 """
 Get the target map for the given ImportExportData
 """
 function targetMap(impor::Import{GID, PID, LID})::BlockMap{GID, PID, LID} where GID <: Integer where PID <:Integer where LID <: Integer
-    impor.data.target
+    impor.importData.target
 end
 
 """
 List of elements in the target map that are permuted.
 """
 function permuteToLIDs(impor::Import{GID, PID, LID})::Array{LID} where GID <: Integer where PID <:Integer where LID <: Integer
-    impor.data.permuteToLIDs
+    impor.importData.permuteToLIDs
 end
 
 """
 List of elements in the source map that are permuted.
 """
 function permuteFromLIDs(impor::Import{GID, PID, LID})::Array{LID} where GID <: Integer where PID <:Integer where LID <: Integer
-    impor.data.permuteFromLIDs
+    impor.importData.permuteFromLIDs
 end
 
 """
 List of elements in the target map that are coming from other processors
 """
 function remoteLIDs(impor::Import{GID, PID, LID})::Array{LID} where GID <: Integer where PID <: Integer where LID <: Integer
-    impor.data.remoteLIDs
+    impor.importData.remoteLIDs
 end
 
 """
 List of elements that will be sent to other processors
 """
 function exportLIDs(impor::Import{GID, PID, LID})::Array{LID} where GID <: Integer where PID <: Integer where LID <: Integer
-    impor.data.exportLIDs
+    impor.importData.exportLIDs
 end
 
 """
 List of processors to which elements will be sent `exportLID[i]` will be sent to processor `exportPIDs[i]`
 """
 function exportPIDs(impor::Import{GID, PID, LID})::Array{PID} where GID <: Integer where PID <: Integer where LID <: Integer
-    impor.data.exportPIDs
+    impor.importData.exportPIDs
 end
 
 """
 Returns the number of elements that are identical between the source and target maps, up to the first different ID
 """
 function numSameIDs(impor::Import{GID, PID, LID})::LID where GID <: Integer where PID <: Integer where LID <: Integer
-    impor.data.numSameIDs
+    impor.importData.numSameIDs
 end
 
 
@@ -358,12 +357,12 @@ end
 Returns the distributor being used
 """
 function distributor(impor::Import{GID, PID, LID})::Distributor{GID, PID, LID} where GID <: Integer where PID <: Integer where LID <: Integer
-    impor.data.distributor
+    impor.importData.distributor
 end
 
 """
 Returns whether the import or export is locally complete
 """
 function isLocallyComplete(impor::Import{GID, PID, LID})::Bool where GID <: Integer where PID <: Integer where LID <: Integer
-    impor.data.isLocallyComplete
+    impor.importData.isLocallyComplete
 end
