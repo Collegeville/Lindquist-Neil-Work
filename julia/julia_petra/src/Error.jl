@@ -2,7 +2,7 @@
 export InvalidArgumentError
 
 """
-    ArgumentValueError(msg)
+    InvalidArgumentError(msg)
 
 The values passed as arguments are not valid.  Argument `msg`
 is a descriptive error string.

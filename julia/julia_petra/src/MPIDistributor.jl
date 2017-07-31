@@ -427,7 +427,10 @@ function resolvePosts(dist::MPIDistributor, exportObjs::Array{T}) where T
     barrier(dist.comm)
            
     for i = 1:(dist.numSends + dist.selfMsg)
-        #TODO use p & procIndex to better group traffic
+        p = procIndex + 1
+        if p > nBlocks
+            p -= nBlocks
+        end
         if dist.procs_to[i] != myProc
             MPI_Rsend(length(exportBytes[i]), dist.procs_to[i]-1, dist.tag, dist.comm.mpiComm)
         else
@@ -459,10 +462,9 @@ function resolvePosts(dist::MPIDistributor, exportObjs::Array{T}) where T
     
     barrier(dist.comm)
     
-    selfNum = 1
-    selfIndex = 1
-    
     #line 844
+    
+    selfNum = 0
     
 #    if dist.indices_to == [] #data already grouped by processor
     for i = 1:nBlocks
@@ -480,11 +482,6 @@ function resolvePosts(dist::MPIDistributor, exportObjs::Array{T}) where T
     if dist.selfMsg
         importObjs[selfRecvAddress] = exportBytes[selfNum]
     end
-
-#    else #data not grouped by proc, use send buffer
-#        #TODO transcribe lines 880-936
-#        error("Not Yet Implemented")
-#    end
 end
 
             

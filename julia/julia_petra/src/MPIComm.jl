@@ -26,7 +26,7 @@ function barrier(comm::MPIComm)
     MPI.Barrier(comm.mpiComm)
 end
 
-function broadcastAll(comm::MPIComm{GID, PID}, myvals::Array{T}, root::Integer)::Array{T} where GID <: Integer where PID <: Integer where T
+function broadcastAll(comm::MPIComm, myvals::Array{T}, root::Integer)::Array{T} where T
     vals = copy(myvals)
     result = MPI.Bcast!(vals, root-1, comm.mpiComm)
     result
@@ -60,14 +60,14 @@ function scanSum(comm::MPIComm, myvals::Array{T})::Array{T} where T
     MPI.Scan(myvals, length(myvals), MPI.SUM, comm.mpiComm)
 end
 
-function myPid(comm::MPIComm{GID, PID})::PID where GID <: Integer where PID <: Integer
+function myPid(comm::MPIComm{GID, PID})::PID where {GID <: Integer, PID <: Integer}
     MPI.Comm_rank(comm.mpiComm) + 1
 end
 
-function numProc(comm::MPIComm{GID, PID})::PID where GID <: Integer where PID <:Integer
+function numProc(comm::MPIComm{GID, PID})::PID where {GID <: Integer, PID <:Integer}
     MPI.Comm_size(comm.mpiComm)
 end
 
-function createDistributor(comm::MPIComm{GID, PID, LID})::MPIDistributor{GID, PID, LID}  where GID <: Integer where PID <: Integer where LID <: Integer
+function createDistributor(comm::MPIComm{GID, PID, LID})::MPIDistributor{GID, PID, LID}  where {GID <: Integer, PID <: Integer, LID <: Integer}
     MPIDistributor{GID, PID, LID}(comm)
 end

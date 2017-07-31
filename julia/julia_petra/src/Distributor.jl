@@ -7,8 +7,6 @@ export resolvePosts, resolveReversePosts, resolveReverseWaits
 
 # methods (and docs) are currently based straight off Epetra_Distributor to match Comm
 
-#TODO need createFromSendAndRecvs method
-
 """
 The base type for gather/scatter setup.
 All subtypes must have the following methods, with DistributorImpl standing
@@ -21,7 +19,7 @@ createFromSends(dist::DistributorImpl,exportPIDs::Array{PID})
         IDs this processor will be reciving
 
 createFromRecvs(dist::DistributorImpl, remoteGIDs::Array{GID},
-        removePIDs::Array{PID})::Tuple{Array{GID}, Array{PID}}
+        remotePIDs::Array{PID})::Tuple{Array{GID}, Array{PID}}
         where GID <: Integer where PID <: Integer
     - sets up the Distributor object using a list of remote global IDs and
         corresponding PIDs.  Returns a tuple with the global IDs and their

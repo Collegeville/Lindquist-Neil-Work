@@ -6,8 +6,6 @@ export numGlobalElements, myGlobalElements
 export uniqueGIDs, globalIndicesType, sameBlockMapDataAs, sameAs
 export linearMap, myGlobalElementIDs, comm
 export myGID, myLID, distributedGlobal, numMyElements
-#export pointToElementList, numGlobalPoints, numMyPoints, pointSameAs
-
 
 # methods and docs based straight off Epetra_BlockMap to match Comm
 
@@ -25,7 +23,7 @@ A type for partitioning block element vectors and matrices
 type BlockMap{GID <: Integer, PID <:Integer, LID <: Integer}
     data::BlockMapData{GID, PID, LID}
     
-    function BlockMap{GID, PID, LID}(data::BlockMapData) where GID <: Integer where PID <:Integer where LID <: Integer
+    function BlockMap{GID, PID, LID}(data::BlockMapData) where {GID <: Integer, PID <:Integer, LID <: Integer}
         new(data)
     end
 end
@@ -46,10 +44,10 @@ function BlockMap(numGlobalElements::GID, comm::Comm{GID, PID, LID}) where GID <
     const data = BlockMapData(numGlobalElements, comm)
     const map = BlockMap{GID, PID, LID}(data)
     
-    numProcVal = numProc(comm)
+    const numProcVal = numProc(comm)
     data.linearMap = true
     
-    myPIDVal = myPid(comm) - 1
+    const myPIDVal = myPid(comm) - 1
     
     data.numMyElements = floor(typeof(data.numGlobalElements),
         data.numGlobalElements/numProcVal)

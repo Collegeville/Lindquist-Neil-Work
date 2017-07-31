@@ -102,7 +102,9 @@ function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
     end
     
     isLocallyComplete(importData, locallyComplete)
-    createFromSendsAndRecvs(distributor(importData), exportPIDs, remoteProcIDs)
+    #TODO create and upgrade to createFromSendsAndRecvs
+    #createFromSendsAndRecvs(distributor(importData), exportPIDs, remoteProcIDs)
+    createFromRecvs(distributor(importData), remoteGIDs, remotePIDs)
     
     Import(debug, importData)
 end
