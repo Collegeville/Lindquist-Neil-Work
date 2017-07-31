@@ -1,6 +1,7 @@
 module julia_petra
 
 # Internal Utilities
+include("Enums.jl")
 include("Error.jl")
 
 # Communication interface
@@ -26,7 +27,6 @@ include("MPIDistributor.jl")
 
 
 # Data interface
-include("CombineMode.jl")
 include("ImportExportData.jl")
 include("Import.jl")
 include("Export.jl")

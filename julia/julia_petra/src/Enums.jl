@@ -10,3 +10,17 @@ Here is the list of combine modes:
   * ZERO: Replace old values with zero
 """
 @enum CombineMode ADD=1 INSERT=2 REPLACE=3 ABSMAX=4 ZERO=5
+
+
+
+"""
+Tells petra whether to use the transpose or conjugate transpose of the matrix
+"""
+@enum TransposeMode NO_TRANS=1 TRANS=2 CONJ_TRANS=3
+
+"""
+Checks whether the given TransposeMode is transposed
+"""
+@inline function isTransposed(mode::TransposeMode)::Bool
+    mode != TransposeMode.NO_TRANS
+end
