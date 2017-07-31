@@ -9,11 +9,18 @@ end
 
 ## Constructors ##
 
+function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID},
+        userRemotePIDs::Array{PID}, remoteGIDs::Array{GID}, userExportLIDs::Array{LID},
+        userExportPIDs::Array{PID}, useRemotePIDGID::Bool,
+        ; plist...) where {GID <: Integer, PID <: Integer, LID <: Integer}
+    Import{GID, PID, LID}(source, target, userRemotePIDs, remoteGIDs,
+        userExportLIDs, userExportPIDs, useREmotePIDGID, Dict(plist))
+end
 
 function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID},
         userRemotePIDs::Array{PID}, remoteGIDs::Array{GID}, userExportLIDs::Array{LID},
         userExportPIDs::Array{PID}, useRemotePIDGID::Bool,
-        plist::Dict{Symbol}=Dict{Symbol, Any}()) where {GID <: Integer, PID <: Integer, LID <: Integer}
+        plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
     sourceGIDs = myGlobalElements(source)
     targetGIDs = myGlobalElements(target)
     numSrcGIDs = length(sourceGIDs)
@@ -100,7 +107,15 @@ function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
     Import(debug, importData)
 end
 
-function Import{GID, PID, LID}(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{Array{PID}}=Nullable{Array{PID}}, plist::Dict{Symbol}=Dict{Symbol, Any}()) where {GID <: Integer, PID <: Integer, LID <: Integer}
+function Import{GID, PID, LID}(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{Array{PID}}=Nullable{Array{PID}}; plist...) where {GID <: Integer, PID <: Integer, LID <: Integer}
+    Import{GID, PID, LID}(source, target, remotePIDs, Dict(plist))
+end
+
+function Import{GID, PID, LID}(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
+    Import{GID, PID, LID}(source, target, Nullable{Array{PID}}(), plist)
+end
+
+function Import{GID, PID, LID}(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{Array{PID}}, plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
         const debug = get(plist, :debug, false)
         
         if debug
