@@ -3,13 +3,13 @@
 """
 The version of RowMatrix that isn't a subtype of DestObject
 """
-abstract type SrcDestRowMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: SrcDestObject{GID, PID, LID} 
+abstract type SrcDistRowMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: SrcDistObject{GID, PID, LID} 
 end
 
 """
 The version of RowMatrix that is a subtype of DestObject
 """
-abstract type DestRowMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: DestObject{GID, PID, LID} 
+abstract type DistRowMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: DistObject{GID, PID, LID} 
 end
 
 #TODO figure out the needed operation functions (multiple, solve, norms, ect), (lines 123-221)
@@ -73,4 +73,4 @@ rowMap(matrix::Impl{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
 colMap(matrix::Impl{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
     - Returns the BlockMap associated with the columns of this matrix
 """
-const RowMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} = Union{SrcDestRowMatrix{Data <: Number, GID, PID, LID}, DestRowMatrix{GID, PID, LID}}
+const RowMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} = Union{SrcDistRowMatrix{Data <: Number, GID, PID, LID}, DistRowMatrix{Data, GID, PID, LID}}
