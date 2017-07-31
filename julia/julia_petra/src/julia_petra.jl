@@ -1,11 +1,9 @@
 module julia_petra
 
 # Internal Utilities
-
 include("Error.jl")
 
 # Communication interface
-
 include("Distributor.jl")
 include("Directory.jl")
 include("Comm.jl")
@@ -25,5 +23,16 @@ include("SerialComm.jl")
 include("MPIUtil.jl")
 include("MPIComm.jl")
 include("MPIDistributor.jl")
+
+
+# Data interface
+include("CombineMode.jl")
+include("ImportExportData.jl")
+include("Import.jl")
+include("Export.jl")
+
+include("SrcDistObject.jl")
+include("DistObject.jl")
+include("RowMatrix.jl")
 
 end # module
