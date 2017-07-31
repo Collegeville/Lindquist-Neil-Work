@@ -7,6 +7,8 @@ export resolvePosts, resolveReversePosts, resolveReverseWaits
 
 # methods (and docs) are currently based straight off Epetra_Distributor to match Comm
 
+#TODO need createFromSendAndRecvs method
+
 """
 The base type for gather/scatter setup.
 All subtypes must have the following methods, with DistributorImpl standing

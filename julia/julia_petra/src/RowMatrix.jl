@@ -73,4 +73,4 @@ rowMap(matrix::Impl{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
 colMap(matrix::Impl{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
     - Returns the BlockMap associated with the columns of this matrix
 """
-const RowMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} = Union{SrcDistRowMatrix{Data <: Number, GID, PID, LID}, DistRowMatrix{Data, GID, PID, LID}}
+const RowMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} = Union{SrcDistRowMatrix{Data, GID, PID, LID}, DistRowMatrix{Data, GID, PID, LID}}

@@ -6,12 +6,18 @@ Comm
 --SerialComm
 --MPIComm
 
+CombiningMode
+
 Directory
 --BasicDirectory
 
 Distributor
 --SerialDistributor
 --MPIDistributor
+
+Export
+
+Import
 
 SrcDistObject
 --DistObject
