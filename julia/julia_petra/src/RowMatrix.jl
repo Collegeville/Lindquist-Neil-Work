@@ -12,9 +12,11 @@ The version of RowMatrix that is a subtype of DestObject
 abstract type DistRowMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: DistObject{GID, PID, LID} 
 end
 
-#TODO figure out the needed operation functions (multiple, solve, norms, ect), (lines 123-221)
+#DECISION are any other mathmatical operations needed?
 
 """
+RowMatrix is the base of 
+
 RowMatrix is actually a type union of SrcDestRowMatrix and DestRowMatrix,
 which are (direct) subtypes of SrcDestObject and DestObject, respectively.
 
@@ -72,5 +74,27 @@ rowMap(matrix::Impl{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
 
 colMap(matrix::Impl{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
     - Returns the BlockMap associated with the columns of this matrix
+
+leftScale!(matrix::Impl{Data, GID, PID, LID}, X::PetraVector{Data, GID, PID, LID})
+    Scales matrix on the left with X
+
+rightScale!(matrix::Impl{Data, GID, PID, LID}, X::PetraVector{Data, GID, PID, LID})
+    Scales matrix on the right with X
+
+
+Additionally, the following method must be implemented to fufil the operator interface:
+
+apply!(matrix::Impl{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, Y::MultiVector{Data, GID, PID, LID}, mode::TransposeMode, alpha::Data, beta::Data)
+    Computes ``Y = α\cdot A^{mode}\cdot X + β\cdot Y``, with the following exceptions
+        If beta == 0, apply MUST overwrite Y, so that any values in Y (including NaNs) are ignored.
+        If alpha == 0, apply MAY short-circuit the operator, so that any values in X (including NaNs) are ignored
+
+domainMap(operator::Op{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
+    Returns the BlockMap associated with the domain of this operation
+
+rangeMap(operator::Op{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
+    Returns the BlockMap associated with the range of this operation
 """
 const RowMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} = Union{SrcDistRowMatrix{Data, GID, PID, LID}, DistRowMatrix{Data, GID, PID, LID}}
+
+@operatorFunctions RowMatrix

@@ -32,6 +32,8 @@ include("ImportExportData.jl")
 include("Import.jl")
 include("Export.jl")
 
+include("Operator.jl")
+
 include("SrcDistObject.jl")
 include("DistObject.jl")
 include("RowMatrix.jl")
