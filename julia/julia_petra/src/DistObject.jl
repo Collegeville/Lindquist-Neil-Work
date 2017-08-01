@@ -1,4 +1,6 @@
 
+#TODO add getter and setter methods for fields required by transfer in requirements
+
 #TODO figure out Packet
 """
 A base type for constructing and using dense multi-vectors, vectors and matrices in parallel.
@@ -14,13 +16,25 @@ copyAndPermute(source::SrcDistObject{GID, PID, LID}, target::Impl{GID, PID, LID}
 
 packAndPrepare(source::SrcDistObject{GID, PID, LID}, target::Impl{GID, PID, LID},
         exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID}
-        )::Tuple{Array{Packet}, Union{Array{Integer}, Integer}}
-    Perform any packing or preparation required for communications
+        )::Tuple{Array{Packet}, Union{Array{<:Integer}, Integer}}
+    Perform any packing or preparation required for communications.  The returned tuple contains
+        1 the allocated export array
+        2 if constantPacketsPerLID != 0: constantPacketsPerLID else: array of number of Packets per LID
 
 unpackAndCombine(target::Impl{GID, PID, LID}, importLIDs::Array{LID, 1}, imports::Array{Packet},
-        numPacketsPerLID::Union{Array{Integer}, Integer}}, distor::Distributor{GID, PID, LID},
+        numPacketsPerLID::Union{Array{<:Integer}, Integer}}, distor::Distributor{GID, PID, LID},
         cm::CombineMode)
     Perform any unpacking and combining after communication
+
+numExportPacketsPerLID(target::Impl, numExportPackets::Array{<:Integer})
+numExportPacketsPerLID(target::Impl)::Integer
+    getter and setter for Integer field numExportPacketsPerLID
+
+numImportPacketsPerLID(target::Impl, numImportPackets::Array{<:Integer})
+numImportPacketsPerLID(target::Impl)::Integer
+    getter and setter for Integer field numImportPacketsPerLID
+
+
 """
 abstract type DistObject{GID <:Integer, PID <: Integer, LID <: Integer} <: SrcDistObject{GID, PID, LID}
 end
@@ -109,6 +123,83 @@ function doTransfer(src::SrcDistObject{GID, PID, LID}, target::DistObject{GID, P
         permuteFromLIDs::Array{LID, 1}, remoteLIDs::Array{LID, 1}, exportLIDs::Array{LID, 1},
         distor::Distributor{GID, PID, LID}, reversed::Bool) where {
             GID <: Integer, PID <: Integer, LID <: Integer}
+    # used doTransferOld since the implementation seemed the same, except for
+    # extra complications converting to the new data types in doTransfer
     
-    #TODO implement 
+    debug = false #DECISION add plist for debug setting? get debug from (im/ex)porter
+    
+    if !checkSizes(source, target)
+        throw(InvalidArgumentError("checkSize() indicates that the destination object " *
+                "is not a legal target for redistribution from the source object.  This " *
+                "probably means that they do not have the same dimensions.  For example, " *
+                "MultiVectors must have the same number of rows and columns"))
+    end
+    
+    readAlso = true #from TPetras rwo
+    if cm == CombineMode.INSERT || cm == CombineMode.REPLACE
+        numIDsToWrite = numSameIDs + length(permuteToLIDs) + length(remoteIDs)
+        if numIDsToWrite == numMyElements(map(target))
+            # overwriting all local data in the destination, so write-only suffices
+            
+            #TODO look at FIXME on line 503
+            readAlso = false
+        end
+    end
+    
+    #TODO look at FIXME on line 514
+    createViews(source)
+    
+    #tell target to create a view of its data
+    #TODO look at FIXME on line 531
+    createViewNonConst(targetreadAlso)
+    
+    
+    if numSameIDs + length(permuteToLIDs) != 0
+        copyAndPermute(source, target, numSameIDs, permuteToLIDs, permuteFromLIDs)
+    end
+    
+    # if there is a known, constant number of packets per LID
+    constantNumPackets = constantNumberOfPackets(target)
+    
+    
+    # only need to pack comm buffers if combine mode is not ZERO
+    # ZERO combine mode indicates results are the same as if all zeros were recieved
+    if cm != CombineMode.ZERO
+        if constantNumPackets == 0
+            #TODO figure out if allocation nessacery
+            numImportPacketsPerLID(target, Array{Integer, 1}(length(remoteLIDs)))
+        end
+        
+        #begin
+
+        exports, numPackets = packAndPrepare(source, target, exportLIDs, distor)
+        if isa(numPackets, Array)
+            numExportPacketsPerLID(target, numPackets)
+        else
+            #TODO check if need allocation for numExportPacketsPerLID if constantNumPackets != 0
+            constantNumPackets = numPackets
+        end
+        
+        exportsLen = length(exports)
+        
+        #Line 596
+        #TODO finish
+    end
+end
+
+"""
+    createViews(obj)
+
+doTransfer calls this on the source object, by default it does nothing, but the source object can use this as a hint to fetch data from a compute buffer on an off-CPU decice (such as GPU) into host memory
+"""
+function createViews(obj)
+end
+
+"""
+    createViewsNonConst(obj, readAlso::Bool)
+
+doTransfer calls this on the target object, by default it does nothing, but the source object can use this as a hint to fetch data from a compute buffer on an off-CPU decice (such as GPU) into host memory
+readAlso indicates whether the doTransfer might read from the original buffer
+"""
+function createViewsNonConst(obj, readAlso::Bool)
 end
