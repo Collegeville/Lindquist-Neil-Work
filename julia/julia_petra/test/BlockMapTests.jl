@@ -1,7 +1,7 @@
 #### Test BlockMap with SerialComm ####
 
-macro SerialMapTests()
-    quote
+function SerialMapTests(map::BlockMap{Int, Int, Int}, map2::BlockMap{Int, Int, Int}, diffMap::BlockMap{Int, Int, Int})
+#    quote
         mapCopy = BlockMap{Int, Int, Int}(map)
         
         @test uniqueGIDs(map)
@@ -68,7 +68,7 @@ macro SerialMapTests()
         @test [1, 2, 3, 4, 5] == myGlobalElementIDs(map)
 
         @test commVal == comm(map)
-    end
+#    end
 end
 
 commVal = SerialComm{Int, Int, Int}()
@@ -84,7 +84,8 @@ BlockMap(1, commVal)
 map = BlockMap(5, commVal)
 map2 = BlockMap(5, commVal)
 diffMap = BlockMap(6, commVal)
-@SerialMapTests
+#@SerialMapTests
+SerialMapTests(map, map2, diffMap)
 
 ## constructor 2 ##
 @test_throws InvalidArgumentError BlockMap(-8, 4, commVal)
@@ -98,12 +99,14 @@ BlockMap(1, 1, commVal)
 map = BlockMap(5, 5, commVal)
 map2 = BlockMap(5, 5, commVal)
 diffMap = BlockMap(6, 6, commVal)
-@SerialMapTests
+#@SerialMapTests
+SerialMapTests(map, map2, diffMap)
 
 map = BlockMap(-1, 5, commVal)
 map2 = BlockMap(-1, 5, commVal)
 diffMap = BlockMap(-1, 6, commVal)
-@SerialMapTests
+#@SerialMapTests
+SerialMapTests(map, map2, diffMap)
 
 
 ## constructor 3 ##
@@ -118,7 +121,8 @@ BlockMap(1, 1, [1], commVal)
 map = BlockMap(5, 5, [1, 2, 3, 4, 5], commVal)
 map2 = BlockMap(5, 5, [1, 2, 3, 4, 5], commVal)
 diffMap = BlockMap(6, 6, [1, 2, 3, 4, 5, 6], commVal)
-@SerialMapTests
+#@SerialMapTests
+SerialMapTests(map, map2, diffMap)
 
 ## constructor 4 ##
 @test_throws InvalidArgumentError BlockMap(-8, 4, [1, 2, 3, 4], false, 1, 4, commVal)
@@ -132,4 +136,5 @@ BlockMap(1, 1, [1], false, 1, 1, commVal)
 map = BlockMap(5, 5, [1, 2, 3, 4, 5], false, 1, 5, commVal)
 map2 = BlockMap(5, 5, [1, 2, 3, 4, 5], false, 1, 5, commVal)
 diffMap = BlockMap(6, 6, [1, 2, 3, 4, 5, 6], false, 1, 6, commVal)
-@SerialMapTests
+#@SerialMapTests
+SerialMapTests(map, map2, diffMap)
