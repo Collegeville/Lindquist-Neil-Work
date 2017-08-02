@@ -12,7 +12,7 @@ type ImportExportData{GID <: Integer, PID <: Integer, LID <: Integer}
     exportPIDs::Array{PID, 1}
     
     numSameIDs::GID
-    distributor::Distributor
+    distributor::Distributor{GID, PID, LID}
     
     isLocallyComplete::Bool
 end

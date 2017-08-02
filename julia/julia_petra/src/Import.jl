@@ -123,11 +123,11 @@ function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
         Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
 end
 
-function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, plist::Dict{Symbol, Any}) where {GID <: Integer, PID <: Integer, LID <: Integer}
+function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
     Import(source, target, Nullable{Array{PID}}(), plist)
 end
 
-function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{Array{PID}}, plist::Dict{Symbol, Any}) where {GID <: Integer, PID <: Integer, LID <: Integer}
+function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{Array{PID}}, plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
     const debug = get(plist, :debug, false)
 
     if debug
@@ -170,7 +170,7 @@ function setupSamePermuteRemote(impor::Import{GID, PID, LID}) where {GID <: Inte
     numGIDs = min(numSrcGIDs, numTgtGIDs)
     
     numSameGIDs = 1
-    while numSameGIDs < numGIDs && sourceGIDs[numSameGIDs] == targetGIDs[numSameGIDs]
+    while numSameGIDs <= numGIDs && sourceGIDs[numSameGIDs] == targetGIDs[numSameGIDs]
         numSameGIDs += 1
     end
     numSameGIDs -= 1

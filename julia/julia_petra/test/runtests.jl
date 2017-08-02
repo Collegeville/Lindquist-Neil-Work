@@ -4,6 +4,8 @@ using Base.Test
 include("InheritanceUtilTests.jl")
 include("SerialCommTests.jl")
 
+include("Import-Export Tests.jl")
+
 include("BlockMapTests.jl")
 include("MultiVectorTests.jl")
 
