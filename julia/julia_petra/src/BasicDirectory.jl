@@ -142,6 +142,7 @@ function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::Bloc
             localEntries[i] = lidVal
         end
     elseif linearMap(map)
+        print("$(myPid(comm(map))): getDirectoryEntries: linear\n")
         minAllGIDVal = minAllGID(map)
         maxAllGIDVal = maxAllGID(map)
         
@@ -149,6 +150,14 @@ function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::Bloc
         
         n_over_p = numGlobalElements(map)/numProcVal
         
+        allMinGIDs_list = directory.allMinGIDs
+        order = sortperm(allMinGIDs_list)
+        permute!(allMinGIDs_list, order)
+        
+        print("$(myPid(comm(map))): getDirectoryEntries: allMinGIDs_list=$allMinGIDs_list\n")
+        print("$(myPid(comm(map))): getDirectoryEntries: order=$order\n")
+        
+        print("$(myPid(comm(map))): getDirectoryEntries: globalEntries=$globalEntries\n")
         for i = 1:numEntries
             lid  = 0
             proc = 0
@@ -159,8 +168,8 @@ function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::Bloc
             end
             #guess uniform distribution and start a little above it
             proc1 = min(GID(fld(gid, max(n_over_p, 1)) + 2), numProcVal)
+            proc1 = 1
             found = false
-            allMinGIDs_list = directory.allMinGIDs
             
             while proc1 >= 1 && proc1 <= numProcVal
                 if allMinGIDs_list[proc1] <= gid
@@ -175,8 +184,8 @@ function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::Bloc
                 end
             end
             if found
-                proc = proc1
-                lid = gid - allMinGIDs_list[proc] + 1
+                proc = order[proc1]
+                lid = gid - allMinGIDs_list[proc1] + 1
             end
             
             procs[i] = proc

@@ -77,6 +77,8 @@ function createSendStructure(dist::MPIDistributor{GID, PID}, pid::PID, nProcs::P
     noSendBuff = true
     numDeadIndices = 0  #for GIDs not owned by any processors
     
+    print("$pid: createSendStructure: exportPIDs=$exportPIDs");
+    
     for i = 1:numExports
         if noSendBuff && i > 1 && exportPIDs[i] < exportPIDs[i-1]
             noSendBuff = false
@@ -88,6 +90,8 @@ function createSendStructure(dist::MPIDistributor{GID, PID}, pid::PID, nProcs::P
             numDeadIndices += 1
         end
     end
+    
+    print("$pid: createSendStructure: starts=$starts");
     
     dist.selfMsg = starts[pid] != 0
     
@@ -203,24 +207,20 @@ function computeRecvs(dist::MPIDistributor{GID, PID, LID}, myProc::PID, nProcs::
         msgCount[dist.procs_to[i]] += 1
     end
     
-    
     #bug fix for reduce-scatter bug applied since no reduce_scatter is present in julia's MPI
     counts = MPI.Reduce(msgCount, MPI.SUM, 0, dist.comm.mpiComm)
     if counts == nothing
         counts = Int[]
     end
     dist.numRecvs = MPI.Scatter(counts, 1, 0, dist.comm.mpiComm)[1]
-    if dist.numRecvs > 0
-        dist.lengths_from = zeros(Int, nProcs)
-        dist.procs_from = zeros(PID, nProcs)
-    end
+    
+    dist.lengths_from = zeros(Int, nProcs)
+    dist.procs_from = zeros(PID, nProcs)
     
     #using NEW_COMM_PATTERN (see line 590)
     
-    if dist.numRecvs > 0
-        if dist.request == []
-            dist.request = Array{MPI.Request}(dist.numRecvs - dist.selfMsg)
-        end
+    if dist.request == []
+        dist.request = Array{MPI.Request}(dist.numRecvs - dist.selfMsg)
     end
     
     #line 616
@@ -350,6 +350,7 @@ function createFromSends(dist::MPIDistributor{GID, PID, LID}, exportPIDs::Array{
     nProcs = numProc(dist.comm)
     createSendStructure(dist, pid, nProcs, exportPIDs)
     computeRecvs(dist, pid, nProcs)
+    print("$pid: createFromSends: numRecvs=$(dist.numRecvs)\n")
     if dist.numRecvs > 0
         if dist.request == []
             dist.request = Array{MPI.request}(numRecvs)

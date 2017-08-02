@@ -38,7 +38,7 @@ function Export(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
         print("$(myPid(comm(source))): Export ctor: setupSamePermuteExport done\n")
     end
     if distributedGlobal(source)
-        setupRemote(expor, remoteGIDs, remotePIDs)
+        setupRemote(expor, exportGIDs)
     end
     if debug
         print("$(myPid(comm(source))): Export ctor: done\n")
@@ -88,16 +88,19 @@ function setupSamePermuteExport(expor::Export{GID, PID, LID})::Array{GID} where 
         end
     end
     
-    if length(exportLIDs) != 0 && !isDistributed(source)
+    if length(exportLIDs) != 0 && !distributedGlobal(source)
         isLocallyComplete(data, false)
         warn("Source has export LIDs but source not distributed globally.  " *
             "Exporting to a submap of the target map.")
     end
     
     if distributedGlobal(source)
-        resize!(exportPIDs(data), length(exportGIDs))
+        #resize!(julia_petra.exportPIDs(data), length(exportGIDs))
         
+        print("$(myPid(comm(target))): setupSamePermuteExport: exportGIDs=$exportGIDs\n")
+        #TODO figure this out: Gives the PID doing the exporting (this one), but need the PID that should be recieving
         (exportPIDs, exportLIDs) = remoteIDList(target, exportGIDs)
+        print("$(myPid(comm(target))): setupSamePermuteExport: exportPIDs=$exportPIDs\n")
         julia_petra.exportPIDs(data, exportPIDs)
         missingGIDs = 0
         for i = 1:length(exportPIDs)
@@ -150,28 +153,33 @@ function setupRemote(expor::Export{GID, PID, LID}, exportGIDs::Array{GID, 1}) wh
         print("$(myPid(comm(target))): setupRemote\n")
     end
     
-    order = sortperm(exportPIDs(data))
-    permute!(exportPIDs(data), order)
+    exportPIDs = julia_petra.exportPIDs(data)
+    print("$(myPid(comm(target))): setupRemote: exportPIDs=$exportPIDs\n")
+    
+    order = sortperm(exportPIDs)
+    permute!(exportPIDs, order)
     permute!(exportLIDs(data), order)
     permute!(exportGIDs, order)
-    
+
     if expor.debug
         print("$(myPid(comm(target))): setupRemote: Calling createFromSends\n")
     end
     
-    numRemoteIDs = createFromSends(distributor(data), exportPIDs(data))
+    print("$(myPid(comm(target))): setupRemote: exportPIDs=$exportPIDs\n")
+    numRemoteIDs = createFromSends(distributor(data), exportPIDs)
     
     if expor.debug
         print("$(myPid(comm(target))): setupRemote: Calling doPostsAndWaits\n")
     end
     
+    print("$(myPid(comm(target))): setupRemote: exportGIDs=$exportGIDs\n")
     remoteGIDs = resolve(distributor(data), exportGIDs)
     
-    remoteLIDs = remoteLIDs(data)
+    remoteLIDs = julia_petra.remoteLIDs(data)
     
     resize!(remoteLIDs, numRemoteIDs)
     
-    for (i, j) in zip(length(remoteGIDs), length(remoteLIDs(data)))
+    for (i, j) in zip(remoteGIDs, remoteLIDs)
         remoteLIDs[j] = lid(target, remoteGIDs[i])
     end
     

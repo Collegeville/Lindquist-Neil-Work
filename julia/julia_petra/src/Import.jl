@@ -202,17 +202,15 @@ function setupSamePermuteRemote(impor::Import{GID, PID, LID}) where {GID <: Inte
     remoteGIDs
 end
 
-function setupExpert(impor::Import{GID, PID, LID}, remoteGIDs::Array{GID}, useRemotePIDs::Bool, userRemotePIDs::Array{PID}) where {GID <: Integer, PID <: Integer, LID <: Integer}
-    
+function setupExport(impor::Import{GID, PID, LID}, remoteGIDs::Array{GID}, userRemotePIDs::Nullable{Array{PID}}) where {GID <: Integer, PID <: Integer, LID <: Integer}
+    data = impor.importData
     const source = sourceMap(impor)
     
+    useRemotePIDs = !isnull(userRemotePIDs)
+    
     # Sanity Checks
-    if !useRemotePIDs && length(userRemotePIDs) > 0
-        throw(InvalidArgumentError("remotePIDs are non-empty, but " *
-                "their use has not been requested"))
-    end
-    if length(userRemotePIDs) > 0 && length(userRemotePIDs) != length(remoteGIDs)
-        throw(InvalidArgumentError("remotePIDs must either be of size zero " *
+    if useRemotePIDs && length(get(userRemotePIDs)) != length(remoteGIDs)
+        throw(InvalidArgumentError("remotePIDs must either be null " *
                 "or match the size of remoteGIDs."))
     end
     
@@ -223,16 +221,16 @@ function setupExpert(impor::Import{GID, PID, LID}, remoteGIDs::Array{GID}, useRe
         newRemotePIDs = Array{PID, 1}(length(remoteGIDs))
         if impor.debug
             print("$(myPid(comm(source))): setupExport(Import): about to call " * 
-                "getRemoteIndexList on sourceMap")
+                "getRemoteIndexList on sourceMap\n")
         end
-        (remoteProcIds, remoteLIDs) = remoteIDList(source, remoteGIDs)
+        (remoteProcIDs, remoteLIDs) = remoteIDList(source, remoteGIDs)
         for e in remoteLIDs
             if e == 0
                 missingGID += 1
             end
         end
     else
-        remoteProcIds = userRemotePIDs
+        remoteProcIDs = get(userRemotePIDs)
     end
     
     #line 688
@@ -276,7 +274,7 @@ function setupExpert(impor::Import{GID, PID, LID}, remoteGIDs::Array{GID}, useRe
                         "= $(totalNumRemote - numInvalidRemote)"))
             end
             
-            resize!(remoteProcIds, numValidRemote)
+            resize!(remoteProcIDs, numValidRemote)
             resize!(remoteGIDs, numValidRemote)
             resize!(remoteLIDs, numValidRemote)
         end
@@ -287,7 +285,7 @@ function setupExpert(impor::Import{GID, PID, LID}, remoteGIDs::Array{GID}, useRe
     permute!(remoteGIDs, order)
     permute!(remoteLIDs, order)
     
-    (exportGIDs, exportPIDs) = createFromRecvs(distributor(data), remoteGIDs, remoteProcs)
+    (exportGIDs, exportPIDs) = createFromRecvs(distributor(data), remoteGIDs, remoteProcIDs)
     
     julia_petra.exportPIDs(data, exportPIDs)
     

@@ -16,6 +16,7 @@ end
 
 include("MPICommTests.jl")
 include("MPIBlockMapTests.jl")
+include("MPIimport-export Tests.jl")
 
 #catch err
 #    sleep(10)
