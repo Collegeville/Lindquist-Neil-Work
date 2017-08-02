@@ -1,4 +1,7 @@
 
+export CombineMode, ADD, INSERT, REPLACE, ABSMAX, ZERO
+export TransposeMode, NO_TRANS, TRANS, CONJ_TRANS
+
 """
 Tells petra how to combine data received from other processes with existing data on the calling process for specific import or export options.
 

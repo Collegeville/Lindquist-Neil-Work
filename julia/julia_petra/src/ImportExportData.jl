@@ -19,7 +19,7 @@ end
 
 ## Constructors ##
 function ImportExportData(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID})::ImportExportData{GID, PID, LID} where GID <: Integer where PID <:Integer where LID <: Integer
-    ImportExportData{GID, PID, LID}(source, target, [], [], [], [], [], 0, getDistributor(comm(source)), true)
+    ImportExportData{GID, PID, LID}(source, target, [], [], [], [], [], 0, createDistributor(comm(source)), true)
 end
     
 ## Getters ##
@@ -61,7 +61,7 @@ end
 """
 Sets the list of elements in the target map that are coming from other processors
 """
-function remoteLIDs(data::ImportExportData{GID, PID, LID}, remoteLIDs::Array{LID}) where GID <: Integer where PID <: Integer where LID <: Integer
+function remoteLIDs(data::ImportExportData{GID, PID, LID}, remoteLIDs::Array{<: Integer}) where GID <: Integer where PID <: Integer where LID <: Integer
     data.remoteLIDs = remoteLIDs
 end
 
@@ -75,7 +75,7 @@ end
 """
 Sets the list of elements that will be sent to other processors
 """
-function exportLIDs(data::ImportExportData{GID, PID, LID}, exportLIDs::Array{LID}) where GID <: Integer where PID <: Integer where LID <: Integer
+function exportLIDs(data::ImportExportData{GID, PID, LID}, exportLIDs::Array{<: Integer}) where GID <: Integer where PID <: Integer where LID <: Integer
     data.exportLIDs = exportLIDs
 end
 
@@ -89,7 +89,7 @@ end
 """
 Sets the list of processors to which elements will be sent `exportLID[i]` will be sent to processor `exportPIDs[i]`
 """
-function exportPIDs(data::ImportExportData{GID, PID, LID}, exportPIDs::Array{PID}) where GID <: Integer where PID <: Integer where LID <: Integer
+function exportPIDs(data::ImportExportData{GID, PID, LID}, exportPIDs::Array{<: Integer}) where GID <: Integer where PID <: Integer where LID <: Integer
     data.exportPIDs = exportPIDs
 end
 
@@ -103,7 +103,7 @@ end
 """
 Sets the number of elements that are identical between the source and target maps, up to the first different ID
 """
-function numSameIDs(data::ImportExportData{GID, PID, LID}, numSame::GID)::LID where GID <: Integer where PID <: Integer where LID <: Integer
+function numSameIDs(data::ImportExportData{GID, PID, LID}, numSame::Integer)::LID where GID <: Integer where PID <: Integer where LID <: Integer
     data.numSameIDs = numSame
 end
 

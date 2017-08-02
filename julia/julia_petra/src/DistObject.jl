@@ -1,42 +1,32 @@
 
+export DistObject
+export doImport, doExport
+export copyAndPermute, packAndPrepare, unpackAndCombine, checkSize
+export releaseViews, createViews, createViewsNonConst
+
 # Note that all packet size information was removed due to the use of julia's
 # built in serialization/objects
 
-#TODO add getter and setter methods for fields required by transfer in requirements
-
-#TODO figure out Packet
+#TODO make this interface feel more ideomatic with mutliple dispatch
 """
 A base type for constructing and using dense multi-vectors, vectors and matrices in parallel.
 
-All subtypes must have the following methods, with Impl standing in for the subtype, in addition to the methods required by SrcDistObject:
+All subtypes must have the following methods, with Impl standing in for the subtype and ??? standing in for all types that ``checkSize()`` indicates are supported for transfer, in addition to the methods required by SrcDistObject:
 
-checkSizes(source::SrcDistObject{GID, PID, LID}, target::Impl{GID, PID, LID})::Bool
-    Compare the source and target objects for compatiblity
-
-copyAndPermute(source::SrcDistObject{GID, PID, LID}, target::Impl{GID, PID, LID},
+copyAndPermute(source::???{GID, PID, LID}, target::Impl{GID, PID, LID},
         numSameIDs::LID, permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1})
     Perform copies and permutations that are local to this process.
 
-packAndPrepare(source::SrcDistObject{GID, PID, LID}, target::Impl{GID, PID, LID},
+packAndPrepare(source::???{GID, PID, LID}, target::Impl{GID, PID, LID},
         exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID}
-        )::Array{Packet}
+        )::Array
     Perform any packing or preparation required for communications.  The
     method returns the array of objects to export
 
 unpackAndCombine(target::Impl{GID, PID, LID}, importLIDs::Array{LID, 1},
-        imports::Array{Packet}, distor::Distributor{GID, PID, LID},
+        imports::Array, distor::Distributor{GID, PID, LID},
         cm::CombineMode)
     Perform any unpacking and combining after communication
-
-numExportPacketsPerLID(target::Impl, numExportPackets::Array{<:Integer})
-numExportPacketsPerLID(target::Impl)::Integer
-    getter and setter for Integer field numExportPacketsPerLID
-
-numImportPacketsPerLID(target::Impl, numImportPackets::Array{<:Integer})
-numImportPacketsPerLID(target::Impl)::Integer
-    getter and setter for Integer field numImportPacketsPerLID
-
-
 """
 abstract type DistObject{GID <:Integer, PID <: Integer, LID <: Integer} <: SrcDistObject{GID, PID, LID}
 end
@@ -103,20 +93,27 @@ end
 
 ## import/export functionality ##
 
+"""
+    checkSizes(source, target)::Bool
+
+Compare the source and target objects for compatiblity.  By default, returns false.  Override this to allow transfering to/from subtypes
+"""
+function checkSizes(source::SrcDistObject{GID, PID, LID},
+        target::SrcDistObject{GID, PID, LID})::Bool where {
+            GID <: Integer, PID <: Integer, LID <: Integer}
+    false
+end
 
 """
     doTransfer(src::SrcDistObject{GID, PID, LID}, target::Impl{GID, PID, LID}, cm::CombineMode, numSameIDs::LID, permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1}, remoteLIDs::Array{LID, 1}, exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID}, reversed::Bool)
 Perform actual redistribution of data across memory images
 """
-function doTransfer(src::SrcDistObject{GID, PID, LID},
+function doTransfer(source::SrcDistObject{GID, PID, LID},
         target::DistObject{GID, PID, LID}, cm::CombineMode,
         numSameIDs::LID, permuteToLIDs::Array{LID, 1},
         permuteFromLIDs::Array{LID, 1}, remoteLIDs::Array{LID, 1},
         exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID},
         reversed::Bool) where {GID <: Integer, PID <: Integer, LID <: Integer}
-    
-    # used doTransferOld since the implementation seemed the same, except for
-    # extra complications converting to the new data types in doTransfer
     
     debug = false #DECISION add plist for debug setting? get debug from (im/ex)porter?
     
@@ -129,8 +126,8 @@ function doTransfer(src::SrcDistObject{GID, PID, LID},
     end
     
     readAlso = true #from TPetras rwo
-    if cm == CombineMode.INSERT || cm == CombineMode.REPLACE
-        numIDsToWrite = numSameIDs + length(permuteToLIDs) + length(remoteIDs)
+    if cm == INSERT || cm == REPLACE
+        numIDsToWrite = numSameIDs + length(permuteToLIDs) + length(remoteLIDs)
         if numIDsToWrite == numMyElements(map(target))
             # overwriting all local data in the destination, so write-only suffices
             
@@ -144,7 +141,7 @@ function doTransfer(src::SrcDistObject{GID, PID, LID},
     
     #tell target to create a view of its data
     #TODO look at FIXME on line 531
-    createViewNonConst(targetreadAlso)
+    createViewsNonConst(target, readAlso)
     
     
     if numSameIDs + length(permuteToLIDs) != 0
@@ -153,13 +150,13 @@ function doTransfer(src::SrcDistObject{GID, PID, LID},
     
     # only need to pack & send comm buffers if combine mode is not ZERO
     # ZERO combine mode indicates results are the same as if all zeros were recieved
-    if cm != CombineMode.ZERO
+    if cm != ZERO
         
         exports = packAndPrepare(source, target, exportLIDs, distor)
         
-        if ((doReverse && distributedGlobal(target)) 
-                || (!doReverse && distributedGlobal(source)))
-            if doReverse
+        if ((reversed && distributedGlobal(target)) 
+                || (!reversed && distributedGlobal(source)))
+            if reversed
                 #do exchange of remote data
                 imports = resolveReverse(distor, exports)
             else
@@ -170,7 +167,7 @@ function doTransfer(src::SrcDistObject{GID, PID, LID},
         end
     end
     
-    relaseViews(source)
+    releaseViews(source)
     releaseViews(target)
 end
 

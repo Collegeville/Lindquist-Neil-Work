@@ -1,10 +1,19 @@
 
+export Import
+
 """
 Communication plan for data redistribution from a uniquely-owned to a (possibly) multiply-owned distribution.
 """
 type Import{GID <: Integer, PID <:Integer, LID <: Integer}
     debug::Bool
     importData::ImportExportData{GID, PID, LID}
+    
+    #default constructor appeared to accept a pair of BlockMaps
+    function Import{GID, PID, LID}(debug::Bool,
+            importData::ImportExportData{GID, PID, LID}) where {
+                GID <: Integer, PID <: Integer, LID <: Integer}
+        new(debug, importData)
+    end
 end
 
 ## Constructors ##
@@ -109,15 +118,16 @@ function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
     Import(debug, importData)
 end
 
-function Import{GID, PID, LID}(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{Array{PID}}=Nullable{Array{PID}}; plist...) where {GID <: Integer, PID <: Integer, LID <: Integer}
-    Import{GID, PID, LID}(source, target, remotePIDs, Dict(plist))
+function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{Array{PID}}=Nullable{Array{PID}}(); plist...) where {GID <: Integer, PID <: Integer, LID <: Integer}
+    Import(source, target, remotePIDs, 
+        Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
 end
 
-function Import{GID, PID, LID}(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
-    Import{GID, PID, LID}(source, target, Nullable{Array{PID}}(), plist)
+function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, plist::Dict{Symbol, Any}) where {GID <: Integer, PID <: Integer, LID <: Integer}
+    Import(source, target, Nullable{Array{PID}}(), plist)
 end
 
-function Import{GID, PID, LID}(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{Array{PID}}, plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
+function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{Array{PID}}, plist::Dict{Symbol, Any}) where {GID <: Integer, PID <: Integer, LID <: Integer}
     const debug = get(plist, :debug, false)
 
     if debug
@@ -131,7 +141,7 @@ function Import{GID, PID, LID}(source::BlockMap{GID, PID, LID}, target::BlockMap
     if debug
         print("$(myPid(comm(source))): Import ctor: setupSamePermuteRemote done\n")
     end
-    if isDistributed(source)
+    if distributedGlobal(source)
         setupExport(impor, remoteGIDs, remotePIDs)
     end
     if debug
@@ -167,12 +177,12 @@ function setupSamePermuteRemote(impor::Import{GID, PID, LID}) where {GID <: Inte
     numSameIDs(data, numSameGIDs)
     
     #TODO refacter into a seperatate method, duplicated in the expert constructor
-    permuteToLIDs = permuteToLIDs(data)
-    permuteFromLIDs = permuteFromLIDs(data)
-    remoteLIDs = remoteLIDs(data)
-    for tgtLID = (numSameGIDs+1):numTgtLIDs
+    permuteToLIDs = julia_petra.permuteToLIDs(data)
+    permuteFromLIDs = julia_petra.permuteFromLIDs(data)
+    remoteLIDs = julia_petra.remoteLIDs(data)
+    for tgtLID = (numSameGIDs+1):numTgtGIDs
         const curTargetGID = targetGIDs[tgtLID]
-        const srcLID = lid(source, curTargetLID)
+        const srcLID = lid(source, curTargetGID)
         if srcLID != 0
             push!(permuteToLIDs, tgtLID)
             push!(permuteFromLIDs, srcLID)
@@ -182,7 +192,7 @@ function setupSamePermuteRemote(impor::Import{GID, PID, LID}) where {GID <: Inte
         end
     end
     
-    if length(remoteLID) != 0 && !isDistributed(source)
+    if length(remoteLIDs) != 0 && !distributedGlobal(source)
         isLocallyComplete(data, false)
         
         warn("Target has remote LIDs but source is not distributed globally.  " *

@@ -58,4 +58,13 @@ vect2 = scale(vect, [2.0, 3.0, 4.0])
 @test vect !== vect2
 @test hcat(2*ones(Float64, n), 3*ones(Float64, n), 4*ones(Float64, n))  == vect2.data
 
+
+#test imports/exports
+source = MultiVector{Float64, Int32, Bool, Int16}(
+            curMap, Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
+target = MultiVector{Float64, Int32, Bool, Int16}(curMap, 3, false)
+impor = Import(curMap, curMap)
+doImport(source, target, impor, REPLACE)
+@test reshape(Array{Float64, 1}(collect(1:(3*n))), (n, 3)) == target.data
+
 #TODO create MPIMultiVectorTests that get included with the other MPI tests

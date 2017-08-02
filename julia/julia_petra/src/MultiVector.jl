@@ -128,3 +128,45 @@ Scales each column of a copy of the mulitvector and returns the copy
 function scale(vect::MultiVector{Data, GID, PID, LID}, alpha::Array{Data, 1})::MultiVector{Data, GID, PID, LID} where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
     scale!(copy(vect), alpha)
 end
+
+
+## DistObject interface ##
+
+function checkSizes(source::MultiVector{Data, GID, PID, LID},
+        target::MultiVector{Data, GID, PID, LID})::Bool where {
+            Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
+    (source.numVectors == target.numVectors 
+        && source.globalLength == target.globalLength 
+        && source.localLength == target.localLength)
+end
+
+
+function copyAndPermute(source::MultiVector{Data, GID, PID, LID},
+        target::MultiVector{Data, GID, PID, LID}, numSameIDs::LID,
+        permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1}
+        ) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
+    #TODO ensure this is correct
+    target.data[1:numSameIDs, :] = source.data[1:numSameIDs, :]
+    order = sortperm(permuteFromLIDs)
+    target.data[permuteToLIDs[order], :] = source.data[permuteFromLIDs[order], :]
+end
+
+function packAndPrepare(source::MultiVector{Data, GID, PID, LID},
+        target::MultiVector{Data, GID, PID, LID}, exportLIDs::Array{LID, 1},
+        distor::Distributor{GID, PID, LID})::Array where {
+            Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
+    exports = Array{Array{Data, 1}}(length(exportLIDs))
+    for i = 1:length(exports)
+        exports[i] = source.data[exportLIDs[i], :]
+    end
+    exports
+end
+
+function unpackAndCombine(target::MultiVector{Data, GID, PID, LID},
+        importLIDs::Array{LID, 1}, imports::Array,
+        distor::Distributor{GID, PID, LID},cm::CombineMode) where {
+            Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
+    for i = 1:length(importLIDs)
+        target.data[importLIDs[i], :] = imports[i]
+    end
+end
