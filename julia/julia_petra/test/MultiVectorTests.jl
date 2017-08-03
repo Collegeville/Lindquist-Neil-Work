@@ -67,4 +67,29 @@ impor = Import(curMap, curMap)
 doImport(source, target, impor, REPLACE)
 @test reshape(Array{Float64, 1}(collect(1:(3*n))), (n, 3)) == target.data
 
+
+source = MultiVector{Float64, Int32, Bool, Int16}(
+            curMap, Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
+target = MultiVector{Float64, Int32, Bool, Int16}(curMap, 3, false)
+expor = Export(curMap, curMap)
+doExport(source, target, expor, REPLACE)
+@test reshape(Array{Float64, 1}(collect(1:(3*n))), (n, 3)) == target.data
+
+source = MultiVector{Float64, Int32, Bool, Int16}(
+            curMap, Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
+target = MultiVector{Float64, Int32, Bool, Int16}(curMap, 3, false)
+impor = Import(curMap, curMap)
+doExport(source, target, impor, REPLACE)
+@test reshape(Array{Float64, 1}(collect(1:(3*n))), (n, 3)) == target.data
+
+
+source = MultiVector{Float64, Int32, Bool, Int16}(
+            curMap, Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
+target = MultiVector{Float64, Int32, Bool, Int16}(curMap, 3, false)
+expor = Export(curMap, curMap)
+doImport(source, target, expor, REPLACE)
+@test reshape(Array{Float64, 1}(collect(1:(3*n))), (n, 3)) == target.data
+
+
+
 #TODO create MPIMultiVectorTests that get included with the other MPI tests

@@ -59,7 +59,7 @@ function doExport(source::SrcDistObject{GID, PID, LID}, target::DistObject{GID, 
     
     doTransfer(source, target, cm, numSameIDs(exporter), permuteToLIDs(exporter),
         permuteFromLIDs(exporter), remoteLIDs(exporter), exportLIDs(exporter),
-        distributor(exorter), false)
+        distributor(exporter), false)
 end
 
 """
@@ -85,9 +85,9 @@ function doExport(source::SrcDistObject{GID, PID, LID}, target::DistObject{GID, 
             GID <:Integer, PID <: Integer, LID <: Integer}
     #TODO add checks for map equality when debugin
     
-    doTransfer(source, target, cm, numSameIDs(exporter), permuteToLIDs(exporter),
-        permuteFromLIDs(exporter), remoteLIDs(exporter), exportLIDs(exporter),
-        distributor(exporter), true)
+    doTransfer(source, target, cm, numSameIDs(importer), permuteToLIDs(importer),
+        permuteFromLIDs(importer), remoteLIDs(importer), exportLIDs(importer),
+        distributor(importer), true)
 end
 
 
