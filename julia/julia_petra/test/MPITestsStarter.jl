@@ -1,6 +1,6 @@
 
 try
-    test_path = "runMPITests.jl"
+    test_path = test_path = abspath(Pkg.dir(), "julia_petra", "test", "runMPITests.jl")
     color = Base.have_color? "--color=yes" : "--color=no"
     codecov = (Bool(Base.JLOptions().code_coverage)? ["--code-coverage=user"] : ["--code-coverage=none"])
     compilecache = "--compilecache=" * (Bool(Base.JLOptions().use_compilecache) ? "yes" : "no")
