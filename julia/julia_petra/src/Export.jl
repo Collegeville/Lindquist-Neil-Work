@@ -60,6 +60,7 @@ function setupSamePermuteExport(expor::Export{GID, PID, LID})::Array{GID} where 
     sourceGIDs = myGlobalElements(source)
     targetGIDs = myGlobalElements(target)
     
+    
     numSrcGIDs = length(sourceGIDs)
     numTgtGIDs = length(targetGIDs)
     numGIDs = min(numSrcGIDs, numTgtGIDs)
@@ -97,10 +98,7 @@ function setupSamePermuteExport(expor::Export{GID, PID, LID})::Array{GID} where 
     if distributedGlobal(source)
         #resize!(julia_petra.exportPIDs(data), length(exportGIDs))
         
-        print("$(myPid(comm(target))): setupSamePermuteExport: exportGIDs=$exportGIDs\n")
-        #TODO figure this out: Gives the PID doing the exporting (this one), but need the PID that should be recieving
         (exportPIDs, exportLIDs) = remoteIDList(target, exportGIDs)
-        print("$(myPid(comm(target))): setupSamePermuteExport: exportPIDs=$exportPIDs\n")
         julia_petra.exportPIDs(data, exportPIDs)
         missingGIDs = 0
         for i = 1:length(exportPIDs)
@@ -154,8 +152,7 @@ function setupRemote(expor::Export{GID, PID, LID}, exportGIDs::Array{GID, 1}) wh
     end
     
     exportPIDs = julia_petra.exportPIDs(data)
-    print("$(myPid(comm(target))): setupRemote: exportPIDs=$exportPIDs\n")
-    
+
     order = sortperm(exportPIDs)
     permute!(exportPIDs, order)
     permute!(exportLIDs(data), order)
@@ -165,14 +162,12 @@ function setupRemote(expor::Export{GID, PID, LID}, exportGIDs::Array{GID, 1}) wh
         print("$(myPid(comm(target))): setupRemote: Calling createFromSends\n")
     end
     
-    print("$(myPid(comm(target))): setupRemote: exportPIDs=$exportPIDs\n")
     numRemoteIDs = createFromSends(distributor(data), exportPIDs)
     
     if expor.debug
         print("$(myPid(comm(target))): setupRemote: Calling doPostsAndWaits\n")
     end
     
-    print("$(myPid(comm(target))): setupRemote: exportGIDs=$exportGIDs\n")
     remoteGIDs = resolve(distributor(data), exportGIDs)
     
     remoteLIDs = julia_petra.remoteLIDs(data)

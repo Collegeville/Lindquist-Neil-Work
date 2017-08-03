@@ -142,7 +142,6 @@ function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::Bloc
             localEntries[i] = lidVal
         end
     elseif linearMap(map)
-        print("$(myPid(comm(map))): getDirectoryEntries: linear\n")
         minAllGIDVal = minAllGID(map)
         maxAllGIDVal = maxAllGID(map)
         
@@ -150,14 +149,10 @@ function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::Bloc
         
         n_over_p = numGlobalElements(map)/numProcVal
         
-        allMinGIDs_list = directory.allMinGIDs
+        allMinGIDs_list = copy(directory.allMinGIDs)
         order = sortperm(allMinGIDs_list)
         permute!(allMinGIDs_list, order)
         
-        print("$(myPid(comm(map))): getDirectoryEntries: allMinGIDs_list=$allMinGIDs_list\n")
-        print("$(myPid(comm(map))): getDirectoryEntries: order=$order\n")
-        
-        print("$(myPid(comm(map))): getDirectoryEntries: globalEntries=$globalEntries\n")
         for i = 1:numEntries
             lid  = 0
             proc = 0

@@ -77,8 +77,6 @@ function createSendStructure(dist::MPIDistributor{GID, PID}, pid::PID, nProcs::P
     noSendBuff = true
     numDeadIndices = 0  #for GIDs not owned by any processors
     
-    print("$pid: createSendStructure: exportPIDs=$exportPIDs");
-    
     for i = 1:numExports
         if noSendBuff && i > 1 && exportPIDs[i] < exportPIDs[i-1]
             noSendBuff = false
@@ -91,10 +89,7 @@ function createSendStructure(dist::MPIDistributor{GID, PID}, pid::PID, nProcs::P
         end
     end
     
-    print("$pid: createSendStructure: starts=$starts");
-    
     dist.selfMsg = starts[pid] != 0
-    
     dist.numSends = 0
     
     if noSendBuff #grouped by processor, no send buffer or indicies_to needed
@@ -350,7 +345,6 @@ function createFromSends(dist::MPIDistributor{GID, PID, LID}, exportPIDs::Array{
     nProcs = numProc(dist.comm)
     createSendStructure(dist, pid, nProcs, exportPIDs)
     computeRecvs(dist, pid, nProcs)
-    print("$pid: createFromSends: numRecvs=$(dist.numRecvs)\n")
     if dist.numRecvs > 0
         if dist.request == []
             dist.request = Array{MPI.request}(numRecvs)
