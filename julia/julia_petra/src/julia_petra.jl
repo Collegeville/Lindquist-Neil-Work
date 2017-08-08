@@ -4,7 +4,6 @@ module julia_petra
 # Internal Utilities
 include("Enums.jl")
 include("Error.jl")
-include("InheritanceUtil.jl")
 
 
 # Communication interface
