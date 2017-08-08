@@ -1,4 +1,3 @@
-
 export Comm
 export barrier, broadcastAll, gatherAll, sumAll, maxAll, minAll, scanSum
 export myPid, numProc, createDistributor
@@ -50,6 +49,9 @@ createDistributor(comm::CommImpl)::Distributor - Create a distributor object
 """
 abstract type Comm{GID <: Integer, PID <:Integer, LID <: Integer}
 end
+
+#TODO document implemented methods
+#TODO document required methods
 
 function Base.show(io::IO, comm::Comm)
     print(io, split(String(Symbol(typeof(comm))), ".")[2]," with PID ", myPid(comm),

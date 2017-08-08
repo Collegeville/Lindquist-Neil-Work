@@ -4,10 +4,12 @@ export Export
 """
 Communication plan for data redistribution from a (possibly) multipl-owned to a uniquely owned distribution
 """
-type Export{GID <: Integer, PID <:Integer, LID <: Integer}
+struct Export{GID <: Integer, PID <:Integer, LID <: Integer}
     debug::Bool
     exportData::ImportExportData{GID, PID, LID}
 end
+
+#TODO document
 
 ## Constructors ##
 

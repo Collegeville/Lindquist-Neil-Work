@@ -1,4 +1,3 @@
-
 export MultiVector
 export localLength, globalLength, numVectors, map
 export scale!, scale
@@ -14,8 +13,6 @@ type MultiVector{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
     
     map::BlockMap{GID, PID, LID}
 end
-
-#TODO add DistObject required methods
 
 ## Constructors ##
 
@@ -77,6 +74,7 @@ end
 
 """
     numVectors(::MultiVector{Data, GID, PID, LID})::LID
+
 Returns the number of vectors in this multivector
 """
 function numVectors(vect::MultiVector{Data, GID, PID, LID})::LID where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
@@ -85,6 +83,7 @@ end
 
 """
     numVectors(::MultiVector{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
+
 Returns the BlockMap used by this multivector
 """
 function map(vect::MultiVector{Data, GID, PID, LID})::BlockMap{GID, PID, LID} where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
@@ -95,6 +94,7 @@ end
 # have to use Base.scale! to avoid requiring module qualification everywhere
 """
     scale!(::MultiVector{Data, GID, PID, LID}, ::Data})::MultiVector{Data, GID, PID, LID}
+
 Scales the mulitvector in place and returns it
 """
 function Base.scale!(vect::MultiVector{Data, GID, PID, LID}, alpha::Data)::MultiVector{Data, GID, PID, LID} where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
@@ -104,6 +104,7 @@ end
 
 """
     scale!(::MultiVector{Data, GID, PID, LID}, ::Data)::MultiVector{Data, GID, PID, LID}
+
 Scales a copy of the mulitvector and returns the copy
 """
 function scale(vect::MultiVector{Data, GID, PID, LID}, alpha::Data)::MultiVector{Data, GID, PID, LID} where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
@@ -112,6 +113,7 @@ end
 
 """
     scale!(::MultiVector{Data, GID, PID, LID}, ::Array{Data, 1})::MultiVector{Data, GID, PID, LID}
+
 Scales each column of the mulitvector in place and returns it
 """
 function Base.scale!(vect::MultiVector{Data, GID, PID, LID}, alpha::Array{Data, 1})::MultiVector{Data, GID, PID, LID} where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
@@ -123,6 +125,7 @@ end
 
 """
     scale(::MultiVector{Data, GID, PID, LID}, ::Array{Data, 1})::MultiVector{Data, GID, PID, LID}
+
 Scales each column of a copy of the mulitvector and returns the copy
 """
 function scale(vect::MultiVector{Data, GID, PID, LID}, alpha::Array{Data, 1})::MultiVector{Data, GID, PID, LID} where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
@@ -145,10 +148,9 @@ function copyAndPermute(source::MultiVector{Data, GID, PID, LID},
         target::MultiVector{Data, GID, PID, LID}, numSameIDs::LID,
         permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1}
         ) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
-    #TODO ensure this is correct
     target.data[1:numSameIDs, :] = source.data[1:numSameIDs, :]
-    order = sortperm(permuteFromLIDs)
-    target.data[permuteToLIDs[order], :] = source.data[permuteFromLIDs[order], :]
+    #don't need to sort permute[To/From]LIDs, since the orders match
+    target.data[permuteToLIDs, :] = source.data[permuteFromLIDs, :]
 end
 
 function packAndPrepare(source::MultiVector{Data, GID, PID, LID},

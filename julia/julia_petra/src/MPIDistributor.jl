@@ -8,7 +8,7 @@ export MPIDistributor
 Creates an Distributor to work with MPIComm.  Created by
 createDistributor(::MPIComm{GID, PID, LID})
 """
-type MPIDistributor{GID <: Integer, PID <: Integer, LID <: Integer} <: Distributor{GID, PID, LID}
+mutable struct MPIDistributor{GID <: Integer, PID <: Integer, LID <: Integer} <: Distributor{GID, PID, LID}
     comm::MPIComm
     
     lengths_to::Array{Integer}

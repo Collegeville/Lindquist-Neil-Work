@@ -10,7 +10,6 @@ noUtil = in("--util", ARGS) #don't run tests on Misc Utils
 
 
 if !noUtil
-    include("InheritanceUtilTests.jl")
 end
 
 if !noComm

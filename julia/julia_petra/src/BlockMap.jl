@@ -1,4 +1,3 @@
-
 export BlockMap
 export remoteIDList, lid, gid, findLocalElementID
 export minAllGID, maxAllGID, minMyGID, maxMyGID, minLID, maxLID
@@ -6,6 +5,7 @@ export numGlobalElements, myGlobalElements
 export uniqueGIDs, globalIndicesType, sameBlockMapDataAs, sameAs
 export linearMap, myGlobalElementIDs, comm
 export myGID, myLID, distributedGlobal, numMyElements
+
 
 # methods and docs based straight off Epetra_BlockMap to match Comm
 
@@ -20,7 +20,7 @@ export myGID, myLID, distributedGlobal, numMyElements
 """
 A type for partitioning block element vectors and matrices
 """
-type BlockMap{GID <: Integer, PID <:Integer, LID <: Integer}
+struct BlockMap{GID <: Integer, PID <:Integer, LID <: Integer}
     data::BlockMapData{GID, PID, LID}
     
     function BlockMap{GID, PID, LID}(data::BlockMapData) where {GID <: Integer, PID <:Integer, LID <: Integer}
@@ -30,7 +30,9 @@ end
 
 
 """
-constructor for Epetra-defined uniform linear distribution of elements
+    BlockMap(numGlobalElements, comm)
+
+Constructor for petra-defined uniform linear distribution of elements
 """
 function BlockMap(numGlobalElements::Integer, comm::Comm{GID, PID, LID}) where GID <: Integer where PID <: Integer where LID <: Integer
     BlockMap(GID(numGlobalElements), comm)
@@ -72,7 +74,9 @@ function BlockMap(numGlobalElements::GID, comm::Comm{GID, PID, LID}) where GID <
 end
 
 """
-constructor for user-defined linear distribution of elements
+    BlockMap(numGlobalElements, numMyElements, comm)
+
+Constructor for user-defined linear distribution of elements
 """
 function BlockMap(numGlobalElements::Integer, numMyElements::Integer, comm::Comm{GID, PID, LID}) where GID <: Integer where PID <: Integer where LID <: Integer
     BlockMap(GID(numGlobalElements), LID(numMyElements), comm)
@@ -124,7 +128,9 @@ end
 
 
 """
-constructor for user-defined arbitrary distribution of elements
+    BlockMap(numGlobalElements, numMyElements, myGlobalElements, comm)
+
+Constructor for user-defined arbitrary distribution of elements
 """
 function BlockMap(numGlobalElements::Integer, numMyElements::Integer,
         myGlobalElements::Array{<:Integer}, comm::Comm{GID, PID,LID}) where GID <: Integer where PID <: Integer where LID <: Integer
@@ -200,8 +206,9 @@ function BlockMap(numGlobalElements::GID, numMyElements::LID,
 end
 
 """
-constructor for user-defined arbitrary distribution of elements
-will all information on globals provided by the user
+    BlockMap(numGlobalElements, numMyElements, myGlobalElements, isDistributedGlobal, minAllGID, maxAllGID, comm)
+
+Constructor for user-defined arbitrary distribution of elements with all information on globals provided by the user
 """
 function BlockMap(numGlobalElements::Integer, numMyElements::Integer,
         myGlobalElements::Array{GID}, userIsDistributedGlobal::Bool,
@@ -273,13 +280,6 @@ function BlockMap(numGlobalElements::GID, numMyElements::LID,
     end
     EndOfConstructorOps(map)
     map
-end
-
-"""
-Copy constructor
-"""
-function BlockMap(map::BlockMap)
-    BlockMap(map.data)
 end
 
 
@@ -356,22 +356,28 @@ end
 ##### external methods #####
 
 """
+    myGID(map::BlockMap, gidVal::Integer)
+
 Return true if the GID passed in belongs to the calling processor in this
 map, otherwise returns false.
 """
-function myGID(map::BlockMap{GID, PID, LID}, gidVal::Integer) where GID <: Integer where PID <: Integer where LID <: Integer
+function myGID(map::BlockMap, gidVal::Integer)
     lid(map, gidVal) != 0
 end
 
 """
+    myLID(map::BlockMap, lidVal::Integer)
+
 Return true if the LID passed in belongs to the calling processor in this
 map, otherwise returns false.
 """
-function myLID(map::BlockMap{GID, PID, LID}, lidVal::Integer) where GID <: Integer where PID <: Integer where LID <: Integer
+function myLID(map::BlockMap, lidVal::Integer)
     gid(map, lidVal) != 0
 end
 
 """
+    distributedGlobal(map::BlockMap)
+
 Return true if map is defined across more than one processor
 """
 function distributedGlobal(map::BlockMap)
@@ -379,6 +385,8 @@ function distributedGlobal(map::BlockMap)
 end
 
 """
+    numMyElements(map::BlockMap{GID, PID, LID})::LID
+
 Return the number of elements across the calling processor
 """
 function numMyElements(map::BlockMap{GID, PID, LID})::LID where GID <: Integer where PID <: Integer where LID <: Integer
@@ -386,6 +394,8 @@ function numMyElements(map::BlockMap{GID, PID, LID})::LID where GID <: Integer w
 end
 
 """
+    minMyGID(map::BlockMap{GID, PID, LID})::GID
+
 Return the minimum global ID owned by this processor
 """
 function minMyGID(map::BlockMap{GID, PID, LID})::GID where GID <: Integer where PID <: Integer where LID <: Integer
@@ -393,6 +403,8 @@ function minMyGID(map::BlockMap{GID, PID, LID})::GID where GID <: Integer where 
 end
     
 """
+    maxMyGID(map::BlockMap{GID, PID, LID})::GID
+
 Return the maximum global ID owned by this processor
 """
 function maxMyGID(map::BlockMap{GID, PID, LID})::GID where GID <: Integer where PID <: Integer where LID <: Integer
@@ -403,10 +415,12 @@ end
 ##local/global ID accessor methods##
 
 """
+    remoteIDList(map::BlockMap{GID, PID, LID}, gidList::Array{<: Integer}::Tuple{Array{PID}, Array{LID}}
+
 Return the processor ID and local index value for a given list of global indices.
 The returned value is a tuple containing
-    1 - an Array of processors owning the global ID's in question
-    2 - an Array of local IDs of the global on the owning processor
+1. an Array of processors owning the global ID's in question
+2. an Array of local IDs of the global on the owning processor
 """
 function remoteIDList(map::BlockMap{GID, PID, LID}, gidList::Array{<:Integer}
         )::Tuple{Array{PID}, Array{LID}} where GID <: Integer where PID <: Integer where LID <: Integer
@@ -424,6 +438,8 @@ function remoteIDList(map::BlockMap{GID, PID, LID}, gidList::Array{GID}
 end
 
 """
+    lid(map::BlockMap{GID, PID, LID}, gid::Integer)::LID
+
 Return local ID of global ID, or 0 if not found on this processor
 """
 function lid(map::BlockMap{GID, PID, LID}, gid::Integer)::LID where GID <: Integer where PID <: Integer where LID <: Integer
@@ -442,6 +458,8 @@ function lid(map::BlockMap{GID, PID, LID}, gid::Integer)::LID where GID <: Integ
 end
 
 """
+    gid(map::BlockMap{GID, PID, LID}, lid::Integer)::GID
+
 Return global ID of local ID, or 0 if not found on this processor
 """
 function gid(map::BlockMap{GID, PID, LID}, lid::Integer)::GID where GID <: Integer where PID <: Integer where LID <: Integer 
@@ -458,6 +476,8 @@ end
 
 
 """
+    minAllGID(map::BlockMap{GID, PID, LID})::GID
+
 Return the minimum global ID across the entire map
 """
 function minAllGID(map::BlockMap{GID})::GID where GID <: Integer
@@ -465,6 +485,8 @@ function minAllGID(map::BlockMap{GID})::GID where GID <: Integer
 end
 
 """
+    maxAllGID(map::BlockMap{GID, PID, LID})::GID
+
 Return the maximum global ID across the entire map
 """
 function maxAllGID(map::BlockMap{GID})::GID where GID <: Integer
@@ -472,6 +494,8 @@ function maxAllGID(map::BlockMap{GID})::GID where GID <: Integer
 end
 
 """
+    minLID(map::BlockMap{GID, PID, LID})::LID
+
 Return the mimimum local index value on the calling processor
 """
 function minLID(map::BlockMap{GID, PID, LID})::LID where GID <: Integer where PID <: Integer where LID <: Integer
@@ -479,6 +503,8 @@ function minLID(map::BlockMap{GID, PID, LID})::LID where GID <: Integer where PI
 end
 
 """
+    maxLID(map::BlockMap{GID, PID, LID})::LID
+
 Return the maximum local index value on the calling processor
 """
 function maxLID(map::BlockMap{GID, PID, LID})::LID where GID <: Integer where PID <: Integer where LID <: Integer
@@ -488,6 +514,8 @@ end
 ##size/dimension accessor functions##
 
 """
+    numGlobalElements(map::BlockMap{GID, PID, LID})::GID
+
 Return the number of elements across all processors
 """
 function numGlobalElements(map::BlockMap{GID})::GID where GID <: Integer
@@ -495,6 +523,8 @@ function numGlobalElements(map::BlockMap{GID})::GID where GID <: Integer
 end
 
 """
+    myGlobalElements(map::BlockMap{GID, PID, LID})::Array{GID}
+
 Return a list of global elements on this processor
 """
 function myGlobalElements(map::BlockMap{GID})::Array{GID} where GID <: Integer
@@ -515,6 +545,8 @@ end
 ##Miscellaneous boolean tests##
 
 """
+    uniqueGIDs(map::BlockMap)::Bool
+
 Return true if each map GID exists on at most 1 processor
 """
 function uniqueGIDs(map::BlockMap)::Bool
@@ -523,14 +555,17 @@ end
 
 
 """
-	globalIndicesType(map::BlockMap{GID})::Type{GID}
+    globalIndicesType(map::BlockMap{GID, PID, LID})::Type{GID}
+
 Return the type used for global indices in the map
 """
 function globalIndicesType(map::BlockMap{GID})::Type{GID} where GID <: Integer
-	GID
+    GID
 end
 
 """
+    sameBlockMapDataAs(this::BlockMap, other::BlockMap)::Bool
+
 Return true if the maps have the same data
 """
 function sameBlockMapDataAs(this::BlockMap, other::BlockMap)::Bool
@@ -538,8 +573,15 @@ function sameBlockMapDataAs(this::BlockMap, other::BlockMap)::Bool
 end
 
 """
+    sameAs(this::BlockMap, other::BlockMap)::Bool
+
 Return true if this and other are identical maps
 """
+function sameAs(this::BlockMap, other::BlockMap)
+    # behavior by specification
+    false
+end
+
 function sameAs(this::BlockMap{GID, PID, LID}, other::BlockMap{GID, PID, LID})::Bool where GID <: Integer where PID <: Integer where LID <: Integer
     tData = this.data
     oData = other.data
@@ -578,6 +620,8 @@ end
 
 
 """
+    linearMap(map::BlockMap)::Bool
+
 Return true if the global ID space is contiguously divided (but
 not necessarily uniformly) across all processors
 """
@@ -589,6 +633,8 @@ end
 ##Array accessor functions##
 
 """
+    myGlobalElementsIDs map::BlockMap{GID, PID, LID})::Array{GID}
+
 Return list of global IDs assigned to the calling processor
 """
 function myGlobalElementIDs(map::BlockMap{GID})::Array{GID} where GID <: Integer
@@ -627,6 +673,8 @@ function determineIsOneToOne(map::BlockMap)::Bool
 end
                                                     
 """
+    comm(map::BlockMap{GID, PID, LID})::Comm{GID, PID, LID}
+
 Return the Comm for the map                                                    
 """
 function comm(map::BlockMap{GID, PID, LID})::Comm{GID, PID, LID} where GID <: Integer where PID <: Integer where LID <: Integer

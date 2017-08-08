@@ -4,7 +4,6 @@ module julia_petra
 # Internal Utilities
 include("Enums.jl")
 include("Error.jl")
-include("InheritanceUtil.jl")
 
 
 # Communication interface
@@ -36,8 +35,6 @@ include("ImportExportData.jl")
 include("Import.jl")
 include("Export.jl")
 
-include("Operator.jl")
-
 include("SrcDistObject.jl")
 include("DistObject.jl")
 
@@ -49,5 +46,7 @@ include("MultiVector.jl")
 # Sparse Data types
 include("RowMatrix.jl")
 include("CRSMatrix.jl")
+
+include("Operator.jl")
 
 end # module

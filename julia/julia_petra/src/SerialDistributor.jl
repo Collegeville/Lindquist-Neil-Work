@@ -1,6 +1,10 @@
-
 export SerialDistributor
 
+"""
+    SerialDistributor()
+
+Creates a distributor to work with SerialComm
+"""
 type SerialDistributor{GID <: Integer, PID <:Integer, LID <: Integer} <: Distributor{GID, PID, LID}
     post::Nullable{Array}
     reversePost::Nullable{Array}

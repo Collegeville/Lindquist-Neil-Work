@@ -1,3 +1,6 @@
+Handcopy shared code
+	- Awful solution, don't use if at all possible
+
 use union type (ala RowMatrix)
 	  const Operator = Union{RowMatrix, OperatorBase}
 	- Subtypes have to be aware of OperatorBase versus Operator
