@@ -27,3 +27,26 @@ Checks whether the given TransposeMode is transposed
 @inline function isTransposed(mode::TransposeMode)::Bool
     mode != TransposeMode.NO_TRANS
 end
+
+
+
+
+"""
+Allocation profile for matrix/graph entries
+"""
+@enum ProfileType STATIC_PROFILE DYNAMIC_PROFILE
+
+
+"""
+Can be used to differentiate global and local indices
+"""
+@enum IndexType LOCAL GLOBAL
+
+
+"""
+Status of the graph's or matrix's storage, when not in
+a fill-complete state.
+"""
+@enum StorageStatus STORAGE_2D STORAGE_1D_UNPACKED STORAGE_1D_PACKED
+
+
