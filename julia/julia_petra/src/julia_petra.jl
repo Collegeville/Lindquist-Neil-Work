@@ -45,7 +45,8 @@ include("MultiVector.jl")
 
 # Sparse Data types
 include("RowMatrix.jl")
-include("CRSMatrix.jl")
+include("CSRGraph.jl")
+include("CSRMatrix.jl")
 
 include("Operator.jl")
 

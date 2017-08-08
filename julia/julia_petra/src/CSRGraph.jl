@@ -9,7 +9,7 @@ k_numAllocPerRow_ and numAllocForAllRows_ are not copied to julia
 =#
 #TODO remember to do allocations in constructor, not lazily
 
-mutable struct CRSGraph{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: DistObject{Data, GID, PID, LID}
+mutable struct CSRGraph{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: DistObject{Data, GID, PID, LID}
     rowMap::BlockMap{GID, PID, LID}
     colMap::BlockMap{GID, PID, LID}
     rangeMap::BlockMap{GID, PID, LID}
@@ -75,5 +75,9 @@ mutable struct CRSGraph{Data <: Number, GID <: Integer, PID <: Integer, LID <: I
 end
 
 
-#TODO implement SrcObject methods
+function map(graph::CGSGraph)
+    graph.rowMap
+end
+
 #TODO implement DistObject methods
+#TODO implement methods similar to RowMatrix
