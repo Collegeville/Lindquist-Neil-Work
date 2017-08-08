@@ -1,4 +1,4 @@
-
+export BasicDirectory
 
 """
     BasicDirectory(map::BlockMap)
@@ -39,6 +39,9 @@ type BasicDirectory{GID <: Integer, PID <:Integer, LID <: Integer} <: Directory{
     end
 end
 
+"""
+internal method to assist constructor
+"""
 function generateContent(dir::BasicDirectory{GID, PID, LID}, map::BlockMap{GID, PID, LID}) where GID <: Integer where PID <: Integer where LID <: Integer
     minAllGID = minAllGID(map)
     maxAllGID = maxAllGID(map)
@@ -117,10 +120,6 @@ function generateContent(dir::BasicDirectory{GID, PID, LID}, map::BlockMap{GID, 
 end
 
 
-#    - Returns processor and local id infor for non-local map entries.  Returns a tuple
-#        containing
-#            1 - an Array of processors owning the global ID's in question
-#            2 - an Array of local IDs of the global on the owning processor
 function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::BlockMap{GID, PID, LID}, globalEntries::Array{GID},
         high_rank_sharing_procs::Bool)::Tuple{Array{PID}, Array{LID}} where GID <: Integer where PID <: Integer where LID <: Integer
     numEntries = length(globalEntries)

@@ -5,6 +5,8 @@ export MPIComm
 
 """
     MPIComm()
+    MPIComm(comm::MPI.Comm)
+
 An implementation of Comm using MPI
 The no argument constructor uses MPI.COMM_WORLD
 """

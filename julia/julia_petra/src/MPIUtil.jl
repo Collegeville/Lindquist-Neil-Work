@@ -1,6 +1,8 @@
 #Contains MPI related things that the library is missing
 import MPI
 
+#TODO document
+
 function MPI_Rsend{T}(buf::MPI.MPIBuffertype{T}, count::Integer,
                 dest::Integer, tag::Integer, comm::MPI.Comm)
     ccall(MPI.MPI_RSEND, Void,

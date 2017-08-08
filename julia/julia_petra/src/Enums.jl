@@ -1,4 +1,3 @@
-
 export CombineMode, ADD, INSERT, REPLACE, ABSMAX, ZERO
 export TransposeMode, NO_TRANS, TRANS, CONJ_TRANS
 
@@ -22,6 +21,8 @@ Tells petra whether to use the transpose or conjugate transpose of the matrix
 @enum TransposeMode NO_TRANS=1 TRANS=2 CONJ_TRANS=3
 
 """
+    isTransposed(mode::TransposeMode)::Bool
+
 Checks whether the given TransposeMode is transposed
 """
 @inline function isTransposed(mode::TransposeMode)::Bool

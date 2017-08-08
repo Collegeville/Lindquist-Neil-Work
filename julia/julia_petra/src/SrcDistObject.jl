@@ -22,3 +22,13 @@ Get's the Comm instance being used by this object
 function comm(obj::SrcDistObject)
     comm(map(obj))
 end
+
+
+#### required method documentation stubs ####
+
+"""
+    map(obj::SrcDistObject{GID, PID, LID})::BlockMap{GID, PID, LID}
+
+Gets the `BlockMap` associated with the given SrcDistObject
+"""
+function map end

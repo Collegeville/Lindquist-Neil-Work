@@ -2,7 +2,9 @@
 
 export @createFunctionGenerator
 
+#TODO figure out if this can be removed since Operator changed design
 
+#doc is needed to escape $
 doc"""
     @createFunctionGenerator name functions
 

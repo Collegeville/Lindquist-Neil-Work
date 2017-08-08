@@ -36,6 +36,7 @@ end
 
 """
     doImport(target::Impl{GID, PID, LID}, source::SrcDistObject{GID, PID, LID}, importer::Import{GID, PID, LID}, cm::CombineMode)
+
 Import data into this object using an Import object ("forward mode")
 """
 function doImport(source::SrcDistObject{GID, PID, LID}, 
@@ -50,6 +51,7 @@ end
 
 """
     doExport(target::Impl{GID, PID, LID}, source::SrcDistObject{GID, PID, LID}, exporter::Export{GID, PID, LID}, cm::CombineMode)
+
 Export data into this object using an Export object ("forward mode")
 """
 function doExport(source::SrcDistObject{GID, PID, LID}, target::DistObject{GID, PID, LID},
@@ -64,6 +66,7 @@ end
 
 """
     doImport(source::SrcDistObject{GID, PID, LID}, target::DistObject{GID, PID, LID}, exporter::Export{GID, PID, LID}, cm::CombineMode)
+
 Import data into this object using an Export object ("reverse mode")
 """
 function doImport(source::SrcDistObject{GID, PID, LID}, target::DistObject{GID, PID, LID},
@@ -78,6 +81,7 @@ end
 
 """
     doExport(source::SrcDistObject{GID, PID, LID}, target::DistObject{GID, PID, LID}, importer::Import{GID, PID, LID}, cm::CombineMode)
+
 Export data into this object using an Import object ("reverse mode")
 """
 function doExport(source::SrcDistObject{GID, PID, LID}, target::DistObject{GID, PID, LID},
@@ -106,6 +110,7 @@ end
 
 """
     doTransfer(src::SrcDistObject{GID, PID, LID}, target::Impl{GID, PID, LID}, cm::CombineMode, numSameIDs::LID, permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1}, remoteLIDs::Array{LID, 1}, exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID}, reversed::Bool)
+
 Perform actual redistribution of data across memory images
 """
 function doTransfer(source::SrcDistObject{GID, PID, LID},
@@ -174,7 +179,7 @@ end
 """
     createViews(obj::SrcDistObject)
 
-doTransfer calls this on the source object, by default it does nothing, but the source object can use this as a hint to fetch data from a compute buffer on an off-CPU decice (such as GPU) into host memory
+doTransfer calls this on the source object.  By default it does nothing, but the source object can use this as a hint to fetch data from a compute buffer on an off-CPU decice (such as GPU) into host memory
 """
 function createViews(obj::SrcDistObject)
 end
@@ -182,7 +187,7 @@ end
 """
     createViewsNonConst(obj::SrcDistObject, readAlso::Bool)
 
-doTransfer calls this on the target object, by default it does nothing, but the target object can use this as a hint to fetch data from a compute buffer on an off-CPU decice (such as GPU) into host memory
+doTransfer calls this on the target object.  By default it does nothing, but the target object can use this as a hint to fetch data from a compute buffer on an off-CPU decice (such as GPU) into host memory
 readAlso indicates whether the doTransfer might read from the original buffer
 """
 function createViewsNonConst(obj::SrcDistObject, readAlso::Bool)
@@ -192,7 +197,7 @@ end
 """
     releaseViews(obj::SrcDistObject)
 
-doTransfer calls this on the target and source as it completes to allow any releasing of buffers or views.  By default it does nothinnnnnnnnnnnnnnng
+doTransfer calls this on the target and source as it completes to allow any releasing of buffers or views.  By default it does nothing
 """
 function releaseViews(obj::SrcDistObject)
 end

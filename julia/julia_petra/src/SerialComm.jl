@@ -1,7 +1,13 @@
 
 export SerialComm
 
-type SerialComm{GID <: Integer, PID <:Integer, LID <: Integer} <: Comm{GID, PID, LID}
+"""
+    SerialComm()
+
+Gets an serial communication instance.
+Serial communication results in mostly no-ops for the communication operations
+"""
+struct SerialComm{GID <: Integer, PID <:Integer, LID <: Integer} <: Comm{GID, PID, LID}
 end
 
 

@@ -4,7 +4,7 @@ export Import
 """
 Communication plan for data redistribution from a uniquely-owned to a (possibly) multiply-owned distribution.
 """
-type Import{GID <: Integer, PID <:Integer, LID <: Integer}
+struct Import{GID <: Integer, PID <:Integer, LID <: Integer}
     debug::Bool
     importData::ImportExportData{GID, PID, LID}
     

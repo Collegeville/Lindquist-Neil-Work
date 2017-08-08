@@ -1,4 +1,3 @@
-
 export Directory
 
 # methods and docs based straight off Epetra_Directory to match Comm
