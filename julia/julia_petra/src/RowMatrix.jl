@@ -84,9 +84,10 @@ rightScale!(matrix::Impl{Data, GID, PID, LID}, X::Array{Data})
 Additionally, the following method must be implemented to fufil the operator interface:
 
 apply!(matrix::Impl{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, Y::MultiVector{Data, GID, PID, LID}, mode::TransposeMode, alpha::Data, beta::Data)
-    Computes ``Y = α\cdot A^{mode}\cdot X + β\cdot Y``, with the following exceptions
-        If beta == 0, apply MUST overwrite Y, so that any values in Y (including NaNs) are ignored.
-        If alpha == 0, apply MAY short-circuit the operator, so that any values in X (including NaNs) are ignored
+
+domainMap(operator::RowMatrix{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
+
+function rangeMap(operator::RowMatrix{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
 
 Finally, the required methods from SrcDistObject and possibly DistObject must also be implemented
 """
@@ -108,16 +109,6 @@ function rightScale!(matrix::RowMatrix{Data, GID, PID, LID}, X::MultiVector{Data
         throw(InvalidArgumentError("Can only scale CRS matrix with column vector, not multi vector"))
     end
     rightScale!(matrix, X.data)
-end
-
-function domainMap(operator::RowMatrix{Data, GID, PID, LID})::BlockMap{GID, PID, LID} where {
-        Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
-    colMap(operator)
-end
-
-function rangeMap(operator::RowMatrix{Data, GID, PID, LID})::BlockMap{GID, PID, LID} where {
-        Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
-    rangeMap(operator)
 end
 
 
