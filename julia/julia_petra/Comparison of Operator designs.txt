@@ -1,0 +1,35 @@
+use union type (ala RowMatrix)
+	  const Operator = Union{RowMatrix, OperatorBase}
+	- Subtypes have to be aware of OperatorBase versus Operator
+	- If RowMatrix needs an exception, will other types?
+		The exceptions must be hard-coded, users cannot create exceptions
+	
+function generator macro
+	  current system
+	- Types need to remember to call @operatorFunctions
+		no warn/error guards
+	- Checking if a type is an operator requires array search
+	
+Operator functions take any
+	+ Simplest
+	+ Shouldn't need to worry about method collisions for apply and apply!
+	- lose some of the instrospection ability to check if a method exists
+		methodexists(apply!, (RowMatrix{Float64}, MultiVector{Float32}, MultiVector{Float32}) -> true
+		but calling that method will result in method doesn't exist error
+	- Only works as long as any new methods are collision-free
+	- Doesn't allow check if object is an operator
+	
+Traits
+	+ Seems to be considered the julian way to emulate multiple inheritance
+	+ Can use for RowMatrix as well to clean that up
+	- Types need to remember to designate themself as an Operator
+	- Might need some tweaking for multiple dispatch
+	- Adds extra library
+		Although it's handled by Pkg
+		Also might be added to Julia itself
+		
+
+
+Conclusion:
+	Converting the pre-created Operator functions to take Any as the operator seems like the best for this specific instance, since it's simple to implement and shouldn't have any collisions
+	If complications arise that disallow just accepting Any, Traits seems to be the best approach

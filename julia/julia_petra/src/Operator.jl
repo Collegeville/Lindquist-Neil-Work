@@ -40,12 +40,12 @@ function apply! end
 
 
 @createFunctionGenerator operatorFunctions begin
-    function apply!(matrix::$typ{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, Y::MultiVector{Data, GID, PID, LID}, mode::TransposeMode=TransposeMode.NO_TRANS, alpha::Data=1) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
-        apply!(matrix, X, Y, mode, alpha, 0)
+    function apply!(operator::$typ{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, Y::MultiVector{Data, GID, PID, LID}, mode::TransposeMode=TransposeMode.NO_TRANS, alpha::Data=1) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
+        apply!(operator, X, Y, mode, alpha, 0)
     end
 
-    function apply!(matrix::$typ{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, Y::MultiVector{Data, GID, PID, LID}, alpha::Data, beta::Data=0) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
-        apply!(matrix, X, Y, Transpose_Mode.NO_TRANS, alpha, beta)
+    function apply!(operator::$typ{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, Y::MultiVector{Data, GID, PID, LID}, alpha::Data, beta::Data=0) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
+        apply!(operator, X, Y, Transpose_Mode.NO_TRANS, alpha, beta)
     end
 
     """
@@ -53,9 +53,9 @@ function apply! end
         If beta == 0, apply MUST overwrite Y, so that any values in Y (including NaNs) are ignored.
         If alpha == 0, apply MAY short-circuit the operator, so that any values in X (including NaNs) are ignored
     """
-    function apply(matrix::$typ{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, Y::MultiVector{Data, GID, PID, LID}, mode::TransposeMode=NO_TRANS, alpha::Data=1, beta=0) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
+    function apply(operator::$typ{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, Y::MultiVector{Data, GID, PID, LID}, mode::TransposeMode=NO_TRANS, alpha::Data=1, beta=0) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
         Y = copy(Y)
-        apply!(matrix, X, Y, mode, alpha, beta)
+        apply!(operator, X, Y, mode, alpha, beta)
     end
     
     push!(operators, $typ)
