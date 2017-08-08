@@ -148,10 +148,9 @@ function copyAndPermute(source::MultiVector{Data, GID, PID, LID},
         target::MultiVector{Data, GID, PID, LID}, numSameIDs::LID,
         permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1}
         ) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
-    #TODO ensure this is correct
     target.data[1:numSameIDs, :] = source.data[1:numSameIDs, :]
-    order = sortperm(permuteFromLIDs)
-    target.data[permuteToLIDs[order], :] = source.data[permuteFromLIDs[order], :]
+    #don't need to sort permute[To/From]LIDs, since the orders match
+    target.data[permuteToLIDs, :] = source.data[permuteFromLIDs, :]
 end
 
 function packAndPrepare(source::MultiVector{Data, GID, PID, LID},

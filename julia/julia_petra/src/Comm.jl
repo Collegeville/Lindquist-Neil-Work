@@ -1,4 +1,3 @@
-
 export Comm
 export barrier, broadcastAll, gatherAll, sumAll, maxAll, minAll, scanSum
 export myPid, numProc, createDistributor

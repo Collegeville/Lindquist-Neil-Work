@@ -42,8 +42,6 @@ Import data into this object using an Import object ("forward mode")
 function doImport(source::SrcDistObject{GID, PID, LID}, 
         target::DistObject{GID, PID, LID}, importer::Import{GID, PID, LID},
         cm::CombineMode) where {GID <:Integer, PID <: Integer, LID <: Integer}
-    #TODO add checks for map equality when debuging
-    
     doTransfer(source, target, cm, numSameIDs(importer), permuteToLIDs(importer),
         permuteFromLIDs(importer), remoteLIDs(importer), exportLIDs(importer),
         distributor(importer), false)
@@ -57,8 +55,6 @@ Export data into this object using an Export object ("forward mode")
 function doExport(source::SrcDistObject{GID, PID, LID}, target::DistObject{GID, PID, LID},
         exporter::Export{GID, PID, LID}, cm::CombineMode) where {
         GID <:Integer, PID <: Integer, LID <: Integer}
-    #TODO add checks for map equality when debuging
-    
     doTransfer(source, target, cm, numSameIDs(exporter), permuteToLIDs(exporter),
         permuteFromLIDs(exporter), remoteLIDs(exporter), exportLIDs(exporter),
         distributor(exporter), false)
@@ -72,8 +68,6 @@ Import data into this object using an Export object ("reverse mode")
 function doImport(source::SrcDistObject{GID, PID, LID}, target::DistObject{GID, PID, LID},
         exporter::Export{GID, PID, LID}, cm::CombineMode) where {
             GID <:Integer, PID <: Integer, LID <: Integer}
-    #TODO add checks for map equality when debuging
-    
     doTransfer(source, target, cm, numSameIDs(exporter), permuteToLIDs(exporter),
         permuteFromLIDs(exporter), remoteLIDs(exporter), exportLIDs(exporter),
         distributor(exporter), true)
@@ -87,8 +81,6 @@ Export data into this object using an Import object ("reverse mode")
 function doExport(source::SrcDistObject{GID, PID, LID}, target::DistObject{GID, PID, LID},
         importer::Import{GID, PID, LID}, cm::CombineMode) where {
             GID <:Integer, PID <: Integer, LID <: Integer}
-    #TODO add checks for map equality when debugin
-    
     doTransfer(source, target, cm, numSameIDs(importer), permuteToLIDs(importer),
         permuteFromLIDs(importer), remoteLIDs(importer), exportLIDs(importer),
         distributor(importer), true)
@@ -121,6 +113,12 @@ function doTransfer(source::SrcDistObject{GID, PID, LID},
         reversed::Bool) where {GID <: Integer, PID <: Integer, LID <: Integer}
     
     debug = false #DECISION add plist for debug setting? get debug from (im/ex)porter?
+    
+    if debug
+        if !sameAs(map(source), map(target))
+            throw(InvalidArgumentError("Source and target maps don't match"))
+        end
+    end
     
     if !checkSizes(source, target)
         throw(InvalidArgumentError("checkSize() indicates that the destination " *

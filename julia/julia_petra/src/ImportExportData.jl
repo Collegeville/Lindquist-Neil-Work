@@ -1,6 +1,4 @@
-
-
-type ImportExportData{GID <: Integer, PID <: Integer, LID <: Integer}
+mutable struct ImportExportData{GID <: Integer, PID <: Integer, LID <: Integer}
     source::BlockMap{GID, PID, LID}
     target::BlockMap{GID, PID, LID}
     
@@ -22,6 +20,8 @@ function ImportExportData(source::BlockMap{GID, PID, LID}, target::BlockMap{GID,
     ImportExportData{GID, PID, LID}(source, target, [], [], [], [], [], 0, createDistributor(comm(source)), true)
 end
     
+#TODO remove documentation, these are internal methods and shouldn't show up in docs
+
 ## Getters ##
 """
 Get the source map for the given ImportExportData
