@@ -36,8 +36,6 @@ include("ImportExportData.jl")
 include("Import.jl")
 include("Export.jl")
 
-include("Operator.jl")
-
 include("SrcDistObject.jl")
 include("DistObject.jl")
 
@@ -48,5 +46,7 @@ include("MultiVector.jl")
 
 # Sparse Data types
 include("RowMatrix.jl")
+
+include("Operator.jl")
 
 end # module

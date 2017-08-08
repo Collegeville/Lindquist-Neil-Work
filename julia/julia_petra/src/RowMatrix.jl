@@ -75,10 +75,10 @@ rowMap(matrix::Impl{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
 colMap(matrix::Impl{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
     - Returns the BlockMap associated with the columns of this matrix
 
-leftScale!(matrix::Impl{Data, GID, PID, LID}, X::PetraVector{Data, GID, PID, LID})
+leftScale!(matrix::Impl{Data, GID, PID, LID}, X::Array{Data})
     Scales matrix on the left with X
 
-rightScale!(matrix::Impl{Data, GID, PID, LID}, X::PetraVector{Data, GID, PID, LID})
+rightScale!(matrix::Impl{Data, GID, PID, LID}, X::Array{Data})
     Scales matrix on the right with X
 
 
@@ -94,7 +94,25 @@ domainMap(operator::Op{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
 
 rangeMap(operator::Op{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
     Returns the BlockMap associated with the range of this operation
+
+Finally, the required methods from SrcDistObject and possibly DistObject must also be implemented
 """
 const RowMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} = Union{SrcDistRowMatrix{Data, GID, PID, LID}, DistRowMatrix{Data, GID, PID, LID}}
 
-@operatorFunctions RowMatrix
+#TODO document all the required methods for RowMatrix
+
+function leftScale!(matrix::RowMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}) where {
+        Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
+    if numVectors(X) != 1
+        throw(InvalidArgumentError("Can only scale CRS matrix with column vector, not multi vector"))
+    end
+    leftScale!(matrix, X.data)
+end
+
+function rightScale!(matrix::RowMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}) where {
+        Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
+    if numVectors(X) != 1
+        throw(InvalidArgumentError("Can only scale CRS matrix with column vector, not multi vector"))
+    end
+    rightScale!(matrix, X.data)
+end
