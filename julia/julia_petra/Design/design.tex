@@ -1,0 +1,70 @@
+\documentclass{article}
+
+\title{Design Decisions of Julia Petra}
+\author{Neil Lindquist}
+
+\begin{document}
+
+\section{The Operator Inheritance}
+In both E and T petras, Operator is an purely abstract class, that various types, including RowMatrix, implement.  However, Julia does not allow a type to have multiple supertypes.  However, there are a few methods that are shared between all types of Operators (mainly overloads that call another version).  I found multiple approaches to implement Operator.
+\begin{enumerate}
+	\item Let the shared methods accept operators of type Any and duck-type
+	\begin{itemize}
+		\item This is the simplest approach
+		\item There is no way to check if a type is an Operator, except via duck typing
+		\item For this set of methods (apply! and apply), there isn't a collision issue
+		\begin{itemize}
+			\item Future, similar situations might have collision issues with overly general inputs
+		\end{itemize}
+		\item introspection gets less clean, as the version of apply! implemented by the subtypes needs to exist for any of the other versions (which always exist) to not throw a no such method error
+	\end{itemize}
+
+	\item Handcopy the shared code between all Operators
+	\begin{itemize}
+		\item This is violating the Don't Repeat Yourself principle
+		\item This approach should probably be avoided if at all possible
+		\item There is no way to check if a type is an Operator, except via duck typing
+	\end{itemize}
+	
+	\item Create macros to generate the shared code
+	\begin{itemize}
+		\item This was the original approach, so the macro is already working
+		\item Subtypes need to remember to call @operatorFunctions on themselves
+		\begin{itemize}
+			\item There isn't a way to warn or error if @operatorFunctions isn't called
+		\end{itemize}
+		\item Checking if a type is an Operator requires an array search
+	\end{itemize}
+	
+	\item Implement Operator using Unions and make RowMatrix a special case
+	\begin{itemize}
+		\item \verb|const Operator = Union{RowMatrix, OperatorBase}|
+		\item This is how the multiple supertype issue was solved for RowMatrix
+		\item Subtypes have to be aware that OperatorBase is the type to subtype, not Operator
+		\item The requirement for RowMatrix needing an exception, hints that there might be other types that need an exception
+		\begin{itemize}
+			\item And the exceptions must be hard-coding, so users cannot create exceptions
+		\end{itemize}
+	\end{itemize}		 
+
+	\item Use Traits
+	\begin{itemize}
+		\item The SimpleTraits.jl library handles the details, just need a few macro calls to use
+		\begin{itemize}
+			\item Part of Metadata.jl
+			\item Might become part of the official library at somepoint
+		\end{itemize}
+		\item Seems to be considered the Julian way to emulate multiple inheritance
+		\item Can be used for RowMatrix as well to make that feel like less of a workaround
+		\item Types need to remember to designate themselves as an Operator
+		\begin{itemize}
+			\item There isn't a way to warn or error if the type forgets
+		\end{itemize}
+	\end{itemize}
+\end{enumerate}
+
+My final decision was to have the shared Operator functions accept Any for the "Operator" types.  I chose this approach since it's the simplest to implement and, for this situation, won't need to worry about method collisions or ambiguity.
+
+If complications arise that cause the chosen approach to stop working, Traits seems to be the second best.  Traits can handle the cases when dispatching is useful and seems to be considered Julian.
+
+\end{document}
