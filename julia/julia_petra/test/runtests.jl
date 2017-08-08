@@ -20,7 +20,7 @@ end
 
 if !noDataStructs
     include("MultiVectorTests.jl")
-    include("CSRMatrixTest.jl")
+    include("CSRMatrixTests.jl")
 end
 
 # do MPI tests at the end so that other errors are found faster since the MPI tests take the longest
