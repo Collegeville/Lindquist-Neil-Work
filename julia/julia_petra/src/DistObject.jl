@@ -163,7 +163,7 @@ function doTransfer(source::SrcDistObject{GID, PID, LID},
                 imports = resolve(distor, exports)
             end
             
-            unpackAndCombine(target, importLIDs, imports, distor, cm)
+            unpackAndCombine(target, remoteLIDs, imports, distor, cm)
         end
     end
     

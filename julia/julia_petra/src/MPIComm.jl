@@ -3,6 +3,7 @@ import MPI
 
 export MPIComm
 
+#TODO make MPIComm immutable then use atexit(f) to finalize MPI
 """
     MPIComm()
 An implementation of Comm using MPI
@@ -69,5 +70,5 @@ function numProc(comm::MPIComm{GID, PID})::PID where {GID <: Integer, PID <:Inte
 end
 
 function createDistributor(comm::MPIComm{GID, PID, LID})::MPIDistributor{GID, PID, LID}  where {GID <: Integer, PID <: Integer, LID <: Integer}
-    MPIDistributor{GID, PID, LID}(comm)
+    MPIDistributor(comm)
 end
