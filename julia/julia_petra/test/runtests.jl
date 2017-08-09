@@ -3,24 +3,32 @@ using Base.Test
 
 @. ARGS = lowercase(ARGS)
 # check for command line arguments requesting parts to not be tested
-noMPI = in("--mpi", ARGS) #don't run multi-process tests
-noComm = in("--comm", ARGS) #don't run comm framework tests
-noDataStructs = in("--data", ARGS) #don't run tests on data structures
-noUtil = in("--util", ARGS) #don't run tests on Misc Utils
+const noMPI = in("--mpi", ARGS) #don't run multi-process tests
+const noComm = in("--comm", ARGS) #don't run comm framework tests
+const noDataStructs = in("--data", ARGS) #don't run tests on data structures
+const noUtil = in("--util", ARGS) #don't run tests on Misc Utils
 
+@testset "Serial tests" begin
 
-if !noUtil
-end
+    if !noUtil
+        @testset "Util Tests" begin
+        end
+    end
 
-if !noComm
-    include("SerialCommTests.jl")
-    include("Import-Export Tests.jl")
-    include("BlockMapTests.jl")
-end
+    if !noComm
+        @testset "Comm Tests" begin
+            include("SerialCommTests.jl")
+            include("Import-Export Tests.jl")
+            include("BlockMapTests.jl")
+        end
+    end
 
-if !noDataStructs
-    include("MultiVectorTests.jl")
-    include("CSRMatrixTests.jl")
+    if !noDataStructs
+        @testset "Data Structure Tests" begin
+            include("MultiVectorTests.jl")
+            include("CSRMatrixTests.jl")
+        end
+    end
 end
 
 # do MPI tests at the end so that other errors are found faster since the MPI tests take the longest

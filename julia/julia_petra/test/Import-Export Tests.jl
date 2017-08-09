@@ -26,27 +26,53 @@ function basicTest(impor, debugSetting=false)
     @test true == data.isLocallyComplete
 end
 
+#for scoping purposes
+impor = Array{Import, 1}(1)
+expor = Array{Export, 1}(1)
+
+#ensure at least a few lines, each starting with the PID
+#Need to escape coloring:  .*
+debugregex = Regex("^(?:.*INFO: .*$(myPid(serialComm)): .+\n){2,}.*\$")
+
 # basic import
-basicTest(Import(srcMap, desMap))
-basicTest(Import(srcMap, desMap, debug=true), true)
-basicTest(Import(srcMap, desMap, Nullable{Array{Bool}}()))
-basicTest(Import(srcMap, desMap, Nullable{Array{Bool}}(), debug=true), true)
+@test_nowarn impor[1] = Import(srcMap, desMap)
+basicTest(impor[1])
+@test_warn debugregex impor[1] = Import(srcMap, desMap, debug=true)
+#impor[1] = Import(srcMap, desMap, debug=true)
+basicTest(impor[1], true)
+@test_nowarn impor[1] = Import(srcMap, desMap, Nullable{Array{Bool}}())
+basicTest(impor[1])
+@test_warn debugregex impor[1] = Import(srcMap, desMap, Nullable{Array{Bool}}(), debug=true)
+basicTest(impor[1], true)
+
 
 # import using Dicts
-basicTest(Import(srcMap, desMap, Dict{Symbol, Any}()))
-basicTest(Import(srcMap, desMap, Dict([(:debug, true)])), true)
-basicTest(Import(srcMap, desMap, Nullable{Array{Bool}}(), Dict{Symbol, Any}()))
-basicTest(Import(srcMap, desMap, Nullable{Array{Bool}}(), Dict([(:debug, true)])), true)
+@test_nowarn impor[1] = Import(srcMap, desMap, Dict{Symbol, Any}())
+basicTest(impor[1])
+@test_warn debugregex impor[1] = Import(srcMap, desMap, Dict([(:debug, true)]))
+basicTest(impor[1], true)
+@test_nowarn impor[1] = Import(srcMap, desMap, Nullable{Array{Bool}}(), Dict{Symbol, Any}())
+basicTest(impor[1])
+@test_warn debugregex impor[1] = Import(srcMap, desMap, Nullable{Array{Bool}}(), Dict([(:debug, true)])) 
+basicTest(impor[1], true)
 
 
 # basic export
-basicTest(Export(srcMap, desMap))
-basicTest(Export(srcMap, desMap, debug=true), true)
-basicTest(Export(srcMap, desMap, Nullable{Array{Bool}}()))
-basicTest(Export(srcMap, desMap, Nullable{Array{Bool}}(), debug=true), true)
+@test_nowarn expor[1] = Export(srcMap, desMap)
+basicTest(expor[1])
+@test_warn debugregex expor[1] = Export(srcMap, desMap, debug=true)
+basicTest(expor[1], true)
+@test_nowarn expor[1] = Export(srcMap, desMap, Nullable{Array{Bool}}())
+basicTest(expor[1])
+@test_warn debugregex expor[1] = Export(srcMap, desMap, Nullable{Array{Bool}}(), debug=true)
+basicTest(expor[1], true)
 
 #export using Dicts
-basicTest(Export(srcMap, desMap, Dict{Symbol, Any}()))
-basicTest(Export(srcMap, desMap, Dict([(:debug, true)])), true)
-basicTest(Export(srcMap, desMap, Nullable{Array{Bool}}(), Dict{Symbol, Any}()))
-basicTest(Export(srcMap, desMap, Nullable{Array{Bool}}(), Dict([(:debug, true)])), true)
+@test_nowarn expor[1] = Export(srcMap, desMap, Dict{Symbol, Any}())
+basicTest(expor[1])
+@test_warn debugregex expor[1] = Export(srcMap, desMap, Dict([(:debug, true)]))
+basicTest(expor[1], true)
+@test_nowarn expor[1] = Export(srcMap, desMap, Nullable{Array{Bool}}(), Dict{Symbol, Any}())
+basicTest(expor[1])
+@test_warn debugregex expor[1] = Export(srcMap, desMap, Nullable{Array{Bool}}(), Dict([(:debug, true)]))
+basicTest(expor[1], true)

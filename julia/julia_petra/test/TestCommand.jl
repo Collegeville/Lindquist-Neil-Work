@@ -24,8 +24,7 @@ function testJuliaPetra(flags...; coverage=false)
             run(cmd)
             info("julia_petra tests passed")
         catch err
-            warnbanner(err, label="[ ERROR: julia_petra ]")
-            push!(errs,pkg)
+             Base.Pkg.Entry.warnbanner(err, label="[ ERROR: julia_petra ]")
         end
     end
 end
