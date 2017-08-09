@@ -10,7 +10,7 @@ k_numAllocPerRow_ and numAllocForAllRows_ are not copied to julia
 #TODO remember to do allocations in constructor, not lazily
 
 #TODO figure out type of Data
-mutable struct CSRGraph{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: DistObject{GID, PID, LID}
+mutable struct CRSGraph{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: DistObject{GID, PID, LID}
     rowMap::BlockMap{GID, PID, LID}
     colMap::Nullable{BlockMap{GID, PID, LID}}
     rangeMap::Nullable{BlockMap{GID, PID, LID}}
@@ -78,21 +78,21 @@ end
 #### Constructors #####
 
 #TODO add plist call that passes kwargs
-function CSRGraph(rowMap::BlockMap{GID, PID, LID}, maxNumEntriesPerRow::LID,
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, maxNumEntriesPerRow::LID,
         pftype::ProfileType, plist::Dict{Symbol}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
-    CSRGraph(rowMap, Nullable{BlockMap{GID, PID, LID}}(), maxNumEntriesPerRow, pftype, plist)
+    CRSGraph(rowMap, Nullable{BlockMap{GID, PID, LID}}(), maxNumEntriesPerRow, pftype, plist)
 end
-function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
         maxNumEntriesPerRow::LID, pftype::ProfileType, plist::Dict{Symbol}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
-    CSRGraph(rowMap, Nullable(colMap), maxNumEntriesPerRow, pftype, plist)
+    CRSGraph(rowMap, Nullable(colMap), maxNumEntriesPerRow, pftype, plist)
 end
     
-function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}},
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}},
         maxNumEntriesPerRow::LID, pftype::ProfileType, plist::Dict{Symbol}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
-    graph = CSRGraph(
+    graph = CRSGraph(
         rowMap,
         colMap,
         Nullable{BlockMap{GID, PID, LID}}(),
@@ -149,22 +149,22 @@ function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
 end
 
 
-function CSRGraph(rowMap::BlockMap{GID, PID, LID}, numEntPerRow::Array{LID, 1},
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, numEntPerRow::Array{LID, 1},
         pftype::ProfileType, plist::Dict{Symbol})  where {
         GID <: Integer, PID <: Integer, LID <: Integer}
-    CSRGraph(rowMap, Nullable{BlockMap{GID, PID, LID}}(), numEntPerRow, pftype, plist)
+    CRSGraph(rowMap, Nullable{BlockMap{GID, PID, LID}}(), numEntPerRow, pftype, plist)
 end
 
-function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
         numEntPerRow::Array{LID, 1}, pftype::ProfileType,
         plist::Dict{Symbol})  where {GID <: Integer, PID <: Integer, LID <: Integer}
-    CSRGraph(rowMap, Nullable(colMap), numEntPerRow, pftype, plist)
+    CRSGraph(rowMap, Nullable(colMap), numEntPerRow, pftype, plist)
 end
 
-function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}},
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}},
         numEntPerRow::Array{LID, 1}, pftype::ProfileType,
         plist::Dict{Symbol})  where {GID <: Integer, PID <: Integer, LID <: Integer}
-    graph = CSRGraph(
+    graph = CRSGraph(
         rowMap,
         colMap,
         Nullable{BlockMap{GID, PID, LID}}(),
@@ -240,10 +240,10 @@ function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
 end
 
 
-function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
         rowPointers::Array{LID, 1}, columnIndices::Array{LID, 1},
         plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
-    graph = CSRGraph(
+    graph = CRSGraph(
         rowMap,
         Nullable(colMap),
         Nullable{BlockMap{GID, PID, LID}}(),
@@ -298,12 +298,12 @@ function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
     checkInternalState(graph)
 end
 
-#This method appears to require Kokkos.StaticCSRGraph
+#This method appears to require Kokkos.StaticCRSGraph
 #=
-function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
-        localGraph::Kokkos.StaticCSRGraph, plist::Dict{Symbol}) where {
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
+        localGraph::Kokkos.StaticCRSGraph, plist::Dict{Symbol}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
-    graph = CSRGraph(
+    graph = CRSGraph(
         rowMap,
         Nullable(colMap),
         Nullable{BlockMap{GID, PID, LID}}(),
@@ -356,12 +356,12 @@ function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
 #TODO group duplicate constructor code and staticAssertions into inner constructor    
     
 
-#TODO implement staticAssertions(::CSRGraph)
-#TODO implement resumeFill(::CSRGraph, ::Dict{Symbol})
-#TODO implement checkInternalState(::CSRGraph)
-#TODO implement setAllIndices(::CSRGraph, ::Array{LID, 1}, ::Array{LID, 1}) 
+#TODO implement staticAssertions(::CRSGraph)
+#TODO implement resumeFill(::CRSGraph, ::Dict{Symbol})
+#TODO implement checkInternalState(::CRSGraph)
+#TODO implement setAllIndices(::CRSGraph, ::Array{LID, 1}, ::Array{LID, 1}) 
 
-function map(graph::CSRGraph)
+function map(graph::CRSGraph)
     graph.rowMap
 end
 
