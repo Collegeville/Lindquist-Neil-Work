@@ -9,6 +9,7 @@ k_numAllocPerRow_ and numAllocForAllRows_ are not copied to julia
 =#
 #TODO remember to do allocations in constructor, not lazily
 
+#TODO figure out type of Data
 mutable struct CSRGraph{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: DistObject{GID, PID, LID}
     rowMap::BlockMap{GID, PID, LID}
     colMap::Nullable{BlockMap{GID, PID, LID}}
@@ -20,8 +21,7 @@ mutable struct CSRGraph{Data <: Number, GID <: Integer, PID <: Integer, LID <: I
     #may be null if rangeMap and rowMap are the same
     exporter::Nullable{Export{GID, PID, LID}}
 
-    #TODO is this needed? what type should it be?
-    #local_graph_type lclGraph_;
+    lclGraph::Array{Data, 2}
 
     #Local number of (populated) entries; must always be consistent
     nodeNumEntries::LID
@@ -89,7 +89,7 @@ function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
     CSRGraph(rowMap, Nullable(colMap), maxNumEntriesPerRow, pftype, plist)
 end
     
-function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}}(),
+function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}},
         maxNumEntriesPerRow::LID, pftype::ProfileType, plist::Dict{Symbol}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
     graph = CSRGraph(
@@ -101,6 +101,8 @@ function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
         Nullable{Import{GID, PID, LID}}(),
         Nullable{Export{GID, PID, LID}}(),
 
+        [], #lclGraph
+        
         0, #nodeNumEntries
         #using -1 to indicate uninitiallized, likely to cause an error if used
         -1, #nodeNumDiags
@@ -141,11 +143,223 @@ function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
         
         
     staticAssertions(graph)
+    #TODO do allocations
     resumueFill(graph, params)
     checkInternalState(graph)
 end
 
 
+function CSRGraph(rowMap::BlockMap{GID, PID, LID}, numEntPerRow::Array{LID, 1},
+        pftype::ProfileType, plist::Dict{Symbol})  where {
+        GID <: Integer, PID <: Integer, LID <: Integer}
+    CSRGraph(rowMap, Nullable{BlockMap{GID, PID, LID}}(), numEntPerRow, pftype, plist)
+end
+
+function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
+        numEntPerRow::Array{LID, 1}, pftype::ProfileType,
+        plist::Dict{Symbol})  where {GID <: Integer, PID <: Integer, LID <: Integer}
+    CSRGraph(rowMap, Nullable(colMap), numEntPerRow, pftype, plist)
+end
+
+function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}},
+        numEntPerRow::Array{LID, 1}, pftype::ProfileType,
+        plist::Dict{Symbol})  where {GID <: Integer, PID <: Integer, LID <: Integer}
+    graph = CSRGraph(
+        rowMap,
+        colMap,
+        Nullable{BlockMap{GID, PID, LID}}(),
+        Nullable{BlockMap{GID, PID, LID}}(),
+
+        Nullable{Import{GID, PID, LID}}(),
+        Nullable{Export{GID, PID, LID}}(),
+
+        [], #lclGraph
+        
+        0, #nodeNumEntries
+        #using -1 to indicate uninitiallized, likely to cause an error if used
+        -1, #nodeNumDiags
+        -1, #nodeMaxNumRowEntries
+        -1, #globalNumEntries
+        -1, #globalNumDiags
+        -1, #globalMaxNumRowEntries
+
+        #Whether the graph was allocated with static or dynamic profile.
+        pftype,
+        
+        #TODO find numAllocForAllRows (see line 248)
+
+        ## 1-D storage (Static profile) data structures ##
+        [],
+        [],
+        [],
+
+        ## 2-D storage (Dynamic profile) data structures ##
+        [],
+        [],
+        [],
+
+        (pftype == STATIC_PROFILE ?
+              STORAGE_1D_UNPACKED 
+            : STORAGE_2D),
+
+        false,
+        UNKNOWN,
+        false,
+
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+
+        Dict{GID, Array{GID, 1}}()
+    )
+    
+    staticAssertions(graph);
+    
+    #DECISION allow rowMap to be null?
+    lclNumRows = numLocalElements(rowMap)
+    if length(numEntPerRow) != lclNumRows
+        throw(InvalidArgumentError("numEntPerRows has length $(length(numEntPerRow)) " *
+                "!= the local number of rows $lclNumRows as spcified by the input row Map"))
+    end
+    
+    if get(plist, "debug", false)
+        for r = 1:lclNumRows
+            curRowCount = numEntPerRow[r]
+            if curRowCount <= 0
+                throw(InvalidArgumentError("numEntPerRow[$r] = $curRowCount is not valid"))
+            end
+        end
+    end
+    #TODO do allocations
+    
+    resumeFill(graph, plist)
+    checkInternalState(graph)
+end
+
+
+function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
+        rowPointers::Array{LID, 1}, columnIndices::Array{LID, 1},
+        plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
+    graph = CSRGraph(
+        rowMap,
+        Nullable(colMap),
+        Nullable{BlockMap{GID, PID, LID}}(),
+        Nullable{BlockMap{GID, PID, LID}}(),
+        
+        Nullable{Import{GID, PID, LID}}(),
+        Nullable{Export{GID, PID, LID}}(),
+
+        [], #lclGraph
+        
+        0, #nodeNumEntries
+        #using -1 to indicate uninitiallized, likely to cause an error if used
+        -1, #nodeNumDiags
+        -1, #nodeMaxNumRowEntries
+        -1, #globalNumEntries
+        -1, #globalNumDiags
+        -1, #globalMaxNumRowEntries
+        
+        STATIC_PROFILE,
+        
+        #TODO figure out numAllocForAllRows
+        
+        ## 1-D storage (Static profile) data structures ##
+        [],
+        [],
+        [],
+
+        ## 2-D storage (Dynamic profile) data structures ##
+        [],
+        [],
+        [],
+
+        STORAGE_1D_PACKED,
+
+        false,
+        LOCAL,
+        false,
+
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+
+        Dict{GID, Array{GID, 1}}()
+    )
+    
+    staticAssertions(graph)
+    #TODO do allocations
+    setAllIndicies(graph, rowPointers, columnIndicies)
+    checkInternalState(graph)
+end
+
+#This method appears to require Kokkos.StaticCSRGraph
+#=
+function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
+        localGraph::Kokkos.StaticCSRGraph, plist::Dict{Symbol}) where {
+        GID <: Integer, PID <: Integer, LID <: Integer}
+    graph = CSRGraph(
+        rowMap,
+        Nullable(colMap),
+        Nullable{BlockMap{GID, PID, LID}}(),
+        Nullable{BlockMap{GID, PID, LID}}(),
+        
+        Nullable{Import{GID, PID, LID}}(),
+        Nullable{Export{GID, PID, LID}}(),
+
+        localGraph,
+        
+        length(localGraph), #nodeNumEntries
+        #using -1 to indicate uninitiallized, likely to cause an error if used
+        -1, #nodeNumDiags
+        -1, #nodeMaxNumRowEntries
+        -1, #globalNumEntries
+        -1, #globalNumDiags
+        -1, #globalMaxNumRowEntries
+        
+        STATIC_PROFILE,
+        
+        #TODO figure out numAllocForAllRows
+        
+        ## 1-D storage (Static profile) data structures ##
+        [],
+        [],
+        [],
+
+        ## 2-D storage (Dynamic profile) data structures ##
+        [],
+        [],
+        [],
+
+        STORAGE_1D_PACKED,
+        
+        false,
+        LOCAL,
+        false,
+
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+
+        Dict{GID, Array{GID, 1}}()
+    )
+    =#
+    
+#TODO group duplicate constructor code and staticAssertions into inner constructor    
+    
+
+#TODO implement staticAssertions(::CSRGraph)
+#TODO implement resumeFill(::CSRGraph, ::Dict{Symbol})
+#TODO implement checkInternalState(::CSRGraph)
+#TODO implement setAllIndices(::CSRGraph, ::Array{LID, 1}, ::Array{LID, 1}) 
 
 function map(graph::CSRGraph)
     graph.rowMap
