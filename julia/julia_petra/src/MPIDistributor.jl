@@ -55,7 +55,7 @@ mutable struct MPIDistributor{GID <: Integer, PID <: Integer, LID <: Integer} <:
     #lastRoundBytesSend::Integer
     #lastRoundBytesRecv::Integer
     
-    function MPIDistributor{GID, PID, LID}(comm::MPIComm{GID, PID, LID}) where GID <: Integer where PID <: Integer where LID <: Integer
+    function MPIDistributor(comm::MPIComm{GID, PID, LID}) where GID <: Integer where PID <: Integer where LID <: Integer
         new{GID, PID, LID}(comm, [], [], [], [], [], [], false, [], [], [], [], [],
             0, 0, 0, 0, 0, 0, 0, [], [],  Nullable{MPIDistributor}(),
             Nullable{Array{UInt8}}())
@@ -275,7 +275,7 @@ end
 function computeSends(dist::MPIDistributor{GID, PID, LID}, remoteGIDs::Array{GID}, remotePIDs::Array{PID})::Tuple{Array{GID}, Array{PID}} where GID <:Integer where PID <:Integer where LID <:Integer
     numImports = length(remoteGIDs)
 
-    tmpPlan = MPIDistributor{GID, PID, LID}(dist.comm)
+    tmpPlan = MPIDistributor(dist.comm)
     
     procList = copy(remotePIDs)
     importObjs = Array{Tuple{GID, PID}}(numImports)
@@ -317,20 +317,20 @@ function createReverseDistributor(dist::MPIDistributor)
         
         reverse.lengths_to = dist.lengths_from
         reverse.procs_to = dist.procs_from
-        reverse.indices_to = dist.indicies_from
+        reverse.indices_to = dist.indices_from
         reverse.starts_to = dist.starts_from
         
         reverse.lengths_from = dist.lengths_to
         reverse.procs_from = dist.procs_to
-        reverse.indices_from = dist.indicies_to
+        reverse.indices_from = dist.indices_to
         reverse.starts_from = dist.starts_to
         
         reverse.numSends = dist.numRecvs
         reverse.numRecvs = dist.numSends
         reverse.selfMsg = dist.selfMsg
         
-        reverse.maxSendLength = dist.maxRecvLength
-        reverse.totalRecvLength = dist.totalSendLength
+        reverse.maxSendLength = maxRecvLength
+        reverse.totalRecvLength = totalSendLength
         
         reverse.request = Array{MPI.Request}(reverse.numRecvs)
         reverse.status  = Array{MPI.Status}(reverse.numRecvs)

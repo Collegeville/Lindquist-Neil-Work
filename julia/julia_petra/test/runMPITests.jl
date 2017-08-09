@@ -12,16 +12,36 @@ if pid != 1
     #redirect_stderr()
 end
 
-#try
 
-@testset "MPI Tests" begin
+#tries are to allow barriers to work correctly, even under erronious situtations
+try
+    @testset "MPI Tests" begin
+        try
+            @testset "Comm MPI Tests" begin
+                include("MPICommTests.jl")
+                include("MPIBlockMapTests.jl")
+                include("MPIimport-export Tests.jl")
+            end
 
-    @testset "Comm MPI Tests" begin
-        include("MPICommTests.jl")
-        include("MPIBlockMapTests.jl")
-        include("MPIimport-export Tests.jl")
+            @testset "Data MPI Tests" begin
+                include("MultiVectorTests.jl")
+                multiVectorTests(comm)
+            end
+
+        finally
+            #print results sequentially
+            for i in 1:pid
+                barrier(comm)
+            end
+        end
+        info("process $pid test results:")
     end
-    
+
+finally
+    #print results sequentially
+    for i in pid:4
+        barrier(comm)
+    end
 end
 
 #catch err
