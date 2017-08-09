@@ -14,10 +14,14 @@ end
 
 #try
 
-@testset "Comm MPI Tests" begin
-    include("MPICommTests.jl")
-    include("MPIBlockMapTests.jl")
-    include("MPIimport-export Tests.jl")
+@testset "MPI Tests" begin
+
+    @testset "Comm MPI Tests" begin
+        include("MPICommTests.jl")
+        include("MPIBlockMapTests.jl")
+        include("MPIimport-export Tests.jl")
+    end
+    
 end
 
 #catch err

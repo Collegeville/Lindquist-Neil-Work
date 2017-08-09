@@ -29,7 +29,7 @@ function Export(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
     const debug = get(plist, :debug, false)
 
     if debug
-        print("$(myPid(comm(source))): Export ctor\n")
+        info("$(myPid(comm(source))): Export ctor\n")
     end
 
     expor = Export(debug, ImportExportData(source, target))
@@ -37,13 +37,13 @@ function Export(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
     exportGIDs = setupSamePermuteExport(expor)
 
     if debug
-        print("$(myPid(comm(source))): Export ctor: setupSamePermuteExport done\n")
+        info("$(myPid(comm(source))): Export ctor: setupSamePermuteExport done\n")
     end
     if distributedGlobal(source)
         setupRemote(expor, exportGIDs)
     end
     if debug
-        print("$(myPid(comm(source))): Export ctor: done\n")
+        info("$(myPid(comm(source))): Export ctor: done\n")
     end
 
     expor
@@ -150,7 +150,7 @@ function setupRemote(expor::Export{GID, PID, LID}, exportGIDs::Array{GID, 1}) wh
     target = targetMap(data)
 
     if expor.debug
-        print("$(myPid(comm(target))): setupRemote\n")
+        info("$(myPid(comm(target))): setupRemote\n")
     end
     
     exportPIDs = julia_petra.exportPIDs(data)
@@ -161,13 +161,13 @@ function setupRemote(expor::Export{GID, PID, LID}, exportGIDs::Array{GID, 1}) wh
     permute!(exportGIDs, order)
 
     if expor.debug
-        print("$(myPid(comm(target))): setupRemote: Calling createFromSends\n")
+        info("$(myPid(comm(target))): setupRemote: Calling createFromSends\n")
     end
     
     numRemoteIDs = createFromSends(distributor(data), exportPIDs)
     
     if expor.debug
-        print("$(myPid(comm(target))): setupRemote: Calling doPostsAndWaits\n")
+        info("$(myPid(comm(target))): setupRemote: Calling doPostsAndWaits\n")
     end
     
     remoteGIDs = resolve(distributor(data), exportGIDs)
@@ -181,7 +181,7 @@ function setupRemote(expor::Export{GID, PID, LID}, exportGIDs::Array{GID, 1}) wh
     end
     
     if expor.debug
-        print("$(myPid(comm(target))): setupRemote: done\n")
+        info("$(myPid(comm(target))): setupRemote: done\n")
     end
 end
     

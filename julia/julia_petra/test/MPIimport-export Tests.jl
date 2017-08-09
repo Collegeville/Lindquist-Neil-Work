@@ -25,12 +25,15 @@ impor = Array{Import, 1}(1)
 expor = Array{Export, 1}(1)
 
 #ensure at least a few lines, each starting with the PID
-debugregex = "^(?:$myPid: .+\n){3,}\$"
+#Need to escape coloring:  .*
+#"^(?:.*INFO: .*$pid: .+\n){2,}.*\$"
+debugregex = Regex("^(?:.*INFO: .*$pid: .+\n){2,}.*\$")
 
 # basic import
 @test_nowarn impor[1] = Import(srcMap, desMap)
 basicMPITest(impor[1])
 @test_warn debugregex impor[1] = Import(srcMap, desMap, debug=true)
+#impor[1] = Import(srcMap, desMap, debug=true)
 basicMPITest(impor[1], true)
 @test_nowarn impor[1] = Import(srcMap, desMap, Nullable{Array{UInt16}}())
 basicMPITest(impor[1])

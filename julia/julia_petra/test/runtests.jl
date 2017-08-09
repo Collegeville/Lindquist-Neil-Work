@@ -8,23 +8,25 @@ const noComm = in("--comm", ARGS) #don't run comm framework tests
 const noDataStructs = in("--data", ARGS) #don't run tests on data structures
 const noUtil = in("--util", ARGS) #don't run tests on Misc Utils
 
+@testset "Serial tests" begin
 
-if !noUtil
-    @testset "Util Tests" begin
+    if !noUtil
+        @testset "Util Tests" begin
+        end
     end
-end
 
-if !noComm
-    @testset "Comm Tests" begin
-        include("SerialCommTests.jl")
-        include("Import-Export Tests.jl")
-        include("BlockMapTests.jl")
+    if !noComm
+        @testset "Comm Tests" begin
+            include("SerialCommTests.jl")
+            include("Import-Export Tests.jl")
+            include("BlockMapTests.jl")
+        end
     end
-end
 
-if !noDataStructs
-    @testset "Data Structure Tests" begin
-        include("MultiVectorTests.jl")
+    if !noDataStructs
+        @testset "Data Structure Tests" begin
+            include("MultiVectorTests.jl")
+        end
     end
 end
 

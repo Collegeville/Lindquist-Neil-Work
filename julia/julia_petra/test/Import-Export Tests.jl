@@ -31,12 +31,14 @@ impor = Array{Import, 1}(1)
 expor = Array{Export, 1}(1)
 
 #ensure at least a few lines, each starting with the PID
-debugregex = "^(?:$(myPid(serialComm)): .+\n){3,}\$"
+#Need to escape coloring:  .*
+debugregex = Regex("^(?:.*INFO: .*$(myPid(serialComm)): .+\n){2,}.*\$")
 
 # basic import
 @test_nowarn impor[1] = Import(srcMap, desMap)
 basicTest(impor[1])
 @test_warn debugregex impor[1] = Import(srcMap, desMap, debug=true)
+#impor[1] = Import(srcMap, desMap, debug=true)
 basicTest(impor[1], true)
 @test_nowarn impor[1] = Import(srcMap, desMap, Nullable{Array{Bool}}())
 basicTest(impor[1])

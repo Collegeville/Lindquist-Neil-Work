@@ -45,7 +45,7 @@ function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
     const debug = get(plist, :debug, false)
     
     if debug
-        println("$(myPid(comm(source))): Import ctor expert\n")
+        info("$(myPid(comm(source))): Import ctor expert\n")
     end
     
     importData = ImportExportData(source, target)
@@ -131,7 +131,7 @@ function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
     const debug = get(plist, :debug, false)
 
     if debug
-        print("$(myPid(comm(source))): Import ctor\n")
+        info("$(myPid(comm(source))): Import ctor\n")
     end
 
     impor = Import{GID, PID, LID}(debug, ImportExportData(source, target))
@@ -139,13 +139,13 @@ function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
     remoteGIDs = setupSamePermuteRemote(impor)
 
     if debug
-        print("$(myPid(comm(source))): Import ctor: setupSamePermuteRemote done\n")
+        info("$(myPid(comm(source))): Import ctor: setupSamePermuteRemote done\n")
     end
     if distributedGlobal(source)
         setupExport(impor, remoteGIDs, remotePIDs)
     end
     if debug
-        print("$(myPid(comm(source))): Import ctor: done\n")
+        info("$(myPid(comm(source))): Import ctor: done\n")
     end
 
     impor
@@ -220,7 +220,7 @@ function setupExport(impor::Import{GID, PID, LID}, remoteGIDs::Array{GID}, userR
     if !useRemotePIDs
         newRemotePIDs = Array{PID, 1}(length(remoteGIDs))
         if impor.debug
-            print("$(myPid(comm(source))): setupExport(Import): about to call " * 
+            info("$(myPid(comm(source))): setupExport(Import): about to call " * 
                 "getRemoteIndexList on sourceMap\n")
         end
         (remoteProcIDs, remoteLIDs) = remoteIDList(source, remoteGIDs)
@@ -300,7 +300,7 @@ function setupExport(impor::Import{GID, PID, LID}, remoteGIDs::Array{GID}, userR
     end
     
     if impor.debug
-        print("$(myPid(comm(source))): setupExport: done\n")
+        info("$(myPid(comm(source))): setupExport: done\n")
     end
 end
 
