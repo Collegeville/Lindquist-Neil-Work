@@ -30,54 +30,27 @@ function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
         userRemotePIDs::Array{PID}, remoteGIDs::Array{GID}, userExportLIDs::Array{LID},
         userExportPIDs::Array{PID}, useRemotePIDGID::Bool,
         plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
-    sourceGIDs = myGlobalElements(source)
-    targetGIDs = myGlobalElements(target)
-    numSrcGIDs = length(sourceGIDs)
-    numTgtGIDs = length(targetGITs)
-    numGIDS = min(numSrcGIDs, numTgtGIDs)
     
-    numSameGIDs = 1
-    while numSameGIDS <= numGIDs && sourceGIDs[numSameGIDs] == targetGIDs[numSameGIDs]
-        numSameGIDs += 1
-    end
-    numSameGIDs -= 1
-    
+    importData = ImportExportData(source, target)
     const debug = get(plist, :debug, false)
     
     if debug
         info("$(myPid(comm(source))): Import ctor expert\n")
     end
     
-    importData = ImportExportData(source, target)
-    numSameIDs(importData, numSameGIDS)
-    
-    permuteToLIDs = permuteToLIDs(importData)
-    permuteFromLIDs = permuteFromLIDs(importData)
-    remoteLIDs = remoteLIDs(importData)
+    remoteLIDs = julia_petra.remoteLIDs(importData)
     
     if !userRemotePIDGID
         empty!(remoteGIDs)
         empty!(remoteLIDs)
     end
     
-    for tgtLID =  (numSameGIDs+1):numTgtLIDs
-        const curTgtGID = targetGIDs[tgtLID]
-        const srcLID = lid(curTgtGID)
-        if srcLID != 0
-            push!(permuteToLID, tgtLID)
-            push!(permuteFromLID, srcLID)
-        else
-            if !userRemotePIDGID
-                push!(remoteGIDs, curTgtGID)
-                push!(remoteLIDs, tgtLID)
-            end
-        end
-    end
+    getIDsSource(data, remoteGIDs, !userRemotePIDGID)
     
     if length(remoteGIDs) > 0 && !isDistributed(source)
         throw(InvalidArgumentError("Target has remote LIDs but source is not distributed globally"))
     end
-    
+        
     (remotePIDs, _) = remoteIDList(source, remoteGIDs)
     
     remoteProcIDs = (useRemotePIDGID) ? userRemotePIDs : remotePIDs
@@ -159,8 +132,22 @@ function setupSamePermuteRemote(impor::Import{GID, PID, LID}) where {GID <: Inte
     
     remoteGIDs = Array{GID, 1}(0)
     
-    source = sourceMap(impor)
-    target = targetMap(impor)
+    getIDSources(data, remoteGIDs)
+    
+    if length(remoteLIDs(data)) != 0 && !distributedGlobal(sourceMap(impor))
+        isLocallyComplete(data, false)
+        
+        warn("Target has remote LIDs but source is not distributed globally.  " *
+            "Importing a submap of the target map")
+    end
+    
+    remoteGIDs
+end
+
+
+function getIDSources(data, remoteGIDs, useRemotes=true)
+    source = sourceMap(data)
+    target = targetMap(data)
     
     sourceGIDs = myGlobalElements(source)
     targetGIDs = myGlobalElements(target)
@@ -176,10 +163,11 @@ function setupSamePermuteRemote(impor::Import{GID, PID, LID}) where {GID <: Inte
     numSameGIDs -= 1
     numSameIDs(data, numSameGIDs)
     
-    #TODO refacter into a seperatate method, duplicated in the expert constructor
     permuteToLIDs = julia_petra.permuteToLIDs(data)
     permuteFromLIDs = julia_petra.permuteFromLIDs(data)
     remoteLIDs = julia_petra.remoteLIDs(data)
+    
+    
     for tgtLID = (numSameGIDs+1):numTgtGIDs
         const curTargetGID = targetGIDs[tgtLID]
         const srcLID = lid(source, curTargetGID)
@@ -187,19 +175,12 @@ function setupSamePermuteRemote(impor::Import{GID, PID, LID}) where {GID <: Inte
             push!(permuteToLIDs, tgtLID)
             push!(permuteFromLIDs, srcLID)
         else
-            push!(remoteGIDs, curTargetGID)
-            push!(remoteLIDs, tgtLID)
+            if useRemotes
+                push!(remoteGIDs, curTargetGID)
+                push!(remoteLIDs, tgtLID)
+            end
         end
     end
-    
-    if length(remoteLIDs) != 0 && !distributedGlobal(source)
-        isLocallyComplete(data, false)
-        
-        warn("Target has remote LIDs but source is not distributed globally.  " *
-            "Importing a submap of the target map")
-    end
-    
-    remoteGIDs
 end
 
 function setupExport(impor::Import{GID, PID, LID}, remoteGIDs::Array{GID}, userRemotePIDs::Nullable{Array{PID}}) where {GID <: Integer, PID <: Integer, LID <: Integer}

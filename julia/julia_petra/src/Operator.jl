@@ -1,10 +1,6 @@
 export apply!, apply
 
 
-# TODO figure out how to document
-# the below block is a docstring and requires a something
-# const Operator = Any ???
-#=
 """
 Operator is a description of all types that have a specific set of methods.  ``@operatorFunctions typ`` must be called
 for Operator type ``typ``.  Operators must have 4 parametric types:
@@ -28,7 +24,7 @@ rangeMap(operator::Op{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
     Returns the BlockMap associated with the range of this operation
 The field operators contains all types that have had ``@operatorFunctions`` called on them
 """
-=#
+const Operator = Any #allow Operator to be documented
 
 
 """

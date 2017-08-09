@@ -10,7 +10,7 @@ export MPIComm
 An implementation of Comm using MPI
 The no argument constructor uses MPI.COMM_WORLD
 """
-type MPIComm{GID <: Integer, PID <:Integer, LID <: Integer} <: Comm{GID, PID, LID}
+struct MPIComm{GID <: Integer, PID <:Integer, LID <: Integer} <: Comm{GID, PID, LID}
     mpiComm::MPI.Comm
 end
 
@@ -18,7 +18,7 @@ function MPIComm(GID::Type, PID::Type, LID::Type)
     MPI.Init()
     comm = MPIComm{GID, PID, LID}(MPI.COMM_WORLD)
     
-    finalizer(comm, x -> MPI.Finalize())
+    atexit(() -> MPI.Finalize())
     
     comm
 end
