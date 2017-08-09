@@ -2,9 +2,9 @@ using julia_petra
 using Base.Test
 
 #use distinct types
-comm = MPIComm(UInt64, UInt16, UInt32)
+const comm = MPIComm(UInt64, UInt16, UInt32)
 
-pid = myPid(comm)
+const pid = myPid(comm)
 
 #only print errors from one process
 if pid != 1
@@ -14,9 +14,11 @@ end
 
 #try
 
-include("MPICommTests.jl")
-include("MPIBlockMapTests.jl")
-include("MPIimport-export Tests.jl")
+@testset "Comm MPI Tests" begin
+    include("MPICommTests.jl")
+    include("MPIBlockMapTests.jl")
+    include("MPIimport-export Tests.jl")
+end
 
 #catch err
 #    sleep(10)

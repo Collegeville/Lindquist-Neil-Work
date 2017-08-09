@@ -16,31 +16,55 @@ function basicMPITest(impor, debugSetting=false)
     @test isa(data.distributor, Distributor{UInt64, UInt16, UInt32})
     @test [] == data.permuteToLIDs
     @test [] == data.permuteFromLIDs
-    
+    #TODO test remoteLIDs, exportLIDs, exportPIDs
     @test true == data.isLocallyComplete
 end
 
+#for scoping purposes
+impor = Array{Import, 1}(1)
+expor = Array{Export, 1}(1)
+
+#ensure at least a few lines, each starting with the PID
+debugregex = "^(?:$myPid: .+\n){3,}\$"
+
 # basic import
-basicMPITest(Import(srcMap, desMap))
-basicMPITest(Import(srcMap, desMap, debug=true), true)
-basicMPITest(Import(srcMap, desMap, Nullable{Array{UInt16}}()))
-basicMPITest(Import(srcMap, desMap, Nullable{Array{UInt16}}(), debug=true), true)
+@test_nowarn impor[1] = Import(srcMap, desMap)
+basicMPITest(impor[1])
+@test_warn debugregex impor[1] = Import(srcMap, desMap, debug=true)
+basicMPITest(impor[1], true)
+@test_nowarn impor[1] = Import(srcMap, desMap, Nullable{Array{UInt16}}())
+basicMPITest(impor[1])
+@test_warn debugregex impor[1] = Import(srcMap, desMap, Nullable{Array{UInt16}}(), debug=true)
+basicMPITest(impor[1], true)
+
 
 # import using Dicts
-basicMPITest(Import(srcMap, desMap, Dict{Symbol, Any}()))
-basicMPITest(Import(srcMap, desMap, Dict([(:debug, true)])), true)
-basicMPITest(Import(srcMap, desMap, Nullable{Array{UInt16}}(), Dict{Symbol, Any}()))
-basicMPITest(Import(srcMap, desMap, Nullable{Array{UInt16}}(), Dict([(:debug, true)])), true)
+@test_nowarn impor[1] = Import(srcMap, desMap, Dict{Symbol, Any}())
+basicMPITest(impor[1])
+@test_warn debugregex impor[1] = Import(srcMap, desMap, Dict([(:debug, true)]))
+basicMPITest(impor[1], true)
+@test_nowarn impor[1] = Import(srcMap, desMap, Nullable{Array{UInt16}}(), Dict{Symbol, Any}())
+basicMPITest(impor[1])
+@test_warn debugregex impor[1] = Import(srcMap, desMap, Nullable{Array{UInt16}}(), Dict([(:debug, true)])) 
+basicMPITest(impor[1], true)
 
 
 # basic export
-basicMPITest(Export(srcMap, desMap))
-basicMPITest(Export(srcMap, desMap, debug=true), true)
-basicMPITest(Export(srcMap, desMap, Nullable{Array{UInt16}}()))
-basicMPITest(Export(srcMap, desMap, Nullable{Array{UInt16}}(), debug=true), true)
+@test_nowarn expor[1] = Export(srcMap, desMap)
+basicMPITest(expor[1])
+@test_warn debugregex expor[1] = Export(srcMap, desMap, debug=true)
+basicMPITest(expor[1], true)
+@test_nowarn expor[1] = Export(srcMap, desMap, Nullable{Array{UInt16}}())
+basicMPITest(expor[1])
+@test_warn debugregex expor[1] = Export(srcMap, desMap, Nullable{Array{UInt16}}(), debug=true)
+basicMPITest(expor[1], true)
 
 #export using Dicts
-basicMPITest(Export(srcMap, desMap, Dict{Symbol, Any}()))
-basicMPITest(Export(srcMap, desMap, Dict([(:debug, true)])), true)
-basicMPITest(Export(srcMap, desMap, Nullable{Array{UInt16}}(), Dict{Symbol, Any}()))
-basicMPITest(Export(srcMap, desMap, Nullable{Array{UInt16}}(), Dict([(:debug, true)])), true)
+@test_nowarn expor[1] = Export(srcMap, desMap, Dict{Symbol, Any}())
+basicMPITest(expor[1])
+@test_warn debugregex expor[1] = Export(srcMap, desMap, Dict([(:debug, true)]))
+basicMPITest(expor[1], true)
+@test_nowarn expor[1] = Export(srcMap, desMap, Nullable{Array{UInt16}}(), Dict{Symbol, Any}())
+basicMPITest(expor[1])
+@test_warn debugregex expor[1] = Export(srcMap, desMap, Nullable{Array{UInt16}}(), Dict([(:debug, true)]))
+basicMPITest(expor[1], true)
