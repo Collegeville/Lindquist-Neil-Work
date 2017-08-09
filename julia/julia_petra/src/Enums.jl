@@ -1,5 +1,8 @@
 export CombineMode, ADD, INSERT, REPLACE, ABSMAX, ZERO
 export TransposeMode, NO_TRANS, TRANS, CONJ_TRANS
+export ProfileType, STATIC_PROFILE, DYNAMIC_PROFILE
+export IndexType, LOCAL, GLOBAL, UNKNOWN
+export StorageStatus, STORAGE_2D, STORAGE_1D_UNPACKED, STORAGE_1D_PACKED
 
 """
 Tells petra how to combine data received from other processes with existing data on the calling process for specific import or export options.
@@ -41,7 +44,7 @@ Allocation profile for matrix/graph entries
 """
 Can be used to differentiate global and local indices
 """
-@enum IndexType LOCAL GLOBAL
+@enum IndexType LOCAL GLOBAL UNKNOWN
 
 
 """

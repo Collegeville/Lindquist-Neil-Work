@@ -11,9 +11,9 @@ k_numAllocPerRow_ and numAllocForAllRows_ are not copied to julia
 
 mutable struct CSRGraph{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: DistObject{GID, PID, LID}
     rowMap::BlockMap{GID, PID, LID}
-    colMap::BlockMap{GID, PID, LID}
-    rangeMap::BlockMap{GID, PID, LID}
-    domainMap::BlockMap{GID, PID, LID}
+    colMap::Nullable{BlockMap{GID, PID, LID}}
+    rangeMap::Nullable{BlockMap{GID, PID, LID}}
+    domainMap::Nullable{BlockMap{GID, PID, LID}}
     
     #may be null if domainMap and colMap are the same
     importer::Nullable{Import{GID, PID, LID}}
@@ -75,9 +75,82 @@ mutable struct CSRGraph{Data <: Number, GID <: Integer, PID <: Integer, LID <: I
 end
 
 
+#### Constructors #####
+
+#TODO add plist call that passes kwargs
+function CSRGraph(rowMap::BlockMap{GID, PID, LID}, maxNumEntriesPerRow::LID,
+        pftype::ProfileType, plist::Dict{Symbol}) where {
+        GID <: Integer, PID <: Integer, LID <: Integer}
+    CSRGraph(rowMap, Nullable{BlockMap{GID, PID, LID}}(), maxNumEntriesPerRow, pftype, plist)
+end
+function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
+        maxNumEntriesPerRow::LID, pftype::ProfileType, plist::Dict{Symbol}) where {
+        GID <: Integer, PID <: Integer, LID <: Integer}
+    CSRGraph(rowMap, Nullable(colMap), maxNumEntriesPerRow, pftype, plist)
+end
+    
+function CSRGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}}(),
+        maxNumEntriesPerRow::LID, pftype::ProfileType, plist::Dict{Symbol}) where {
+        GID <: Integer, PID <: Integer, LID <: Integer}
+    graph = CSRGraph(
+        rowMap,
+        colMap,
+        Nullable{BlockMap{GID, PID, LID}}(),
+        Nullable{BlockMap{GID, PID, LID}}(),
+        
+        Nullable{Import{GID, PID, LID}}(),
+        Nullable{Export{GID, PID, LID}}(),
+
+        0, #nodeNumEntries
+        #using -1 to indicate uninitiallized, likely to cause an error if used
+        -1, #nodeNumDiags
+        -1, #nodeMaxNumRowEntries
+        -1, #globalNumEntries
+        -1, #globalNumDiags
+        -1, #globalMaxNumRowEntries
+
+        pftype,
+
+        ## 1-D storage (Static profile) data structures ##
+        [],
+        [],
+        [],
+
+        ## 2-D storage (Dynamic profile) data structures ##
+        [],
+        [],
+        [],
+
+        (pftype == STATIC_PROFILE ?
+              STORAGE_1D_UNPACKED 
+            : STORAGE_2D),
+        
+        false,
+        UNKNOWN,
+        false,
+
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+
+        Dict{GID, Array{GID, 1}}()
+    )
+        
+        
+    staticAssertions(graph)
+    resumueFill(graph, params)
+    checkInternalState(graph)
+end
+
+
+
 function map(graph::CSRGraph)
     graph.rowMap
 end
 
+#TODO implement Constructors
 #TODO implement DistObject methods
 #TODO implement methods similar to RowMatrix
