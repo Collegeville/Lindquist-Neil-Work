@@ -9,8 +9,7 @@ k_numAllocPerRow_ and numAllocForAllRows_ are not copied to julia
 =#
 #TODO remember to do allocations in constructor, not lazily
 
-#TODO figure out type of Data
-mutable struct CRSGraph{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: DistObject{GID, PID, LID}
+mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistObject{GID, PID, LID}
     rowMap::BlockMap{GID, PID, LID}
     colMap::Nullable{BlockMap{GID, PID, LID}}
     rangeMap::Nullable{BlockMap{GID, PID, LID}}
@@ -21,7 +20,7 @@ mutable struct CRSGraph{Data <: Number, GID <: Integer, PID <: Integer, LID <: I
     #may be null if rangeMap and rowMap are the same
     exporter::Nullable{Export{GID, PID, LID}}
 
-    lclGraph::Array{Data, 2}
+    lclGraph::LocalCRSGraph
 
     #Local number of (populated) entries; must always be consistent
     nodeNumEntries::LID
@@ -72,6 +71,90 @@ mutable struct CRSGraph{Data <: Number, GID <: Integer, PID <: Integer, LID <: I
     haveGlobalConstants::Bool
 
     nonLocals::Dict{GID, Array{GID, 1}}
+
+    #Large ammounts of duplication between the constructors, so group it in an inner constructor
+    function CRSGraph(
+        rowMap::BlockMap{GID, PID, LID},
+        colMap::Nullable{BlockMap{GID, PID, LID}},
+        rangeMap::Nullable{BlockMap{GID, PID, LID}},
+        domainMap::Nullable{BlockMap{GID, PID, LID}},
+
+        lclGraph::LocalCRSGraph,
+
+        nodeNumEntries::LID,
+
+        pftype::ProfileType,
+        storageStatus::StorageStatus,
+
+        indiciesType::IndexType
+    ) where {GID <: Integer, PID <: Integer, LID <: Integer}
+
+        graph = new{GID, PID, LID}(
+            rowMap,
+            colMap,
+            rangeMap,
+            domainMap,
+
+            Nullable{Import{GID, PID, LID}}(),
+            Nullable{Export{GID, PID, LID}}(),
+
+            lclGraph,
+
+            #Local number of (populated) entries; must always be consistent
+            nodeNumEntries,
+
+            #using -1 to indicate uninitiallized, likely to cause an error if used
+            -1, #nodeNumDiags
+            -1, #nodeMaxNumRowEntries
+            -1, #globalNumEntries
+            -1, #globalNumDiags
+            -1, #globalMaxNumRowEntries
+
+            #Whether the graph was allocated with static or dynamic profile.
+            pftype,
+
+
+            ## 1-D storage (Static profile) data structures ##
+            [],
+            [],
+            [],
+
+            ## 2-D storage (Dynamic profile) data structures ##
+            [],
+            [],
+            [],
+
+            storageStatus,
+
+            false,
+            indiciesType,
+            false,
+
+            false,
+            false,
+            true,
+            true,
+            false,
+            false,
+
+            Dict{GID, Array{GID, 1}}()
+        )
+
+        ## staticAssertions() 
+        #skipping sizeof checks
+        #skipping max value checks related to size_t
+
+        #ensure LID is a subset of GID (for positive numbers)
+        if !(LID <: GID) && (GID != BigInt) && (GID != Integer)
+            # all ints are assumed to be able to handle 1, up to their max
+            if LID == BigInt || LID == Integer || typemax(LID) > typeMax(GID)
+                throw(InvalidArgumentError("The positive values of GID must "
+                        * "be a superset of the positive values of LID"))
+            end
+        end
+
+        graph
+    end
 end
 
 
@@ -97,52 +180,20 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
         colMap,
         Nullable{BlockMap{GID, PID, LID}}(),
         Nullable{BlockMap{GID, PID, LID}}(),
-        
-        Nullable{Import{GID, PID, LID}}(),
-        Nullable{Export{GID, PID, LID}}(),
 
-        [], #lclGraph
+        LocalCRSGraph{LID, LID}(), #lclGraph
         
         0, #nodeNumEntries
-        #using -1 to indicate uninitiallized, likely to cause an error if used
-        -1, #nodeNumDiags
-        -1, #nodeMaxNumRowEntries
-        -1, #globalNumEntries
-        -1, #globalNumDiags
-        -1, #globalMaxNumRowEntries
 
         pftype,
-
-        ## 1-D storage (Static profile) data structures ##
-        [],
-        [],
-        [],
-
-        ## 2-D storage (Dynamic profile) data structures ##
-        [],
-        [],
-        [],
 
         (pftype == STATIC_PROFILE ?
               STORAGE_1D_UNPACKED 
             : STORAGE_2D),
         
-        false,
-        UNKNOWN,
-        false,
-
-        false,
-        false,
-        true,
-        true,
-        false,
-        false,
-
-        Dict{GID, Array{GID, 1}}()
+        UNKNOWN
     )
         
-        
-    staticAssertions(graph)
     #TODO do allocations
     resumueFill(graph, params)
     checkInternalState(graph)
@@ -170,53 +221,21 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
         Nullable{BlockMap{GID, PID, LID}}(),
         Nullable{BlockMap{GID, PID, LID}}(),
 
-        Nullable{Import{GID, PID, LID}}(),
-        Nullable{Export{GID, PID, LID}}(),
-
-        [], #lclGraph
+        LocalCRSGraph{LID, LID}(), #lclGraph
         
         0, #nodeNumEntries
-        #using -1 to indicate uninitiallized, likely to cause an error if used
-        -1, #nodeNumDiags
-        -1, #nodeMaxNumRowEntries
-        -1, #globalNumEntries
-        -1, #globalNumDiags
-        -1, #globalMaxNumRowEntries
 
         #Whether the graph was allocated with static or dynamic profile.
         pftype,
         
         #TODO find numAllocForAllRows (see line 248)
 
-        ## 1-D storage (Static profile) data structures ##
-        [],
-        [],
-        [],
-
-        ## 2-D storage (Dynamic profile) data structures ##
-        [],
-        [],
-        [],
-
         (pftype == STATIC_PROFILE ?
               STORAGE_1D_UNPACKED 
             : STORAGE_2D),
 
-        false,
-        UNKNOWN,
-        false,
-
-        false,
-        false,
-        true,
-        true,
-        false,
-        false,
-
-        Dict{GID, Array{GID, 1}}()
+        UNKNOWN
     )
-    
-    staticAssertions(graph);
     
     #DECISION allow rowMap to be null?
     lclNumRows = numLocalElements(rowMap)
@@ -248,115 +267,121 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
         Nullable(colMap),
         Nullable{BlockMap{GID, PID, LID}}(),
         Nullable{BlockMap{GID, PID, LID}}(),
-        
-        Nullable{Import{GID, PID, LID}}(),
-        Nullable{Export{GID, PID, LID}}(),
 
-        [], #lclGraph
+        LocalCRSGraph{LID, LID}(), #lclGraph
         
         0, #nodeNumEntries
-        #using -1 to indicate uninitiallized, likely to cause an error if used
-        -1, #nodeNumDiags
-        -1, #nodeMaxNumRowEntries
-        -1, #globalNumEntries
-        -1, #globalNumDiags
-        -1, #globalMaxNumRowEntries
         
         STATIC_PROFILE,
         
         #TODO figure out numAllocForAllRows
-        
-        ## 1-D storage (Static profile) data structures ##
-        [],
-        [],
-        [],
-
-        ## 2-D storage (Dynamic profile) data structures ##
-        [],
-        [],
-        [],
 
         STORAGE_1D_PACKED,
 
-        false,
-        LOCAL,
-        false,
-
-        false,
-        false,
-        true,
-        true,
-        false,
-        false,
-
-        Dict{GID, Array{GID, 1}}()
+        LOCAL
     )
-    
-    staticAssertions(graph)
     #TODO do allocations
     setAllIndicies(graph, rowPointers, columnIndicies)
     checkInternalState(graph)
 end
 
-#This method appears to require Kokkos.StaticCRSGraph
-#=
+
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
-        localGraph::Kokkos.StaticCRSGraph, plist::Dict{Symbol}) where {
+        localGraph::LocalCRSGraph{LID, LID}, plist::Dict{Symbol}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
+    mapRowCount = numMyElements(rowMap)
     graph = CRSGraph(
         rowMap,
         Nullable(colMap),
-        Nullable{BlockMap{GID, PID, LID}}(),
-        Nullable{BlockMap{GID, PID, LID}}(),
+        Nullable{}(rowMap),
+        Nullable{}(colMap),
         
-        Nullable{Import{GID, PID, LID}}(),
-        Nullable{Export{GID, PID, LID}}(),
-
         localGraph,
         
-        length(localGraph), #nodeNumEntries
-        #using -1 to indicate uninitiallized, likely to cause an error if used
-        -1, #nodeNumDiags
-        -1, #nodeMaxNumRowEntries
-        -1, #globalNumEntries
-        -1, #globalNumDiags
-        -1, #globalMaxNumRowEntries
+        localGraph.rowMap[mapRowCount+1], #nodeNumEntries
         
         STATIC_PROFILE,
         
         #TODO figure out numAllocForAllRows
-        
-        ## 1-D storage (Static profile) data structures ##
-        [],
-        [],
-        [],
-
-        ## 2-D storage (Dynamic profile) data structures ##
-        [],
-        [],
-        [],
 
         STORAGE_1D_PACKED,
         
-        false,
-        LOCAL,
-        false,
-
-        false,
-        false,
-        true,
-        true,
-        false,
-        false,
-
-        Dict{GID, Array{GID, 1}}()
+        LOCAL
     )
-    =#
+    
+    if numRows(localGraph) != numMyElements(rowMap)
+        throw(InvalidArgumentError("input row map and input local "
+                * "graph need to have the same number of rows.  The "
+                * "row map claims $(numMyElements(rowMap)) row(s), "
+                * "but the local graph claims $(numRows(localGraph)) "
+                * "row(s)."))
+    end
+    
+    makeImportExport(graph)
+    
+    d_inds = localGraph.entries
+    graph.localIndices1D = d_inds
+    
+    d_ptrs = localGraph.rowMap
+    graph.rowOffsets = d_ptrs
+    
+    
+    #TODO figure out if these can be computed pre-inner constructor call
+    #reset local properties
+    graph.upperTriangular = true
+    graph.lowerTriangular = true
+    graph.nodeMaxNumRowEntries = 0
+    graph.nodeNumDiags
+    
+    for localRow = 1:mapRowCount
+        globalRow = gid(rowMap, localRow)
+        rowLID = lid(colMap, globalRow)
+        
+        #possible that the local matrix has no entries in the column
+        #corrisponding to the current row, in that case, the column map
+        #might not contain that GID.  Hence, the index validity check
+        if rowLID != 0
+            if rowLID +1 > length(d_ptrs)
+                throw(InvalidArgumentError("The given row Map and/or column Map "
+                        * "is/are not compatible with the provided local graphs."))
+            end
+            if d_ptrs[rowLID] != d_ptr[rowLID_1]
+                const smallestCol = d_inds[d_ptrs[rowLID]]
+                const largestCol  = d_inds[d_ptrs[rowLID+1]-1]
+                
+                if smallestCol < localRow
+                    graph.upperTriangular = false
+                end
+                if localRow < largestCol
+                    graph.lowerTriangular = false
+                end
+                for i = d_ptrs[rowLID]:d_ptrs[rowLID]-1
+                    if d_inds[i] == rowLID
+                        graph.nodeNumDiags += 1
+                        break #can only be 1 diagonal per row
+                    end
+                end
+            end
+            
+            graph.nodeMaxNumRowEntries = max((d_ptrs[rowLID + 1] - d_ptrs[rowLID]),
+                                            graph.nodeMaxNumRowEntries)
+        end
+    end
+    
+    graph.hasLocalConstants = true
+    computeGlobalConstants(graph)
+    
+    graph.fillComplete = true
+    checkInternalState(graph)
+end
+    
+    
     
 #TODO group duplicate constructor code and staticAssertions into inner constructor    
     
 
-#TODO implement staticAssertions(::CRSGraph)
+#TODO implement computeGlobalConstants(::CRSGraph)
+#TODO implement makeImportExport(::CRSGraph)
 #TODO implement resumeFill(::CRSGraph, ::Dict{Symbol})
 #TODO implement checkInternalState(::CRSGraph)
 #TODO implement setAllIndices(::CRSGraph, ::Array{LID, 1}, ::Array{LID, 1}) 
