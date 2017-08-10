@@ -1,95 +1,103 @@
-#number of elements in vectors
-n = 8
+#these tests are used for test MultiVector under both serial and MPI comms
 
-# use serial comm for local tests
-serialComm = SerialComm{Int32, Bool, Int16}()
-curMap = BlockMap(n, n, serialComm)
+function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
+    #number of elements in vectors
+    n = 8
 
-# test basic construction with setting data to zeros
-vect = MultiVector{Float64, Int32, Bool, Int16}(curMap, 3, true)
-@test n == localLength(vect)
-@test n == globalLength(vect)
-@test 3 == numVectors(vect)
-@test curMap == julia_petra.map(vect)
-@test zeros(Float64, (n, 3)) == vect.data
+    pid = myPid(comm)
+    nProcs = numProc(comm)
 
-# test basic construction without setting data to zeros
-vect = MultiVector{Float64, Int32, Bool, Int16}(curMap, 3, false)
-@test n == localLength(vect)
-@test n == globalLength(vect)
-@test 3 == numVectors(vect)
-@test curMap == julia_petra.map(vect)
+    curMap = BlockMap(nProcs*n, n, comm)
 
-# test wrapper constructor
-arr = Array{Float64, 2}(n, 3)
-vect = MultiVector{Float64, Int32, Bool, Int16}(curMap, arr)
-@test n == localLength(vect)
-@test n == globalLength(vect)
-@test 3 == numVectors(vect)
-@test curMap == julia_petra.map(vect)
-@test arr === vect.data
+    # test basic construction with setting data to zeros
+    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, 3, true)
+    @test n == localLength(vect)
+    @test nProcs*n == globalLength(vect)
+    @test 3 == numVectors(vect)
+    @test curMap == julia_petra.map(vect)
+    @test zeros(Float64, (n, 3)) == vect.data
 
-# test copy
-vect2 = copy(vect)
-@test n == localLength(vect)
-@test n == globalLength(vect)
-@test 3 == numVectors(vect)
-@test curMap == julia_petra.map(vect)
-@test vect.data == vect2.data
-@test vect.data !== vect2.data #ensure same contents, but different address
+    # test basic construction without setting data to zeros
+    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, 3, false)
+    @test n == localLength(vect)
+    @test nProcs*n == globalLength(vect)
+    @test 3 == numVectors(vect)
+    @test curMap == julia_petra.map(vect)
 
+    # test wrapper constructor
+    arr = Array{Float64, 2}(n, 3)
+    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, arr)
+    @test n == localLength(vect)
+    @test nProcs*n == globalLength(vect)
+    @test 3 == numVectors(vect)
+    @test curMap == julia_petra.map(vect)
+    @test arr === vect.data
 
-# test scale and scale!
-vect = MultiVector{Float64, Int32, Bool, Int16}(curMap, ones(Float64, n, 3))
-@test vect == scale!(vect, 5.0)
-@test 5*ones(Float64, (n, 3)) == vect.data
-
-vect = MultiVector{Float64, Int32, Bool, Int16}(curMap, ones(Float64, n, 3))
-vect2 = scale(vect, 5.0)
-@test vect !== vect2
-@test 5*ones(Float64, (n, 3)) == vect2.data
-
-vect = MultiVector{Float64, Int32, Bool, Int16}(curMap, ones(Float64, n, 3))
-@test vect == scale!(vect, [2.0, 3.0, 4.0])
-@test hcat(2*ones(Float64, n), 3*ones(Float64, n), 4*ones(Float64, n))  == vect.data
-
-vect = MultiVector{Float64, Int32, Bool, Int16}(curMap, ones(Float64, n, 3))
-vect2 = scale(vect, [2.0, 3.0, 4.0])
-@test vect !== vect2
-@test hcat(2*ones(Float64, n), 3*ones(Float64, n), 4*ones(Float64, n))  == vect2.data
+    # test copy
+    vect2 = copy(vect)
+    @test n == localLength(vect)
+    @test nProcs*n == globalLength(vect)
+    @test 3 == numVectors(vect)
+    @test curMap == julia_petra.map(vect)
+    @test vect.data == vect2.data
+    @test vect.data !== vect2.data #ensure same contents, but different address
 
 
-#test imports/exports
-source = MultiVector{Float64, Int32, Bool, Int16}(
-            curMap, Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
-target = MultiVector{Float64, Int32, Bool, Int16}(curMap, 3, false)
-impor = Import(curMap, curMap)
-doImport(source, target, impor, REPLACE)
-@test reshape(Array{Float64, 1}(collect(1:(3*n))), (n, 3)) == target.data
+    # test scale and scale!
+    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, ones(Float64, n, 3))
+    @test vect == scale!(vect, pid*5.0)
+    @test pid*5*ones(Float64, (n, 3)) == vect.data
+
+    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, ones(Float64, n, 3))
+    vect2 = scale(vect, pid*5.0)
+    @test vect !== vect2
+    @test pid*5*ones(Float64, (n, 3)) == vect2.data
+
+    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, ones(Float64, n, 3))
+    @test vect == scale!(vect, pid*nProcs+[2.0, 3.0, 4.0])
+    @test hcat( (pid*nProcs+2)*ones(Float64, n),
+                (pid*nProcs+3)*ones(Float64, n), 
+                (pid*nProcs+4)*ones(Float64, n))  == vect.data
+
+    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, ones(Float64, n, 3))
+    vect2 = scale(vect, pid*nProcs+[2.0, 3.0, 4.0])
+    @test vect !== vect2
+    @test hcat( (pid*nProcs+2)*ones(Float64, n),
+                (pid*nProcs+3)*ones(Float64, n), 
+                (pid*nProcs+4)*ones(Float64, n))  == vect2.data
 
 
-source = MultiVector{Float64, Int32, Bool, Int16}(
-            curMap, Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
-target = MultiVector{Float64, Int32, Bool, Int16}(curMap, 3, false)
-expor = Export(curMap, curMap)
-doExport(source, target, expor, REPLACE)
-@test reshape(Array{Float64, 1}(collect(1:(3*n))), (n, 3)) == target.data
-
-source = MultiVector{Float64, Int32, Bool, Int16}(
-            curMap, Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
-target = MultiVector{Float64, Int32, Bool, Int16}(curMap, 3, false)
-impor = Import(curMap, curMap)
-doExport(source, target, impor, REPLACE)
-@test reshape(Array{Float64, 1}(collect(1:(3*n))), (n, 3)) == target.data
+    #test imports/exports
+    source = MultiVector{Float64, UInt64, UInt16, UInt32}(
+        curMap, Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
+    target = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, 3, false)
+    impor = Import(curMap, curMap)
+    doImport(source, target, impor, REPLACE)
+    @test reshape(Array{Float64, 1}(collect(1:(3*n))), (n, 3)) == target.data
 
 
-source = MultiVector{Float64, Int32, Bool, Int16}(
-            curMap, Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
-target = MultiVector{Float64, Int32, Bool, Int16}(curMap, 3, false)
-expor = Export(curMap, curMap)
-doImport(source, target, expor, REPLACE)
-@test reshape(Array{Float64, 1}(collect(1:(3*n))), (n, 3)) == target.data
+    source = MultiVector{Float64, UInt64, UInt16, UInt32}(
+        curMap, Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
+    target = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, 3, false)
+    expor = Export(curMap, curMap)
+    doExport(source, target, expor, REPLACE)
+    @test reshape(Array{Float64, 1}(collect(1:(3*n))), (n, 3)) == target.data
+
+    source = MultiVector{Float64, UInt64, UInt16, UInt32}(
+        curMap, Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
+    target = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, 3, false)
+    impor = Import(curMap, curMap)
+    doExport(source, target, impor, REPLACE)
+    @test reshape(Array{Float64, 1}(collect(1:(3*n))), (n, 3)) == target.data
 
 
+    source = MultiVector{Float64, UInt64, UInt16, UInt32}(
+        curMap, Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
+    target = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, 3, false)
+    expor = Export(curMap, curMap)
+    doImport(source, target, expor, REPLACE)
+    @test reshape(Array{Float64, 1}(collect(1:(3*n))), (n, 3)) == target.data
 
-#TODO create MPIMultiVectorTests that get included with the other MPI tests
+    #TODO create import expor tests to test non trivial case
+
+end

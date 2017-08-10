@@ -8,6 +8,7 @@ const noComm = in("--comm", ARGS) #don't run comm framework tests
 const noDataStructs = in("--data", ARGS) #don't run tests on data structures
 const noUtil = in("--util", ARGS) #don't run tests on Misc Utils
 
+
 @testset "Serial tests" begin
 
     if !noUtil
@@ -26,7 +27,10 @@ const noUtil = in("--util", ARGS) #don't run tests on Misc Utils
     if !noDataStructs
         @testset "Data Structure Tests" begin
             include("LocalCRSGraphTests.jl")
+
             include("MultiVectorTests.jl")
+            multiVectorTests(SerialComm{UInt64, UInt16, UInt32}())
+
             include("CSRMatrixTests.jl")
         end
     end
