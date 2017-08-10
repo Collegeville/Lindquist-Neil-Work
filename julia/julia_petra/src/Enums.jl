@@ -41,6 +41,7 @@ Allocation profile for matrix/graph entries
 @enum ProfileType STATIC_PROFILE DYNAMIC_PROFILE
 
 
+#TODO change theses to ?????_INDICES
 """
 Can be used to differentiate global and local indices
 """

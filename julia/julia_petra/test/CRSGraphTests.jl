@@ -5,8 +5,10 @@ commObj = SerialComm{UInt32, UInt8, UInt16}()
 map = BlockMap(20, commObj)
 
 graph = CRSGraph(map, UInt16(15), STATIC_PROFILE, Dict{Symbol, Any}())
-@test julia_petra.map(graph) == map
-@test graph.pftype == STATIC_PROFILE
+@test map == julia_petra.map(graph)
+@test STATIC_PROFILE == getProfileType(graph)
+@test isLocallyIndexed(graph)
+@test !isGloballyIndexed(graph)
 
 commObj = SerialComm{UInt8, Int8, UInt16}()
 map = BlockMap(20, commObj)

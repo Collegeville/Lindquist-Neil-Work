@@ -1,5 +1,5 @@
 
-export CRSGraph
+export CRSGraph, isLocallyIndexed, isGloballyIndexed, getProfileType
 
 #=
 k_numAllocPerRow_ and numAllocForAllRows_ are not copied to julia
@@ -55,15 +55,15 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
     rowOffsets::Array{LID, 1}  #Tpetra: k_rowPts_
 
     ## 2-D storage (Dynamic profile) data structures ##
-    localIndices2D::Array{LID, 2}
-    globalIndices2D::Array{LID, 2}
+    localIndices2D::Array{Array{LID, 1}, 1}
+    globalIndices2D::Array{Array{GID, 1}, 1}
     #may exist in 1-D storage if not packed
     numRowEntries::Array{LID, 1}
 
     storageStatus::StorageStatus
 
-    indiciesAllowed::Bool
-    indiciesType::IndexType
+    indicesAllowed::Bool
+    indicesType::IndexType
     fillComplete::Bool
 
     lowerTriangle::Bool
@@ -72,6 +72,8 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
     noRedundancies::Bool
     haveLocalConstants::Bool
     haveGlobalConstants::Bool
+
+    debug::Bool
 
     nonLocals::Dict{GID, Array{GID, 1}}
 
@@ -89,7 +91,8 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
         pftype::ProfileType,
         storageStatus::StorageStatus,
 
-        indiciesType::IndexType
+        indiciesType::IndexType,
+        debug::Bool
     ) where {GID <: Integer, PID <: Integer, LID <: Integer}
 
         graph = new{GID, PID, LID}(
@@ -123,8 +126,8 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
             LID[],
 
             ## 2-D storage (Dynamic profile) data structures ##
-            Array{LID, 2}(0, 0),
-            Array{LID, 2}(0, 0),
+            Array{Array{LID, 1}, 1}(0),
+            Array{Array{GID, 1}, 1}(0),
             LID[],
 
             storageStatus,
@@ -140,6 +143,8 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
             false,
             false,
 
+            debug,
+        
             Dict{GID, Array{GID, 1}}()
         )
 
@@ -178,6 +183,7 @@ end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}},
         maxNumEntriesPerRow::LID, pftype::ProfileType, plist::Dict{Symbol}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
+    debug = get(plist, "debug", false)
     graph = CRSGraph(
         rowMap,
         colMap,
@@ -194,10 +200,12 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
               STORAGE_1D_UNPACKED 
             : STORAGE_2D),
         
-        UNKNOWN
+        LOCAL,
+        debug
     )
         
-    #TODO do allocations
+    allocateIndices(graph, LOCAL, maxNumEntriesPerRow)
+    
     resumeFill(graph, plist)
     checkInternalState(graph)
     
@@ -220,6 +228,7 @@ end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}},
         numEntPerRow::Array{LID, 1}, pftype::ProfileType,
         plist::Dict{Symbol})  where {GID <: Integer, PID <: Integer, LID <: Integer}
+    debug = get(plist, "debug", false)
     graph = CRSGraph(
         rowMap,
         colMap,
@@ -233,13 +242,12 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
         #Whether the graph was allocated with static or dynamic profile.
         pftype,
         
-        #TODO find numAllocForAllRows (see line 248)
-
         (pftype == STATIC_PROFILE ?
               STORAGE_1D_UNPACKED 
             : STORAGE_2D),
 
-        UNKNOWN
+        LOCAL,
+        debug
     )
     
     #DECISION allow rowMap to be null?
@@ -249,7 +257,7 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
                 "!= the local number of rows $lclNumRows as spcified by the input row Map"))
     end
     
-    if get(plist, "debug", false)
+    if debug
         for r = 1:lclNumRows
             curRowCount = numEntPerRow[r]
             if curRowCount <= 0
@@ -257,7 +265,8 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
             end
         end
     end
-    #TODO do allocations
+    
+    allocateIndices(graph, LOCAL, numEntPerRow)
     
     resumeFill(graph, plist)
     checkInternalState(graph)
@@ -269,6 +278,7 @@ end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
         rowPointers::Array{LID, 1}, columnIndices::Array{LID, 1},
         plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
+    debug = get(plist, "debug", false)
     graph = CRSGraph(
         rowMap,
         Nullable(colMap),
@@ -281,13 +291,14 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
         
         STATIC_PROFILE,
         
-        #TODO figure out numAllocForAllRows
-
         STORAGE_1D_PACKED,
 
-        LOCAL
+        LOCAL,
+        debug
     )
-    #TODO do allocations
+    #seems to be already taken care of
+    #allocateIndices(graph, LOCAL, numEntPerRow)
+    
     setAllIndicies(graph, rowPointers, columnIndicies)
     checkInternalState(graph)
     
@@ -298,6 +309,7 @@ end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
         localGraph::LocalCRSGraph{LID, LID}, plist::Dict{Symbol}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
+    debug = get(plist, "debug", false)
     mapRowCount = numMyElements(rowMap)
     graph = CRSGraph(
         rowMap,
@@ -315,7 +327,8 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
 
         STORAGE_1D_PACKED,
         
-        LOCAL
+        LOCAL,
+        debug
     )
     
     if numRows(localGraph) != numMyElements(rowMap)
@@ -326,6 +339,9 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
                 * "row(s)."))
     end
     
+    #seems to be already taken care of
+    #allocateIndices(graph, LOCAL, numEntPerRow)
+    
     makeImportExport(graph)
     
     d_inds = localGraph.entries
@@ -334,8 +350,6 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
     d_ptrs = localGraph.rowMap
     graph.rowOffsets = d_ptrs
     
-    
-    #TODO figure out if these can be computed pre-inner constructor call
     #reset local properties
     graph.upperTriangular = true
     graph.lowerTriangular = true
@@ -387,15 +401,259 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
 end
     
     
+#### internal methods ####
+function computeGlobalConstants(graph::CRSGraph{GID, PID, LID}) where {
+        GID <: Integer, PID <: Integer, LID <: Integer}
     
+    #short circuit if already computed
+    graph.haveGlobalConstants && return
+    
+    if graph.debug
+        @assert !null(graph.colMap) "The graph must have a column map at this point"
+    end
+    
+    computeLocalConstants()
+    
+    #if graph.haveGlobalConstants == false  #short circuited above
+    graph.globalNumEntries, graph.globalNumDiags = sumAll(comm(graph.map),
+        [GID(graph.nodeNumEntries), GID(graph.nodeNumDiags)])
+        
+    graph.globalMaxNumRowEntries = maxAll(comm(graph.map), GID(graph.nodeMaxNumRowEntries))
+    graph.haveGlobalConstants = true
+end
 
-#TODO implement computeGlobalConstants(::CRSGraph)
+
+function computeLocalConstants(graph::CRSGraph{GID, PID, LID}) where {
+        GID <: Integer, PID <: Integer, LID <: Integer}
+    
+    #short circuit if already computed
+    graph.haveLocalConstants && return
+    
+    if graph.debug
+        @assert !null(graph.colMap) "The graph must have a column map at this point"
+    end
+    
+    #if graph.haveLocalConstants == false  #short circuited above
+    
+    graph.upperTriangular = true
+    graph.lowerTriangular = true
+    graph.nodeMaxNumRowEntries = 0
+    graph.nodeNumDiags = 0
+    
+    rowMap = graph.rowMap
+    colMap = get(graph.colMap)
+    
+    #indicesAreAllocated => true
+    if  hasRowInfo(graph)
+        const numLocalRows = numMyElements(rowMap)
+        for localRow = 1:numLocalRows
+            const globalRow = gid(rowMap, localRow)
+            const rowLID = lid(colMap, globalRow)
+            
+            const rowInfo = getRowInfo(graph, localRow)
+            rowView = getLocalView(rowInfo)
+
+            for i = rowView
+                if rowLID == i
+                    graph.nodeNumDiags += 1
+                    break #should only have 1 diag per row
+                end
+            end
+
+            const smallestCol = rowView[1]
+            const largestCol  = rowView[end]
+            if smallestCol < localRow
+                graph.upperTriangular = false
+            end
+            if localRow < largestCol
+                graph.lowerTriangular = false
+            end
+            graph.nodeMaxNumRowEntries = max(graph.nodeMaxNumRowEntries, rowInfo.numEntries)
+        end
+    end
+    graph.haveLocalConstants = true
+end
+              
+
+function hasRowInfo(graph::CRSGraph)
+    #indicesAreAllocated => true
+    (getProfileType(graph) != STATIC_PROFILE
+        || length(graph.rowOffsets) != 0)
+end
+
+function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} where {GID, PID, LID <: Integer}
+    if graph.debug
+        @assert hasRowInfo(graph) "Graph does not have row info anymore.  Should have been caught earlier"
+    end
+    
+    if !hasRowInfo(graph) || !myLID(graph.rowMap, row)
+        return RowInfo{LID}(graph, 0, 0, 0, 0)
+    end
+    
+    if getProfileType(graph) == STATIC_PROFILE
+        if length(graph.rowOffsets) == 0
+            ofset1D = 0
+            allocSize = 0
+        else
+            offset1D  = graph.rowOffsets[row]
+            allocSize = graph.rowOffsets[row+1] - graph.rowOffsets[row]
+        end
+        numEntries = (length(graph.numRowEntries) == 0 ?
+            allocSize : numRowEntries[row])
+    else #dynamic profile
+        offset1D = 0
+        if isLocallyIndexed(graph)
+            allocSize = (length(graph.localIndices2D) == 0 ?
+                0 : length(graph.localIndices2D[row]))
+        elseif isGloballyIndexed(graph)
+            allocSize = (length(graph.globalIndices2D) == 0 ?
+                0 : length(graph.globalIndices2D[row]))
+        else
+            allocSize = 0
+        end
+        numEntries = (length(graph.numRowEntries) == 0 ?
+            0 : graph.numRowEntries[row])
+    end
+    RowInfo{LID}(graph, row, allocSize, numEntries, offset1D)
+end
+
+#DECISION put this somewhere else?  Its only an internal grouping
+struct RowInfo{LID <: Integer}
+    graph::CRSGraph{<:Integer, <:Integer, LID}
+    localRow::LID
+    allocSize::LID
+    numEntries::LID
+    offset1D::LID
+end
+
+function getLocalView(rowInfo::RowInfo{LID})::AbstractArray{LID, 1} where LID <: Integer
+    graph = rowInfo.graph
+    if rowInfo.allocSize == 0
+        LID[]
+    elseif length(graph.localIndices1D) != 0
+        start = rowInfo.offset1D
+        len = rowInfo.allocSize
+        
+        view(graph.localIndices1D, start:len)
+    elseif length(graph.localIndices2D[rowInfo.localRow]) != 0
+        graph.localIndices2D[rowInfo.localRow]
+    else
+        LID[]
+    end
+end
+
+
+function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
+        lg::IndexType, numAllocPerRow::Union{Integer, Array{<:Integer, 1}}) where {
+        GID <: Integer, LID <: Integer}
+    @assert isLocallyIndexed(graph) == (lg == LOCAL) "Graph is locally indexed, by lg=$lg"
+    @assert isGloballyIndexed(graph) == (lg == GLOBAL) "Graph is globally indexed by lg=$lg"
+    
+    numRows = getNodeNumRows(graph)
+
+    if getProfileType(graph) == STATIC_PROFILE
+        rowPtrs = Array{LID, 1}(numRows + 1)
+
+        #using function call style, since otherwise it needs to be 1 line or julia funcalls a Bool
+        @assert(!isa(numAllocPerRow, Array{<:Integer}) 
+            || length(numAllocPerRow) == numRows,
+            "numAllocRows has length = $(length(numAllocPerRow)) "
+            * "!= numRows = $numRows")
+        computeOffsetsFromCounts(rowPtrs, numAllocPerRow)
+        
+        graph.rowOffsets = rowPtrs
+        numInds = rowPtrs[numRows+1]
+        
+        if lg == LOCAL
+            graph.localIndices1D = Array{LID, 1}(numInds)
+        else
+            graph.globalIndices1D = Array{GID, 1}(numInds)
+        end
+        graph.storageStatus = STORAGE_1D_UNPACKED
+    else
+        numAllocIsArray = isa(numAllocPerRow, Array{<: Integer})
+        if lg == LOCAL
+            graph.localInds2D = Array{Array{LID, 1}, 1}(numRows)
+            for i = 1:numRows
+                const howMany = (numAllocIsArray ?
+                    numAllocPerRow[i] : numAllocPerRow)
+                if howMany > 0
+                    resize(graph.localInds2D[i], howMany)
+                end
+            end
+        else #lg == GLOBAL
+            graph.globalInds2D = Array{Array{GID, 1}, 1}(numRows)
+            for i = 1:numRows
+                const howMany = (numAllocIsArray ?
+                    numAllocPerRow[i] : numAllocPerRow)
+                if howMany > 0
+                    resize(graph.globalInds2D[i], howMany)
+                end
+            end
+        end
+        graph.storageStatus = STORAGE_2D
+    end
+
+    graph.indicesType = lg
+    
+    if numRows > 0
+        numRowEntries = zeros(LID, 1)
+        graph.numRowEntries = numRowEntries
+    end
+    
+    checkInternalState(graph)
+end
+    
+    
+#TODO implement computeOffsetsFromCounts
+function computeOffsetsFromCounts(rP::Array{<:Integer, 1}, nE::Union{Integer, Array{<: Integer, 1}}) end
 #TODO implement makeImportExport(::CRSGraph)
 #TODO implement resumeFill(::CRSGraph, ::Dict{Symbol})
 function resumeFill(g::CRSGraph, d::Dict{Symbol}) end
 #TODO implement checkInternalState(::CRSGraph)
 function checkInternalState(g::CRSGraph) end
 #TODO implement setAllIndices(::CRSGraph, ::Array{LID, 1}, ::Array{LID, 1}) 
+
+
+#### external API ####
+
+"""
+    getNodeNumRows(graph)
+
+Gets the number of rows on this processor
+"""
+function getNodeNumRows(graph::CRSGraph{<:Integer, <:Integer, LID}) where LID <: Integer
+    numMyElements(graph.rowMap)
+end
+    
+
+"""
+    isGloballyIndexed(::CRSGraph)
+
+Whether the graph uses global indexes
+"""
+function isGloballyIndexed(graph::CRSGraph)
+    graph.indicesType == GLOBAL
+end
+   
+"""
+    isLocallyIndexed(::CRSGraph)
+
+Whether the graph uses local indexes
+"""
+function isLocallyIndexed(graph::CRSGraph)
+    graph.indicesType == LOCAL
+end
+
+"""
+    getProfileType(::CRSGraph)
+
+Gets the profile type of the graph
+"""
+function getProfileType(graph::CRSGraph)
+    graph.pftype
+end
+
 
 function map(graph::CRSGraph)
     graph.rowMap
