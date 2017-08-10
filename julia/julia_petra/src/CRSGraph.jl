@@ -1,4 +1,6 @@
 
+export CRSGraph
+
 #=
 k_numAllocPerRow_ and numAllocForAllRows_ are not copied to julia
 
@@ -20,6 +22,7 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
     #may be null if rangeMap and rowMap are the same
     exporter::Nullable{Export{GID, PID, LID}}
 
+    #TODO figure out if this really needs to be stored
     lclGraph::LocalCRSGraph
 
     #Local number of (populated) entries; must always be consistent
@@ -103,26 +106,26 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
             #Local number of (populated) entries; must always be consistent
             nodeNumEntries,
 
-            #using -1 to indicate uninitiallized, likely to cause an error if used
-            -1, #nodeNumDiags
-            -1, #nodeMaxNumRowEntries
-            -1, #globalNumEntries
-            -1, #globalNumDiags
-            -1, #globalMaxNumRowEntries
+            #using 0 to indicate uninitiallized, since -1 isn't gareenteed to work
+            0, #nodeNumDiags
+            0, #nodeMaxNumRowEntries
+            0, #globalNumEntries
+            0, #globalNumDiags
+            0, #globalMaxNumRowEntries
 
             #Whether the graph was allocated with static or dynamic profile.
             pftype,
 
 
             ## 1-D storage (Static profile) data structures ##
-            [],
-            [],
-            [],
+            LID[],
+            GID[],
+            LID[],
 
             ## 2-D storage (Dynamic profile) data structures ##
-            [],
-            [],
-            [],
+            Array{LID, 2}(0, 0),
+            Array{LID, 2}(0, 0),
+            LID[],
 
             storageStatus,
 
@@ -147,7 +150,7 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
         #ensure LID is a subset of GID (for positive numbers)
         if !(LID <: GID) && (GID != BigInt) && (GID != Integer)
             # all ints are assumed to be able to handle 1, up to their max
-            if LID == BigInt || LID == Integer || typemax(LID) > typeMax(GID)
+            if LID == BigInt || LID == Integer || typemax(LID) > typemax(GID)
                 throw(InvalidArgumentError("The positive values of GID must "
                         * "be a superset of the positive values of LID"))
             end
@@ -160,7 +163,7 @@ end
 
 #### Constructors #####
 
-#TODO add plist call that passes kwargs
+#TODO add plist constructors that passes kwargs
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, maxNumEntriesPerRow::LID,
         pftype::ProfileType, plist::Dict{Symbol}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
@@ -183,7 +186,7 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
 
         LocalCRSGraph{LID, LID}(), #lclGraph
         
-        0, #nodeNumEntries
+        LID(0), #nodeNumEntries
 
         pftype,
 
@@ -195,8 +198,10 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
     )
         
     #TODO do allocations
-    resumueFill(graph, params)
+    resumeFill(graph, plist)
     checkInternalState(graph)
+    
+    graph
 end
 
 
@@ -223,7 +228,7 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
 
         LocalCRSGraph{LID, LID}(), #lclGraph
         
-        0, #nodeNumEntries
+        LID(0), #nodeNumEntries
 
         #Whether the graph was allocated with static or dynamic profile.
         pftype,
@@ -256,6 +261,8 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
     
     resumeFill(graph, plist)
     checkInternalState(graph)
+    
+    graph
 end
 
 
@@ -270,7 +277,7 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
 
         LocalCRSGraph{LID, LID}(), #lclGraph
         
-        0, #nodeNumEntries
+        LID(0), #nodeNumEntries
         
         STATIC_PROFILE,
         
@@ -283,6 +290,8 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
     #TODO do allocations
     setAllIndicies(graph, rowPointers, columnIndicies)
     checkInternalState(graph)
+    
+    graph
 end
 
 
@@ -373,23 +382,24 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
     
     graph.fillComplete = true
     checkInternalState(graph)
+    
+    graph
 end
     
     
-    
-#TODO group duplicate constructor code and staticAssertions into inner constructor    
     
 
 #TODO implement computeGlobalConstants(::CRSGraph)
 #TODO implement makeImportExport(::CRSGraph)
 #TODO implement resumeFill(::CRSGraph, ::Dict{Symbol})
+function resumeFill(g::CRSGraph, d::Dict{Symbol}) end
 #TODO implement checkInternalState(::CRSGraph)
+function checkInternalState(g::CRSGraph) end
 #TODO implement setAllIndices(::CRSGraph, ::Array{LID, 1}, ::Array{LID, 1}) 
 
 function map(graph::CRSGraph)
     graph.rowMap
 end
 
-#TODO implement Constructors
 #TODO implement DistObject methods
 #TODO implement methods similar to RowMatrix
