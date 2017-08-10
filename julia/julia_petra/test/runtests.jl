@@ -25,6 +25,7 @@ const noUtil = in("--util", ARGS) #don't run tests on Misc Utils
 
     if !noDataStructs
         @testset "Data Structure Tests" begin
+            include("LocalCRSGraphTests.jl")
             include("MultiVectorTests.jl")
             include("CSRMatrixTests.jl")
         end
