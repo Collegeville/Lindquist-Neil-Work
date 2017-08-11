@@ -218,7 +218,7 @@ end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}},
         numEntPerRow::Array{LID, 1}, pftype::ProfileType,
         plist::Dict{Symbol})  where {GID <: Integer, PID <: Integer, LID <: Integer}
-    debug = get(plist, "debug", false)
+    debug = get(plist, :debug, false)
     graph = CRSGraph(
         rowMap,
         colMap,
@@ -393,7 +393,7 @@ function computeGlobalConstants(graph::CRSGraph{GID, PID, LID}) where {
     #short circuit if already computed
     graph.haveGlobalConstants && return
     
-    if get(graph.plist, "debug", false)
+    if get(graph.plist, :debug, false)
         @assert !null(graph.colMap) "The graph must have a column map at this point"
     end
     
@@ -414,7 +414,7 @@ function computeLocalConstants(graph::CRSGraph{GID, PID, LID}) where {
     #short circuit if already computed
     graph.haveLocalConstants && return
     
-    if get(graph.plist, "debug", false)
+    if get(graph.plist, :debug, false)
         @assert !null(graph.colMap) "The graph must have a column map at this point"
     end
     
@@ -467,7 +467,7 @@ function hasRowInfo(graph::CRSGraph)
 end
 
 function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} where {GID, PID, LID <: Integer}
-    if get(graph.plist, "debug", false)
+    if get(graph.plist, :debug, false)
         @assert hasRowInfo(graph) "Graph does not have row info anymore.  Should have been caught earlier"
     end
     
@@ -586,7 +586,8 @@ function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
         graph.numRowEntries = numRowEntries
     end
     
-    checkInternalState(graph)
+    #let the calling constructor take care of this
+    #checkInternalState(graph)
 end
     
     
@@ -607,14 +608,186 @@ function makeImportExport(graph::CRSGraph{GID, PID, LID}) where {
     end
 end
     
-#TODO implement resumeFill(::CRSGraph, ::Dict{Symbol})
-function resumeFill(g::CRSGraph, d::Dict{Symbol}) end
-#TODO implement checkInternalState(::CRSGraph)
-function checkInternalState(g::CRSGraph) end
+function checkInternalState(graph::CRSGraph)
+    if get(graph.plist, :debug, false)
+        const localNumRows = getNodeNumRows(graph)
+        
+        @assert(isFillActive(graph) != isFillComplete(graph),
+            "Graph must be either fill active or fill "
+            * "complete$(isFillActive(graph)?"not both":"").")
+        @assert(!isFillComplete(graph)
+                || (!isnull(graph.colMap) 
+                    && !isnull(graph.domainMap) 
+                    && !isnull(graph.rangeMap)),
+            "Graph is fill complete, but at least one of {column, range, domain} map is null")
+        @assert((graph.storageStatus != STORAGE_1D_PACKED 
+                    && graph.storageStatus != STORAGE_1D_UNPACKED) 
+            || graph.pftype != DYNAMIC_PROFILE,
+            "Graph claims 1D storage, but dynamic profile")
+        if graph.storageStatus == STORAGE_2D
+            @assert(graph.pftype != STATIC_PROFILE ,
+                "Graph claims 2D storage, but static profile")
+            @assert(!isLocallyIndexed(graph) 
+                || length(graph.localIndices2D) == localNumRows,
+                "Graph calims to be locally index and have 2D storage, "
+                * "but length(graph.localIndices2D) = $(length(graph.localIndices2D)) "
+                * "!= getNodeNumRows(graph) = $localNumRows")
+            @assert(!isGloballyIndexed(graph)
+                || length(graph.globalIndices2D) == localNumRows,
+                "Graph calims to be globally index and have 2D storage, "
+                * "but length(graph.globalIndices2D) = $(length(graph.globalIndices2D)) "
+                * "!= getNodeNumRows(graph) = $localNumRows")
+        end
+        
+        @assert(graph.haveGlobalConstants 
+            || (graph.globalNumEntries == 0 
+                && graph.globalNumDiags == 0 
+                && graph.globalMaxNumRowEntries == 0),
+            "Graph claims to not have global constants, "
+            * "but some of the global constants are not 0")
+        
+        @assert(!graph.haveGlobalConstants 
+            || (graph.globalNumEntries != 0 
+                && graph.globalMaxNumRowEntries != 0), 
+            "Graph claims to have global constants, but also says 0 global entries")
+        
+        @assert(!graph.haveGlobalConstants
+            || (graph.globalNumEntries > graph.nodeNumEntries
+                && graph.globalNumDiags > graph.nodeNumDiags
+                && graph.globalMaxNumRowEntries > graph.nodeMaxNumRowEntries),
+            "Graph claims to have global constants, but some of the local "
+            * "constants are greater than their corresponding global constants")
+        
+        @assert(!isStorageOptimized(graph)
+            || graph.pftype == STATIC_PROFILE,
+            "Storage is optimized, but graph is not STATIC_PROFILE")
+        
+        @assert(!isGloballyIndexed(graph)
+            || length(graph.rowOffsets) == 0
+            || (length(graph.rowOffsets) == localNumRows +1
+                && graph.rowOffsets[localNumRows+1] == length(graph.globalIndices1D)),
+            "If rowOffsets has nonzero size and the graph is globally "
+            * "indexed, then rowOffsets must have N+1 rows and rowOffsets[N+1] "
+            * "must equal the length of globalIndices1D")
+        
+        @assert(!isLocallyIndexed(graph)
+            || length(graph.rowOffsets) == 0
+            || (length(graph.rowOffsets) == localNumRows +1
+                && graph.rowOffsets[localNumRows+1] == length(graph.localIndices1D)),
+            "If rowOffsets has nonzero size and the graph is globally "
+            * "indexed, then rowOffsets must have N+1 rows and rowOffsets[N+1] "
+            * "must equal the length of localIndices1D")
+        
+        if graph.pftype == DYNAMIC_PROFILE
+            @assert(localNumRows == 0 
+                || length(graph.localIndices2D) > 0 
+                || length(graph.globalIndices2D) > 0,
+                "Graph has dynamic profile, the calling process has nonzero "
+                * "rows, but no 2-D column index storage is present.")
+            @assert(localNumRows == 0
+                || length(graph.numRowEntries) != 0,
+                "Graph has dynamic profiles and the calling process has "
+                * "nonzero rows, but numRowEntries is not present")
+            
+            @assert(length(graph.localIndices1D) == 0
+                && length(graph.globalIndices1D) == 0,
+                "Graph has dynamic profile, but 1D allocations are present")
+            
+            @assert(length(graph.rowOffsets) == 0,
+                "Graph has dynamic profile, but row offsets are present")
+            
+        elseif graph.pftype == STATIC_PROFILE
+            @assert(length(graph.localIndices1D) != 0 
+                || length(graph.globalIndices1D) != 0,
+                "Graph has static profile, but 1D allocations are not present")
+            
+            @assert(length(graph.localIndices2D) == 0
+                && length(graph.globalIndices2D) == 0,
+                "Graph has static profile, but 2D allocations are present")
+        else
+            error("Unknown profile type: $(graph.pftype)")
+        end
+        
+        if graph.indicesType == LOCAL
+            @assert(length(graph.globalIndices1D) == 0
+                && length(graph.globalIndices2D) == 0,
+                "Indices are local, but global allocations are present")
+            @assert(graph.nodeNumEntries == 0
+                || length(graph.localIndices1D) > 0
+                || length(graph.localIndices2D) > 0,
+                "Indices are local and local entries exist, but there aren't local allocations present")
+        elseif graph.indicesType == GLOBAL
+            @assert(length(graph.localIndices1D) == 0
+                && length(graph.globalIndices2D) == 0,
+                "Indices are global, but local allocations are present")
+            @assert(graph.localNumEntries == 0
+                || length(graph.globalIndices1D) > 0
+                || length(graph.globalIndices2D) > 0,
+                "Indices are global and local entries exist, but there aren't global allocations present")
+        else
+            warn("Unknown indices type: $(graph.indicesType)")
+        end
+
+        #check actual allocations
+        const lenRowOffsets = length(graph.rowOffsets)
+        if graph.pftype == STATIC_PROFILE && lenRowOffsets != 0
+            @assert(lenRowOffsets == localNumRows+1,
+                "Graph has static profile, rowOffsets has a nonzero length "
+                * "($lenRowOffsets), but is not equal to the "
+                * "local number of rows plus one ($(localNumRows+1))")
+            const actualNumAllocated = graph.rowOffsets[localNumRows+1]
+            @assert(!isLocallyIndexed(graph)
+                || length(graph.localIndices1D) == actualNumAllocated,
+                "Graph has static profile, rowOffsets has a nonzero length, "
+                * "but length(localIndices1D) = $(length(graph.localIndices1D)) "
+                * "!= actualNumAllocated = $actualNumAllocated")
+            @assert(!isGloballyIndexed(graph)
+                || length(graph.globalIndices1D) == actualNumAllocated,
+                "Graph has static profile, rowOffsets has a nonzero length, "
+                * "but length(globalIndices1D) = $(length(graph.globalIndices1D)) "
+                * "!= actualNumAllocated = $actualNumAllocated")
+        end
+    end
+end
+        
+
 #TODO implement setAllIndices(::CRSGraph, ::Array{LID, 1}, ::Array{LID, 1}) 
 #TODO implement fillComplete(::CRSGraph)
+#TODO implement resumeFill(::CRSGraph, ::Dict{Symbol})
+function resumeFill(g::CRSGraph, d::Dict{Symbol})
+    #this is just a mock to get checkInternalState working
+    g.fillComplete = false
+end
 
 #### external API ####
+
+"""
+    isStorageOptimized(::CRSGraph)
+
+Whether the graph's storage is optimized
+"""
+function isStorageOptimized(graph::CRSGraph)
+    const isOpt = length(graph.numRowEntries) == 0 && getNodeNumRows(graph) > 0
+    if isOpt && get(graph.plist, :debug, false)
+        @assert(getProfileType(graph) == STATIC_PROFILE,
+            "Matrix claims optimized storage by profile type "
+            * "is dynamic.  This shouldn't happend.")
+    end
+    isOpt
+end
+
+"""
+    isFillActive(graph)::Bool
+
+Whether the graph is in fill mode
+"""
+isFillActive(g::CRSGraph) = !g.fillComplete
+"""
+    isFillComplete(graph)::Bool
+
+Whether the graph is fill complete
+"""
+isFillComplete(g::CRSGraph) = g.fillComplete
 
 """
     getNodeNumRows(graph)

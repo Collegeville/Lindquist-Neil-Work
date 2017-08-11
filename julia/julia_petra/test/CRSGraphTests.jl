@@ -10,6 +10,12 @@ graph = CRSGraph(map, UInt16(15), STATIC_PROFILE, Dict{Symbol, Any}())
 @test isLocallyIndexed(graph)
 @test !isGloballyIndexed(graph)
 
+graph = CRSGraph(map, UInt16(15), STATIC_PROFILE, Dict{Symbol, Any}(:debug=>true))
+@test map == julia_petra.map(graph)
+@test STATIC_PROFILE == getProfileType(graph)
+@test isLocallyIndexed(graph)
+@test !isGloballyIndexed(graph)
+
 commObj = SerialComm{UInt8, Int8, UInt16}()
 map = BlockMap(20, commObj)
 

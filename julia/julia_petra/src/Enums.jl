@@ -42,6 +42,7 @@ Allocation profile for matrix/graph entries
 
 
 #TODO change theses to ?????_INDICES
+#TODO remove UNKNOWN enums
 """
 Can be used to differentiate global and local indices
 """
