@@ -527,9 +527,24 @@ function getLocalView(rowInfo::RowInfo{LID})::AbstractArray{LID, 1} where LID <:
     end
 end
 
+function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
+        lg::IndexType, numAllocPerRow::Array{<:Integer, 1}) where {
+        GID <: Integer, LID <: Integer}
+    #using function call style, since otherwise it needs to be 1 line or julia funcalls a Bool
+    @assert(length(numAllocPerRow) == numRows,
+        "numAllocRows has length = $(length(numAllocPerRow)) "
+        * "!= numRows = $numRows")
+    allocateIndices(graph, lg, numAllocPerRow, i -> numAllocPerRow[i])
+end
 
 function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
-        lg::IndexType, numAllocPerRow::Union{Integer, Array{<:Integer, 1}}) where {
+        lg::IndexType, numAllocPerRow::Integer) where {
+        GID <: Integer, LID <: Integer}
+    allocateIndices(graph, lg, numAllocPerRow, i-> numAllocPerRow)
+end
+    
+function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
+        lg::IndexType, numAlloc, numAllocPerRow::Function) where {
         GID <: Integer, LID <: Integer}
     @assert isLocallyIndexed(graph) == (lg == LOCAL) "Graph is locally indexed, by lg=$lg"
     @assert isGloballyIndexed(graph) == (lg == GLOBAL) "Graph is globally indexed by lg=$lg"
@@ -538,13 +553,8 @@ function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
 
     if getProfileType(graph) == STATIC_PROFILE
         rowPtrs = Array{LID, 1}(numRows + 1)
-
-        #using function call style, since otherwise it needs to be 1 line or julia funcalls a Bool
-        @assert(!isa(numAllocPerRow, Array{<:Integer}) 
-            || length(numAllocPerRow) == numRows,
-            "numAllocRows has length = $(length(numAllocPerRow)) "
-            * "!= numRows = $numRows")
-        computeOffsets(rowPtrs, numAllocPerRow)
+            
+        computeOffsets(rowPtrs, numAlloc)
         
         graph.rowOffsets = rowPtrs
         numInds = rowPtrs[numRows+1]
@@ -556,12 +566,10 @@ function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
         end
         graph.storageStatus = STORAGE_1D_UNPACKED
     else
-        numAllocIsArray = isa(numAllocPerRow, Array{<: Integer})
         if lg == LOCAL
             graph.localInds2D = Array{Array{LID, 1}, 1}(numRows)
             for i = 1:numRows
-                const howMany = (numAllocIsArray ?
-                    numAllocPerRow[i] : numAllocPerRow)
+                const howMany = numAllocPerRow(i)
                 if howMany > 0
                     resize(graph.localInds2D[i], howMany)
                 end
@@ -569,8 +577,7 @@ function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
         else #lg == GLOBAL
             graph.globalInds2D = Array{Array{GID, 1}, 1}(numRows)
             for i = 1:numRows
-                const howMany = (numAllocIsArray ?
-                    numAllocPerRow[i] : numAllocPerRow)
+                const howMany = numAllocPerRow(i)
                 if howMany > 0
                     resize(graph.globalInds2D[i], howMany)
                 end

@@ -1,6 +1,7 @@
 
 #used in implementation of CRSGraph, CSRMatrix and, if added, FixedHashTable
 
+
 function computeOffsets(rowPtrs::Array{<: Integer, 1}, numEnts::Integer)
     numOffsets = length(rowPtrs)
     @simd for i = 1:numOffsets
@@ -8,6 +9,7 @@ function computeOffsets(rowPtrs::Array{<: Integer, 1}, numEnts::Integer)
     end
     rowPtrs
 end
+
 
 function computeOffsets(rowPtrs::Array{<: Integer, 1}, numEnts::Array{<: Integer, 1})
     numOffsets = length(rowPtrs)
