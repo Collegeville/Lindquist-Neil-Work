@@ -13,6 +13,7 @@ const noUtil = in("--util", ARGS) #don't run tests on Misc Utils
 
     if !noUtil
         @testset "Util Tests" begin
+            include("ComputeOffsetsTests.jl")
         end
     end
 

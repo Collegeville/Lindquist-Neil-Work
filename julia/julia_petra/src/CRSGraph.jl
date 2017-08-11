@@ -1,15 +1,6 @@
 
 export CRSGraph, isLocallyIndexed, isGloballyIndexed, getProfileType
 
-#=
-k_numAllocPerRow_ and numAllocForAllRows_ are not copied to julia
-
-/// FIXME (mfh 07 Aug 2014) We want graph's constructors to
-/// allocate, rather than doing lazy allocation at first insert.
-/// This will make both k_numAllocPerRow_ and numAllocForAllRows_
-/// obsolete.
-=#
-#TODO remember to do allocations in constructor, not lazily
 
 mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistObject{GID, PID, LID}
     rowMap::BlockMap{GID, PID, LID}
@@ -250,7 +241,6 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
         debug
     )
     
-    #DECISION allow rowMap to be null?
     lclNumRows = numLocalElements(rowMap)
     if length(numEntPerRow) != lclNumRows
         throw(InvalidArgumentError("numEntPerRows has length $(length(numEntPerRow)) " *
@@ -323,8 +313,6 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
         
         STATIC_PROFILE,
         
-        #TODO figure out numAllocForAllRows
-
         STORAGE_1D_PACKED,
         
         LOCAL,
@@ -559,7 +547,7 @@ function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
             || length(numAllocPerRow) == numRows,
             "numAllocRows has length = $(length(numAllocPerRow)) "
             * "!= numRows = $numRows")
-        computeOffsetsFromCounts(rowPtrs, numAllocPerRow)
+        computeOffsets(rowPtrs, numAllocPerRow)
         
         graph.rowOffsets = rowPtrs
         numInds = rowPtrs[numRows+1]
@@ -605,8 +593,6 @@ function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
 end
     
     
-#TODO implement computeOffsetsFromCounts
-function computeOffsetsFromCounts(rP::Array{<:Integer, 1}, nE::Union{Integer, Array{<: Integer, 1}}) end
 #TODO implement makeImportExport(::CRSGraph)
 #TODO implement resumeFill(::CRSGraph, ::Dict{Symbol})
 function resumeFill(g::CRSGraph, d::Dict{Symbol}) end
