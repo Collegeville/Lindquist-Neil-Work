@@ -1,6 +1,7 @@
 
 export CRSGraph, isLocallyIndexed, isGloballyIndexed, getProfileType
 
+#TODO document this type and it's methods
 
 mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistObject{GID, PID, LID}
     rowMap::BlockMap{GID, PID, LID}
@@ -59,10 +60,11 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
 
     lowerTriangle::Bool
     upperTriangle::Bool
-    indiciesAreSorted::Bool
+    indicesAreSorted::Bool
     noRedundancies::Bool
     haveLocalConstants::Bool
     haveGlobalConstants::Bool
+    sortGhostsAssociatedWithEachProcessor::Bool
 
     plist::Dict{Symbol}
 
@@ -133,6 +135,7 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
             true,
             false,
             false,
+            true,
 
             plist,
         
@@ -336,8 +339,8 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
     graph.rowOffsets = d_ptrs
     
     #reset local properties
-    graph.upperTriangular = true
-    graph.lowerTriangular = true
+    graph.upperTriangle = true
+    graph.lowerTriangle = true
     graph.nodeMaxNumRowEntries = 0
     graph.nodeNumDiags
     
@@ -358,10 +361,10 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
                 const largestCol  = d_inds[d_ptrs[rowLID+1]-1]
                 
                 if smallestCol < localRow
-                    graph.upperTriangular = false
+                    graph.upperTriangle = false
                 end
                 if localRow < largestCol
-                    graph.lowerTriangular = false
+                    graph.lowerTriangle = false
                 end
                 for i = d_ptrs[rowLID]:d_ptrs[rowLID]-1
                     if d_inds[i] == rowLID
@@ -407,6 +410,13 @@ function computeGlobalConstants(graph::CRSGraph{GID, PID, LID}) where {
     graph.haveGlobalConstants = true
 end
 
+function clearGlobalConstants(graph::CRSGraph)
+    graph.globalNumEntries = 0
+    graph.globalNumDiags = 0
+    graph.globalMaxNumRowEntries = 0
+    graph.haveGlobalConstants = false
+end
+
 
 function computeLocalConstants(graph::CRSGraph{GID, PID, LID}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
@@ -420,8 +430,8 @@ function computeLocalConstants(graph::CRSGraph{GID, PID, LID}) where {
     
     #if graph.haveLocalConstants == false  #short circuited above
     
-    graph.upperTriangular = true
-    graph.lowerTriangular = true
+    graph.upperTriangle = true
+    graph.lowerTriangle = true
     graph.nodeMaxNumRowEntries = 0
     graph.nodeNumDiags = 0
     
@@ -448,10 +458,10 @@ function computeLocalConstants(graph::CRSGraph{GID, PID, LID}) where {
             const smallestCol = rowView[1]
             const largestCol  = rowView[end]
             if smallestCol < localRow
-                graph.upperTriangular = false
+                graph.upperTriangle = false
             end
             if localRow < largestCol
-                graph.lowerTriangular = false
+                graph.lowerTriangle = false
             end
             graph.nodeMaxNumRowEntries = max(graph.nodeMaxNumRowEntries, rowInfo.numEntries)
         end
@@ -756,17 +766,144 @@ function checkInternalState(graph::CRSGraph)
         end
     end
 end
-        
 
-#TODO implement setAllIndices(::CRSGraph, ::Array{LID, 1}, ::Array{LID, 1}) 
-#TODO implement fillComplete(::CRSGraph)
-#TODO implement resumeFill(::CRSGraph, ::Dict{Symbol})
-function resumeFill(g::CRSGraph, d::Dict{Symbol})
-    #this is just a mock to get checkInternalState working
-    g.fillComplete = false
-end
+
+#TODO implement globalAssemble(::CRSGraph)
+#TODO implement setDomainRangeMaps(graph, domainMap, rangeMap)
+#TODO implement hasColMap(graph)
+#TODO implement makeColMap(graph)
+#TODO implement makeIndicesLocal(graph)
+#TODO implement sortAndMergeAllIndices(graph, isSorted, isMerged)
+#TODO implement isSorted(graph)
+#TODO implement isMerged(graph)
+
 
 #### external API ####
+
+resumeFill(graph::CRSGraph; plist...) = resumeFill(graph, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
+
+function resumeFill(graph::CRSGraph, plist::Dict{Symbol})
+    if !hasRowInfo(graph)
+        throw(InvalidStateException("Cannot resume fill of the CRSGraph, "
+                * "since the graph's row information was deleted."))
+    end
+    
+    clearGlobalConstants(graph)
+    graph.plist = plist
+    graph.lowerTriangle = false
+    graph.upperTriangle = false
+    graph.indicesAreSorted = true
+    graph.noRedundancies = true
+    graph.fillComplete = false
+    
+    if get(plist, :debug, false)
+        @assert isFillActive(graph) && !isFillComplete(graph) "Post condition violated"
+    end
+end
+
+
+fillComplete(graph::CRSGraph; plist...) = fillComplete(graph, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
+
+function fillComplete(graph::CRSGraph, plist::Dict{Symbol})
+    if isnull(graph.domainMap)
+        domMap = graph.rowMap
+    else
+        domMap = get(graph.domainMap)
+    end
+    
+    if isnull(graph.rangeMap)
+        ranMap = graph.colMap
+    else
+        ranMap = get(graph.rangeMap)
+    end
+    
+    fillComplete(graph, ranMap, domMap, plist)
+end
+
+function fillComplete(graph::CRSGraph{GID, PID, LID},
+        domainMap::BlockMap{GID, PID, LID}, rangeMap::BlockMap{GID, PID, LID};
+        plist...) where {GID, PID, LID}
+    fillComplete(graph, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
+end
+
+function fillComplete(graph::CRSGraph{GID, PID, LID}, domainMap::BlockMap{GID, PID, LID}, rangeMap::BlockMap{GID, PID, LID}, plist::Dict{Symbol}) where {GID, PID, LID}
+    if !isFillActive(graph) || isFillComplete(graph)
+        throw(InvalidStateException("Graph fill state must be active to call fillComplete(...)"))
+    end
+       
+    const numProcs = numProc(comm(graph))
+    
+    if haskey(plist, :sortColumnMapGhostGIDs)
+        graph.sortGhostsAssociatedWithEachProcessor = get(plist, :sortColumnMapGhostGIDs, :VERY_BAD)
+    end
+    
+    const assertNoNonlocalInserts = get(plist, :noNonlocalChanges, false)
+    
+    const mayNeedGlobalAssemble = !assertNoNonlocalInserts && numProcs > 1
+    if mayNeedGlobalAssemble
+        globalAssemble(graph)
+    else
+        if numProcs == 1 && length(graph.nonLocals) > 0
+            throw(InvalidStateException("Only one process, but nonlocal entries are present"))
+        end
+    end
+    
+    setDomainRangeMaps(graph, domainMap, rangeMap)
+
+    if !hasColMap(graph)
+        makeColMap(graph)
+    end
+
+    makeIndicesLocal(graph)
+
+    sortAndMergeAllIndices(graph, isSorted(graph), isMerged(graph))
+    
+    makeImportExport(graph)
+    computeGlobalConstants(graph)
+    fillLocalGraph(graph, plist)
+    graph.fillComplete(true)
+    
+    if get(plist, :debug, false)
+        @assert !isFillActive(graph) && isFillComplete(graph) "post conditions violated"
+    end
+    
+    checkInternalState(graph)
+end
+
+"""
+    setAllIndices(graph::CRSGraph{GID, PID, LID}, rowPointers::Array{LID, 1}, columnIndices::Array{LID, 1})
+
+Sets the graph's data directly, using 1D storage
+"""
+function setAllIndices(graph::CRSGraph{GID, PID, LID},
+        rowPointers::Array{LID, 1},columnIndices::Array{LID, 1}) where {
+        GID, PID, LID <: Integer}
+    
+    localNumRows = getNodeNumRows(graph)
+    
+    if isnull(graph.colMap)
+        throw(InvalidStateException("The graph must have a "
+                * "column map before calling setAllIndices"))
+    end
+    if length(rowPointers) != localNumRows + 1
+        throw(InvalidArgumentError("length(rowPointers) = $(length(rowPointers)) "
+                * "!= localNumRows+1 = $(localNumRows+1)"))
+    end
+    
+    localNumEntries = rowPointers[localNumRows+1]
+    
+    graph.indicesType    = LOCAL_INDICES
+    graph.pftype         = STATIC_PROFILE
+    graph.localIndices1D = columnIndices
+    graph.rowOffsets     = rowPointers
+    graph.nodeNumEntries = localNumEntries
+    graph.storageStatus  = STORAGE_1D_UNPACKED
+    
+    graph.localGraph     = LocalCRSGraph(columnIndices, rowPointers)
+    
+    checkInternalState(graph)
+end
+
 
 """
     isStorageOptimized(::CRSGraph)
