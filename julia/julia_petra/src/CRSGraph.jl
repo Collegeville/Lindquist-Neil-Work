@@ -190,11 +190,11 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
               STORAGE_1D_UNPACKED 
             : STORAGE_2D),
         
-        LOCAL,
+        LOCAL_INDICES,
         plist
     )
         
-    allocateIndices(graph, LOCAL, maxNumEntriesPerRow)
+    allocateIndices(graph, LOCAL_INDICES, maxNumEntriesPerRow)
     
     resumeFill(graph, plist)
     checkInternalState(graph)
@@ -236,7 +236,7 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
               STORAGE_1D_UNPACKED 
             : STORAGE_2D),
 
-        LOCAL,
+        LOCAL_INDICES,
         plist
     )
     
@@ -255,7 +255,7 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
         end
     end
     
-    allocateIndices(graph, LOCAL, numEntPerRow)
+    allocateIndices(graph, LOCAL_INDICES, numEntPerRow)
     
     resumeFill(graph, plist)
     checkInternalState(graph)
@@ -281,11 +281,11 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
         
         STORAGE_1D_PACKED,
 
-        LOCAL,
+        LOCAL_INDICES,
         plist
     )
     #seems to be already taken care of
-    #allocateIndices(graph, LOCAL, numEntPerRow)
+    #allocateIndices(graph, LOCAL_INDICES, numEntPerRow)
     
     setAllIndicies(graph, rowPointers, columnIndicies)
     checkInternalState(graph)
@@ -312,7 +312,7 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
         
         STORAGE_1D_PACKED,
         
-        LOCAL,
+        LOCAL_INDICES,
         plist
     )
     
@@ -325,7 +325,7 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
     end
     
     #seems to be already taken care of
-    #allocateIndices(graph, LOCAL, numEntPerRow)
+    #allocateIndices(graph, LOCAL_INDICES, numEntPerRow)
     
     makeImportExport(graph)
     
@@ -546,8 +546,8 @@ end
 function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
         lg::IndexType, numAlloc, numAllocPerRow::Function) where {
         GID <: Integer, LID <: Integer}
-    @assert isLocallyIndexed(graph) == (lg == LOCAL) "Graph is locally indexed, by lg=$lg"
-    @assert isGloballyIndexed(graph) == (lg == GLOBAL) "Graph is globally indexed by lg=$lg"
+    @assert isLocallyIndexed(graph) == (lg == LOCAL_INDICES) "Graph is locally indexed, but lg=$lg"
+    @assert isGloballyIndexed(graph) == (lg == GLOBAL_INDICES) "Graph is globally indexed but lg=$lg"
     
     numRows = getNodeNumRows(graph)
 
@@ -559,14 +559,14 @@ function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
         graph.rowOffsets = rowPtrs
         numInds = rowPtrs[numRows+1]
         
-        if lg == LOCAL
+        if lg == LOCAL_INDICES
             graph.localIndices1D = Array{LID, 1}(numInds)
         else
             graph.globalIndices1D = Array{GID, 1}(numInds)
         end
         graph.storageStatus = STORAGE_1D_UNPACKED
     else
-        if lg == LOCAL
+        if lg == LOCAL_INDICES
             graph.localInds2D = Array{Array{LID, 1}, 1}(numRows)
             for i = 1:numRows
                 const howMany = numAllocPerRow(i)
@@ -574,7 +574,7 @@ function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
                     resize(graph.localInds2D[i], howMany)
                 end
             end
-        else #lg == GLOBAL
+        else #lg == GLOBAL_INDICES
             graph.globalInds2D = Array{Array{GID, 1}, 1}(numRows)
             for i = 1:numRows
                 const howMany = numAllocPerRow(i)
@@ -715,7 +715,7 @@ function checkInternalState(graph::CRSGraph)
             error("Unknown profile type: $(graph.pftype)")
         end
         
-        if graph.indicesType == LOCAL
+        if graph.indicesType == LOCAL_INDICES
             @assert(length(graph.globalIndices1D) == 0
                 && length(graph.globalIndices2D) == 0,
                 "Indices are local, but global allocations are present")
@@ -723,7 +723,7 @@ function checkInternalState(graph::CRSGraph)
                 || length(graph.localIndices1D) > 0
                 || length(graph.localIndices2D) > 0,
                 "Indices are local and local entries exist, but there aren't local allocations present")
-        elseif graph.indicesType == GLOBAL
+        elseif graph.indicesType == GLOBAL_INDICES
             @assert(length(graph.localIndices1D) == 0
                 && length(graph.globalIndices2D) == 0,
                 "Indices are global, but local allocations are present")
@@ -812,7 +812,7 @@ end
 Whether the graph uses global indexes
 """
 function isGloballyIndexed(graph::CRSGraph)
-    graph.indicesType == GLOBAL
+    graph.indicesType == GLOBAL_INDICES
 end
    
 """
@@ -821,7 +821,7 @@ end
 Whether the graph uses local indexes
 """
 function isLocallyIndexed(graph::CRSGraph)
-    graph.indicesType == LOCAL
+    graph.indicesType == LOCAL_INDICES
 end
 
 """

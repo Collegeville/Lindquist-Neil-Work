@@ -1,7 +1,7 @@
 export CombineMode, ADD, INSERT, REPLACE, ABSMAX, ZERO
 export TransposeMode, NO_TRANS, TRANS, CONJ_TRANS
 export ProfileType, STATIC_PROFILE, DYNAMIC_PROFILE
-export IndexType, LOCAL, GLOBAL, UNKNOWN
+export IndexType, LOCAL_INDICES, GLOBAL_INDICES
 export StorageStatus, STORAGE_2D, STORAGE_1D_UNPACKED, STORAGE_1D_PACKED
 
 """
@@ -41,12 +41,10 @@ Allocation profile for matrix/graph entries
 @enum ProfileType STATIC_PROFILE DYNAMIC_PROFILE
 
 
-#TODO change theses to ?????_INDICES
-#TODO remove UNKNOWN enums
 """
 Can be used to differentiate global and local indices
 """
-@enum IndexType LOCAL GLOBAL UNKNOWN
+@enum IndexType LOCAL_INDICES GLOBAL_INDICES
 
 
 """
