@@ -64,7 +64,7 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
     haveLocalConstants::Bool
     haveGlobalConstants::Bool
 
-    debug::Bool
+    plist::Dict{Symbol}
 
     nonLocals::Dict{GID, Array{GID, 1}}
 
@@ -83,7 +83,7 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
         storageStatus::StorageStatus,
 
         indiciesType::IndexType,
-        debug::Bool
+        plist::Dict{Symbol}
     ) where {GID <: Integer, PID <: Integer, LID <: Integer}
 
         graph = new{GID, PID, LID}(
@@ -134,7 +134,7 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
             false,
             false,
 
-            debug,
+            plist,
         
             Dict{GID, Array{GID, 1}}()
         )
@@ -174,7 +174,6 @@ end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}},
         maxNumEntriesPerRow::LID, pftype::ProfileType, plist::Dict{Symbol}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
-    debug = get(plist, "debug", false)
     graph = CRSGraph(
         rowMap,
         colMap,
@@ -192,7 +191,7 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
             : STORAGE_2D),
         
         LOCAL,
-        debug
+        plist
     )
         
     allocateIndices(graph, LOCAL, maxNumEntriesPerRow)
@@ -238,7 +237,7 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
             : STORAGE_2D),
 
         LOCAL,
-        debug
+        plist
     )
     
     lclNumRows = numLocalElements(rowMap)
@@ -268,7 +267,6 @@ end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
         rowPointers::Array{LID, 1}, columnIndices::Array{LID, 1},
         plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
-    debug = get(plist, "debug", false)
     graph = CRSGraph(
         rowMap,
         Nullable(colMap),
@@ -284,7 +282,7 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
         STORAGE_1D_PACKED,
 
         LOCAL,
-        debug
+        plist
     )
     #seems to be already taken care of
     #allocateIndices(graph, LOCAL, numEntPerRow)
@@ -299,7 +297,6 @@ end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
         localGraph::LocalCRSGraph{LID, LID}, plist::Dict{Symbol}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
-    debug = get(plist, "debug", false)
     mapRowCount = numMyElements(rowMap)
     graph = CRSGraph(
         rowMap,
@@ -316,7 +313,7 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
         STORAGE_1D_PACKED,
         
         LOCAL,
-        debug
+        plist
     )
     
     if numRows(localGraph) != numMyElements(rowMap)
@@ -396,7 +393,7 @@ function computeGlobalConstants(graph::CRSGraph{GID, PID, LID}) where {
     #short circuit if already computed
     graph.haveGlobalConstants && return
     
-    if graph.debug
+    if get(graph.plist, "debug", false)
         @assert !null(graph.colMap) "The graph must have a column map at this point"
     end
     
@@ -417,7 +414,7 @@ function computeLocalConstants(graph::CRSGraph{GID, PID, LID}) where {
     #short circuit if already computed
     graph.haveLocalConstants && return
     
-    if graph.debug
+    if get(graph.plist, "debug", false)
         @assert !null(graph.colMap) "The graph must have a column map at this point"
     end
     
@@ -470,7 +467,7 @@ function hasRowInfo(graph::CRSGraph)
 end
 
 function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} where {GID, PID, LID <: Integer}
-    if graph.debug
+    if get(graph.plist, "debug", false)
         @assert hasRowInfo(graph) "Graph does not have row info anymore.  Should have been caught earlier"
     end
     
@@ -593,13 +590,29 @@ function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
 end
     
     
-#TODO implement makeImportExport(::CRSGraph)
+function makeImportExport(graph::CRSGraph{GID, PID, LID}) where {
+        GID <: Integer, PID <: Integer, LID <: Integer}
+    @assert !null(graph.colMap) "Cannot make imports and exports without a column map"
+    
+    if null(graph.importer)
+        if graph.domainMap != graph.colMap && !isSameAs(graph.domainMap, graph.colMap)
+            graph.importer = Import(graph.domainMap, graph.colMap, graph.plist)
+        end
+    end
+    
+    if null(graph.exporter)
+        if graph.rangeMap != graph.rowMap && !isSameAs(graph.rangeMap, graph.rowMap)
+            graph.exporter = Export(graph.rowMap, graph.rangeMap, graph.plist)
+        end
+    end
+end
+    
 #TODO implement resumeFill(::CRSGraph, ::Dict{Symbol})
 function resumeFill(g::CRSGraph, d::Dict{Symbol}) end
 #TODO implement checkInternalState(::CRSGraph)
 function checkInternalState(g::CRSGraph) end
 #TODO implement setAllIndices(::CRSGraph, ::Array{LID, 1}, ::Array{LID, 1}) 
-
+#TODO implement fillComplete(::CRSGraph)
 
 #### external API ####
 
