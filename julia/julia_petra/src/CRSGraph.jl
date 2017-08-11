@@ -2,6 +2,7 @@
 export CRSGraph, isLocallyIndexed, isGloballyIndexed, getProfileType
 
 #TODO document this type and it's methods
+#TODO ensure graphs that lack a colMap use global indexing
 
 mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistObject{GID, PID, LID}
     rowMap::BlockMap{GID, PID, LID}
@@ -768,14 +769,13 @@ function checkInternalState(graph::CRSGraph)
 end
 
 
+#TODO implement makeColMap(graph)
+
 #TODO implement globalAssemble(::CRSGraph)
 #TODO implement setDomainRangeMaps(graph, domainMap, rangeMap)
-#TODO implement hasColMap(graph)
-#TODO implement makeColMap(graph)
 #TODO implement makeIndicesLocal(graph)
 #TODO implement sortAndMergeAllIndices(graph, isSorted, isMerged)
-#TODO implement isSorted(graph)
-#TODO implement isMerged(graph)
+#TODO implement getGlobalRowView(graph)
 
 
 #### external API ####
@@ -869,6 +869,199 @@ function fillComplete(graph::CRSGraph{GID, PID, LID}, domainMap::BlockMap{GID, P
     
     checkInternalState(graph)
 end
+
+function makeColMap(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
+    debug = get(graph.plist, :debug, false)
+    const localNumRows = getNodeNumElements(graph)
+    
+    #TODO get rid of this order retention stuff, it has to do with epetra interop
+    const sortEachProcsGIDs = graph.sortGhostsAssociatedWithEachProcessr
+    
+    errCode, colMap = __makeColMap(graph, graph.domainMap, sortEachProcsGIDs)
+    #TODO look at the debuging stuff
+    
+    graph.colMap = colMap
+    
+    checkInternalState(graph)
+end
+
+#returns Tuple(errCode, colMap)
+function __makeColMap(graph::CRSGraph{GID, PID, LID},domMap::BlockMap{GID, PID, LID},
+        sortEachProcsGIDs::Bool) where {GID, PID, LID}
+    errCode = 0#TODO improve from int error code
+
+    if isnull(domMap)
+        colMap = Nullable{BlockMap{GID, PID, LID}}()
+    else
+        myColumns = GID[]
+
+        if isLocallyIndexed(graph)
+            wrappedColMap = graph.colMap
+
+            if isnull(wrappedColMap)
+                warn("The graph is locally indexed, but does not have a column map")
+
+                errCode = -1
+            else
+                colMap = get(wrappedColMap)
+                if linearMap(colMap) #i think isContiguous(map) <=> linearMap(map)?
+                    numCurGIDs = numMyElements(colMap)
+                    resize!(myColumns, numCurGIDs)
+                    myFirstGlobalIndex = minMyGIDs(colMap)
+
+                    for k = 1:numCurGIDs
+                        myColumns[k] = myFirstGlobalIndex + k
+                    end
+                else
+                    curGIDs = myGlobalElements(colMap)
+                    numCurGIDs = length(curGIDs)
+                    resize!(myColumns, numCurGIDs)
+                    for k = 1:numCurGIDs
+                        myColumns[k] = curGIDs[k]
+                    end
+                end
+            end
+            else #if graph.isGloballyIndexed
+            numLocalColGIDs = 0
+            numRemoteColGIDs = 0
+
+            gidIsLocal = zeros(Bool, localNumRows)
+            remoteGIDSet = Set()
+            remoteGIDUnorderedVector = GID[]
+
+            #if rowMap != null
+            const rowMap = graph.rowMap
+
+            for localRow = 1:localNumRows
+                globalRow = gid(rowMap, localRow)
+                rowGIDs = getGlobalRowView(graph)
+
+                numEnt = length(rowGIDs)
+                if numEnt != 0
+                    for k = 1:numEnt
+                        gid = rowGIDs[k]
+                        lid = julia_petra.lid(domMap, gid)
+                        if lid != 0
+                            if !gidIsLocal[lid]
+                                gidIsLocal = true
+                                numLocalColGIDs += 1
+                            end
+                        else
+                            if !in(remoteGIDSet, gid)
+                                push!(remoteGIDSet, gid)
+                                if !sortEachProcsGIDs
+                                    #user wants order retained
+                                    push!(remoteGIDUnorderedVector, gid)
+                                end
+                                numRemoteColGIDs += 1
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        #line 214, abunch of explanation of serial short circuit
+        if numProc(comm(domMap)) == 1
+            if numRemoteColGIDs != 0
+                errCode = -2
+            end
+            if numLocalColGIDs == localNumRows
+                return (errCode, domMap)
+            end
+        else
+            resize!(myColumns, numLocalColGIDs+numRemoteColGIDs)
+            localColGIDs  = view(myColumns, 1:numLocalColGIDs)
+            remoteColGIDs = view(myColumns, numLocalColGIDs+1:numRemoteColGIDs)
+
+            if sortEachProcsGIDs
+                remoteColGIDs[:] = [el for el in remoteGIDSet]
+            else
+                remoteColGIDs[:] = remoteGIDUnorderedVector
+            end
+
+            remotePIDs = Array{PID, 1}(numRemoteColGIDs)
+
+            remotePIDs = remoteIDList(domMap, remoteColGIDs)
+            if any(remotePIDs .== 0)
+                if debug
+                    warn("Some column indices are not in the domain Map")
+                end
+                errCode = 3
+            end
+
+            order = sortperm(remotePIDs)
+            permute!(remotePIDs, order)
+            permute!(remoteColGIDs, order)
+
+            #line 333
+
+            numDomainELts = numMyElements(domMap)
+            if numLocalColGIDs == numDomainElts
+                if linearMap(domMap) #I think isContiguous() <=> linearMap()
+                    localColGIDs[1:numLocalColGIDs] = minMyGIDs(domMap)
+                else
+                    domElts = myGlobalElements(domMap)
+                    localColGIDs[1:length(domElts)] = domElts
+                end
+            else
+                numLocalCount = 0
+                if linearMap(domMap) #I think isContiguous() <=> linearMap()
+                    curColMapGID = minMyGIDs(domMap)
+                    for i = 1:numDomainElts
+                        if gidIsLocal[i]
+                            localColGIDs[numLocalCount] = curColMapGID
+                            numLocalCount += 1
+                        end
+                        curColMapGID += 1
+                    end
+                else
+                    domainElts = myGlobalElement(domMap)
+                    for i = 1:numDomainElts
+                        if gidIsLocal[i]
+                            localColGIDs[numLocalCount] = domainElts[i]
+                            numLocalCount += 1
+                        end
+                        curColMapGID += 1
+                    end
+                end
+
+                if numLocalCount != numLocalColGIDs
+                    if debug
+                        warn("numLocalCount = $numLocalCount "
+                            * "!= numLocalColGIDs = $numLocalColGIDs.  "
+                            * "This should not happen.")
+                    end
+                    errCode = -4
+                end
+            end
+        end
+
+        #TODO look into FIXME on line 393
+    end
+    return(errCode, BlockMap(-1, -1, myColumns, comm(domMap)))
+end
+
+"""
+hasColMap(::CRSGraph)
+
+Whether the graph has a column map
+"""
+hasColMap(graph::CRSGraph) = !isnull(graph.colMap)
+
+"""
+    isSorted(::CRSGraph)
+
+Whether the indices are sorted
+"""
+isSorted(graph::CRSGraph) = graph.indicesAreSorted
+
+"""
+    isMerged(::CRSGraph)
+
+Whether duplicate column indices in each row have been merged
+"""
+isMerged(graph::CRSGraph) = graph.noRedundancies
 
 """
     setAllIndices(graph::CRSGraph{GID, PID, LID}, rowPointers::Array{LID, 1}, columnIndices::Array{LID, 1})
