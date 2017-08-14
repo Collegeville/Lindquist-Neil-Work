@@ -477,6 +477,7 @@ function hasRowInfo(graph::CRSGraph)
         || length(graph.rowOffsets) != 0)
 end
 
+#implement getRowInfoFromGlobalRow
 function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} where {GID, PID, LID <: Integer}
     if get(graph.plist, :debug, false)
         @assert hasRowInfo(graph) "Graph does not have row info anymore.  Should have been caught earlier"
@@ -769,16 +770,75 @@ function checkInternalState(graph::CRSGraph)
 end
 
 
-#TODO implement makeColMap(graph)
-
 #TODO implement globalAssemble(::CRSGraph)
 #TODO implement setDomainRangeMaps(graph, domainMap, rangeMap)
 #TODO implement makeIndicesLocal(graph)
 #TODO implement sortAndMergeAllIndices(graph, isSorted, isMerged)
-#TODO implement getGlobalRowView(graph)
-
 
 #### external API ####
+
+function getNumEntriesInGlobalRow(graph::CRSGraph{GID}, globalRow::GID)::Integer where {GID <: Integer}
+    localRow = lid(graph.rowMap, globalRow)
+    if hasRowInfo(graph) && localRow != 0
+        getRowInfo(localRow).numEntries
+    else
+        -1
+    end
+end
+
+function getNumEntriesInLocalRow(graph::CRSGraph{GID, PID, LID}, localRow::LID)::Integer where {GID, PID, LID <: Integer}
+    if hasRowInfo(graph) && myLID(graph.rowMap, localRow)
+        getRowInfo(localRow).numEntries
+    else
+        -1
+    end
+end
+
+function getGlobalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}) where {GID <: Integer, PID, LID <: Integer}
+    if rowInfo.allocSize > 0
+        if length(graph.globalIndices1D) != 0
+            range = rowInfo.offset1D : rowInfo.offset1D + rowInfo.allocSize
+            view(graph.globalIndices1D, range)
+        elseif length(graph.globalIndices2D[rowInfo.localRow]) == 0
+            globalIndices2D[rowInfo.localRow]
+        else
+            GID[]
+        end
+    else
+        GID[]
+    end
+end
+
+function getGlobalRowCopy(graph::CRSGraph{GID}, globalRow::GID)::Array{GID, 1} where {GID <: Integer}
+    Array{GID, 1}(getGlobalRowView(graph, globalRow))
+end
+
+function getGlobalRowView(graph::CRSGraph{GID}, globalRow::GID)::AbstractArray{GID, 1} where {GID <: Integer}
+    debug = get(graph.plist, :debug, false)
+    if isLocallyIndexed(graph)
+        throw(InvalidArgumentError("The graph's indices are currently stored as local indices, so a view with global column indices cannot be returned.  Use getGlobalRowCopy(::CRSGraph) instead"))
+    end
+
+    if debug
+        @assert hasRowInfo() "Graph row information was deleted"
+    end
+    rowInfo = getRowInfoFromGlobalRowIndex(globalRow)
+    
+    if rowInfo.localRow != 0 && rowInfo.numEntries > 0
+        indices = view(getGlobalView, 1:rowInfo.numEntries)
+        if debug
+            @assert(length(indices) == getNumEntriesInGlobalRow(globalRow),
+                "length(indices) = $(length(indices)) "
+                * "!= getNumEntriesInGlobalRow(graph, $globalRow) "
+                * "= $(getNumEntriesInGlobalRow(globalRow))")
+        end
+        indices
+    else
+        GID[]
+    end
+end
+    
+
 
 resumeFill(graph::CRSGraph; plist...) = resumeFill(graph, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
 
@@ -877,14 +937,25 @@ function makeColMap(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
     #TODO get rid of this order retention stuff, it has to do with epetra interop
     const sortEachProcsGIDs = graph.sortGhostsAssociatedWithEachProcessr
     
+    #TODO look at FIXME on line 4898
+    
     errCode, colMap = __makeColMap(graph, graph.domainMap, sortEachProcsGIDs)
-    #TODO look at the debuging stuff
+    if debug
+        comm = julia_petra.comm(graph)
+        localSuccess = (errCode == 0)? 1 : 0
+        globalSuccess = minAll(comm, localSuccess)
+        
+        if globalSuccess != 1
+            error("makeColMap reports an error on at least one process")
+        end
+    end
     
     graph.colMap = colMap
     
     checkInternalState(graph)
 end
 
+#internal implementation of makeColMap, needed to handle some return and debuging stuff
 #returns Tuple(errCode, colMap)
 function __makeColMap(graph::CRSGraph{GID, PID, LID},domMap::BlockMap{GID, PID, LID},
         sortEachProcsGIDs::Bool) where {GID, PID, LID}
@@ -899,7 +970,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID},domMap::BlockMap{GID, PID, 
             wrappedColMap = graph.colMap
 
             if isnull(wrappedColMap)
-                warn("The graph is locally indexed, but does not have a column map")
+                warn("$(myPid(comm(graph))): The graph is locally indexed, but does not have a column map")
 
                 errCode = -1
             else
@@ -921,7 +992,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID},domMap::BlockMap{GID, PID, 
                     end
                 end
             end
-            else #if graph.isGloballyIndexed
+        else #if graph.isGloballyIndexed
             numLocalColGIDs = 0
             numRemoteColGIDs = 0
 
@@ -1028,7 +1099,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID},domMap::BlockMap{GID, PID, 
 
                 if numLocalCount != numLocalColGIDs
                     if debug
-                        warn("numLocalCount = $numLocalCount "
+                        warn("$(myPid(comm(graph))): numLocalCount = $numLocalCount "
                             * "!= numLocalColGIDs = $numLocalColGIDs.  "
                             * "This should not happen.")
                     end
