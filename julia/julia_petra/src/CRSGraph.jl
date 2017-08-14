@@ -769,11 +769,125 @@ function checkInternalState(graph::CRSGraph)
     end
 end
 
+function sortAndMergeAllIndices(graph::CRSGraph, sorted::Bool, merged::Bool)
+    @assert isLocallyIndexed(graph) "This method may only be called after makeIndicesLocal(graph)"
+    @assert merged || isStoragedOptimized(graph) "The graph is already storage optimized, so we shouldn't be merging any indices."
+    
+    if !sorted || !merged
+        localNumRows = getNodeNumRows(graph)
+        totalNumDups = 0
+        for localRow = 1:localNumRows
+            rowInfo = getRowInfo(graph, localRow)
+            if !sorted
+                sortRowIndices(graph, rowInfo)
+            end
+            if !merged
+                numDups += mergeRowIndices(graph, rowInfo)
+            end
+        end
+        graph.nodeNumEntries -= totalNumDups
+        graph.indiciesAreSorted = true
+        graph.noRedunancies = true
+    end
+end
 
-#TODO implement globalAssemble(::CRSGraph)
-#TODO implement setDomainRangeMaps(graph, domainMap, rangeMap)
+function sortRowIndices(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}) where {GID, PID, LID <: Integer}
+    if rowInfo.numEntries > 0
+        localColumnIndices = getLocalView(graph, rowInfo)
+        sort!(localColumnIndices)
+    end
+end
+
+function mergeRowIndices(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}) where {GID, PID, LID <: Integer}
+    localColIndices = getLocalView(graph, rowInfo)
+    localColIndices[:] = unique(localColIndices)
+    mergedEntries = length(localColIndices)
+    graph.numRowEntries[rowInfo.localRow] = mergedEntries
+    
+    rowInfo.numEntries - mergedEntries
+end
+        
+
+function setDomainRangeMaps(graph::CRSGraph{GID, PID, LID}, domainMap::BlockMap{GID, PID, LID}, rangeMap::BlockMap{GID, PID, LID}) where {GID, PID, LID}
+    if graph.domainMap != domainMap
+        graph.domainMap = domainMap
+        graph.importer = Nullable{Import{GID, PID, LID}}()
+    end
+    if graph.rangeMap != rangeMap
+        graph.rangeMap = rangeMap
+        graph.exporter = Nullable{Export{GID, PID, LID}}()
+    end
+end
+
+
+function globalAssemble(graph::CRSGraph)
+    @assert isFillActive(graph) "Fill must be active before calling globalAssemble(graph)"
+    
+    comm = julia_petra.comm(graph)
+    myNumNonlocalRows = length(graph.nonlocals)
+    
+    iHaveNonlocalRows = myNumNonlocalRows == 0
+    someoneHasNonlocalRows = maxAll(comm, iHaveNonLocalRows)
+    if !someoneHasNonlocalRows
+        return
+    end
+    
+    #skipping: nonlocalRowMap = null
+    
+    numEntPerNonlocalRow = Array{LID, 1}(myNumNonlocalRows)
+    myNonlocalGlobalRows = Array{GID, 1}(myNumNonlocalRows)
+    
+    for (i, (key, val)) = zip(1:length(graph.nonlocals), graph.nonlocals)
+        myNonlocalGlobalRows[i] = key
+        const globalCols = val #const b/c changing in place
+        sort!(globalCols)
+        globalCols[:] = unique(globalCols)
+        numEntPerNonlocalRow[i] = length(globalCols)
+    end
+    
+    myMinNonlocalGlobalRow = 0
+    myMinNonLocalGlobalRow = minimum(myNonLocalGlobalRows)
+    
+    globalMinNonlocalRow = minAll(comm, myMinNonlocalGlobalRow)
+    
+    nonlocalRowMap = BlockMap(-1, myNonlocalGlobalRows, comm)
+    
+    nonlocalGraph = CRSGraph(nonlocalRowMap, numEntPerNonlocalRow, STATIC_PROFILE)
+    for (i, (key, val)) = zip(1:length(graph.nonlocals), graph.nonlocals)
+        globalRow = key
+        globalColumns = val
+        numEnt = length(numEntPerNonlocalRow[i])
+        insertGlobalIndices(nonLocalGraph, globalRow, numEnt, globalColumns)
+    end
+    
+    const origRowMap = graph.rowMap
+    const origRowMapIsOneToOne = isOneToOne(origRowMap)
+    
+    if origRowMapIsOneToOne
+        exportToOrig = Export(nonlocalRowMap, origRowMap)
+        doExport(nonLocalGraph, graph, exportToOrig, INSERT)
+    else
+        oneToOneRowMap = createOneToOne(origRowMap)
+        exportToOneToOne = Export(nonlocalRowMap, oneToOneRowMap)
+        
+        oneToOneGraph = CRSGraph(oneToOneRowMap, 0)
+        doExport(nonlocalGraph, oneToOneGraph, exportToOneToOne, INSERT)
+        
+        #keep memory highwater down
+        #nonlocalGraph = null
+        
+        importToOrig(oneToOneRowMap, origRowMap)
+        doImport(oneToOneGraph, graph, importToOrig, INSERT)
+    end
+    clear!(graph.nonLocals)
+    
+    checkInternalState(graph)
+end
+     
+    
+
 #TODO implement makeIndicesLocal(graph)
-#TODO implement sortAndMergeAllIndices(graph, isSorted, isMerged)
+#TODO implement insertGlobalIndices(graph, row, numEntries, data)
 
 #### external API ####
 
@@ -808,9 +922,28 @@ function getGlobalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}) wh
         GID[]
     end
 end
+        
+function getLocalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}) where {GID <: Integer, PID, LID <: Integer}
+    if rowInfo.allocSize > 0
+        if length(graph.localIndices1D) != 0
+            range = rowInfo.offset1D : rowInfo.offset1D + rowInfo.allocSize
+            view(graph.localIndices1D, range)
+        elseif length(graph.localIndices2D[rowInfo.localRow]) == 0
+            localIndices2D[rowInfo.localRow]
+        else
+            LID[]
+        end
+    else
+        LID[]
+    end
+end
 
 function getGlobalRowCopy(graph::CRSGraph{GID}, globalRow::GID)::Array{GID, 1} where {GID <: Integer}
     Array{GID, 1}(getGlobalRowView(graph, globalRow))
+end
+        
+function getLocalRowCopy(graph::CRSGraph{GID, PID, LID}, globalRow::LID)::Array{LID, 1} where {GID, PID, LID <: Integer}
+    Array{LID, 1}(getLocalRowView(graph, globalRow))
 end
 
 function getGlobalRowView(graph::CRSGraph{GID}, globalRow::GID)::AbstractArray{GID, 1} where {GID <: Integer}
@@ -830,11 +963,36 @@ function getGlobalRowView(graph::CRSGraph{GID}, globalRow::GID)::AbstractArray{G
             @assert(length(indices) == getNumEntriesInGlobalRow(globalRow),
                 "length(indices) = $(length(indices)) "
                 * "!= getNumEntriesInGlobalRow(graph, $globalRow) "
-                * "= $(getNumEntriesInGlobalRow(globalRow))")
+                * "= $(getNumEntriesInGlobalRow(graph, globalRow))")
         end
         indices
     else
         GID[]
+    end
+end
+        
+function getLocalRowView(graph::CRSGraph{GID}, localRow::GID)::AbstractArray{GID, 1} where {GID <: Integer}
+    debug = get(graph.plist, :debug, false)
+    if isGloballyIndexed(graph)
+        throw(InvalidArgumentError("The graph's indices are currently stored as global indices, so a view with local column indices cannot be returned.  Use getLocalRowCopy(::CRSGraph) instead"))
+    end
+
+    if debug
+        @assert hasRowInfo() "Graph row information was deleted"
+    end
+    rowInfo = getRowInfoFromLocalRowIndex(localRow)
+    
+    if rowInfo.localRow != 0 && rowInfo.numEntries > 0
+        indices = view(getLocalView, 1:rowInfo.numEntries)
+        if debug
+            @assert(length(indices) == getNumEntriesInLocalRow(localRow),
+                "length(indices) = $(length(indices)) "
+                * "!= getNumEntriesInLocalRow(graph, $localRow) "
+                * "= $(getNumEntriesInLocalRow(graph, localRow))")
+        end
+        indices
+    else
+        LID[]
     end
 end
     
