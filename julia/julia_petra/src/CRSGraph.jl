@@ -397,7 +397,7 @@ function computeGlobalConstants(graph::CRSGraph{GID, PID, LID}) where {
     #short circuit if already computed
     graph.haveGlobalConstants && return
     
-    if get(graph.plist, :debug, false)
+    if @debug graph
         @assert !null(graph.colMap) "The graph must have a column map at this point"
     end
     
@@ -425,7 +425,7 @@ function computeLocalConstants(graph::CRSGraph{GID, PID, LID}) where {
     #short circuit if already computed
     graph.haveLocalConstants && return
     
-    if get(graph.plist, :debug, false)
+    if @debug graph
         @assert !null(graph.colMap) "The graph must have a column map at this point"
     end
     
@@ -479,7 +479,7 @@ end
 
 #implement getRowInfoFromGlobalRow
 function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} where {GID, PID, LID <: Integer}
-    if get(graph.plist, :debug, false)
+    if @debug graph
         @assert hasRowInfo(graph) "Graph does not have row info anymore.  Should have been caught earlier"
     end
     
@@ -628,7 +628,7 @@ function makeImportExport(graph::CRSGraph{GID, PID, LID}) where {
 end
     
 function checkInternalState(graph::CRSGraph)
-    if get(graph.plist, :debug, false)
+    if @debug graph
         const localNumRows = getNodeNumRows(graph)
         
         @assert(isFillActive(graph) != isFillComplete(graph),
@@ -769,6 +769,14 @@ function checkInternalState(graph::CRSGraph)
     end
 end
 
+function setLocallyModified(graph::CRSGraph)
+    
+    graph.indicesAreSorted = false
+    graph.noRedundancies = false
+    
+    graph.haveLocalConstants = false
+end
+
 function sortAndMergeAllIndices(graph::CRSGraph, sorted::Bool, merged::Bool)
     @assert isLocallyIndexed(graph) "This method may only be called after makeIndicesLocal(graph)"
     @assert merged || isStoragedOptimized(graph) "The graph is already storage optimized, so we shouldn't be merging any indices."
@@ -884,12 +892,273 @@ function globalAssemble(graph::CRSGraph)
     checkInternalState(graph)
 end
      
+function makeIndicesLocal(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
+    @assert hasColMap(graph) "The graph does not have a column map yet.  This method should never be called in that case"
     
+    colMap = get(graph.colMap)
+    localNumRows = getNodeNumRows(graph)
+    
+    if isGloballyIndexed(graph) && localNumRows != 0
+        numRowEntries = graph.numRowEntries
+        
+        if getProfileType(graph) == STATIC_PROFILE
+            if GID == LID
+                graph.localIndices1D = graph.globalIndices1D
+            else
+                @assert(length(graph.rowOffsets) != 0,
+                    "length(graph.rowOffsets) == 0.  "
+                    * "This should never happen at this point")
+                const numEnt = graph.rowOffsets[localNumRows]
+                graph.localIndices1D = Array{LID, 1}(numEnt)
+            end
+            
+            localColumnMap = getLocalMap(colMap)
+            
+            numBad = convertColumnIndicesFromGlobalToLocal(
+                        graph.localIndices1D,
+                        graph.globalIndices1D,
+                        graph.rowoffsets,
+                        localColumnMap,
+                        numRowEntries)
+            
+            if numBad != 0
+                throw(InvalidArgumentError("When converting column indices from "
+                        * "global to local, we enchoundered $numBad indices that "
+                        * "do not live in the column map on this process"))
+            end
+            
+            graph.globalIndices1D = Array{LID, 1}(0)
+        else #graph has dynamic profile
+            graph.localIndices2D = Array{Array{LID, 1}, 1}(localNumRows)
+            for localRow = 1:localNumRows
+                if length(graph.globalIndices2D[localRow]) != 0
+                    globalIndices = graph.globalIndices2D[localRow]
+                    rna = length(globalIndices)
+                    numEnt = numRowEntries[localRow]
+                    graph.localIndices2D[localRow] = [lid(colMap, gid) for gid in globalIndices]
+                    if @debug graph
+                        @assert(minimum(graph.localIndices2D[localRow]) > 0,
+                            "Globalal indices were not found in the column Map")
+                    end
+                end
+            end
+            graph.globalIndices2D = Array{GID, 1}[]
+        end
+    end
+    
+    graph.localGraph = LocalCRSGraph(graph.localIndices1D, graph.rowOffsets)
+    graph.indexType = LOCAL_INDICES
+    checkInternalState(graph)
+end
+                    
+            
+function convertColumnIndicesFromGlobalToLocal(localColumnIndices::Array{LID, 1},
+        globalColumnIndices::Array{GID, 1}, ptr::Array{LID, 1},
+        localColumnMap::BlockMap{GID, PID, LID}, numRowEntries::Array{LID, 1})::LID where {
+        GID, PID, LID}
+    
+    localNumRows = max(length(ptr)-1, 0)
+    numBad = 0
+    for localRow = 1:localNumRows
+        offset = ptr[localRow]
+        
+        for j = 1:numRowEntries[localRow]
+            gid = globalColumnIndices[offset+j]
+            localColumnIndices[offset+j] = lid(localColumnMap, gid)
+            if lid == 0
+                numBad += 1
+            end
+        end
+    end
+    numBad
+end
 
-#TODO implement makeIndicesLocal(graph)
-#TODO implement insertGlobalIndices(graph, row, numEntries, data)
+#TODO implement insertLocalIndices
 
 #### external API ####
+
+#TODO implement insertGlobalIndices(graph, row, numEntries, data)
+function insertGlobalIndices(graph::CRSGraph{GID, PID, LID}, globalRow::GID,
+        numEntries::LID, inds::Array{GID, 1}) where {
+        GID <: Integer, PID, LID <: Integer}
+    indicesView = view(inds, 1:numEntries)
+    insertGlobalIndices(graph, globalRow, indsT)
+end
+
+function insertGlobalIndices(graph::CRSGraph{GID, PID, LID}, globalRow::GID,
+        inds::Array{GID, 1}) where {GID <: Integer, PID, LID <: Integer}
+    if isLocallyIndexed(graph)
+        throw(InvalidStateException("Graph indices are local, use insertLocalIndices()"))
+    end
+    if !hasRowInfo(graph)
+        throw(InvalidStateException("Graph row information was deleted"))
+    end
+    if isFillComplete(graph)
+        throw(InvalidStateException("Cannot call this method if the fill is not active"))
+    end
+    
+    myRow = lid(graph.rowMap, globalRow)
+    if myRow != 0
+        if @debug graph
+            if hasColMap(graph)
+                colMap = get(graph.colMap)
+                
+                badColInds = [myGid(colMap, index) for index in indices]
+                allInColumnMap = length(badColInds) == 0
+                
+                if !allIndColumnMap
+                    throw(InvalidArgumentError("$(myPid(comm(graph))): "
+                            * "Attempted to insert entries in owned row $globalRow, "
+                            * "at the following column indices: $indices.\n"
+                            
+                            * "Of those, the following indices are not in the "
+                            * "column Map on this process: $badColInds.\n"
+                            
+                            * "Since the matrix has a column map already, it "
+                            * "is invalid to insert entries at those locations"))
+                end
+            end
+        end
+        insertGlobalIndicesImpl(graph, myRow, indices)
+    else
+        append!(graph.nonlocalRow, indices)
+    end
+end
+
+function insertGlobalIndicesImpl(graph::CRSGraph{GID, PID, LID},
+        globalRow::GID, inds::Array{GID, 1}) where {
+        GID <: Integer, PID, LID <: Integer}
+    rowInfo = getRowInfo(graph, myRow)
+    numNewInds = length(indices)
+    newNumEntries = rowInfo.numEntires + numNewInds
+
+    if newNumEntries > rowInfo.allocSize
+        if getProfileType(graph) == STATIC_PROFILE
+            @assert(rowInfo.numEntries <= rowInfo.allocSize,
+                "For local row $myRow, rowInfo.numEntries = $(rowInfo.numEntries) "
+                * "> rowInfo.allocSize = $(rowInfo.allocSize).")
+
+            dupCount = 0
+            if length(graph.globalIndices1D) != 0
+                curOffset = rowInfo.offset1D
+                @assert(length(graph.globalIndices1D) >= curOffset,
+                    "length(graph.globalIndices1D) = $(length(graph.globalIndices1D)) "
+                    * ">= curOffset = $curOffset")
+                @assert(length(graph.globalIndices1D) >= curOffset + rowInfo.offset1D,
+                    "length(graph.globalIndices1D) = $(length(graph.globalIndices1D)) "
+                    * ">= curOffset+rowInfo.offset1D = $(curOffset + rowInfo.offset1D)")
+
+                range = curOffset:curOffset+rowInfo.numEntries
+                globalIndicesCur = view(graph.globalIndices1D, range)
+
+                @assert(length(globalIndicesCur) == rowInfo.numEntries,
+                    "length(globalIndicesCur) = $(length(globalIndicesCur)) "
+                    * "!= rowInfo.numEntries = $(rowInfo.numEntries)")
+            else
+                #line 1959
+
+                globalIndices = graph.globalIndices2D[myRow]
+                @assert(rowInfo.allocSize == length(globalIndices),
+                    "rowInfo.allocSize = $(rowInfo.allocSize) "
+                    * "== length(globalIndices) = $(length(globalIndices))")
+                @assert(rowInfo.numEntries <= length(globalIndices), 
+                    "rowInfo.numEntries = $(rowInfo.numEntries) "
+                    * "== length(globalIndices) = $(length(globalIndices))")
+
+                globalIndicesCur = view(globalIndices, 0, rowInfo.numEntries)
+            end
+            for globalIndexToInsert = indices
+                for oldIndex = globalIndicesCur
+                    if oldIndex == globalIndexToInsert
+                        dupCount += 1
+                    end
+                end
+            end
+
+            numNewToInsert = length(indices) - dupCount
+            @assert numNewToInsert >= 0 "More duplications than indices"
+
+            if rowInfo.numEntries + numNewToInsert > rowInfo.allocSize
+                throw(InvalidArgumentError("$(myPid(comm(graph))): "
+                        * "For local row $myRow, even after excluding "
+                        * "$dupCount duplicate(s) in input, the new number "
+                        * "of entries $(rowInfo.numEntries + numNewToInsert) "
+                        * "still exceeds this row's static allocation size "
+                        * "$(rowInfo.allocSize).  You must either fix the upper "
+                        * "bound on number of entries in this row, or switch "
+                        * "to dynamic profile."))
+            end
+
+            if length(graph.globalIndices) != 0
+                curOffset = rowInfo.offset1D
+                globalIndicesCur = view(graph.globalIndices1D,
+                    curOffset:curOffset+rowInfo.numEntries)
+                globalIndicesNew = view(graph.globalIndices1D,
+                    curOffset+rowInfo.numEntries+1 : currOffset+rowInfo.allocSize)
+            else
+                #line 2036
+
+                globalIndices = graph.globalIndices2D[myRow]
+                globalIndicesCur = view(globalIndices, 1:rowInfo.numEntries)
+                globalIndicesNew = view(globalIndices,
+                    rowInfo.numEntries+1 : rowInfo.allocSize-rowInfo.numEntries)
+            end
+
+            curPos = 1
+            for globalIndexToInsert = indices
+
+                alreadyInOld = globalIndexToInsert in globalIndicesCur
+                if !alreadyInOld
+                    @assert(curPos <= numNewToInsert,
+                        "curPos = $curPos >= numNewToInsert = $newToInsert.")
+                    globalIndicesNew[curPos] == globalIndexToInsert
+                    curPos += 1
+                end
+            end
+
+            graph.numRowEntries[myRow] = rowInfo.numEntries+numNewToInsert
+            graph.nodeNumEntries += numNewToInsert
+            setLocallyModified(graph)
+
+            if @debug graph
+                newNumEntries = rowInfo.numEntries + numNewToInsert
+                chkNewNumEntries = getNumEntiresInLocalRow(graph, myRow)
+                @assert(chkNewNumEntries == newNumEntries,
+                    "chkNewNumEntries = $chkNewNumEntries "
+                    * "!= newNumEntries = $newNumEntries")
+            end
+            return #TODO figure out if needed
+        else
+            newAllocSize = 2*rowInfo.allocSize
+            if newAllocSize < newNumEntries
+                newAllocSize = newNumEntries
+            end
+            resize!(graph.globalIndices2D[myRow], newAllocSize)
+        end
+    end
+
+    if length(graph.globalIndices1D) != 0
+        numIndicesToCopy = length(indices)
+        offset = rowInfo.offset1D + rowInfo.numEntries
+        for k = 1:numIndicesToCopy
+            graph.globalIndices1D[offset+k] = indices[k]
+        end
+    else
+        graph.globalIndices[myRow][rowInfo.numEntries:end] = indices[:]
+    end
+
+    graph.numRowEntries[myRow] += numNewIndices
+    graph.nodeNumEntries += numNewIndices
+    setLocallyModified(graph)
+
+    if @debug graph
+        chkNewNumEntries = getNumEntriesInLocalRow(myRow)
+        @assert(chkNewNumEntries == newNumEntries,
+            "chkNewNumEntries = $chkNewNumEntries "
+            * "!= newNumEntries = $newNumEntries")
+    end
+end
+                
 
 function getNumEntriesInGlobalRow(graph::CRSGraph{GID}, globalRow::GID)::Integer where {GID <: Integer}
     localRow = lid(graph.rowMap, globalRow)
@@ -947,7 +1216,7 @@ function getLocalRowCopy(graph::CRSGraph{GID, PID, LID}, globalRow::LID)::Array{
 end
 
 function getGlobalRowView(graph::CRSGraph{GID}, globalRow::GID)::AbstractArray{GID, 1} where {GID <: Integer}
-    debug = get(graph.plist, :debug, false)
+    debug = @debug graph
     if isLocallyIndexed(graph)
         throw(InvalidArgumentError("The graph's indices are currently stored as local indices, so a view with global column indices cannot be returned.  Use getGlobalRowCopy(::CRSGraph) instead"))
     end
@@ -972,7 +1241,7 @@ function getGlobalRowView(graph::CRSGraph{GID}, globalRow::GID)::AbstractArray{G
 end
         
 function getLocalRowView(graph::CRSGraph{GID}, localRow::GID)::AbstractArray{GID, 1} where {GID <: Integer}
-    debug = get(graph.plist, :debug, false)
+    debug = @debug graph
     if isGloballyIndexed(graph)
         throw(InvalidArgumentError("The graph's indices are currently stored as global indices, so a view with local column indices cannot be returned.  Use getLocalRowCopy(::CRSGraph) instead"))
     end
@@ -1089,7 +1358,7 @@ function fillComplete(graph::CRSGraph{GID, PID, LID}, domainMap::BlockMap{GID, P
 end
 
 function makeColMap(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
-    debug = get(graph.plist, :debug, false)
+    debug = @debug graph
     const localNumRows = getNodeNumElements(graph)
     
     #TODO get rid of this order retention stuff, it has to do with epetra interop
@@ -1334,7 +1603,7 @@ Whether the graph's storage is optimized
 """
 function isStorageOptimized(graph::CRSGraph)
     const isOpt = length(graph.numRowEntries) == 0 && getNodeNumRows(graph) > 0
-    if isOpt && get(graph.plist, :debug, false)
+    if isOpt && @debug graph
         @assert(getProfileType(graph) == STATIC_PROFILE,
             "Matrix claims optimized storage by profile type "
             * "is dynamic.  This shouldn't happend.")

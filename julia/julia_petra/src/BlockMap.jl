@@ -15,7 +15,7 @@ export myGID, myLID, distributedGlobal, numMyElements
 
 
 # TODO figure out expert users and developers only functions
-
+#TODO implement getLocalMap(::BlockMap)
 
 """
 A type for partitioning block element vectors and matrices
