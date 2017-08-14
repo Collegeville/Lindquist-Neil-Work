@@ -1,4 +1,9 @@
 
+#ensure multiple calls to MPIComm works
+MPIComm(Bool, Bool, Bool)
+MPIComm(UInt64, UInt16, UInt32)
+
+
 @test 4 == numProc(comm)
 @test isa(numProc(comm), UInt16)
 
