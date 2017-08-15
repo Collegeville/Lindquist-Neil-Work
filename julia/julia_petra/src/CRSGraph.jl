@@ -1,5 +1,7 @@
 
 export CRSGraph, isLocallyIndexed, isGloballyIndexed, getProfileType
+export isFillActive, isFillComplete, resumeFill, fillComplete
+export hasColMap, getColMap
 
 #TODO document this type and it's methods
 #TODO ensure graphs that lack a colMap use global indexing
@@ -567,19 +569,16 @@ function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
         graph.storageStatus = STORAGE_1D_UNPACKED
     else
         if lg == LOCAL_INDICES
-            graph.localInds2D = Array{Array{LID, 1}, 1}(numRows)
-            for i = 1:numRows
-                const howMany = numAllocPerRow(i)
-                if howMany > 0
-                    resize(graph.localInds2D[i], howMany)
-                end
+            graph.localIndices2D = Array{Array{LID, 1}, 1}(numRows)
+            for row = 1:numRows
+                graph.localIndices2D[row] = Array{LID, 1}(numAllocPerRow(row))
             end
         else #lg == GLOBAL_INDICES
-            graph.globalInds2D = Array{Array{GID, 1}, 1}(numRows)
+            graph.globalIndices2D = Array{Array{GID, 1}, 1}(numRows)
             for i = 1:numRows
                 const howMany = numAllocPerRow(i)
                 if howMany > 0
-                    resize(graph.globalInds2D[i], howMany)
+                    resize!(graph.globalIndices2D[i], howMany)
                 end
             end
         end
