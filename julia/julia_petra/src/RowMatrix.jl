@@ -1,4 +1,6 @@
 
+#TODO add all exports
+
 """
 The version of RowMatrix that isn't a subtype of DestObject
 """
@@ -14,7 +16,7 @@ end
 #DECISION are any other mathmatical operations needed?
 
 """
-RowMatrix is the base of 
+RowMatrix is the base "type" for all row oriented matrices
 
 RowMatrix is actually a type union of SrcDestRowMatrix and DestRowMatrix,
 which are (direct) subtypes of SrcDestObject and DestObject, respectively.

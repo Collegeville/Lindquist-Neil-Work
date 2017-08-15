@@ -48,14 +48,14 @@ include("MultiVector.jl")
 
 
 # Sparse Data types
-include("RowMatrix.jl")
-
 include("LocalCRSGraph.jl")
 
+include("RowGraph.jl")
 include("CRSGraphConstructors.jl")
 include("CRSGraphInternalMethods.jl")
 include("CRSGraphExternalMethods.jl")
 
+include("RowMatrix.jl")
 include("CSRMatrix.jl")
 
 include("Operator.jl")

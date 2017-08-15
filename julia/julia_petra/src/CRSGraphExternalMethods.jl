@@ -1,8 +1,6 @@
-export isLocallyIndexed, isGloballyIndexed, getProfileType
-export isFillActive, isFillComplete, resumeFill, fillComplete
+export getProfileType, getColMap
+export resumeFill, fillComplete
 export insertLocalIndices, insertGlobalIndices
-export hasColMap, getColMap
-export getNumEntriesInLocalRow, getNumEntriesInGlobalRow
 
 #TODO document these methods
 
@@ -417,12 +415,6 @@ function isStorageOptimized(graph::CRSGraph)
 end
 
 """
-    isFillActive(graph)::Bool
-
-Whether the graph is in fill mode
-"""
-isFillActive(g::CRSGraph) = !g.fillComplete
-"""
     isFillComplete(graph)::Bool
 
 Whether the graph is fill complete
@@ -513,7 +505,7 @@ function copyAndPermute(source::CRSGraph{GID, PID, LID},
         for myid = 1:numSameIDs
             myGID = gid(srcRowMap, myid)
             row = getGlobalRowView(source, myGID)
-            insertGlobalIndices(target, myGID row)
+            insertGlobalIndices(target, myGID, row)
         end
         
         #permute part
@@ -558,8 +550,8 @@ end
     
 
 function packAndPrepare(source::RowGraph{GID, PID, LID},
-        target::CRSGraphGID, PID, LID}, exportLIDs::Array{LID, 1},
-        distor::Distributor{GID, PID, LID})::Array where {
+        target::CRSGraph{GID, PID, LID}, exportLIDs::Array{LID, 1},
+        distor::Distributor{GID, PID, LID})::Array{GID, 1} where {
         GID, PID, LID}
 
     pack(source, exportLIDs, distor)
