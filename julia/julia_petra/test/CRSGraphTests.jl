@@ -21,6 +21,8 @@ graph = CRSGraph(map, UInt16(15), STATIC_PROFILE, Dict{Symbol, Any}(:debug=>true
 @test map == julia_petra.map(graph)
 @test STATIC_PROFILE == getProfileType(graph)
 basicTests(graph)
+insertLocalIndices(graph, 1, [2, 3])
+@test 2 == getNumEntriesInLocalRow(graph, 1)
 
 graph = CRSGraph(map, UInt16(15), DYNAMIC_PROFILE, Dict{Symbol, Any}(:debug=>true))
 @test map == julia_petra.map(graph)
