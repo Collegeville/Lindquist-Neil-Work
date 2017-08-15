@@ -6,7 +6,6 @@ export hasColMap, getColMap
 export getNumEntriesInLocalRow, getNumEntriesInGlobalRow
 
 #TODO document this type and it's methods
-#TODO ensure graphs that lack a colMap use global indexing
 #TODO break up this file - Constructors, internal methods, external methods?
 
 mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistObject{GID, PID, LID}
@@ -90,7 +89,7 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
         pftype::ProfileType,
         storageStatus::StorageStatus,
 
-        indiciesType::IndexType,
+        indicesType::IndexType,
         plist::Dict{Symbol}
     ) where {GID <: Integer, PID <: Integer, LID <: Integer}
 
@@ -132,7 +131,7 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
             storageStatus,
 
             false,
-            indiciesType,
+            indicesType,
             false,
 
             false,
@@ -152,6 +151,9 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
         #skipping sizeof checks
         #skipping max value checks related to size_t
 
+        @assert(indicesType != LOCAL_INDICES || !isnull(colMap),
+            "Cannot have local indices with a null column Map")
+    
         #ensure LID is a subset of GID (for positive numbers)
         if !(LID <: GID) && (GID != BigInt) && (GID != Integer)
             # all ints are assumed to be able to handle 1, up to their max
@@ -199,11 +201,11 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
               STORAGE_1D_UNPACKED 
             : STORAGE_2D),
         
-        LOCAL_INDICES,
+        isnull(colMap)?GLOBAL_INDICES:LOCAL_INDICES,
         plist
     )
         
-    allocateIndices(graph, LOCAL_INDICES, maxNumEntriesPerRow)
+    allocateIndices(graph, graph.indicesType, maxNumEntriesPerRow)
     
     resumeFill(graph, plist)
     checkInternalState(graph)
@@ -244,7 +246,7 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
               STORAGE_1D_UNPACKED 
             : STORAGE_2D),
 
-        LOCAL_INDICES,
+        isnull(colMap)?GLOBAL_INDICES:LOCAL_INDICES,
         plist
     )
     
@@ -262,7 +264,7 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
         end
     end
     
-    allocateIndices(graph, LOCAL_INDICES, numEntPerRow)
+    allocateIndices(graph, graph.indicesType, numEntPerRow)
     
     resumeFill(graph, plist)
     checkInternalState(graph)
@@ -472,7 +474,7 @@ end
 hasRowInfo(graph::CRSGraph) = (getProfileType(graph) != STATIC_PROFILE 
                                 || length(graph.rowOffsets) != 0)
 
-#implement getRowInfoFromGlobalRow
+#TODO implement getRowInfoFromGlobalRow
 function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} where {GID, PID, LID <: Integer}
     if @debug graph
         @assert hasRowInfo(graph) "Graph does not have row info anymore.  Should have been caught earlier"
@@ -491,7 +493,7 @@ function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} wher
             allocSize = graph.rowOffsets[row+1] - graph.rowOffsets[row]
         end
         numEntries = (length(graph.numRowEntries) == 0 ?
-            allocSize : numRowEntries[row])
+            allocSize : graph.numRowEntries[row])
     else #dynamic profile
         if isLocallyIndexed(graph) && length(graph.localIndices2D) == 0
             allocSize = length(graph.localIndices2D[row])
@@ -578,11 +580,8 @@ function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
             end
         else #lg == GLOBAL_INDICES
             graph.globalIndices2D = Array{Array{GID, 1}, 1}(numRows)
-            for i = 1:numRows
-                const howMany = numAllocPerRow(i)
-                if howMany > 0
-                    resize!(graph.globalIndices2D[i], howMany)
-                end
+            for row = 1:numRows
+                graph.globalIndices2D[row] = Array{GID, 1}(numAllocPerRow(row))
             end
         end
         graph.storageStatus = STORAGE_2D
@@ -727,9 +726,9 @@ function checkInternalState(graph::CRSGraph)
                 "Indices are local and local entries exist, but there aren't local allocations present")
         elseif graph.indicesType == GLOBAL_INDICES
             @assert(length(graph.localIndices1D) == 0
-                && length(graph.globalIndices2D) == 0,
+                && length(graph.localIndices2D) == 0,
                 "Indices are global, but local allocations are present")
-            @assert(graph.localNumEntries == 0
+            @assert(graph.nodeNumEntries == 0
                 || length(graph.globalIndices1D) > 0
                 || length(graph.globalIndices2D) > 0,
                 "Indices are global and local entries exist, but there aren't global allocations present")
@@ -968,8 +967,8 @@ macro insertIndicesImpl(indicesType, innards)
 
     esc(quote
             rowInfo = getRowInfo(graph, myRow)
-            numNewInds = length(indices)
-            newNumEntries = rowInfo.numEntires + numNewInds
+            numNewIndices = length(indices)
+            newNumEntries = rowInfo.numEntries + numNewIndices
             
             if newNumEntries > rowInfo.allocSize
                 if getProfileType(graph) == STATIC_PROFILE
@@ -985,7 +984,7 @@ macro insertIndicesImpl(indicesType, innards)
 
             if length(graph.$indices1D) != 0
                 offset = rowInfo.offset1D + rowInfo.numEntries
-                destRange = offset:offset+numNewInds
+                destRange = offset+1:offset+numNewIndices
 
                 graph.$indices1D[destRange] = indices[:]
             else
@@ -997,7 +996,7 @@ macro insertIndicesImpl(indicesType, innards)
             setLocallyModified(graph)
 
             if @debug graph
-                chkNewNumEntries = getNumEntriesInLocalRow(myRow)
+                chkNewNumEntries = getNumEntriesInLocalRow(graph, myRow)
                 @assert(chkNewNumEntries == newNumEntries,
                     "Internal Logic error: chkNewNumEntries = $chkNewNumEntries "
                     * "!= newNumEntries = $newNumEntries")
@@ -1006,7 +1005,7 @@ macro insertIndicesImpl(indicesType, innards)
 end
 
 function insertLocalIndicesImpl(graph::CRSGraph{GID, PID, LID},
-        myRow::LID, inds::Array{LID, 1}) where {
+        myRow::LID, indices::Array{LID, 1}) where {
         GID, PID, LID <: Integer}
     @insertIndicesImpl "local" begin  
         throw(InvalidArgumentError("new indices exceed statically allocated graph structure"))
@@ -1015,7 +1014,7 @@ end
 
 #TODO figure out if this all can be moved to @insertIndicesImpl
 function insertGlobalIndicesImpl(graph::CRSGraph{GID, PID, LID},
-        myRow::LID, inds::Array{GID, 1}) where {
+        myRow::LID, indices::Array{GID, 1}) where {
         GID <: Integer, PID, LID <: Integer}
     @insertIndicesImpl "global" begin
         @assert(rowInfo.numEntries <= rowInfo.allocSize,
@@ -1130,19 +1129,19 @@ function insertLocalIndices(graph::CRSGraph{GID, PID, LID},
         localRow::LID, indices::Array{LID, 1}) where{
         GID, PID, LID <: Integer}
     if !isFillActive(graph)
-        throw(InvalidStateException("insertLocalIndices requires that fill is active"))
+        throw(InvalidStateError("insertLocalIndices requires that fill is active"))
     end
     if isGloballyIndexed(graph)
-        throw(InvalidStateException("graph indices are global, use insertGlobalIndices(...) instead"))
+        throw(InvalidStateError("graph indices are global, use insertGlobalIndices(...) instead"))
     end
     if !hasColMap(graph)
-        throw(InvalidStateException("Cannot insert local indices without a column map"))
+        throw(InvalidStateError("Cannot insert local indices without a column map"))
     end
     if !myLID(map(graph), localRow)
         throw(InvalidArgumentError("Row does not belong to this process"))
     end
     if !hasRowInfo(graph)
-        throw(InvalidStateException("Row information was deleted"))
+        throw(InvalidStateError("Row information was deleted"))
     end
     
     debug = @debug graph
@@ -1186,20 +1185,20 @@ function insertGlobalIndices(graph::CRSGraph{GID, PID, LID}, globalRow::GID,
 end
 
 function insertGlobalIndices(graph::CRSGraph{GID, PID, LID}, globalRow::Integer,
-        inds::Array{Integer, 1}) where {GID <: Integer, PID, LID <: Integer}
+        inds::Array{<: Integer, 1}) where {GID <: Integer, PID, LID <: Integer}
     insertGlobalIndices(graph, GID(globalRow), Array{GID, 1}(inds))
 end
 
 function insertGlobalIndices(graph::CRSGraph{GID, PID, LID}, globalRow::GID,
-        inds::Array{GID, 1}) where {GID <: Integer, PID, LID <: Integer}
+        indices::Array{GID, 1}) where {GID <: Integer, PID, LID <: Integer}
     if isLocallyIndexed(graph)
-        throw(InvalidStateException("Graph indices are local, use insertLocalIndices()"))
+        throw(InvalidStateError("Graph indices are local, use insertLocalIndices()"))
     end
     if !hasRowInfo(graph)
-        throw(InvalidStateException("Graph row information was deleted"))
+        throw(InvalidStateError("Graph row information was deleted"))
     end
     if isFillComplete(graph)
-        throw(InvalidStateException("Cannot call this method if the fill is not active"))
+        throw(InvalidStateError("Cannot call this method if the fill is not active"))
     end
     
     myRow = lid(graph.rowMap, globalRow)
@@ -1231,18 +1230,18 @@ function insertGlobalIndices(graph::CRSGraph{GID, PID, LID}, globalRow::GID,
 end
             
 
-function getNumEntriesInGlobalRow(graph::CRSGraph{GID}, globalRow::GID)::Integer where {GID <: Integer}
-    localRow = lid(graph.rowMap, globalRow)
+function getNumEntriesInGlobalRow(graph::CRSGraph{GID}, globalRow::Integer)::Integer where {GID <: Integer}
+    localRow = lid(graph.rowMap, GID(globalRow))
     if hasRowInfo(graph) && localRow != 0
-        getRowInfo(localRow).numEntries
+        getRowInfo(graph, localRow).numEntries
     else
         -1
     end
 end
 
-function getNumEntriesInLocalRow(graph::CRSGraph{GID, PID, LID}, localRow::LID)::Integer where {GID, PID, LID <: Integer}
-    if hasRowInfo(graph) && myLID(graph.rowMap, localRow)
-        getRowInfo(localRow).numEntries
+function getNumEntriesInLocalRow(graph::CRSGraph{GID, PID, LID}, localRow::Integer)::Integer where {GID, PID, LID <: Integer}
+    if hasRowInfo(graph) && myLID(graph.rowMap, LID(localRow))
+        getRowInfo(graph, LID(localRow)).numEntries
     else
         -1
     end
@@ -1322,7 +1321,7 @@ function getLocalRowView(graph::CRSGraph{GID}, localRow::GID)::AbstractArray{GID
     if rowInfo.localRow != 0 && rowInfo.numEntries > 0
         indices = view(getLocalView, 1:rowInfo.numEntries)
         if debug
-            @assert(length(indices) == getNumEntriesInLocalRow(localRow),
+            @assert(length(indices) == getNumEntriesInLocalRow(graph, localRow),
                 "length(indices) = $(length(indices)) "
                 * "!= getNumEntriesInLocalRow(graph, $localRow) "
                 * "= $(getNumEntriesInLocalRow(graph, localRow))")
@@ -1339,7 +1338,7 @@ resumeFill(graph::CRSGraph; plist...) = resumeFill(graph, Dict(Array{Tuple{Symbo
 
 function resumeFill(graph::CRSGraph, plist::Dict{Symbol})
     if !hasRowInfo(graph)
-        throw(InvalidStateException("Cannot resume fill of the CRSGraph, "
+        throw(InvalidStateError("Cannot resume fill of the CRSGraph, "
                 * "since the graph's row information was deleted."))
     end
     
@@ -1383,7 +1382,7 @@ end
 
 function fillComplete(graph::CRSGraph{GID, PID, LID}, domainMap::BlockMap{GID, PID, LID}, rangeMap::BlockMap{GID, PID, LID}, plist::Dict{Symbol}) where {GID, PID, LID}
     if !isFillActive(graph) || isFillComplete(graph)
-        throw(InvalidStateException("Graph fill state must be active to call fillComplete(...)"))
+        throw(InvalidStateError("Graph fill state must be active to call fillComplete(...)"))
     end
        
     const numProcs = numProc(comm(graph))
@@ -1399,7 +1398,7 @@ function fillComplete(graph::CRSGraph{GID, PID, LID}, domainMap::BlockMap{GID, P
         globalAssemble(graph)
     else
         if numProcs == 1 && length(graph.nonLocals) > 0
-            throw(InvalidStateException("Only one process, but nonlocal entries are present"))
+            throw(InvalidStateError("Only one process, but nonlocal entries are present"))
         end
     end
     
@@ -1632,7 +1631,7 @@ function setAllIndices(graph::CRSGraph{GID, PID, LID},
     localNumRows = getNodeNumRows(graph)
     
     if isnull(graph.colMap)
-        throw(InvalidStateException("The graph must have a "
+        throw(InvalidStateError("The graph must have a "
                 * "column map before calling setAllIndices"))
     end
     if length(rowPointers) != localNumRows + 1

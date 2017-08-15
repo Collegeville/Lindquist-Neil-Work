@@ -5,11 +5,12 @@ commObj = SerialComm{UInt32, UInt8, UInt16}()
 map = BlockMap(20, commObj)
 
 function basicTests(graph)
-    @test isLocallyIndexed(graph)
-    @test !isGloballyIndexed(graph)
+    @test !isLocallyIndexed(graph)
+    @test isGloballyIndexed(graph)
     @test isFillActive(graph)
     @test !isFillComplete(graph)
     @test !hasColMap(graph)
+    @test 0 == getNumEntriesInGlobalRow(graph, 1)
 end
 
 graph = CRSGraph(map, UInt16(15), STATIC_PROFILE, Dict{Symbol, Any}())
@@ -21,8 +22,8 @@ graph = CRSGraph(map, UInt16(15), STATIC_PROFILE, Dict{Symbol, Any}(:debug=>true
 @test map == julia_petra.map(graph)
 @test STATIC_PROFILE == getProfileType(graph)
 basicTests(graph)
-insertLocalIndices(graph, 1, [2, 3])
-@test 2 == getNumEntriesInLocalRow(graph, 1)
+insertGlobalIndices(graph, 1, [2, 3])
+@test 2 == getNumEntriesInGlobalRow(graph, 1)
 
 graph = CRSGraph(map, UInt16(15), DYNAMIC_PROFILE, Dict{Symbol, Any}(:debug=>true))
 @test map == julia_petra.map(graph)
