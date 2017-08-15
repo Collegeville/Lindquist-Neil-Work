@@ -73,16 +73,15 @@ serialDistributor = createDistributor(serialComm)
 @test [11, 4, 5, 6, 7, 8, 9, 10] == resolveReverse(serialDistributor, [11, 4, 5, 6, 7, 8, 9, 10])
 @test ['a', 'b', 'c', 'k'] == resolveReverse(serialDistributor, ['a', 'b', 'c', 'k'])
 
-
-@test_throws InvalidStateException resolveWaits(serialDistributor)
-@test_throws InvalidStateException resolveReverseWaits(serialDistributor)
+@test_throws InvalidStateError resolveWaits(serialDistributor)
+@test_throws InvalidStateError resolveReverseWaits(serialDistributor)
 
 resolvePosts(serialDistributor, [1, 2, 3])
 resolvePosts(serialDistributor, [6, 7, 8, 9])
 @test [6, 7, 8, 9] == resolveWaits(serialDistributor)
-@test_throws InvalidStateException resolveWaits(serialDistributor)
+@test_throws InvalidStateError resolveWaits(serialDistributor)
 
 resolveReversePosts(serialDistributor, [11, 12, 13])
 resolveReversePosts(serialDistributor, [16, 17, 81, 19])
 @test [16, 17, 81, 19] == resolveReverseWaits(serialDistributor)
-@test_throws InvalidStateException resolveReverseWaits(serialDistributor)
+@test_throws InvalidStateError resolveReverseWaits(serialDistributor)

@@ -488,7 +488,7 @@ function resolveWaits(dist::MPIDistributor)::Array
     end
     
     if isnull(dist.importObjs)
-        throw(InvalidStateException("Cannot resolve waits when no posts have been made"))
+        throw(InvalidStateError("Cannot resolve waits when no posts have been made"))
     end
     
     importObjs = get(dist.importObjs)
@@ -497,13 +497,15 @@ function resolveWaits(dist::MPIDistributor)::Array
         deserializedObjs[i] = Serializer.deserialize(IOBuffer(importObjs[i]))
     end
     
+    dist.importObjs = Nullable{Array{Array{UInt8}}}()
+    
     reduce(vcat, [], deserializedObjs)
 end
 
 
 function resolveReversePosts(dist::MPIDistributor, exportObjs::Array)
     if dist.indices_to != []
-        throw(InvalidStateException("Cannot do reverse comm when data is not blocked by processor"))
+        throw(InvalidStateError("Cannot do reverse comm when data is not blocked by processor"))
     end
     
     if isnull(dist.planReverse)
@@ -516,7 +518,7 @@ end
 
 function resolveReverseWaits(dist::MPIDistributor)::Array
     if isnull(dist.planReverse)
-        throw(InvalidStateException("Cannot resolve reverse waits if there is no reverse plan"))
+        throw(InvalidStateError("Cannot resolve reverse waits if there is no reverse plan"))
     end
     
     resolveWaits(get(dist.planReverse))

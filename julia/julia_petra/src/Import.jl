@@ -250,7 +250,7 @@ function setupExport(impor::Import{GID, PID, LID}, remoteGIDs::Array{GID}, userR
             numValidRemote -= 1
             
             if numValidRemote != totalNumRemote - numInvalidRemote
-                throw(InvalidStateException("numValidRemote = $numValidRemote " *
+                throw(InvalidStateError("numValidRemote = $numValidRemote " *
                         "!= totalNumRemote - numInvalidRemote " *
                         "= $(totalNumRemote - numInvalidRemote)"))
             end

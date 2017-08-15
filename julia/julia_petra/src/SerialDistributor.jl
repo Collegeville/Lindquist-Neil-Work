@@ -53,7 +53,7 @@ end
 
 function resolveWaits(dist::SerialDistributor)::Array
     if isnull(dist.post)
-        throw(InvalidStateException("Must post before waiting", :SerialDistributor))
+        throw(InvalidStateError("Must post before waiting"))
     end
     
     result = get(dist.post)
@@ -67,8 +67,7 @@ end
 
 function resolveReverseWaits(dist::SerialDistributor)::Array
      if isnull(dist.reversePost)
-        throw(InvalidStateException("Must reverse post before reverse waiting",
-                :SerialDistributor))
+        throw(InvalidStateError("Must reverse post before reverse waiting"))
     end
     
     result = get(dist.reversePost)

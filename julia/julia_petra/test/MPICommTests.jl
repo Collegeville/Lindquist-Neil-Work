@@ -40,11 +40,19 @@ barrier(comm)
 dist = createDistributor(comm)
 @test isa(dist, Distributor{UInt64, UInt16, UInt32})
 
+#check for error when not waiting
+@test_throws InvalidStateError resolveWaits(dist)
+@test_throws InvalidStateError resolveReverseWaits(dist)
+
 @test 4 == createFromSends(dist, [1, 2, 3, 4])
 
 resolvePosts(dist, [pid, 2*pid, 3*pid, 4*pid])
+@test_throws InvalidStateError resolveReverseWaits(dist)
 @test pid*[1, 2, 3, 4] == resolveWaits(dist)
 
+#check for error when not waiting
+@test_throws InvalidStateError resolveWaits(dist)
+@test_throws InvalidStateError resolveReverseWaits(dist)
 
 #test distributor when elements not blocked by processor
 dist2 = createDistributor(comm)
