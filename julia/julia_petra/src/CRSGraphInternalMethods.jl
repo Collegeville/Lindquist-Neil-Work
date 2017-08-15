@@ -676,7 +676,7 @@ function insertGlobalIndicesImpl(graph::CRSGraph{GID, PID, LID},
         if length(graph.globalIndices) != 0
             curOffset = rowInfo.offset1D
             globalIndicesCur = view(graph.globalIndices1D,
-                curOffset:curOffset+rowInfo.numEntries)
+                range(curOffset, 1, rowInfo.numEntries))
             globalIndicesNew = view(graph.globalIndices1D,
                 curOffset+rowInfo.numEntries+1 : currOffset+rowInfo.allocSize)
         else
@@ -808,7 +808,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID},domMap::BlockMap{GID, PID, 
 
             remotePIDs = remoteIDList(domMap, remoteColGIDs)
             if any(remotePIDs .== 0)
-                if debug
+                if @debug graph
                     warn("Some column indices are not in the domain Map")
                 end
                 errCode = 3
@@ -851,7 +851,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID},domMap::BlockMap{GID, PID, 
                 end
 
                 if numLocalCount != numLocalColGIDs
-                    if debug
+                    if @debug graph
                         warn("$(myPid(comm(graph))): numLocalCount = $numLocalCount "
                             * "!= numLocalColGIDs = $numLocalColGIDs.  "
                             * "This should not happen.")
@@ -860,8 +860,6 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID},domMap::BlockMap{GID, PID, 
                 end
             end
         end
-
-        #TODO look into FIXME on line 393
     end
     return(errCode, BlockMap(-1, -1, myColumns, comm(domMap)))
 end

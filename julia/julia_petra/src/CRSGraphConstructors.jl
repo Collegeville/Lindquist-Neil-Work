@@ -15,7 +15,7 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
     exporter::Nullable{Export{GID, PID, LID}}
 
     #TODO figure out if this really needs to be stored
-    lclGraph::LocalCRSGraph
+    localGraph::LocalCRSGraph
 
     #Local number of (populated) entries; must always be consistent
     nodeNumEntries::LID
@@ -37,9 +37,6 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
 
     #Whether the graph was allocated with static or dynamic profile.
     pftype::ProfileType
-
-
-    #TODO combine 1-D and 2-D storage
 
     ## 1-D storage (Static profile) data structures ##
     localIndices1D::Array{LID, 1}
@@ -77,7 +74,7 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
         rangeMap::Nullable{BlockMap{GID, PID, LID}},
         domainMap::Nullable{BlockMap{GID, PID, LID}},
 
-        lclGraph::LocalCRSGraph,
+        localGraph::LocalCRSGraph,
 
         nodeNumEntries::LID,
 
@@ -97,7 +94,7 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistO
             Nullable{Import{GID, PID, LID}}(),
             Nullable{Export{GID, PID, LID}}(),
 
-            lclGraph,
+            localGraph,
 
             #Local number of (populated) entries; must always be consistent
             nodeNumEntries,
@@ -201,7 +198,7 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
         Nullable{BlockMap{GID, PID, LID}}(),
         Nullable{BlockMap{GID, PID, LID}}(),
 
-        LocalCRSGraph{LID, LID}(), #lclGraph
+        LocalCRSGraph{LID, LID}(), #localGraph
         
         LID(0), #nodeNumEntries
 
@@ -259,7 +256,7 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
         Nullable{BlockMap{GID, PID, LID}}(),
         Nullable{BlockMap{GID, PID, LID}}(),
 
-        LocalCRSGraph{LID, LID}(), #lclGraph
+        LocalCRSGraph{LID, LID}(), #localGraph
         
         LID(0), #nodeNumEntries
 
@@ -311,7 +308,7 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
         Nullable{BlockMap{GID, PID, LID}}(),
         Nullable{BlockMap{GID, PID, LID}}(),
 
-        LocalCRSGraph{LID, LID}(), #lclGraph
+        LocalCRSGraph{LID, LID}(), #localGraph
         
         LID(0), #nodeNumEntries
         
