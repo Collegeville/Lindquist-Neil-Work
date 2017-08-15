@@ -199,7 +199,7 @@ function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
     graph.indicesType = lg
     
     if numRows > 0
-        numRowEntries = zeros(LID, 1)
+        numRowEntries = zeros(LID, numRows)
         graph.numRowEntries = numRowEntries
     end
     
@@ -584,7 +584,7 @@ macro insertIndicesImpl(indicesType, innards)
                     $innards
                 else
                     newAllocSize = 2*rowInfo.allocSize
-                    if new AllocSize < newNumEntries
+                    if newAllocSize < newNumEntries
                         newAllocSize = newNumEntries
                     end
                     resize!(graph.$indices2D[myRow], newAllocSize)
@@ -614,7 +614,7 @@ macro insertIndicesImpl(indicesType, innards)
 end
 
 function insertLocalIndicesImpl(graph::CRSGraph{GID, PID, LID},
-        myRow::LID, indices::Array{LID, 1}) where {
+        myRow::LID, indices::AbstractArray{LID, 1}) where {
         GID, PID, LID <: Integer}
     @insertIndicesImpl "local" begin  
         throw(InvalidArgumentError("new indices exceed statically allocated graph structure"))
@@ -623,7 +623,7 @@ end
 
 #TODO figure out if this all can be moved to @insertIndicesImpl
 function insertGlobalIndicesImpl(graph::CRSGraph{GID, PID, LID},
-        myRow::LID, indices::Array{GID, 1}) where {
+        myRow::LID, indices::AbstractArray{GID, 1}) where {
         GID <: Integer, PID, LID <: Integer}
     @insertIndicesImpl "global" begin
         @assert(rowInfo.numEntries <= rowInfo.allocSize,

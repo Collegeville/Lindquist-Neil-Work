@@ -4,6 +4,13 @@ export insertLocalIndices, insertGlobalIndices
 
 #TODO document these methods
 
+getRowMap(graph::CRSGraph) = graph.rowMap
+getColMap(graph::CRSGraph) = get(graph.colMap)
+getDomainMap(graph::CRSGraph) = get(graph.domainMap)
+getRangeMap(graph::CRSGraph) = get(graph.rangeMap)
+getImporter(graph::CRSGraph) = get(graph.importer)
+getExporter(graph::CRSGraph) = get(graph.exporter)
+
 
 function insertLocalIndices(graph::CRSGraph{GID, PID, LID}, localRow::Integer,
         numEntries::Integer, inds::Array{<:Integer, 1}) where {GID, PID, LID <: Integer}
@@ -66,25 +73,25 @@ end
     
 
 function insertGlobalIndices(graph::CRSGraph{GID, PID, LID}, globalRow::Integer,
-        numEntries::Integer, inds::Array{<: Integer, 1}) where {
+        numEntries::Integer, inds::AbstractArray{<: Integer, 1}) where {
         GID <: Integer, PID, LID <: Integer}
     insertGlobalIndices(graph, GID(globalRow), LID(numEntries), Array{GID, 1}(inds))
 end
 
 function insertGlobalIndices(graph::CRSGraph{GID, PID, LID}, globalRow::GID,
-        numEntries::LID, inds::Array{GID, 1}) where {
+        numEntries::LID, inds::AbstractArray{GID, 1}) where {
         GID <: Integer, PID, LID <: Integer}
     indicesView = view(inds, 1:numEntries)
     insertGlobalIndices(graph, globalRow, indsT)
 end
 
 function insertGlobalIndices(graph::CRSGraph{GID, PID, LID}, globalRow::Integer,
-        inds::Array{<: Integer, 1}) where {GID <: Integer, PID, LID <: Integer}
+        inds::AbstractArray{<: Integer, 1}) where {GID <: Integer, PID, LID <: Integer}
     insertGlobalIndices(graph, GID(globalRow), Array{GID, 1}(inds))
 end
 
 function insertGlobalIndices(graph::CRSGraph{GID, PID, LID}, globalRow::GID,
-        indices::Array{GID, 1}) where {GID <: Integer, PID, LID <: Integer}
+        indices::AbstractArray{GID, 1}) where {GID <: Integer, PID, LID <: Integer}
     if isLocallyIndexed(graph)
         throw(InvalidStateError("Graph indices are local, use insertLocalIndices()"))
     end
@@ -122,7 +129,36 @@ function insertGlobalIndices(graph::CRSGraph{GID, PID, LID}, globalRow::GID,
         append!(graph.nonlocalRow, indices)
     end
 end
-            
+
+
+function insertGlobalIndicesFiltered(graph::CRSGraph{GID, PID, LID}, globalRow::GID,
+        indices::AbstractArray{GID, 1}) where{GID, PID, LID}
+    if isLocallyIndexed(graph)
+        throw(InvalidStateError(
+                "graph indices are local, use insertLocalIndices(...)"))
+    end
+    if !hasRowInfo(graph)
+        throw(InvalidStateError("Graph row information was deleted"))
+    end
+    if isFillComplete(graph)
+        throw(InvalidStateError("Cannot insert into fill complete graph"))
+    end
+    
+    myRow = lid(graph.rowMap, globalRow)
+    if myRow != 0
+        #if column map present, use it to filter the entries
+        if hasColMap(graph)
+            colMap = getColMap(graph)
+            indices = [index for index in indices if myLid(colMap, index)]
+        end
+        insertGlobalIndicesImpl(myRow, indices)
+    else
+        #nonlocal row
+        append!(graph.nonlocals[globalRow], indices)
+    end
+end
+                        
+                        
 
 function getNumEntriesInGlobalRow(graph::CRSGraph{GID}, globalRow::Integer)::Integer where {GID <: Integer}
     localRow = lid(graph.rowMap, GID(globalRow))
@@ -183,14 +219,14 @@ function getGlobalRowView(graph::CRSGraph{GID}, globalRow::GID)::AbstractArray{G
     end
 
     if debug
-        @assert hasRowInfo() "Graph row information was deleted"
+        @assert hasRowInfo(graph) "Graph row information was deleted"
     end
-    rowInfo = getRowInfoFromGlobalRowIndex(globalRow)
+    rowInfo = getRowInfoFromGlobalRow(graph, globalRow)
     
     if rowInfo.localRow != 0 && rowInfo.numEntries > 0
-        indices = view(getGlobalView, 1:rowInfo.numEntries)
+        indices = view(getGlobalView(graph, rowInfo), 1:rowInfo.numEntries)
         if debug
-            @assert(length(indices) == getNumEntriesInGlobalRow(globalRow),
+            @assert(length(indices) == getNumEntriesInGlobalRow(graph, globalRow),
                 "length(indices) = $(length(indices)) "
                 * "!= getNumEntriesInGlobalRow(graph, $globalRow) "
                 * "= $(getNumEntriesInGlobalRow(graph, globalRow))")
@@ -463,7 +499,6 @@ function map(graph::CRSGraph)
     graph.rowMap
 end
 
-#TODO implement insertGlobalIndicesFiltered
 
 #TODO implement RowGraph methods
 
@@ -493,7 +528,7 @@ function copyAndPermute(source::CRSGraph{GID, PID, LID},
             copyAndPermuteNoViewMode(source, target,
         numSameIDs, permuteToLIDs, permuteFromLIDs)
     else
-        if length(permuteToLIDs) != length(premuteFromLIDs)
+        if length(permuteToLIDs) != length(permuteFromLIDs)
             throw(InvalidArgumentError("permuteToLIDs and "
                     * "permuteFromLIDs must have the same size"))
         end
@@ -569,10 +604,14 @@ function unpackAndCombine(target::CRSGraph{GID, PID, LID},
     
     for i = 1:length(importLIDs)
         row = imports[i]
-        #line 5436
         insertGlobalIndicesFiltered(target, gid(tgtMap, importLIDs[i]), row)
     end
 end
-        
+
+
+function pack(source::CRSGraph{GID, PID, LID}, exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID})::Array{Array{LID, 1}, 1} where {GID, PID, LID}
+    srcMap = map(source)
+    [getGlobalRowCopy(source, gid(srcMap, lid)) for lid in exportLIDs]
+end
     
     

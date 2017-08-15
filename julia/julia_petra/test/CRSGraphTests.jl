@@ -25,10 +25,15 @@ basicTests(graph)
 insertGlobalIndices(graph, 1, [2, 3])
 @test 2 == getNumEntriesInGlobalRow(graph, 1)
 
-graph = CRSGraph(map, UInt16(15), DYNAMIC_PROFILE, Dict{Symbol, Any}(:debug=>true))
-@test map == julia_petra.map(graph)
-@test DYNAMIC_PROFILE == getProfileType(graph)
-basicTests(graph)
+graph2 = CRSGraph(map, UInt16(15), DYNAMIC_PROFILE, Dict{Symbol, Any}(:debug=>true))
+@test map == julia_petra.map(graph2)
+@test DYNAMIC_PROFILE == getProfileType(graph2)
+basicTests(graph2)
+@test 0 == getNumEntriesInGlobalRow(graph2, 1)
+
+impor = Import(map, map)
+doImport(graph, graph2, impor, REPLACE)
+@test 2 == getNumEntriesInGlobalRow(graph2, 1)
 
 
 commObj = SerialComm{UInt8, Int8, UInt16}()
