@@ -51,7 +51,11 @@ include("MultiVector.jl")
 include("RowMatrix.jl")
 
 include("LocalCRSGraph.jl")
-include("CRSGraph.jl")
+
+include("CRSGraphConstructors.jl")
+include("CRSGraphInternalMethods.jl")
+include("CRSGraphExternalMethods.jl")
+
 include("CSRMatrix.jl")
 
 include("Operator.jl")
