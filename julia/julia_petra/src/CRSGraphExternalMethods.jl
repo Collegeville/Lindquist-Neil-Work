@@ -2,7 +2,7 @@ export getProfileType, getColMap
 export resumeFill, fillComplete
 export insertLocalIndices, insertGlobalIndices
 
-#TODO document these methods
+#### RowGraph methods ####
 
 getRowMap(graph::CRSGraph) = graph.rowMap
 getColMap(graph::CRSGraph) = get(graph.colMap)
@@ -11,6 +11,63 @@ getRangeMap(graph::CRSGraph) = get(graph.rangeMap)
 getImporter(graph::CRSGraph) = get(graph.importer)
 getExporter(graph::CRSGraph) = get(graph.exporter)
 
+getGlobalNumRows(graph::CRSGraph) = numGlobalElements(getRowMap(graph))
+getGlobalNumCols(graph::CRSGraph) = numGlobalElements(getColMap(graph))
+getNodeNumRows(graph::CRSGraph) = numMyElements(getRowMap(graph))
+getNodeNumCols(graph::CRSGraph) = numMyElements(getColMap(graph))
+
+getGlobalNumEntries(graph::CRSGraph) = graph.globalNumEntries
+getNodeNumEntries(graph::CRSGraph) = graph.nodeNumEntries
+
+function getNumEntriesInGlobalRow(graph::CRSGraph{GID}, globalRow::Integer)::Integer where {GID <: Integer}
+    localRow = lid(graph.rowMap, GID(globalRow))
+    if hasRowInfo(graph) && localRow != 0
+        getRowInfo(graph, localRow).numEntries
+    else
+        -1
+    end
+end
+
+function getNumEntriesInLocalRow(graph::CRSGraph{GID, PID, LID}, localRow::Integer)::Integer where {GID, PID, LID <: Integer}
+    if hasRowInfo(graph) && myLID(graph.rowMap, LID(localRow))
+        getRowInfo(graph, LID(localRow)).numEntries
+    else
+        -1
+    end
+end
+
+getGlobalNumDiags(graph::CRSGraph) = graph.globalNumDiags
+getNodeNumDiags(graph::CRSGraph) = graph.nodeNumDiags
+
+getGlobalMaxNumRowEntries(graph::CRSGraph) = graph.globalMaxNumRowEntries
+getNodeMaxNumRowEntries(graph::CRSGraph) = graph.nodeMaxNumRowEntries
+
+hasColMap(graph::CRSGraph) = !isnull(graph.colMap)
+
+isLowerTriangular(graph::CRSGraph) = graph.lowerTriangle
+isUpperTriangular(graph::CRSGraph) = graph.upperTriangle
+
+isGloballyIndexed(graph::CRSGraph) = graph.indicesType == GLOBAL_INDICES
+isLocallyIndexed(graph::CRSGraph) = graph.indicesType == LOCAL_INDICES
+
+isFillComplete(g::CRSGraph) = g.fillComplete
+
+function getGlobalRowCopy(graph::CRSGraph{GID}, globalRow::GID)::Array{GID, 1} where {GID <: Integer}
+    Array{GID, 1}(getGlobalRowView(graph, globalRow))
+end
+        
+function getLocalRowCopy(graph::CRSGraph{GID, PID, LID}, localRow::LID)::Array{LID, 1} where {GID, PID, LID <: Integer}
+    Array{LID, 1}(getLocalRowView(graph, localRow))
+end
+
+function pack(source::CRSGraph{GID, PID, LID}, exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID})::Array{Array{LID, 1}, 1} where {GID, PID, LID}
+    srcMap = map(source)
+    [getGlobalRowCopy(source, gid(srcMap, lid)) for lid in exportLIDs]
+end
+
+
+#### CRSGraph methods ####
+#TODO document the CRSGraph methods
 
 function insertLocalIndices(graph::CRSGraph{GID, PID, LID}, localRow::Integer,
         numEntries::Integer, inds::Array{<:Integer, 1}) where {GID, PID, LID <: Integer}
@@ -158,25 +215,6 @@ function insertGlobalIndicesFiltered(graph::CRSGraph{GID, PID, LID}, globalRow::
     end
 end
                         
-                        
-
-function getNumEntriesInGlobalRow(graph::CRSGraph{GID}, globalRow::Integer)::Integer where {GID <: Integer}
-    localRow = lid(graph.rowMap, GID(globalRow))
-    if hasRowInfo(graph) && localRow != 0
-        getRowInfo(graph, localRow).numEntries
-    else
-        -1
-    end
-end
-
-function getNumEntriesInLocalRow(graph::CRSGraph{GID, PID, LID}, localRow::Integer)::Integer where {GID, PID, LID <: Integer}
-    if hasRowInfo(graph) && myLID(graph.rowMap, LID(localRow))
-        getRowInfo(graph, LID(localRow)).numEntries
-    else
-        -1
-    end
-end
-
 function getGlobalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}) where {GID <: Integer, PID, LID <: Integer}
     if rowInfo.allocSize > 0
         if length(graph.globalIndices1D) != 0
@@ -202,14 +240,6 @@ function getLocalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}) whe
         end
     end
     return LID[]
-end
-
-function getGlobalRowCopy(graph::CRSGraph{GID}, globalRow::GID)::Array{GID, 1} where {GID <: Integer}
-    Array{GID, 1}(getGlobalRowView(graph, globalRow))
-end
-        
-function getLocalRowCopy(graph::CRSGraph{GID, PID, LID}, globalRow::LID)::Array{LID, 1} where {GID, PID, LID <: Integer}
-    Array{LID, 1}(getLocalRowView(graph, globalRow))
 end
 
 function getGlobalRowView(graph::CRSGraph{GID}, globalRow::GID)::AbstractArray{GID, 1} where {GID <: Integer}
@@ -380,13 +410,6 @@ function makeColMap(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
 end
 
 """
-hasColMap(::CRSGraph)
-
-Whether the graph has a column map
-"""
-hasColMap(graph::CRSGraph) = !isnull(graph.colMap)
-
-"""
     isSorted(::CRSGraph)
 
 Whether the indices are sorted
@@ -451,41 +474,6 @@ function isStorageOptimized(graph::CRSGraph)
 end
 
 """
-    isFillComplete(graph)::Bool
-
-Whether the graph is fill complete
-"""
-isFillComplete(g::CRSGraph) = g.fillComplete
-
-"""
-    getNodeNumRows(graph)
-
-Gets the number of rows on this processor
-"""
-function getNodeNumRows(graph::CRSGraph{<:Integer, <:Integer, LID}) where LID <: Integer
-    numMyElements(graph.rowMap)
-end
-    
-
-"""
-    isGloballyIndexed(::CRSGraph)
-
-Whether the graph uses global indexes
-"""
-function isGloballyIndexed(graph::CRSGraph)
-    graph.indicesType == GLOBAL_INDICES
-end
-   
-"""
-    isLocallyIndexed(::CRSGraph)
-
-Whether the graph uses local indexes
-"""
-function isLocallyIndexed(graph::CRSGraph)
-    graph.indicesType == LOCAL_INDICES
-end
-
-"""
     getProfileType(::CRSGraph)
 
 Gets the profile type of the graph
@@ -494,13 +482,6 @@ function getProfileType(graph::CRSGraph)
     graph.pftype
 end
 
-
-function map(graph::CRSGraph)
-    graph.rowMap
-end
-
-
-#TODO implement RowGraph methods
 
 #### DistObject methods ####
 function checkSizes(source::RowGraph{GID, PID, LID},
@@ -607,11 +588,3 @@ function unpackAndCombine(target::CRSGraph{GID, PID, LID},
         insertGlobalIndicesFiltered(target, gid(tgtMap, importLIDs[i]), row)
     end
 end
-
-
-function pack(source::CRSGraph{GID, PID, LID}, exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID})::Array{Array{LID, 1}, 1} where {GID, PID, LID}
-    srcMap = map(source)
-    [getGlobalRowCopy(source, gid(srcMap, lid)) for lid in exportLIDs]
-end
-    
-    
