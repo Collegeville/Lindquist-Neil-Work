@@ -471,5 +471,116 @@ function map(graph::CRSGraph)
     graph.rowMap
 end
 
-#TODO implement DistObject methods
-#TODO implement methods similar to RowMatrix
+#TODO implement insertGlobalIndicesFiltered
+
+#TODO implement RowGraph methods
+
+#### DistObject methods ####
+function checkSizes(source::RowGraph{GID, PID, LID},
+        target::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
+    #T and E petra's don't do any checks
+    true
+end
+
+function copyAndPermute(source::RowGraph{GID, PID, LID},
+        target::CRSGraph{GID, PID, LID}, numSameIDs::LID,
+        permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1}) where {
+        GID, PID, LID}
+    copyAndPermuteNoViewMode(source, target,
+        numSameIDs, permuteToLIDs, permuteFromLIDs)
+end
+
+function copyAndPermute(source::CRSGraph{GID, PID, LID},
+        target::CRSGraph{GID, PID, LID}, numSameIDs::LID,
+        permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1}) where {
+        GID, PID, LID}
+    if isFillComplete(target)
+        throw(InvalidStateError("Target cannot be fill complete"))
+    end
+    if isFillComplete(source)
+            copyAndPermuteNoViewMode(source, target,
+        numSameIDs, permuteToLIDs, permuteFromLIDs)
+    else
+        if length(permuteToLIDs) != length(premuteFromLIDs)
+            throw(InvalidArgumentError("permuteToLIDs and "
+                    * "permuteFromLIDs must have the same size"))
+        end
+        
+        srcRowMap = getRowMap(source)
+        tgtRowMap = getRowMap(target)
+        
+        #copy part
+        for myid = 1:numSameIDs
+            myGID = gid(srcRowMap, myid)
+            row = getGlobalRowView(source, myGID)
+            insertGlobalIndices(target, myGID row)
+        end
+        
+        #permute part
+        for i = 1:length(permuteToLIDs)
+            srcGID = gid(srcRowMap, permuteFromLIDs[i])
+            tgtGID = gid(tgtRowMap, permuteToLIDs[i])
+            row = getGlobalRowView(source, srcGID)
+            insertGlobalIndices(target, tgtGID, row)
+        end
+    end
+end
+        
+            
+function copyAndPermuteNoViewMode(source::RowGraph{GID, PID, LID},
+        target::CRSGraph{GID, PID, LID}, numSameIDs::LID,
+        permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1}) where {
+        GID, PID, LID}
+    if length(permuteToLIDs) != length(premuteFromLIDs)
+        throw(InvalidArgumentError("permuteToLIDs and "
+                * "permuteFromLIDs must have the same size"))
+    end
+    
+    srcRowMap = getRowMap(source)
+    tgtRowMap = getRowMap(target)
+    
+    #copy part
+    for myid = 1:numSameIDs
+        myGID = gid(srcRowMap, myid)
+        rowCopy = getGlobalRowCopy(sourceRowGraph, myGID)
+        insertGlobalIndices(target, myGID, rowCopy)
+    end
+    
+    #permute part
+    for i = 1:length(permuteToLIDs)
+        tgtGID = gid(tgtRowMap, permuteToLIDs[i])
+        srcGID = gid(srcRowMap, permuteFromLIDs[i])
+        rowCopy = getGlobalRowCopy(source, srcGID)
+        insertGlobalIndices(target, tgtGID, rowCopy)
+    end
+end
+        
+    
+
+function packAndPrepare(source::RowGraph{GID, PID, LID},
+        target::CRSGraphGID, PID, LID}, exportLIDs::Array{LID, 1},
+        distor::Distributor{GID, PID, LID})::Array where {
+        GID, PID, LID}
+
+    pack(source, exportLIDs, distor)
+end
+
+function unpackAndCombine(target::CRSGraph{GID, PID, LID},
+        importLIDs::Array{LID, 1}, imports::Array,
+        distor::Distributor{GID, PID, LID}, cm::CombineMode) where {
+        GID, PID, LID}
+    #should be caught else where
+    @assert(isFillActive(target),
+        "Import and Export operations require a fill active graph")
+    
+    tgtMap = map(target)
+    
+    for i = 1:length(importLIDs)
+        row = imports[i]
+        #line 5436
+        insertGlobalIndicesFiltered(target, gid(tgtMap, importLIDs[i]), row)
+    end
+end
+        
+    
+    

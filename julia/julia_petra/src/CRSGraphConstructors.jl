@@ -1,7 +1,7 @@
 export CRSGraph
 
 #TODO document the type and constructors
-
+#TODO create RowGraph type and subtype it
 
 mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistObject{GID, PID, LID}
     rowMap::BlockMap{GID, PID, LID}
