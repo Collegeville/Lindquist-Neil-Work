@@ -16,14 +16,29 @@ struct MPIComm{GID <: Integer, PID <:Integer, LID <: Integer} <: Comm{GID, PID, 
 end
 
 function MPIComm(GID::Type, PID::Type, LID::Type)
-    MPI.Init()
+    MPIInit()
     comm = MPIComm{GID, PID, LID}(MPI.COMM_WORLD)
-    
-    atexit(() -> MPI.Finalize())
     
     comm
 end
 
+MPINeedsInitialization = true
+
+"""
+    MPIInit()
+
+On the first call, initializes MPI and adds an exit hook to finalize MPI
+Does nothing on subsequent calls
+"""
+function MPIInit()
+    global MPINeedsInitialization
+    if MPINeedsInitialization
+        MPI.Init()
+        atexit(() -> MPI.Finalize())
+            
+        MPINeedsInitialization = false
+    end
+end
 
 function barrier(comm::MPIComm)
     MPI.Barrier(comm.mpiComm)
