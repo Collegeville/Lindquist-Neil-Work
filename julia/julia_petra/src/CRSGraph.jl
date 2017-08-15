@@ -170,11 +170,21 @@ end
 
 #### Constructors #####
 
-#TODO add plist constructors that passes kwargs
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, maxNumEntriesPerRow::LID,
+        pftype::ProfileType; plist...) where {
+        GID <: Integer, PID <: Integer, LID <: Integer}
+    CRSGraph(rowMap, maxNumEntriesPerRow,  pftype, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
+end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, maxNumEntriesPerRow::LID,
         pftype::ProfileType, plist::Dict{Symbol}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
     CRSGraph(rowMap, Nullable{BlockMap{GID, PID, LID}}(), maxNumEntriesPerRow, pftype, plist)
+end
+    
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
+        maxNumEntriesPerRow::LID, pftype::ProfileType; plist...) where {
+        GID <: Integer, PID <: Integer, LID <: Integer}
+    CRSGraph(rowMap, colMap, maxNumEntriesPerRow, pftype, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
 end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
         maxNumEntriesPerRow::LID, pftype::ProfileType, plist::Dict{Symbol}) where {
@@ -182,6 +192,11 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
     CRSGraph(rowMap, Nullable(colMap), maxNumEntriesPerRow, pftype, plist)
 end
     
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}},
+        maxNumEntriesPerRow::LID, pftype::ProfileType; plist...) where {
+        GID <: Integer, PID <: Integer, LID <: Integer}
+    CRSGraph(rowMap, colMap, maxNumEntriesPerRow, pftype, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
+end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}},
         maxNumEntriesPerRow::LID, pftype::ProfileType, plist::Dict{Symbol}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
@@ -213,7 +228,11 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
     graph
 end
 
-
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, numEntPerRow::Array{LID, 1},
+        pftype::ProfileType; plist...)  where {
+        GID <: Integer, PID <: Integer, LID <: Integer}
+    CRSGraph(rowMap, numEntPerRow, pftype, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
+end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, numEntPerRow::Array{LID, 1},
         pftype::ProfileType, plist::Dict{Symbol})  where {
         GID <: Integer, PID <: Integer, LID <: Integer}
@@ -221,11 +240,21 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, numEntPerRow::Array{LID, 1},
 end
 
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
+        numEntPerRow::Array{LID, 1}, pftype::ProfileType;
+        plist...)  where {GID <: Integer, PID <: Integer, LID <: Integer}
+    CRSGraph(rowMap, colMap, numEntPerRow, pftype, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
+end
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
         numEntPerRow::Array{LID, 1}, pftype::ProfileType,
         plist::Dict{Symbol})  where {GID <: Integer, PID <: Integer, LID <: Integer}
     CRSGraph(rowMap, Nullable(colMap), numEntPerRow, pftype, plist)
 end
 
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}},
+        numEntPerRow::Array{LID, 1}, pftype::ProfileType;
+        plist...)  where {GID <: Integer, PID <: Integer, LID <: Integer}
+    CRSGraph(rowMap, colMap, numEntPerRow, pftype, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
+end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}},
         numEntPerRow::Array{LID, 1}, pftype::ProfileType,
         plist::Dict{Symbol})  where {GID <: Integer, PID <: Integer, LID <: Integer}
@@ -274,6 +303,11 @@ end
 
 
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
+        rowPointers::Array{LID, 1}, columnIndices::Array{LID, 1};
+        plist...) where {GID <: Integer, PID <: Integer, LID <: Integer}
+    CRSGraph(rowMap, colMap, rowPointers, columnIndices, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
+end
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
         rowPointers::Array{LID, 1}, columnIndices::Array{LID, 1},
         plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
     graph = CRSGraph(
@@ -302,7 +336,11 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LI
     graph
 end
 
-
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
+        localGraph::LocalCRSGraph{LID, LID}; plist...) where {
+        GID <: Integer, PID <: Integer, LID <: Integer}
+    CRSGraph(rowMap, colMap, localGraph, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
+end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
         localGraph::LocalCRSGraph{LID, LID}, plist::Dict{Symbol}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
@@ -474,7 +512,11 @@ end
 hasRowInfo(graph::CRSGraph) = (getProfileType(graph) != STATIC_PROFILE 
                                 || length(graph.rowOffsets) != 0)
 
-#TODO implement getRowInfoFromGlobalRow
+function getRowInfoFromGlobalRow(graph::CRSGraph{GID, PID, LID},
+        row::Integer)::RowInfo{LID} where {GID, PID, LID <: Integer}
+    getRowInfo(graph, lid(graph.rowMap, row))
+end
+    
 function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} where {GID, PID, LID <: Integer}
     if @debug graph
         @assert hasRowInfo(graph) "Graph does not have row info anymore.  Should have been caught earlier"
@@ -1147,8 +1189,7 @@ function insertLocalIndices(graph::CRSGraph{GID, PID, LID},
     debug = @debug graph
     if debug
         colMap = getColMap(graph)
-        #TODO uncomment - commented to get auto indent working correctly
-        #badColIndices = [ind for ind in indices if myLID(colMap, ind)]
+        badColIndices = [ind for ind in indices if myLID(colMap, ind)]
         
         if length(badColIndices) != 0
             throw(InvalidArgumentError(
