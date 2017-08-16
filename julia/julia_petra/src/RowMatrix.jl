@@ -91,7 +91,7 @@ domainMap(operator::RowMatrix{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
 
 function rangeMap(operator::RowMatrix{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
 
-Finally, the required methods from SrcDistObject and possibly DistObject must also be implemented
+Finally, the required methods from DistObject must also be implemented.  `map(...)`, as required by SrcDistObject, is implemented to forward the call to `rowMap(...)`
 """
 const RowMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} = Union{SrcDistRowMatrix{Data, GID, PID, LID}, DistRowMatrix{Data, GID, PID, LID}}
 
@@ -111,6 +111,11 @@ function rightScale!(matrix::RowMatrix{Data, GID, PID, LID}, X::MultiVector{Data
         throw(InvalidArgumentError("Can only scale CRS matrix with column vector, not multi vector"))
     end
     rightScale!(matrix, X.data)
+end
+
+#for SrcDistObject
+function map(matrix::RowMatrix)
+    rowMap(matrix)
 end
 
 

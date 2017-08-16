@@ -225,6 +225,7 @@ function makeImportExport(graph::CRSGraph{GID, PID, LID}) where {
     end
 end
     
+#TODO migrate this to testing
 function checkInternalState(graph::CRSGraph)
     if @debug graph
         const localNumRows = getNodeNumRows(graph)
