@@ -141,7 +141,6 @@ computeGlobalConstants(matrix::CSRMatrix) = nothing
 #Tpetra's only clears forbNorm, exists only to be a parallel to CRSGraph
 clearGlobalConstants(matrix::CSRMatrix) = nothing
 
-#TODO implement globalAssemble
 function globalAssemble(matrix::CSRMatrix)
     comm = julia_petra.comm(matrix)
     if !isFillActive(matrix)
@@ -250,7 +249,6 @@ function globalAssemble(matrix::CSRMatrix)
 end
 
     
-#TODO implement fillLocalGraphAndMatrix
 function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
         plist::Dict{Symbol}) where {Data, GID, PID, LID}
     localNumRows = getNodeNumRows(matrix)
@@ -331,12 +329,77 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
     matrix.localMatrix = LocalCSRMatrix(getNodeNumCols(matrix), vals, graph.localGraph)
 end
         
-                
+function insertNonownedGlobalValues(matrix::CSRMatrix{Data, GID, PID, LID},
+        globalRow::GID, indices::Array{GID, 1}, values::Array{Data, 1}
+        ) where {Data, GID, PID, LID}
+    
+    curRow = matrix.nonlocals[globalRow]
+    curRowVals = curRow[1]
+    curRowInds = curRow[2]
+    
+    newCapacity = length(curRowInds) + length(indices)
+    
+    append!(curRowVals, values)
+    append!(curRowInds, indices)
+end
+    
 
 #### External methods ####
 #TODO document external methods
     
-#TODO implement insertGlobalValues(matrix, row, cols, vals)
+function insertGlobalValues(matrix::CSRMatrix{Data, GID, PID, LID}, globalRow::Integer,
+        indices::AbstractArray{LID, 1}, values::AbstractArray{Data, 1}
+        ) where {Data, GID, PID, LID}
+    myGraph = matrix.myGraph
+    
+    localRow = lid(getRowMap(matrix), globalRow)
+    
+    if localRow == 0
+        insertNonownedGlobalValues(matrix, globalRow, indices, values)
+    else
+        numEntriesToInsert = length(indices)
+        if hasColMap(matrix)
+            colMap = getColMap(matrix)
+            
+            for k = 1:numEntriesToInsert
+                if !myGID(colMap, indices[k])
+                    throw(InvalidArgumentError("Attempted to insert entries into "
+                            * "owned row $globalRow, at the following column indices "
+                            * "$indices.  At least one of those indices ($(indices[k])"
+                            * ") is not in the column map on this process"))
+                end
+            end
+        end
+        
+        #TODO is this ok? from lines 1965-1969
+        inds_view = indices
+        vals_view = values
+        
+        rowInfo = getRowInfo(myGraph, localRow)
+        curNumEntries = rowInfo.numEntries
+        newNumEntries = curNumEntries = length(numEntriesToInsert)
+        if newNumEntries > rowInfo.allocSize
+            if(getProfileType(matrix) == STATIC_PROFILE 
+                    && newNumEntries > rowInfo.allocSize)
+                throw(InvalidArgumentException("number of new indices exceed "
+                        * "statically allocated graph structure"))
+            end
+            
+            rowInfo = updateGlobalAllocAndValues(myGraph, rowInfo, newNumEntries,
+                            matrix.values2D[localRow])
+        end
+
+        if isGloballyIndexed(matrix)
+            insertIndicesAndValues(myGraph, rowInfo, indices, getView(matrix, rowInfo),
+                values, GLOBAL_INDICES, GLOBAL_INDICES)
+        else
+            insertIndicesAndValues(myGraph, rowInfo, indices, getView(matrix, rowInfo),
+                values, GLOBAL_INDICES, LOCAL_INDICES)
+        end
+    end
+end
+            
+    
 
 function resumeFill(matrix::CSRMatrix, plist::Dict{Symbol})
     resumeFill(matrix.myGraph, plist)

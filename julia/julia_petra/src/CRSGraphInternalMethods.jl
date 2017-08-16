@@ -1,4 +1,6 @@
 
+#TODO implement updateGlobalAllocAndValues(graph, rowInfo, newNumEntries, values2D[localRow])::RowInfo
+
 function computeGlobalConstants(graph::CRSGraph{GID, PID, LID}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
     
