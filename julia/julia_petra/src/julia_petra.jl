@@ -48,6 +48,7 @@ include("MultiVector.jl")
 
 
 # Sparse Data types
+include("SparseRowView.jl")
 include("LocalCRSGraph.jl")
 
 include("RowGraph.jl")

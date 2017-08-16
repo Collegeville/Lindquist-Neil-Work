@@ -31,6 +31,7 @@ const noUtil = in("--util", ARGS) #don't run tests on Misc Utils
             include("MultiVectorTests.jl")
             multiVectorTests(SerialComm{UInt64, UInt16, UInt32}())
             
+            include("SparseRowViewTests.jl")
             include("LocalCRSGraphTests.jl")
             include("CRSGraphTests.jl")
             include("CSRMatrixTests.jl")
