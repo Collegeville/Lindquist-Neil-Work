@@ -7,10 +7,20 @@ struct LocalCSRMatrix{Data, IndexType <: Integer}
     numCols::IndexType
 end
 
+"""
+    LocalCSRMatrix{Data, IndexType}()
+
+Creates an empty LocalCSRMatrix
+"""
 function LocalCSRMatrix{Data, IndexType}() where {Data, IndexType}
     LocalCSRMatrix(LocalCRSGraph{IndexType, IndexType}(), Data[], IndexType(0))
 end
 
+"""
+    LocalCSRMatrix(nRows::Integer, nCols::Integer, vals::Array{Data, 1}, rows::Array{IndexType, 1}, cols::Array{IndexType, 1}}
+  
+Creates the specified LocalCSRMatrix
+"""
 function LocalCSRMatrix(nRows::Integer, nCols::Integer,
         vals::Array{Data, 1}, rows::Array{IndexType, 1},
         cols::Array{IndexType, 1}) where {Data, IndexType}
@@ -21,11 +31,6 @@ function LocalCSRMatrix(nRows::Integer, nCols::Integer,
     LocalCSRMatrix(LocalCRSGraph(cols, rows), vals, IndexType(nCols))
 end
 
-"""
-    nnz(::LocalCRSMatrix{Data, IndexType})::IndexType
-
-Gets the number of nonzero elements in the matrix
-"""
 function Base.nnz(matrix::LocalCSRMatrix{Data, IndexType}) where {Data, IndexType}
     IndexType(length(matrix.values))
 end

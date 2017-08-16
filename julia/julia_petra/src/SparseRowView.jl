@@ -26,11 +26,6 @@ function SparseRowView(vals::AbstractArray{Data}, cols::AbstractArray{IndexType}
         view(cols, range(start, stride, count)))
 end
    
-"""
-    nnz(::SparseRowView{Data, IndexType})::IndexType
-
-Gets the number of elements in the row
-"""
 function Base.nnz(row::SparseRowView{Data, IndexType}) where{Data, IndexType} 
     IndexType(length(row.vals))
 end
