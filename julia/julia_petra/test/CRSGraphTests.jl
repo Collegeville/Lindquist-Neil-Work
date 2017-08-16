@@ -40,3 +40,7 @@ commObj = SerialComm{UInt8, Int8, UInt16}()
 map = BlockMap(20, commObj)
 
 @test_throws InvalidArgumentError CRSGraph(map, UInt16(15), STATIC_PROFILE, Dict{Symbol, Any}())
+
+
+#TODO ensure result of CRSGraph(rowMap, colMap, localGraph, plist) is fill complete
+#TODO ensure CRSGraph(rowMap, colMap, rowOffsets, entries, plist) sets up local graph correctly (same length and content in local graph as was given to constructor)
