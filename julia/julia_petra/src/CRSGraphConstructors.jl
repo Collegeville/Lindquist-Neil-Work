@@ -161,26 +161,26 @@ end
 
 #### Constructors #####
 
-function CRSGraph(rowMap::BlockMap{GID, PID, LID}, maxNumEntriesPerRow::LID,
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, maxNumEntriesPerRow::Integer,
         pftype::ProfileType; plist...) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
-    CRSGraph(rowMap, maxNumEntriesPerRow,  pftype, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
+    CRSGraph(rowMap, LID(maxNumEntriesPerRow),  pftype, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
 end
-function CRSGraph(rowMap::BlockMap{GID, PID, LID}, maxNumEntriesPerRow::LID,
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, maxNumEntriesPerRow::Integer,
         pftype::ProfileType, plist::Dict{Symbol}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
-    CRSGraph(rowMap, Nullable{BlockMap{GID, PID, LID}}(), maxNumEntriesPerRow, pftype, plist)
+    CRSGraph(rowMap, Nullable{BlockMap{GID, PID, LID}}(), LID(maxNumEntriesPerRow), pftype, plist)
 end
     
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
-        maxNumEntriesPerRow::LID, pftype::ProfileType; plist...) where {
+        maxNumEntriesPerRow::Integer, pftype::ProfileType; plist...) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
-    CRSGraph(rowMap, colMap, maxNumEntriesPerRow, pftype, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
+    CRSGraph(rowMap, colMap, LID(maxNumEntriesPerRow), pftype, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
 end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
-        maxNumEntriesPerRow::LID, pftype::ProfileType, plist::Dict{Symbol}) where {
+        maxNumEntriesPerRow::Integer, pftype::ProfileType, plist::Dict{Symbol}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
-    CRSGraph(rowMap, Nullable(colMap), maxNumEntriesPerRow, pftype, plist)
+    CRSGraph(rowMap, Nullable(colMap), LID(maxNumEntriesPerRow), pftype, plist)
 end
     
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}},

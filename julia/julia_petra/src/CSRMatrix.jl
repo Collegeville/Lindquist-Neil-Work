@@ -1,4 +1,4 @@
-export CSRMatrix
+export CSRMatrix, insertGlobalValues
 
 mutable struct CSRMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: DistRowMatrix{Data, GID, PID, LID}
     rowMap::BlockMap{GID, PID, LID}
@@ -23,13 +23,14 @@ mutable struct CSRMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: 
 
     plist::Dict{Symbol}
 
-    function CSRMatrix{Data, GID, PID, LID}(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}}, myGraph::CRSGraph{GID, PID, LID}, localMatrix::LocalCSRMatrix{Data, LID}, values2D::Array{Array{Data, 1}, 1}, plist::Dict{Symbol}) where {Data, GID, PID, LID}
+    function CSRMatrix{Data, GID, PID, LID}(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}}, myGraph::CRSGraph{GID, PID, LID}, localMatrix::LocalCSRMatrix{Data, LID}, plist::Dict{Symbol}) where {Data, GID, PID, LID}
         new(rowMap,
             colMap,
             Nullable{MultiVector{Data, GID, PID, LID}}(),
             Nullable{MultiVector{Data, GID, PID, LID}}(),
             myGraph,
-            values2D,
+            localMatrix,
+            Array{Array{Data, 1}, 1}(),
             Dict{GID, Tuple{Array{Data, 1}, Array{GID, 1}}}(),
             plist)
     end
@@ -59,7 +60,7 @@ function CSRMatrix{Data}(rowMap::BlockMap{GID, PID, LID},
     graph = CRSGraph(rowMap, maxNumEntriesPerRow, pftype, plist)
     
     matrix = CSRMatrix{Data, GID, PID, LID}(rowMap, colMap, 
-        graph, LocalCSRMatrix{Data, LID}(), [], plist)
+        graph, LocalCSRMatrix{Data, LID}(), plist)
     
     resumeFill(matrix, plist)
     
@@ -73,7 +74,7 @@ function CSRMatrix{Data}(graph::CRSGraph{GID, PID, LID},plist::Dict{Symbol}
     val = Array{Data, 1}(length(localGraph.entries))
     localMatrix = LocalCSRMatrix(numCols, val, localGraph)
     
-    CSRMatrix(graph.rowMap, graph.colMap, graph, localMatrix, [], plist)
+    CSRMatrix(graph.rowMap, graph.colMap, graph, localMatrix, plist)
 end
 
 function CSRMatrix(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
@@ -94,7 +95,7 @@ function CSRMatrix(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, L
     numCols = numMyElements(getColMap(graph))
     localMatrix = LocalCSRMatrix(numCols, values, localGraph)
     
-    CSRMatrix(rowMap, Nullable(colMap), graph, localMatrix, [], plist)
+    CSRMatrix(rowMap, Nullable(colMap), graph, localMatrix, plist)
 end
 
 
@@ -104,7 +105,7 @@ function CSRMatrix(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, L
     
     graph = CRSGraph(rowMap, colMap, localMatrix.graph, plist)
     
-    matrix = CSRMatrix(rowMap, colMap, graph, localMatrix, [], plist)
+    matrix = CSRMatrix(rowMap, colMap, graph, localMatrix, plist)
     
     computeGlobalConstants(matrix)
     matrix
@@ -404,7 +405,7 @@ end
 function resumeFill(matrix::CSRMatrix, plist::Dict{Symbol})
     resumeFill(matrix.myGraph, plist)
     
-    clearClobalConstants(matrix)
+    clearGlobalConstants(matrix)
     #graph handles fillComplete variable
 end
 
@@ -451,6 +452,15 @@ function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
     fillLocalGraphAndMatrix(matrix, plist)
 end
     
+
+getProfileType(matrix::CSRMatrix) = getProfileType(matrix.myGraph)
+isFillActive(matrix::CSRMatrix) = isFillActive(matrix.myGraph)
+isFillComplete(matrix::CSRMatrix) = isFillComplete(matrix.myGraph)
+getRowMap(matrix::CSRMatrix) = matrix.rowMap
+hasColMap(matrix::CSRMatrix) = !isnull(matrix.colMap)
+getColMap(matrix::CSRMatrix) = get(matrix.colMap)
+isGloballyIndexed(matrix::CSRMatrix) = isGloballyIndexed(matrix.myGraph)
+isLocallyIndexed(matrix::CSRMatrix)  = isLocallyIndexed(matrix.myGraph)
 
 
 #TODO implement CSRMatrix methods
