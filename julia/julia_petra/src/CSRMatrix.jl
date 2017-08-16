@@ -11,7 +11,7 @@ mutable struct CSRMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: 
     myGraph::CRSGraph{GID, PID, LID}
     
     #TODO figure out
-    localMatrix::LocalCRSMatrix{Data, LID}
+    localMatrix::LocalCSRMatrix{Data, LID}
 
     #TODO look at FIXME on line 293 - try to delete values1D?
     values1D::Array{Data, 1}
