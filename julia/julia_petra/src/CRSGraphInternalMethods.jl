@@ -11,7 +11,13 @@ end
 getLocalGraph(graph::CRSGraph) = graph.localGraph
 
 
-#TODO implement updateGlobalAllocAndValues(graph, rowInfo, newNumEntries, values2D[localRow])::RowInfo
+function updateGlobalAllocAndValues(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}, newAllocSize::Integer, rowValues::Array{Data, 1})::RowInfo{LID} where {Data, GID, PID, LID}
+    
+    resize!(graph.globalIndices2D[rowInfo.localRow], newAllocSize)
+    resize!(rowVals, newAllocSize)
+    
+    getRowInfo(graph, rowInfo.localRow)
+end
 
 function insertIndicesAndValues(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}, newInds::Union{AbstractArray{GID, 1}, AbstractArray{LID, 1}}, oldRowVals::AbstractArray{Data, 1}, newRowVals::AbstractArray{Data, 1}, lg::IndexType) where {Data, GID, PID, LID}
     numNewInds = insertIndices(graph, rowInfo, newInds, lg)

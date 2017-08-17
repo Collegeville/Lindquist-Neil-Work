@@ -9,11 +9,16 @@
 n = 8
 m = 6
 
-commObj = SerialComm{UInt16, Bool, UInt8}()
+Data = Float32
+GID = UInt16
+PID = Bool
+LID = UInt8
+
+commObj = SerialComm{GID, PID, LID}()
 rowMap = BlockMap(n, n, commObj)
 
-mat = CSRMatrix{Float32}(rowMap, m, STATIC_PROFILE, Dict{Symbol, Any}())
-@test isa(mat, CSRMatrix{Float32, UInt16, Bool, UInt8})
+mat = CSRMatrix{Data}(rowMap, m, STATIC_PROFILE, Dict{Symbol, Any}())
+@test isa(mat, CSRMatrix{Data, GID, PID, LID})
 @test STATIC_PROFILE == getProfileType(mat)
 @test isFillActive(mat)
 @test !isFillComplete(mat)
@@ -21,9 +26,34 @@ mat = CSRMatrix{Float32}(rowMap, m, STATIC_PROFILE, Dict{Symbol, Any}())
 @test !isLocallyIndexed(mat)
 @test rowMap == getRowMap(mat)
 @test !hasColMap(mat)
-
-@test 0 == mat.myGraph.nodeNumEntries
-insertGlobalValues(mat, 2, UInt8[1, 3, 4], Float32[2.5, 6.21, 77])
-@test 3 == mat.myGraph.nodeNumEntries
+@test n == getGlobalNumRows(mat)
+@test n == getLocalNumRows(mat)
 
 
+@test 0 == getNumEntriesInLocalRow(mat, 2)
+@test 0 == getNumEntriesInGlobalRow(mat, 2)
+@test 0 == getLocalNumEntries(mat)
+@test 0 == getGlobalNumEntries(mat)
+@test 0 == getGlobalNumDiags(mat)
+@test 0 == getLocalNumDiags(mat)
+@test 0 == getGlobalMaxNumRowEntries(mat)
+@test 0 == getLocalMaxNumRowEntries(mat)
+insertGlobalValues(mat, 2, LID[1, 3, 4], Data[2.5, 6.21, 77])
+@test 3 == getNumEntriesInLocalRow(mat, 2)
+@test 3 == getNumEntriesInGlobalRow(mat, 2)
+@test 3 == getLocalNumEntries(mat)
+@test 0 == getLocalNumDiags(mat)
+@test 3 == julia_petra.getRowInfo(mat.myGraph, LID(2)).numEntries
+#skipped many of the global methods because that require re-generating and may not be up to date
+
+row = getGlobalRowCopy(mat, 2)
+@test isa(row, Tuple{Array{GID, 1}, Array{Data, 1}})
+@test GID[1, 3, 4] == row[1]
+@test Data[2.5, 6.21, 77] == row[2]
+
+
+#=
+
+getGlobalNumCols(mat::CSRMatrix) = -1#TODO figure out
+getLocalNumCols(mat::CSRMatrix) = numCols(mat.localMatrix)
+=#

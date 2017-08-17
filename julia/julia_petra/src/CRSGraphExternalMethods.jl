@@ -401,7 +401,7 @@ function getLocalRowView(graph::CRSGraph{GID}, localRow::GID)::AbstractArray{GID
     rowInfo = getRowInfoFromLocalRowIndex(localRow)
     
     if rowInfo.localRow != 0 && rowInfo.numEntries > 0
-        indices = view(getLocalView, 1:rowInfo.numEntries)
+        indices = view(getLocalView(graph, rowInfo), 1:rowInfo.numEntries)
         if debug
             @assert(length(indices) == getNumEntriesInLocalRow(graph, localRow),
                 "length(indices) = $(length(indices)) "
