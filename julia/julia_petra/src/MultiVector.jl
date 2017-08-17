@@ -1,6 +1,8 @@
 export MultiVector
 export localLength, globalLength, numVectors, map
 export scale!, scale
+export getVectorView, getVectorCopy
+
 
 """
 MultiVector represents a dense multi-vector.  Note that all the vectors in a single MultiVector are the same size
@@ -130,6 +132,25 @@ Scales each column of a copy of the mulitvector and returns the copy
 """
 function scale(vect::MultiVector{Data, GID, PID, LID}, alpha::Array{Data, 1})::MultiVector{Data, GID, PID, LID} where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
     scale!(copy(vect), alpha)
+end
+
+
+"""
+    getVectorView(::MultiVector{Data}, columns)::AbstractArray{Data}
+
+Gets a view of the requested column vector(s) in this multivector
+"""
+function getVectorView(mVect::MultiVector{Data}, column)::AbstractArray{Data}  where {Data}
+    view(mVect.data, :, column)
+end
+
+"""
+    getVectorCopy(::MultiVector{Data}, columns)::Array{Data}
+
+Gets a copy of the requested column vector(s) in this multivector
+"""
+function getVectorCopy(mVect::MultiVector{Data}, column)::Array{Data} where {Data}
+    mVect.data[:, column]
 end
 
 
