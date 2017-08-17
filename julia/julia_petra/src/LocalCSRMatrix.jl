@@ -31,9 +31,8 @@ function LocalCSRMatrix(nRows::Integer, nCols::Integer,
     LocalCSRMatrix(LocalCRSGraph(cols, rows), vals, IndexType(nCols))
 end
 
-function Base.nnz(matrix::LocalCSRMatrix{Data, IndexType}) where {Data, IndexType}
-    IndexType(length(matrix.values))
-end
+#TODO need (numCols, values, localGraph) constructor
+
 
 """
     numRows(::LocalCSRMatrix{Data, IndexType})::IndexType

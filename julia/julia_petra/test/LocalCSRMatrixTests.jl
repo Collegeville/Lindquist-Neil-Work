@@ -1,6 +1,5 @@
 
 default = LocalCSRMatrix{Float32, UInt32}()
-@test 0 == nnz(default)
 @test 0 == numRows(default)
 @test 0 == numCols(default)
 @test_throws BoundsError getRowView(default, 1)
@@ -11,7 +10,6 @@ rawVals = Float32[5, 8, 6, 2, 1, 6]
 rawCols =  UInt32[2, 4, 5, 2, 3, 1]
 mat = LocalCSRMatrix(4, 5, rawVals, UInt32[1, 2, 4, 6, 7], rawCols)
 @test isa(mat, LocalCSRMatrix{Float32, UInt32})
-@test 6 == nnz(mat)
 @test 4 == numRows(mat)
 @test 5 == numCols(mat)
 @test Float32[5] == vals(getRowView(mat, 1))

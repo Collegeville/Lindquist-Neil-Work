@@ -24,13 +24,35 @@ mutable struct CSRMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: 
     plist::Dict{Symbol}
 
     function CSRMatrix{Data, GID, PID, LID}(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}}, myGraph::CRSGraph{GID, PID, LID}, localMatrix::LocalCSRMatrix{Data, LID}, plist::Dict{Symbol}) where {Data, GID, PID, LID}
+    
+        #allocate values
+        localNumRows = getNodeNumRows(myGraph)
+        if getProfileType(myGraph) == STATIC_PROFILE
+            ptrs = myGraph.rowOffsets
+            localTotalNumEntries = ptrs[localNumRows+1]
+
+            resize!(localMatrix.values, localTotalNumEntries)
+        
+            values2D = Array{Array{Data, 1}, 1}(0)
+        else #DYNAMIC_PROFILE
+            if isLocallyIndexed(myGraph)
+                graphIndices = myGraph.localIndices
+            else
+                graphIndices = myGraph.globalIndices
+            end
+            values2D = Array{Array{Data, 1}, 1}(localNumRows)
+            for r = 1:length(graphIndices)
+                values2D[r] = Array{Array{Data, 1}, 1}(length(graphIndices[r]))
+            end
+        end
+    
         new(rowMap,
             colMap,
             Nullable{MultiVector{Data, GID, PID, LID}}(),
             Nullable{MultiVector{Data, GID, PID, LID}}(),
             myGraph,
             localMatrix,
-            Array{Array{Data, 1}, 1}(),
+            values2D,
             Dict{GID, Tuple{Array{Data, 1}, Array{GID, 1}}}(),
             plist)
     end
@@ -248,7 +270,8 @@ function globalAssemble(matrix::CSRMatrix)
                 * "row map on any process in its communicator."))
     end
 end
-
+        
+    
     
 function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
         plist::Dict{Symbol}) where {Data, GID, PID, LID}
@@ -343,6 +366,17 @@ function insertNonownedGlobalValues(matrix::CSRMatrix{Data, GID, PID, LID},
     append!(curRowVals, values)
     append!(curRowInds, indices)
 end
+
+function getView(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID}) where {Data, GID, PID, LID}
+    if getProfileType(matrix) == STATIC_PROFILE && rowInfo.allocSize > 0
+        range = rowInfo.offset1D:rowInfo.offset1D+rowInfo.allocSize
+        view(matrix.localMatrix.values, range)
+    elseif getProfileType(matrix) == DYNAMIC_PROFILE
+        matrix.values2D[rowInfo.localRow]
+    else
+        Data[]
+    end
+end
     
 
 #### External methods ####
@@ -372,10 +406,6 @@ function insertGlobalValues(matrix::CSRMatrix{Data, GID, PID, LID}, globalRow::I
             end
         end
         
-        #TODO is this ok? from lines 1965-1969
-        inds_view = indices
-        vals_view = values
-        
         rowInfo = getRowInfo(myGraph, localRow)
         curNumEntries = rowInfo.numEntries
         newNumEntries = curNumEntries = length(numEntriesToInsert)
@@ -390,16 +420,10 @@ function insertGlobalValues(matrix::CSRMatrix{Data, GID, PID, LID}, globalRow::I
                             matrix.values2D[localRow])
         end
 
-        if isGloballyIndexed(matrix)
-            insertIndicesAndValues(myGraph, rowInfo, indices, getView(matrix, rowInfo),
-                values, GLOBAL_INDICES, GLOBAL_INDICES)
-        else
-            insertIndicesAndValues(myGraph, rowInfo, indices, getView(matrix, rowInfo),
-                values, GLOBAL_INDICES, LOCAL_INDICES)
-        end
+        insertIndicesAndValues(myGraph, rowInfo, indices, getView(matrix, rowInfo),
+                values, GLOBAL_INDICES)
     end
-end
-            
+end   
     
 
 function resumeFill(matrix::CSRMatrix, plist::Dict{Symbol})

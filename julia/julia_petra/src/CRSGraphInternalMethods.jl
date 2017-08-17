@@ -1,5 +1,59 @@
+#DECISION put this somewhere else?  Its only an internal grouping
+struct RowInfo{LID <: Integer}
+    graph::CRSGraph{<:Integer, <:Integer, LID}
+    localRow::LID
+    allocSize::LID
+    numEntries::LID
+    offset1D::LID
+end
+
+
+getLocalGraph(graph::CRSGraph) = graph.localGraph
+
 
 #TODO implement updateGlobalAllocAndValues(graph, rowInfo, newNumEntries, values2D[localRow])::RowInfo
+
+function insertIndicesAndValues(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}, newInds::Union{AbstractArray{GID, 1}, AbstractArray{LID, 1}}, oldRowVals::AbstractArray{Data, 1}, newRowVals::AbstractArray{Data, 1}, lg::IndexType) where {Data, GID, PID, LID}
+    numNewInds = insertIndices(graph, rowInfo, newInds, lg)
+    oldInd = rowInfo.numEntries+1
+    
+    oldRowVals[range(oldInd, 1, numNewInds)] = newRowVals[1:numNewInds]
+end
+    
+function insertIndices(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}, newInds::Union{AbstractArray{GID, 1}, AbstractArray{LID, 1}}, lg::IndexType) where {GID, PID, LID}
+    numNewInds = 0
+    if lg == GLOBAL_INDICES
+        newGInds = AbstractArray{GID, 1}(newInds)
+        numNewInds = length(newGInds)
+        if isGloballyIndexed(graph)
+            gIndView = getGlobalView(graph, rowInfo)
+            gIndView[range(rowInfo.numEntries+1, 1, length(newGInds))] = newGInds[:]
+        else
+            lIndView = getLocalView(graph, rowInfo)
+            colMap = graph.colMap
+            
+            dest = range(rowInfo.numEntries, 1, length(newGInds))
+            lIndView[dest] = [lid(colMap, gid) for gid in newGInds]
+        end
+    elseif lg == LOCAL_INDICES
+        newLInds = AbstractArray{LID, 1}(newInds)
+        numNewInds = length(newLInds)
+        if isLocallyIndexed(graph)
+            lIndView = getLocalView(graph, rowInfo)
+            lIndView[range(rowInfo.numEntries, 1, length(newLInds))] = newLInds[:]
+        else
+            @assert(false,"lg=LOCAL_INDICES, isGloballyIndexed(g) not implemented, "
+            * "because it doesn't make sense")
+        end
+    end
+    
+    graph.numRowEntries[rowInfo.localRow] += numNewInds
+    graph.nodeNumEntries += numNewInds
+    setLocallyModified(graph)
+    
+    numNewInds
+end
+            
 
 function computeGlobalConstants(graph::CRSGraph{GID, PID, LID}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
@@ -116,15 +170,6 @@ function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} wher
             0 : graph.numRowEntries[row])
     end
     RowInfo{LID}(graph, row, allocSize, numEntries, offset1D)
-end
-
-#DECISION put this somewhere else?  Its only an internal grouping
-struct RowInfo{LID <: Integer}
-    graph::CRSGraph{<:Integer, <:Integer, LID}
-    localRow::LID
-    allocSize::LID
-    numEntries::LID
-    offset1D::LID
 end
 
 function getLocalView(rowInfo::RowInfo{LID})::AbstractArray{LID, 1} where LID <: Integer

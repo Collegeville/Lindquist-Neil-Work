@@ -13,7 +13,6 @@ mutable struct CRSGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistR
     #may be null if rangeMap and rowMap are the same
     exporter::Nullable{Export{GID, PID, LID}}
 
-    #TODO figure out if this really needs to be stored
     localGraph::LocalCRSGraph
 
     #Local number of (populated) entries; must always be consistent
