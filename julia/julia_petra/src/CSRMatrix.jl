@@ -675,10 +675,6 @@ function getLocalDiagCopy(matrix::CSRMatrix{Data, GID, PID, LID})::MultiVector{D
     end
 end
 
-
-#TODO implement local math ops
-
 #TODO implement RowMatrix methods
 #TODO implement DistObject methods
-#TODO implement SrcDistObject methods
 #TODO implement Operator methods
