@@ -7,7 +7,7 @@ struct RowInfo{LID <: Integer}
     offset1D::LID
 end
 
-
+#TODO implement getLocalDiagOffsets(::CRSGraph)
 getLocalGraph(graph::CRSGraph) = graph.localGraph
 
 

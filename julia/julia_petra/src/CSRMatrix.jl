@@ -1,7 +1,7 @@
 export CSRMatrix, insertGlobalValues
 
 #TODO most likely should be RowMatrix requirements
-export getLocalNumEntries, getLocalNumRows, getLocalNumCols, getLocalNumEntries, getLocalNumDiags, getLocalMaxNumRowEntries, getLocalRowCopy
+export getLocalNumEntries, getLocalNumRows, getLocalNumCols, getLocalNumEntries, getLocalNumDiags, getLocalMaxNumRowEntries, getLocalRowCopy, getGlobalRowView, getLocalRowView
 
 mutable struct CSRMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: DistRowMatrix{Data, GID, PID, LID}
     rowMap::BlockMap{GID, PID, LID}
@@ -380,6 +380,38 @@ function getView(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID}) 
         Data[]
     end
 end
+
+function getDiagCopyWithoutOffsets(rowMap, colMap, A::CSRMatrix{Data}) where {Data}
+    errCount = 0
+
+    D = Array{Data, 1}(getNumLocalRows(A))
+
+    for localRowIndex = 1:length(D)
+        D[localRowIndex] = 0
+        globalIndex = gid(rowMap, localRowIndex)
+        localColIndex = lid(colMap, globalIndex)
+        if localColIndex != 0
+            colInds, vals = getLocalRowView(A, localRowIndex)
+            
+            offset = 1
+            numEnt = length(curRow)
+            while offset <= numEnt
+                if colInds[offset] == localColIndex
+                    break;
+                end
+                offset += 1
+            end
+            
+            if offset > numEnt
+                errCount += 1
+            else
+                D[localRowIndex] = vals[offset]
+            end
+        end
+    end
+    D
+end
+        
     
 
 #### External methods ####
@@ -481,6 +513,18 @@ end
     
 
 getProfileType(mat::CSRMatrix) = getProfileType(mat.myGraph)
+isStorageOptimized(mat::CSRMatrix) = isStorageOptimized(mat.myGraph)
+   
+
+function getLocalDiagOffsets(matrix::CSRMatrix{Data, GID, PID, LID})::AbstractArray{LID, 1} where {Data, GID, PID, LID}
+    graph = matrix.myGraph
+    localNumRows = getLocalNumRows(graph)
+    getLocalDiagOffsets(graph)
+end
+
+
+#### Row Matrix functions ####
+
 isFillActive(mat::CSRMatrix) = isFillActive(mat.myGraph)
 isFillComplete(mat::CSRMatrix) = isFillComplete(mat.myGraph)
 getRowMap(mat::CSRMatrix) = mat.rowMap
@@ -488,7 +532,6 @@ hasColMap(mat::CSRMatrix) = !isnull(mat.colMap)
 getColMap(mat::CSRMatrix) = get(mat.colMap)
 isGloballyIndexed(mat::CSRMatrix) = isGloballyIndexed(mat.myGraph)
 isLocallyIndexed(mat::CSRMatrix)  = isLocallyIndexed(mat.myGraph)
-isStorageOptimized(mat::CSRMatrix) = isStorageOptimized(mat.myGraph)
 getGraph(mat::CSRMatrix) = mat.myGraph
 
 getGlobalNumRows(mat::CSRMatrix) = getGlobalNumRows(mat.myGraph)
@@ -513,19 +556,19 @@ function getGlobalRowCopy(matrix::CSRMatrix{Data, GID, PID, LID},
     myGraph = matrix.myGraph
     
     rowInfo = getRowInfoFromGlobalRow(myGraph, GID(globalRow))
+    viewRange = 1:rowInfo.numEntries
     
-    theNumEntries = rowInfo.numEntries
     if rowInfo.localRow != 0
         if isLocallyIndexed(myGraph)
             colMap = getColMap(myGraph)
-            curLocalIndices = getLocalView(myGraph, rowInfo)
+            curLocalIndices = getLocalView(myGraph, rowInfo)[viewRange]
             curGlobalIndices = @. gid(colMap, curLocalIndices)
         else
-            curGlobalIndices = getGlobalView(myGraph, rowInfo)
+            curGlobalIndices = getGlobalView(myGraph, rowInfo)[viewRange]
         end
-        curValues = getView(matrix, rowInfo)
+        curValues = getView(matrix, rowInfo)[viewRange]
         
-        (curGlobalIndices[1:rowInfo.numEntries], curValues[1:rowInfo.numEntries])
+        (curGlobalIndices, curValues)
     else
         (GID[], Data[])
     end
@@ -539,33 +582,102 @@ function getLocalRowCopy(matrix::CSRMatrix{Data, GID, PID, LID},
     myGraph = matrix.myGraph
     
     rowInfo = getRowInfo(myGraph, LID(localRow))
+    viewRange = 1:rowInfo.numEntries
     
-    theNumEntries = rowInfo.numEntries
     if rowInfo.localRow != 0
-        colMap = getColMap(myGraph)
         if isLocallyIndexed(myGraph)
-            curLocalIndices = getLocalView(myGraph, rowInfo)
+            curLocalIndices = getLocalView(myGraph, rowInfo)[viewRange]
         else
-            curGlobalIndices = getGlobalView(myGraph, rowInfo)
+            colMap = getColMap(myGraph)
+            curGlobalIndices = getGlobalView(myGraph, rowInfo)[viewRange]
             curLocalIndices = @. lid(colMap, curLocalIndices)
         end
-        curValues = getView(matrix, rowInfo)
+        curValues = getView(matrix, rowInfo)[viewRange]
         
-        (curLocalIndices[1:rowInfo.numEntries], curValues[1:rowInfo.numEntries])
+        (curLocalIndices, curValues)
     else
         (LID[], Data[])
     end
 end
 
-#TODO implement getGlobalRowView(...)
-#TODO implement getLocalRowView(...)
-#TODO implement getLocalDiagCopy(...)
-#TODO implement getLocalDiagOffsets(...)
-#TODO implement getLocalDiagCopy(...)
+
+function getGlobalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
+        globalRow::Integer
+        )::Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}} where {
+        Data, GID, PID, LID}
+    if isLocallyIndexed(matrix)
+        throw(InvalidStateError("The matrix is locally indexed, so cannot return a "
+                * "view of the row with global column indices.  Use "
+                * "getGlobalRowCopy(...) instead."))
+    end
+    myGraph = matrix.myGraph
+    
+    rowInfo = getRowInfoFromGlobalRow(myGraph, globalRow)
+    if rowInfo.localRow != 0 && rowInfo.numEntries > 0
+        viewRange = 1:rowInfo.numEntries
+        indices = getGlobalView(myGraph, rowInfo)[viewRange]
+        values = getView(matrix, rowInfo)[viewRange]
+    else
+        indices = GID[]
+        values = Data[]
+    end
+    (indices, values)
+end
+    
+function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
+        localRow::Integer
+        )::Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}} where {
+        Data, GID, PID, LID}
+    if isGloballyIndexed(matrix)
+        throw(InvalidStateError("The matrix is globally indexed, so cannot return a "
+                * "view of the row with local column indices.  Use "
+                * "getLocalalRowCopy(...) instead."))
+    end
+    myGraph = matrix.myGraph
+    
+    rowInfo = getRowInfo(myGraph, localRow)
+    if rowInfo.localRow != 0 && rowInfo.numEntries > 0
+        viewRange = 1:rowInfo.numEntries
+        indices = getLocalView(myGraph, rowInfo)[viewRange]
+        values = getView(matrix, rowInfo)[viewRange]
+    else
+        indices = LID[]
+        values = Data[]
+    end
+    (indices, values)
+end
+
+
+function getLocalDiagCopy(matrix::CSRMatrix{Data, GID, PID, LID})::MultiVector{Data, GID, PID, LID} where {Data, GID, PID, LID}
+    if !hasColMap(matrix)
+        throw(InvalidStateError("This method requires a column map"))
+    end
+    
+    rowMap = getRowMap(matrix)
+    colMap = getColMap(matrix)
+    
+    numLocalRows = getLocalNumRows(matrix)
+    
+    if isFillComplete(matrix)
+        diag = MultiVector{Data, GID, PID, LID}(rowMap, 1, false)
+ 
+        
+        diag1D = getVectorView(diag, 1)
+        localRowMap = getLocalMap(rowMap)
+        localColMap = getLocalMap(colMap)
+        localMatrix = matrix.localMatrix
+        
+        diag1D[:] = getDiagCopyWithoutOffsets(matrix, localRowMap, localColMap, localMatrix)
+        
+        diag
+    else
+        getLocalDiagCopyWithoutOffsetsNotFillComplete(matrix)
+    end
+end
+
 
 #TODO implement local math ops
 
-#TODO implement CSRMatrix methods
 #TODO implement RowMatrix methods
 #TODO implement DistObject methods
 #TODO implement SrcDistObject methods

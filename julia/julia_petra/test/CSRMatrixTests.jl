@@ -47,7 +47,12 @@ insertGlobalValues(mat, 2, LID[1, 3, 4], Data[2.5, 6.21, 77])
 #skipped many of the global methods because that require re-generating and may not be up to date
 
 row = getGlobalRowCopy(mat, 2)
-@test isa(row, Tuple{Array{GID, 1}, Array{Data, 1}})
+@test isa(row, Tuple{<: AbstractArray{GID, 1}, <: AbstractArray{Data, 1}})
+@test GID[1, 3, 4] == row[1]
+@test Data[2.5, 6.21, 77] == row[2]
+
+row = getGlobalRowView(mat, 2)
+@test isa(row, Tuple{<: AbstractArray{GID, 1}, <: AbstractArray{Data, 1}})
 @test GID[1, 3, 4] == row[1]
 @test Data[2.5, 6.21, 77] == row[2]
 
