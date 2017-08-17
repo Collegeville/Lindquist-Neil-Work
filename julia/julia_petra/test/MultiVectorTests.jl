@@ -53,11 +53,19 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
     @test vect !== vect2
     @test pid*5*ones(Float64, (n, 3)) == vect2.data
 
+    increase = pid*nProcs
+    
     vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, ones(Float64, n, 3))
-    @test vect == scale!(vect, pid*nProcs+[2.0, 3.0, 4.0])
-    @test hcat( (pid*nProcs+2)*ones(Float64, n),
-                (pid*nProcs+3)*ones(Float64, n), 
-                (pid*nProcs+4)*ones(Float64, n))  == vect.data
+    @test vect == scale!(vect, increase+[2.0, 3.0, 4.0])
+    @test hcat( (increase+2)*ones(Float64, n),
+                (increase+3)*ones(Float64, n), 
+                (increase+4)*ones(Float64, n))  == vect.data
+    
+    for i = 1:3
+        act = i+1+repeat(Float64[increase], inner=n)
+        @test act == getVectorView(vect, i)
+        @test act == getVectorCopy(vect, i)
+    end
 
     vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, ones(Float64, n, 3))
     vect2 = scale(vect, pid*nProcs+[2.0, 3.0, 4.0])

@@ -7,26 +7,24 @@ export releaseViews, createViews, createViewsNonConst
 # Note that all packet size information was removed due to the use of julia's
 # built in serialization/objects
 
-#TODO make this interface feel more ideomatic with mutliple dispatch
 """
 A base type for constructing and using dense multi-vectors, vectors and matrices in parallel.
 
-All subtypes must have the following methods, with Impl standing in for the subtype and ??? standing in for all types that ``checkSize()`` indicates are supported for transfer, in addition to the methods required by SrcDistObject:
 
-copyAndPermute(source::???{GID, PID, LID}, target::Impl{GID, PID, LID},
-        numSameIDs::LID, permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1})
-    Perform copies and permutations that are local to this process.
+To support transfers the following methods must be implemented for the source type and the target type
 
-packAndPrepare(source::???{GID, PID, LID}, target::Impl{GID, PID, LID},
-        exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID}
-        )::Array
-    Perform any packing or preparation required for communications.  The
-    method returns the array of objects to export
+    checkSizes(source::<:SrcDistObject{GID, PID, LID}, target::<:DistObject{GID, PID, LID})::Bool
+Whether the source and target are compatible for a transfer
 
-unpackAndCombine(target::Impl{GID, PID, LID}, importLIDs::Array{LID, 1},
-        imports::Array, distor::Distributor{GID, PID, LID},
-        cm::CombineMode)
-    Perform any unpacking and combining after communication
+    copyAndPermute(source::<:SrcDistObject{GID, PID, LID}, target::<:DistObject{GID, PID, LID}, numSameIDs::LID, permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1})
+Perform copies and permutations that are local to this process.
+
+    packAndPrepare(source::<:SrcDistObject{GID, PID, LID}, target::<:DistObjectGID, PID, LID}, exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID})::Array
+Perform any packing or preparation required for communications.  The
+method returns the array of objects to export
+
+    unpackAndCombine(target::<:DistObject{GID, PID, LID},importLIDs::Array{LID, 1}, imports::Array, distor::Distributor{GID, PID, LID}, cm::CombineMode)
+Perform any unpacking and combining after communication
 """
 abstract type DistObject{GID <:Integer, PID <: Integer, LID <: Integer} <: SrcDistObject{GID, PID, LID}
 end
