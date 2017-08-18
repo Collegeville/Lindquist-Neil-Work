@@ -11,6 +11,9 @@ const noUtil = in("--util", ARGS) #don't run tests on Misc Utils
 
 @testset "Serial tests" begin
 
+    #a generic serial comm for the tests that need to be called with a comm object
+    const serialComm = SerialComm{UInt64, UInt16, UInt32}()
+    
     if !noUtil
         @testset "Util Tests" begin
             include("MacroTests.jl")
@@ -23,13 +26,16 @@ const noUtil = in("--util", ARGS) #don't run tests on Misc Utils
             include("SerialCommTests.jl")
             include("Import-Export Tests.jl")
             include("BlockMapTests.jl")
+            
+            include("LocalCommTests.jl")
+            runLocalCommTests(serialComm)
         end
     end
 
     if !noDataStructs
         @testset "Data Structure Tests" begin
             include("MultiVectorTests.jl")
-            multiVectorTests(SerialComm{UInt64, UInt16, UInt32}())
+            multiVectorTests(serialComm)
             
             include("SparseRowViewTests.jl")
             include("LocalCRSGraphTests.jl")

@@ -14,6 +14,7 @@ include("ComputeOffsets.jl")
 include("Distributor.jl")
 include("Directory.jl")
 include("Comm.jl")
+include("LocalComm.jl")
 
 include("BlockMapData.jl")
 include("BlockMap.jl")

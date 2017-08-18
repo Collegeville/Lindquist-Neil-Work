@@ -21,6 +21,9 @@ try
                 include("MPICommTests.jl")
                 include("MPIBlockMapTests.jl")
                 include("MPIimport-export Tests.jl")
+                
+                include("LocalCommTests.jl")
+                runLocalCommTests(comm)
             end
 
             @testset "Data MPI Tests" begin
