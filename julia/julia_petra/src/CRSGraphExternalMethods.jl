@@ -13,11 +13,11 @@ getExporter(graph::CRSGraph) = get(graph.exporter)
 
 getGlobalNumRows(graph::CRSGraph) = numGlobalElements(getRowMap(graph))
 getGlobalNumCols(graph::CRSGraph) = numGlobalElements(getColMap(graph))
-getNodeNumRows(graph::CRSGraph) = numMyElements(getRowMap(graph))
-getNodeNumCols(graph::CRSGraph) = numMyElements(getColMap(graph))
+getLocalNumRows(graph::CRSGraph) = numMyElements(getRowMap(graph))
+getLocalNumCols(graph::CRSGraph) = numMyElements(getColMap(graph))
 
 getGlobalNumEntries(graph::CRSGraph) = graph.globalNumEntries
-getNodeNumEntries(graph::CRSGraph) = graph.nodeNumEntries
+getLocalNumEntries(graph::CRSGraph) = graph.nodeNumEntries
 
 function getNumEntriesInGlobalRow(graph::CRSGraph{GID}, globalRow::Integer)::Integer where {GID <: Integer}
     localRow = lid(graph.rowMap, GID(globalRow))
@@ -37,10 +37,10 @@ function getNumEntriesInLocalRow(graph::CRSGraph{GID, PID, LID}, localRow::Integ
 end
 
 getGlobalNumDiags(graph::CRSGraph) = graph.globalNumDiags
-getNodeNumDiags(graph::CRSGraph) = graph.nodeNumDiags
+getLocalNumDiags(graph::CRSGraph) = graph.nodeNumDiags
 
 getGlobalMaxNumRowEntries(graph::CRSGraph) = graph.globalMaxNumRowEntries
-getNodeMaxNumRowEntries(graph::CRSGraph) = graph.nodeMaxNumRowEntries
+getLocalMaxNumRowEntries(graph::CRSGraph) = graph.nodeMaxNumRowEntries
 
 hasColMap(graph::CRSGraph) = !isnull(graph.colMap)
 
@@ -506,7 +506,7 @@ end
 
 function makeColMap(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
     debug = @debug graph
-    const localNumRows = getNodeNumElements(graph)
+    const localNumRows = getLocalNumElements(graph)
     
     #TODO get rid of this order retention stuff, it has to do with epetra interop
     const sortEachProcsGIDs = graph.sortGhostsAssociatedWithEachProcessr
@@ -552,7 +552,7 @@ function setAllIndices(graph::CRSGraph{GID, PID, LID},
         rowPointers::Array{LID, 1},columnIndices::Array{LID, 1}) where {
         GID, PID, LID <: Integer}
     
-    localNumRows = getNodeNumRows(graph)
+    localNumRows = getLocalNumRows(graph)
     
     if isnull(graph.colMap)
         throw(InvalidStateError("The graph must have a "
@@ -584,7 +584,7 @@ end
 Whether the graph's storage is optimized
 """
 function isStorageOptimized(graph::CRSGraph)
-    const isOpt = length(graph.numRowEntries) == 0 && getNodeNumRows(graph) > 0
+    const isOpt = length(graph.numRowEntries) == 0 && getLocalNumRows(graph) > 0
     if isOpt && @debug graph
         @assert(getProfileType(graph) == STATIC_PROFILE,
             "Matrix claims optimized storage by profile type "

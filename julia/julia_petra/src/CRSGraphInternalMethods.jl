@@ -218,7 +218,7 @@ function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
     @assert(isGloballyIndexed(graph) == (lg == GLOBAL_INDICES),
         "Graph is $(isGloballyIndexed(graph)?"":"not ")globally indexed but lg=$lg")
     
-    numRows = getNodeNumRows(graph)
+    numRows = getLocalNumRows(graph)
 
     if getProfileType(graph) == STATIC_PROFILE
         rowPtrs = Array{LID, 1}(numRows + 1)
@@ -281,7 +281,7 @@ end
 #TODO migrate this to testing
 function checkInternalState(graph::CRSGraph)
     if @debug graph
-        const localNumRows = getNodeNumRows(graph)
+        const localNumRows = getLocalNumRows(graph)
         
         @assert(isFillActive(graph) != isFillComplete(graph),
             "Graph must be either fill active or fill "
@@ -302,12 +302,12 @@ function checkInternalState(graph::CRSGraph)
                 || length(graph.localIndices2D) == localNumRows,
                 "Graph calims to be locally index and have 2D storage, "
                 * "but length(graph.localIndices2D) = $(length(graph.localIndices2D)) "
-                * "!= getNodeNumRows(graph) = $localNumRows")
+                * "!= getLocalNumRows(graph) = $localNumRows")
             @assert(!isGloballyIndexed(graph)
                 || length(graph.globalIndices2D) == localNumRows,
                 "Graph calims to be globally index and have 2D storage, "
                 * "but length(graph.globalIndices2D) = $(length(graph.globalIndices2D)) "
-                * "!= getNodeNumRows(graph) = $localNumRows")
+                * "!= getLocalNumRows(graph) = $localNumRows")
         end
         
         @assert(graph.haveGlobalConstants 
@@ -435,7 +435,7 @@ function sortAndMergeAllIndices(graph::CRSGraph, sorted::Bool, merged::Bool)
         * "so we shouldn't be merging any indices.")
     
     if !sorted || !merged
-        localNumRows = getNodeNumRows(graph)
+        localNumRows = getLocalNumRows(graph)
         totalNumDups = 0
         for localRow = 1:localNumRows
             rowInfo = getRowInfo(graph, localRow)
@@ -547,7 +547,7 @@ function makeIndicesLocal(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
     @assert hasColMap(graph) "The graph does not have a column map yet.  This method should never be called in that case"
     
     colMap = get(graph.colMap)
-    localNumRows = getNodeNumRows(graph)
+    localNumRows = getLocalNumRows(graph)
     
     if isGloballyIndexed(graph) && localNumRows != 0
         numRowEntries = graph.numRowEntries

@@ -35,13 +35,15 @@ Returns a copy of the given row using local indices
 Returns a view to the given row using global indices
     getLocalRowView(matrix::RowMatrix{Data, GID, PID, LID},localRow::Integer)::Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}}
 Returns a view to the given row using local indices
+    getLocalNumDiags(mat::RowMatrix)
+Returns the number of diagonal element on the calling processor
     getLocalDiagCopy(matrix::RowMatrix{Data, GID, PID, LID})::MultiVector{Data, GID, PID, LID}
 Returns a copy of the diagonal elements on the calling processor
 
-    leftScale!(matrix::Impl{Data, GID, PID, LID}, X::Array{Data})
+    leftScale!(matrix::Impl{Data, GID, PID, LID}, X::Array{Data, 1})
 Scales matrix on the left with X
 
-    rightScale!(matrix::Impl{Data, GID, PID, LID}, X::Array{Data})
+    rightScale!(matrix::Impl{Data, GID, PID, LID}, X::Array{Data, 1})
 Scales matrix on the right with X
 
 
@@ -86,8 +88,6 @@ Returns the number of entries on the local processor in the given row
 Returns the number of entries on the local processor in the given row
     getGlobalNumDiags(mat::RowMatrix)
 Returns the number of diagonal elements across all processors
-    getLocalNumDiags(mat::RowMatrix)
-Returns the number of diagonal element on the calling processor
     getGlobalMaxNumRowEntries(mat::RowMatrix)
 Returns the maximum number of row entries across all processors
     getLocalMaxNumRowEntries(mat::RowMatrix)

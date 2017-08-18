@@ -2,9 +2,9 @@ export SrcDistRowGraph, DistRowGraph, RowGraph
 #required methods
 export getRowMap, getColMap, getDomainMap, getRangeMap, getImporter, getExporter
 export getGlobalNumRows, getGlobalNumCols, getGlobalNumEntries, getGlobalNumDiags
-export getNodeNumRows, getNodeNumCols, getNodeNumEntries, getNodeNumDiags
+export getLocalNumRows, getLocalNumCols, getLocalNumEntries, getLocalNumDiags
 export getNumEntriesInGlobalRow, getNumEntriesInLocalRow
-export getGlobalMaxNumRowEntries, getNodeMaxNumRowEntries
+export getGlobalMaxNumRowEntries, getLocalMaxNumRowEntries
 export hasColMap, isLowerTriangular, sUpperTriangular
 export isLocallyIndexed, isGloballyIndexed, isFillComplete
 export getGlobalRowCopy, getLocalRowCopy, pack
@@ -22,8 +22,6 @@ The version of RowMatrix that is a subtype of DistObject
 """
 abstract type DistRowGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: DistObject{GID, PID, LID} 
 end
-
-#TODO change function names that reference "Node" to reference "Local"
 
 """
 RowGraph is the base "type" for all row oriented storage graphs
@@ -57,16 +55,16 @@ Returns the number of global rows in the graph
     getGlobalNumCols(::RowGraph{GID})::GID
 Returns the number of global columns in the graph
 
-    getNodeNumRows(::RowGraph{GID, PID, LID})::LID
+    getLocalNumRows(::RowGraph{GID, PID, LID})::LID
 Returns the number of rows owned by the calling process
 
-    getNodeNumCols(::RowGraph{GID, PID, LID})::LID
+    getLocalNumCols(::RowGraph{GID, PID, LID})::LID
 Returns the number of columns owned by teh calling process
 
     getGlobalNumEntries(::RowGraph{GID, PID, LID})::GID
 Returns the global number of entries in the graph
 
-    getNodeNumEntries(::RowGraph{GID, PID, LID})::LID
+    getLocalNumEntries(::RowGraph{GID, PID, LID})::LID
 Returns the local number of entries in the graph
 
     getNumEntriesInGlobalRow(::RowGraph{GID, PID, LID}, row::GID)::LID
@@ -78,13 +76,13 @@ Returns the current number of local entries in the given row
     getGlobalNumDiags(::RowGraph{GID, PID, LID})::GID
 Returns the global number of diagonal entries
 
-    getNodeNumDiags(::RowGraph{GID, PID, LID})::LID
+    getLocalNumDiags(::RowGraph{GID, PID, LID})::LID
 Returns the local number of diagonal entries
 
     getGlobalMaxNumRowEntries(::RowGraph{GID, PID, LID})::LID
 Returns the maximum number of entries across all rows/columns on all processors
 
-    getNodeMaxNumRowEntries(::RowGraph{GID, PID, LID})::LID
+    getLocalMaxNumRowEntries(::RowGraph{GID, PID, LID})::LID
 Returns the maximum number of entries across all rows/columns on this processor
 
     hasColMap(::RowGraph{GID, PID, LID})::Bool
@@ -250,18 +248,18 @@ Returns the number of global columns in the graph
 function getGlobalNumCols end  #is this really a thing????
 
 """
-    getNodeNumRows(::RowGraph{GID, PID, LID})::LID
+    getLocalNumRows(::RowGraph{GID, PID, LID})::LID
 
 Returns the number of rows owned by the calling process
 """
-function getNodeNumRows end
+function geLocalNumRows end
 
 """
-    getNodeNumCols(::RowGraph{GID, PID, LID})::LID
+    getLocalNumCols(::RowGraph{GID, PID, LID})::LID
 
 Returns the number of columns owned by the calling process
 """
-function getNodeNumCols end
+function getLocalNumCols end
 
 """
     getGlobalNumEntries(::RowGraph{GID, PID, LID})::GID
@@ -271,11 +269,11 @@ Returns the global number of entries in the graph
 function getGlobalNumEntries end
 
 """
-    getNodeNumEntries(::RowGraph{GID, PID, LID})::LID
+    getLocalNumEntries(::RowGraph{GID, PID, LID})::LID
 
 Returns the local number of entries in the graph
 """
-function getNodeNumEntries end
+function getLocalNumEntries end
 
 """
     getNumEntriesInGlobalRow(::RowGraph{GID, PID, LID}, row::GID)::LID
@@ -299,11 +297,11 @@ Returns the global number of diagonal entries
 function getGlobalNumDiags end
 
 """
-    getNodeNumDiags(::RowGraph{GID, PID, LID})::LID
+    getLocalNumDiags(::RowGraph{GID, PID, LID})::LID
 
 Returns the local number of diagonal entries
 """
-function getNodeNumDiags end
+function getLocalNumDiags end
 
 """
     getGlobalMaxNumRowEntries(::RowGraph{GID, PID, LID})::LID
@@ -313,11 +311,18 @@ Returns the maximum number of entries across all rows/columns on all processors
 function getGlobalMaxNumRowEntries end
 
 """
-    getNodeMaxNumRowEntries(::RowGraph{GID, PID, LID})::LID
+    getLocalMaxNumRowEntries(::RowGraph{GID, PID, LID})::LID
+
+Returns the maximum number of entries across all rows/columns on the calling processor
+"""
+function getLocalMaxNumRowEntries end
+
+"""
+    getLocalMaxNumRowEntries(::RowGraph{GID, PID, LID})::LID
 
 Returns the maximum number of entries across all rows/columns on this processor
 """
-function getNodeMaxNumRowEntries end
+function getLocalMaxNumRowEntries end
 
 """
     isLowerTriangular(::RowGraph{GID, PID, LID})::Bool

@@ -26,7 +26,7 @@ mutable struct CSRMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: 
     function CSRMatrix{Data, GID, PID, LID}(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}}, myGraph::CRSGraph{GID, PID, LID}, localMatrix::LocalCSRMatrix{Data, LID}, plist::Dict{Symbol}) where {Data, GID, PID, LID}
     
         #allocate values
-        localNumRows = getNodeNumRows(myGraph)
+        localNumRows = getLocalNumRows(myGraph)
         if getProfileType(myGraph) == STATIC_PROFILE
             ptrs = myGraph.rowOffsets
             localTotalNumEntries = ptrs[localNumRows+1]
@@ -275,7 +275,7 @@ end
     
 function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
         plist::Dict{Symbol}) where {Data, GID, PID, LID}
-    localNumRows = getNodeNumRows(matrix)
+    localNumRows = getLocalNumRows(matrix)
     
     myGraph = matrix.myGraph
     localMatrix = matrix.localMatrix
@@ -350,7 +350,7 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
     end
     
     myGraph.localGraph = LocalCRSGraph(inds, ptrs)
-    matrix.localMatrix = LocalCSRMatrix(getNodeNumCols(matrix), vals, graph.localGraph)
+    matrix.localMatrix = LocalCSRMatrix(getLocalNumCols(matrix), vals, graph.localGraph)
 end
         
 function insertNonownedGlobalValues(matrix::CSRMatrix{Data, GID, PID, LID},
@@ -532,17 +532,17 @@ isLocallyIndexed(mat::CSRMatrix)  = isLocallyIndexed(mat.myGraph)
 getGraph(mat::CSRMatrix) = mat.myGraph
 
 getGlobalNumRows(mat::CSRMatrix) = getGlobalNumRows(mat.myGraph)
-getGlobalNumCols(mat::CSRMatrix) = -1#TODO figure out
-getLocalNumRows(mat::CSRMatrix) = getNodeNumRows(mat.myGraph)
+getGlobalNumCols(mat::CSRMatrix) = getGlobalNumCols(mat.myGraph)
+getLocalNumRows(mat::CSRMatrix) = getLocalNumRows(mat.myGraph)
 getLocalNumCols(mat::CSRMatrix) = numCols(mat.localMatrix)
 getGlobalNumEntries(mat::CSRMatrix) = getGlobalNumEntries(mat.myGraph)
-getLocalNumEntries(mat::CSRMatrix) = getNodeNumEntries(mat.myGraph)
+getLocalNumEntries(mat::CSRMatrix) = getLocalNumEntries(mat.myGraph)
 getNumEntriesInGlobalRow(mat::CSRMatrix, grow) = getNumEntriesInGlobalRow(mat.myGraph, grow)
 getNumEntriesInLocalRow(mat::CSRMatrix, lrow) = getNumEntriesInLocalRow(mat.myGraph, lrow)
 getGlobalNumDiags(mat::CSRMatrix) = getGlobalNumDiags(mat.myGraph)
-getLocalNumDiags(mat::CSRMatrix) = getNodeNumDiags(mat.myGraph)
+getLocalNumDiags(mat::CSRMatrix) = getLocalNumDiags(mat.myGraph)
 getGlobalMaxNumRowEntries(mat::CSRMatrix) = getGlobalMaxNumRowEntries(mat.myGraph)
-getLocalMaxNumRowEntries(mat::CSRMatrix) = getNodeMaxNumRowEntries(mat.myGraph)
+getLocalMaxNumRowEntries(mat::CSRMatrix) = getLocalMaxNumRowEntries(mat.myGraph)
 
 isLowerTriangular(mat::CSRMatrix) = isLowerTriangular(mat.myGraph)
 isUpperTriangular(mat::CSRMatrix) = isUpperTriangular(mat.myGraph)
@@ -672,6 +672,27 @@ function getLocalDiagCopy(matrix::CSRMatrix{Data, GID, PID, LID})::MultiVector{D
     end
 end
 
-#TODO implement RowMatrix methods
+function leftScale!(matrix::CSRMatrix{Data}, X::Array{Data, 1}) where {Data <: Number}
+    for row in 1:getLocalNumRows(matrix)
+        _, vals = getLocalRowView(matrix, row)
+        LinAlg.scale!(vals, X[row])
+    end
+end
+
+function rightScale!(matrix::CSRMatrix{Data}, X::Array{Data, 1}) where {Data <: Number}
+    for row in 1:getLocalNumRows(matrix)
+        inds, vals = getLocalRowView(matrix, row)
+        for entry in 1:length(inds)
+            vals[entry] *= X[inds[entry]]
+        end
+    end
+end
+    
+
 #TODO implement DistObject methods
+
+#### Operator methods ####
 #TODO implement Operator methods
+
+getDomainMap(matrix::CSRMatrix) = getDomainMap(matrix.myGraph)
+getRangeMap(matrix::CSRMatrix) = getRangeMap(matrix.myGraph)
