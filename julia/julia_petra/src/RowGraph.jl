@@ -318,13 +318,6 @@ Returns the maximum number of entries across all rows/columns on the calling pro
 function getLocalMaxNumRowEntries end
 
 """
-    getLocalMaxNumRowEntries(::RowGraph{GID, PID, LID})::LID
-
-Returns the maximum number of entries across all rows/columns on this processor
-"""
-function getLocalMaxNumRowEntries end
-
-"""
     isLowerTriangular(::RowGraph{GID, PID, LID})::Bool
 
 Whether the graph is lower trianguluar
