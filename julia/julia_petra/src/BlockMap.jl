@@ -15,7 +15,6 @@ export myGID, myLID, distributedGlobal, numMyElements
 
 
 # TODO figure out expert users and developers only functions
-#TODO implement getLocalMap(::BlockMap)
 
 """
 A type for partitioning block element vectors and matrices
@@ -411,7 +410,36 @@ function maxMyGID(map::BlockMap{GID, PID, LID})::GID where GID <: Integer where 
     map.data.maxMyGID
 end
 
+"""
+    getLocalMap(::BlockMap{GID, PID, LID})::BlockMap{GID, PID, LID}
 
+Creates a copy of the given map that doesn't support any inter-process actions
+"""
+function getLocalMap(map::BlockMap{GID, PID, LID})::BlockMap{GID, PID, LID} where {GID, PID, LID}
+    oldData = map.data
+    data = BlockMapData(oldData.numGlobalElements, LocalComm(oldData.comm))
+    
+    directory = Nullable{Directory}()
+    lid = copy(oldData.lid)
+    myGlobalElements =  copy(oldData.myGlobalElements)
+    numMyElements = oldData.numMyElements
+    minAllGID = oldData.minAllGID
+    maxAllGID = oldData.maxAllGID
+    minMyGID = oldData.minMyGID
+    maxMyGID = oldData.maxMyGID
+    minLID = oldData.minLID
+    maxLID = oldData.maxLID
+    linearMap = oldData.linearMap
+    distributedGlobal = oldData.distributedGlobal
+    oneToOneIsDetermined = oldData.oneToOneIsDetermined
+    oneToOne = oldData.oneToOne
+    lastContiguousGID = oldData.lastContiguousGID
+    lastContiguousGIDLoc = oldData.lastCOntiguousGIDLoc
+    lidHash = copy(oldData.lidHash)
+    
+    BlockMap(data)
+end
+    
 ##local/global ID accessor methods##
 
 """
