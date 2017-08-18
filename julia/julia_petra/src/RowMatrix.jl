@@ -1,7 +1,7 @@
 
 export SrcDistRowMatrix, DistRowMatrix, RowMatrix
 export isFillActive, isLocallyIndexed
-export isFillComplete, getRowMap, hasColMap, getColMap, isGloballyIndexed, getGraph, getGlobalNumRows, getGlobalNumCols, getLocalNumRows, getLocalNumCols, getGlobalNumEntries, getLocalNumEntries, getNumEntriesInGlobalRow, getNumEntriesInLocalRow, getGlobalNumDiags, getLocalNumDiags, getGlobalMaxNumRowEntries, getLocalMaxNumRowEntries, isLowerTriangular, isUpperTriangular, getGlobalRowCopy, getLocalRowCopy, getGlobalRowView, getLocalRowView, getLocalDiagCopy, leftScale!, rightScale!
+export getGraph, getGlobalRowCopy, getLocalRowCopy, getGlobalRowView, getLocalRowView, getLocalDiagCopy, leftScale!, rightScale!
 
 """
 The version of RowMatrix that isn't a subtype of DestObject
@@ -25,6 +25,39 @@ which are (direct) subtypes of SrcDestObject and DestObject, respectively.
 
 All subtypes must have the following methods, with Impl standing in for the subtype:
 
+    getGraph(mat::RowMatrix)
+Returns the graph that represents the structure of the row matrix
+    getGlobalRowCopy(matrix::RowMatrix{Data, GID, PID, LID}, globalRow::Integer)::Tuple{Array{GID, 1}, Array{Data, 1}}
+Returns a copy of the given row using global indices
+    getLocalRowCopy(matrix::RowMatrix{Data, GID, PID, LID},localRow::Integer)::Tuple{AbstractArray{LID, 1}, AbstractArray{Data, 1}}
+Returns a copy of the given row using local indices
+    getGlobalRowView(matrix::RowMatrix{Data, GID, PID, LID},globalRow::Integer)::Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}} 
+Returns a view to the given row using global indices
+    getLocalRowView(matrix::RowMatrix{Data, GID, PID, LID},localRow::Integer)::Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}}
+Returns a view to the given row using local indices
+    getLocalDiagCopy(matrix::RowMatrix{Data, GID, PID, LID})::MultiVector{Data, GID, PID, LID}
+Returns a copy of the diagonal elements on the calling processor
+
+    leftScale!(matrix::Impl{Data, GID, PID, LID}, X::Array{Data})
+Scales matrix on the left with X
+
+    rightScale!(matrix::Impl{Data, GID, PID, LID}, X::Array{Data})
+Scales matrix on the right with X
+
+
+Additionally, the following method must be implemented to fufil the operator interface:
+
+    apply!(matrix::RowMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, Y::MultiVector{Data, GID, PID, LID}, mode::TransposeMode, alpha::Data, beta::Data)
+
+    domainMap(operator::RowMatrix{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
+
+    rangeMap(operator::RowMatrix{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
+
+The required methods from DistObject must also be implemented.  `map(...)`, as required by SrcDistObject, is implemented to forward the call to `rowMap(...)`
+
+
+The following methods are currently implemented by redirecting the call to the matrices' graph by calling `getGraph(matrix)`.  It is recommended that the implmenting class implements these more efficiently.
+
     isFillComplete(mat::RowMatrix)
 Whether `fillComplete(...)` has been called
     getRowMap(mat::RowMatrix)
@@ -35,8 +68,6 @@ Whether the matrix has a column map
 Returns the BlockMap associated with the columns of this matrix
     isGloballyIndexed(mat::RowMatrix)
 Whether the matrix stores indices with global indexes
-    getGraph(mat::RowMatrix)
-Returns the graph that represents the structure of the row matrix
     getGlobalNumRows(mat::RowMatrix)
 Returns the number of rows across all processors
     getGlobalNumCols(mat::RowMatrix)
@@ -65,34 +96,6 @@ Returns the maximum number of row entries on the calling processor
 Whether the matrix is lower triangular
     isUpperTriangular(mat::RowMatrix)
 Whether the matrix is upper triangular
-
-    getGlobalRowCopy(matrix::RowMatrix{Data, GID, PID, LID}, globalRow::Integer)::Tuple{Array{GID, 1}, Array{Data, 1}}
-Returns a copy of the given row using global indices
-    getLocalRowCopy(matrix::RowMatrix{Data, GID, PID, LID},localRow::Integer)::Tuple{AbstractArray{LID, 1}, AbstractArray{Data, 1}}
-Returns a copy of the given row using local indices
-    getGlobalRowView(matrix::RowMatrix{Data, GID, PID, LID},globalRow::Integer)::Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}} 
-Returns a view to the given row using global indices
-    getLocalRowView(matrix::RowMatrix{Data, GID, PID, LID},localRow::Integer)::Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}}
-Returns a view to the given row using local indices
-    getLocalDiagCopy(matrix::RowMatrix{Data, GID, PID, LID})::MultiVector{Data, GID, PID, LID}
-Returns a copy of the diagonal elements on the calling processor
-
-    leftScale!(matrix::Impl{Data, GID, PID, LID}, X::Array{Data})
-Scales matrix on the left with X
-
-    rightScale!(matrix::Impl{Data, GID, PID, LID}, X::Array{Data})
-Scales matrix on the right with X
-
-
-Additionally, the following method must be implemented to fufil the operator interface:
-
-    apply!(matrix::RowMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, Y::MultiVector{Data, GID, PID, LID}, mode::TransposeMode, alpha::Data, beta::Data)
-
-    domainMap(operator::RowMatrix{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
-
-    rangeMap(operator::RowMatrix{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
-
-Finally, the required methods from DistObject must also be implemented.  `map(...)`, as required by SrcDistObject, is implemented to forward the call to `rowMap(...)`
 """
 const RowMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} = Union{SrcDistRowMatrix{Data, GID, PID, LID}, DistRowMatrix{Data, GID, PID, LID}}
 
@@ -157,43 +160,143 @@ function getLocalDiagCopyWithoutOffsetsNotFillComplete(A::RowMatrix{Data, GID, P
 end
 
 
-
-#### required method documentation stubs ####
-#TODO look into the fact that RowGraph and RowMatrix have methods that share function objects, thus causing documentation overwritting
+#### default implementations using getGraph(...) ####
 """
     isFillComplete(mat::RowMatrix)
 
 Whether `fillComplete(...)` has been called
 """
-function isFillComplete end
+isFillComplete(mat::RowMatrix) = isFillComplete(getGraph(mat))
 
 """
-    getRowMap(mat::RowMatrix)
+    getRowMap(::RowMatrix{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
 
-Returns the BlockMap associated with the rows of this matrix
+Gets the row map for the container
 """
-function getRowMap end
-
-"""
-    hasColMap(mat::RowMatrix)
-
-Whether the matrix has a column map
-"""
-function hasColMap end
+getRowMap(mat::RowMatrix) = getRowMap(getGraph(mat))
 
 """
-    getColMap(mat::RowMatrix)
+    getColMap(::RowMatrix{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
 
-Returns the BlockMap associated with the columns of this matrix
+Gets the column map for the container
 """
-function getColMap end
+getColMap(mat::RowMatrix) = getColMap(getGraph(mat))
+
+"""
+    hasColMap(::RowMatrix)::Bool
+
+Whether the container has a well-defined column map
+"""
+hasColMap(mat::RowMatrix) = hasColMap(getGraph(mat))
 
 """
     isGloballyIndexed(mat::RowMatrix)
 
 Whether the matrix stores indices with global indexes
 """
-function isGloballyIndexed end
+isGloballyIndexed(mat::RowMatrix) = isGloballyIndexed(getGraph(mat))
+
+"""
+    getGlobalNumRows(mat::RowMatrix)
+
+Returns the number of rows across all processors
+"""
+getGlobalNumRows(mat::RowMatrix) = getGlobalNumRows(getGraph(mat))
+
+"""
+    getGlobalNumCols(mat::RowMatrix)
+
+Returns the number of columns across all processors
+"""
+getGlobalNumCols(mat::RowMatrix) = getGlobalNumCols(getGraph(mat))
+
+"""
+    getLocalNumRows(mat::RowMatrix)
+
+Returns the number of rows on the calling processor
+"""
+getLocalNumRows(mat::RowMatrix) = getLocalNumRows(getGraph(mat))
+
+"""
+    getLocalNumCols(mat::RowMatrix)
+
+Returns the number of columns on the calling processor
+"""
+getLocalNumCols(mat::RowMatrix) = getLocalNumCols(getGraph(mat))
+
+"""
+    getGlobalNumEntries(mat::RowMatrix)
+
+Returns the number of entries across all processors
+"""
+getGlobalNumEntries(mat::RowMatrix) =  getGlobalNumEntries(getGraph(mat))
+
+"""
+    getLocalNumEntries(mat::RowMatrix)
+
+Returns the number of entries on the calling processor
+"""
+getLocalNumEntries(mat::RowMatrix) = getLocalNumEntries(getGraph(mat))
+
+"""
+    getNumEntriesInGlobalRow(mat::RowMatrix, globalRow)
+
+Returns the number of entries on the local processor in the given row
+"""
+getNumEntriesInGlobalRow(mat::RowMatrix, globalRow) = getNumEntriesInGlobalRow(getGraph(mat), globalRow)
+
+"""
+    getNumEntriesInLocalRow(mat::RowMatrix, localRow)
+
+Returns the number of entries on the local processor in the given row
+"""
+getNumEntriesInLocalRow(mat::RowMatrix, localRow) = getNumEntriesInLocalRow(getGraph(mat), localRow)
+
+"""
+    getGlobalNumDiags(mat::RowMatrix)
+
+Returns the number of diagonal elements across all processors
+"""
+getGlobalNumDiags(mat::RowMatrix, gRow) = getGlobalNumDiags(getGraph(mat), gRow)
+
+"""
+    getLocalNumDiags(mat::RowMatrix)
+
+Returns the number of diagonal element on the calling processor
+"""
+getLocalNumDiags(mat::RowMatrix, lRow) = getLocalNumDiags(getGraph(mat), lRow)
+
+"""
+    getGlobalMaxNumRowEntries(mat::RowMatrix)
+
+Returns the maximum number of row entries across all processors
+"""
+getGlobalMaxNumRowEntries(mat::RowMatrix) = getGlobalMaxNumRowEntries(getGraph(mat))
+
+"""
+    getLocalMaxNumRowEntries(mat::RowMatrix)
+
+Returns the maximum number of row entries on the calling processor
+"""
+getLocalMaxNumRowEntries(mat::RowMatrix) = getLocalMaxNumRowEntries(getGraph(mat))
+
+"""
+    isLowerTriangular(mat::RowMatrix)
+
+Whether the matrix is lower triangular
+"""
+isLowerTriangular(mat::RowMatrix) = isLowerTriangular(getGraph(mat))
+
+"""
+    isUpperTriangular(mat::RowMatrix)
+
+Whether the matrix is upper triangular
+"""
+isUpperTriangular(mat::RowMatrix) = isUpperTriangular(getGraph(mat))
+
+
+
+#### required method documentation stubs ####
 
 """
     getGraph(mat::RowMatrix)
@@ -201,104 +304,6 @@ function isGloballyIndexed end
 Returns the graph that represents the structure of the row matrix
 """
 function getGraph end
-
-"""
-    getGlobalNumRows(mat::RowMatrix)
-
-Returns the number of rows across all processors
-"""
-function getGlobalNumRows end
-
-"""
-    getGlobalNumCols(mat::RowMatrix)
-
-Returns the number of columns across all processors
-"""
-function getGlobalNumCols end
-
-"""
-    getLocalNumRows(mat::RowMatrix)
-
-Returns the number of rows on the calling processor
-"""
-function getLocalNumRows end
-
-"""
-    getLocalNumCols(mat::RowMatrix)
-
-Returns the number of columns on the calling processor
-"""
-function getLocalNumCols end
-
-"""
-    getGlobalNumEntries(mat::RowMatrix)
-
-Returns the number of entries across all processors
-"""
-function getGlobalNumEntries end
-
-"""
-    getLocalNumEntries(mat::RowMatrix)
-
-Returns the number of entries on the calling processor
-"""
-function getLocalNumEntries end
-
-"""
-    getNumEntriesInGlobalRow(mat::RowMatrix, globalRow)
-
-Returns the number of entries on the local processor in the given row
-"""
-function getNumEntriesInGlobalRow end
-
-"""
-    getNumEntriesInLocalRow(mat::RowMatrix, localRow)
-
-Returns the number of entries on the local processor in the given row
-"""
-function getNumEntriesInLocalRow end
-
-"""
-    getGlobalNumDiags(mat::RowMatrix)
-
-Returns the number of diagonal elements across all processors
-"""
-function getGlobalNumDiags end
-
-"""
-    getLocalNumDiags(mat::RowMatrix)
-
-Returns the number of diagonal element on the calling processor
-"""
-function getLocalNumDiags end
-
-"""
-    getGlobalMaxNumRowEntries(mat::RowMatrix)
-
-Returns the maximum number of row entries across all processors
-"""
-function getGlobalMaxNumRowEntries end
-
-"""
-    getLocalMaxNumRowEntries(mat::RowMatrix)
-
-Returns the maximum number of row entries on the calling processor
-"""
-function getLocalMaxNumRowEntries end
-
-"""
-    isLowerTriangular(mat::RowMatrix)
-
-Whether the matrix is lower triangular
-"""
-function isLowerTriangular end
-
-"""
-    isUpperTriangular(mat::RowMatrix)
-
-Whether the matrix is upper triangular
-"""
-function isUpperTriangular end
 
 """
     getGlobalRowCopy(matrix::RowMatrix{Data, GID, PID, LID}, globalRow::Integer)::Tuple{Array{GID, 1}, Array{Data, 1}}

@@ -165,11 +165,27 @@ function getLocalRowCopy(graph::RowGraph{GID, PID, LID},
 end
 
 
+"""
+    isLocallyIndexed(::RowGraph)::Bool
+
+Whether the graph is using local indices
+"""
+isLocallyIndexed(graph::RowGraph) = !isGloballyIndexed(graph)
+
+
 #### SrcDistObject methods ####
 map(graph::RowGraph) = getRowMap(graph)
 
 
 #### documentation for required methods ####
+
+"""
+    isFillComplete(mat::RowGraph)
+
+Whether `fillComplete(...)` has been called
+"""
+function isFillComplete end
+
 """
     getRowMap(::RowGraph{GID, PID, LID})::BlockMap{GID, PID, LID}
 
@@ -183,6 +199,13 @@ function getRowMap end
 Gets the column map for the graph
 """
 function getColMap end
+
+"""
+    hasColMap(::RowGraph{GID, PID, LID})::Bool
+
+Whether the graph has a well-defined column map
+"""
+function hasColMap end
 
 """
     getDomainMap(::RowGraph{GID, PID, LID})::BlockMap{GID, PID, LID}
@@ -224,7 +247,7 @@ function getGlobalNumRows end
 
 Returns the number of global columns in the graph
 """
-function getGlobalNumCols end
+function getGlobalNumCols end  #is this really a thing????
 
 """
     getNodeNumRows(::RowGraph{GID, PID, LID})::LID
@@ -236,7 +259,7 @@ function getNodeNumRows end
 """
     getNodeNumCols(::RowGraph{GID, PID, LID})::LID
 
-Returns the number of columns owned by teh calling process
+Returns the number of columns owned by the calling process
 """
 function getNodeNumCols end
 
@@ -253,6 +276,20 @@ function getGlobalNumEntries end
 Returns the local number of entries in the graph
 """
 function getNodeNumEntries end
+
+"""
+    getNumEntriesInGlobalRow(::RowGraph{GID, PID, LID}, row::GID)::LID
+
+Returns the current number of local entries in the given row
+"""
+function getNumEntriesInGlobalRow end
+
+"""
+    getNumEntriesInLocalRow(::RowGraph{GID, PID, LID}, row::LID)::LID
+
+Returns the current number of local entries in the given row
+"""
+function getNumEntriesInLocalRow end
 
 """
     getGlobalNumDiags(::RowGraph{GID, PID, LID})::GID
@@ -283,13 +320,6 @@ Returns the maximum number of entries across all rows/columns on this processor
 function getNodeMaxNumRowEntries end
 
 """
-    hasColMap(::RowGraph{GID, PID, LID})::Bool
-
-Whether the graph has a well-defined column map
-"""
-function hasColMap end
-
-"""
     isLowerTriangular(::RowGraph{GID, PID, LID})::Bool
 
 Whether the graph is lower trianguluar
@@ -304,25 +334,11 @@ Whether the graph is upper trianguluar
 function isUpperTriangular end
 
 """
-    isLocallyIndexed(::RowGraph)::Bool
-
-Whether the graph is using local indices
-"""
-function isLocallyIndexed end
-
-"""
     isGloballyIndexed(::RowGraph)::Bool
 
 Whether the graph is using global indices
 """
 function isGloballyIndexed end
-
-"""
-    isFillComplete(::RowGraph)
-
-Whether `fillComplete()` has been called
-"""
-function isFillComplete end
 
 """
     pack(::RowGraph{GID, PID, LID}, exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID})::Array{Array{LID, 1}}

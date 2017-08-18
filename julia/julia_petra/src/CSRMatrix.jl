@@ -1,8 +1,5 @@
 export CSRMatrix, insertGlobalValues
 
-#TODO most likely should be RowMatrix requirements
-export getLocalNumEntries, getLocalNumRows, getLocalNumCols, getLocalNumEntries, getLocalNumDiags, getLocalMaxNumRowEntries, getLocalRowCopy, getGlobalRowView, getLocalRowView
-
 mutable struct CSRMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: DistRowMatrix{Data, GID, PID, LID}
     rowMap::BlockMap{GID, PID, LID}
     colMap::Nullable{BlockMap{GID, PID, LID}}
