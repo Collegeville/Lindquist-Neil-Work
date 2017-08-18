@@ -3,7 +3,6 @@ import MPI
 
 export MPIComm
 
-#TODO make MPIComm immutable then use atexit(f) to finalize MPI
 """
     MPIComm()
     MPIComm(comm::MPI.Comm)

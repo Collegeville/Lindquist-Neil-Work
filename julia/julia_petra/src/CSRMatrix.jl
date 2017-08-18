@@ -108,8 +108,6 @@ function CSRMatrix(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, L
         throw(InvalidArgumentError("values and columnIndices must "
                 * "have the same length"))
     end
-    #TODO add debug from line 328?
-    #if so, use a minAll on the previous error when debuging to propagate the error
     
     graph = CRSGraph(rowMap, colMap, rowOffsets, columnIndices, plist)
     localGraph = getLocalGraph(graph)
