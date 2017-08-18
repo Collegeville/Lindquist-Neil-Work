@@ -27,16 +27,22 @@ All subtypes must have the following methods, with Impl standing in for the subt
 
     getGraph(mat::RowMatrix)
 Returns the graph that represents the structure of the row matrix
+
     getGlobalRowCopy(matrix::RowMatrix{Data, GID, PID, LID}, globalRow::Integer)::Tuple{Array{GID, 1}, Array{Data, 1}}
 Returns a copy of the given row using global indices
+
     getLocalRowCopy(matrix::RowMatrix{Data, GID, PID, LID},localRow::Integer)::Tuple{AbstractArray{LID, 1}, AbstractArray{Data, 1}}
 Returns a copy of the given row using local indices
+
     getGlobalRowView(matrix::RowMatrix{Data, GID, PID, LID},globalRow::Integer)::Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}} 
 Returns a view to the given row using global indices
+
     getLocalRowView(matrix::RowMatrix{Data, GID, PID, LID},localRow::Integer)::Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}}
 Returns a view to the given row using local indices
+
     getLocalNumDiags(mat::RowMatrix)
 Returns the number of diagonal element on the calling processor
+
     getLocalDiagCopy(matrix::RowMatrix{Data, GID, PID, LID})::MultiVector{Data, GID, PID, LID}
 Returns a copy of the diagonal elements on the calling processor
 
@@ -45,6 +51,9 @@ Scales matrix on the left with X
 
     rightScale!(matrix::Impl{Data, GID, PID, LID}, X::Array{Data, 1})
 Scales matrix on the right with X
+
+    pack(::RowGraph{GID, PID, LID}, exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID})::Array{Array{LID, 1}}
+Packs this object's data for import or export
 
 
 Additionally, the following method must be implemented to fufil the operator interface:
@@ -294,6 +303,15 @@ Whether the matrix is upper triangular
 """
 isUpperTriangular(mat::RowMatrix) = isUpperTriangular(getGraph(mat))
 
+"""
+    pack(::RowMatrix{GID, PID, LID}, exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID})::Array{Array{LID, 1}}
+
+Packs this object's data for import or export
+"""
+function pack(mat::RowMatrix{Data, GID, PID, LID}, exportLIDs::Array{LID, 1},
+        distor::Distributor{GID, PID, LID})::Array{Array{GID, 1}, Array{Data, 1}} where {Data, GID, PID, LID}
+    throw(InvalidStateError("No pack implementation for objects of type $(typeof(mat))"))
+end
 
 
 #### required method documentation stubs ####

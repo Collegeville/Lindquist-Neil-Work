@@ -156,6 +156,21 @@ end
 
 
 #### Internal methods ####
+function combineGlobalValues(matrix::CSRMatrix{Data, GID, PID, LID},
+        globalRow::GID, indices::AbstractArray{GID, 1},
+        values::AbstractArray{Data, 1}, cm::CombineMode
+        ) where {Data, GID, PID, LID}
+
+    if cm == ADD || cm == INSERT
+        insertGlobalValuesFiltered(globalRow, indices, values)
+    else
+        #TODO implement ABSMAX and REPLACE
+        #not implmenented in TPetra, because its not a common use case and difficult (see FIXME on line 6225)
+        throw(InvalidArgumentError("Not yet implemented for combine mode $cm"))
+    end
+end
+
+
 #does nothing, exists only to be a parallel to CRSGraph
 computeGlobalConstants(matrix::CSRMatrix) = nothing
 
@@ -278,8 +293,7 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
     myGraph = matrix.myGraph
     localMatrix = matrix.localMatrix
     
-    #TODO figure out if correct
-    matrix.localMatrix.indices = myGraph.localIndices1D
+    matrix.localMatrix.graph.indices = myGraph.localIndices1D
     
     #most of the debug sections were taken out, since they're for debuging Petra itself, and julia doesn't have a compiler option to enable macros
     if getProfileType(matrix) == DYNAMIC_PROFILE
@@ -685,9 +699,85 @@ function rightScale!(matrix::CSRMatrix{Data}, X::Array{Data, 1}) where {Data <: 
         end
     end
 end
-    
 
-#TODO implement DistObject methods
+
+#### DistObject methods ####
+function checkSizes(source::RowMatrix{Data, GID, PID, LID},
+        target::CSRMatrix{Data, GID, PID, LID})::Bool where {Data, GID, PID, LID}
+    true
+end
+
+
+function copyAndPermute(source::RowMatrix{Data, GID, PID, LID},
+        target::CSRMatrix{Data, GID, PID, LID}, numSameIDs::LID,
+        permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1}
+        ) where {Data, GID, PID, LID}
+    sourceIsLocallyIndexed = isLocallyIndexed(source)
+
+    srcRowMap = getRowMap(source)
+    tgtRowMap = getRowMap(target)
+
+    sameGIDs = @. gid(srcRowMap, collect(1:numSameIDs))
+    permuteFromGIDs = @. gid(srcRowMap, permuteFromLIDs)
+    permuteToGIDs   = @. gid(srcRowMap, permuteToLIDs)
+
+    for (sourceGID, targetGID) in zip(vcat(sameGIDs, permuteFromGIDs), vcat(sameGIDs, permuteToGIDs))
+        if sourceIsLocallyIndexed
+            rowInds, rowVals = getGlobalRowCopy(source, sourceGID)
+        else
+            rowInds, rowVals = getGlobalRowView(source, sourceGID)
+        end
+        combineGlobalValues(target, targetGID, rowInds, rowVals, INSERT)
+    end
+end
+
+#TODO move this to RowMatrix.
+#DECSION make a packable trait to encompassRowMatrix and RowGraph? as sources, checkSizes handles matching pairs of objects
+function packAndPrepare(source::RowMatrix{Data, GID, PID, LID},
+        target::CSRMatrix{Data, GID, PID, LID}, exportLIDs::AbstractArray{LID, 1},
+        distor::Distributor{GID, PID, LID})::AbstractArray where {Data, GID, PID, LID}
+    pack(source, exportLIDs, distor)
+end
+
+function pack(source::CSRMatrix{Data, GID, PID, LID}, exportLIDs::AbstractArray{LID, 1},
+        distor::Distributor{GID, PID, LID})::AbstractArray where {Data, GID, PID, LID}
+    numExportLIDs = length(exportLIDs)
+    
+    localMatrix = source.localMatrix
+    localGraph = localMatrix.graph
+
+    packed = Array{Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}}}(numExportLIDs)
+    result = 0
+    for i in 1:numExportLIDs
+        exportLID = exportLIDs[i]
+        start = localGraph.rowOffsets[exportLID]
+        last = localGraph.rowOffsets[exportLIDs+1]-1
+        numEnt = last - start +1
+        if numEnt == 0
+            packed[i] = GID[], Data[]
+        else
+            values = view(localMatrix.values, start:last)
+            lids = view(localGraph.entries, start:last)
+            gids = @. gid(getColMap(source), lids)
+            packed[i] = gids, values
+        end
+    end
+    packed
+end
+
+function unpackAndCombine(target::CSRMatrix{Data, GID, PID, LID},
+        importLIDs::Array{LID, 1}, imports::Array, distor::Distributor{GID, PID, LID},
+        cm::CombineMode) where{Data, GID, PID, LID}
+
+    numImportLIDs = length(importLIDs)
+
+    for i = 1:numImportLIDs
+        if length(imports[i] > 0) #ensure theres acutually something in the row
+            combineGlobalValues(target, importLIDs[i], imports[i][1], imports[i][2], cm)
+        end
+    end
+end
+
 
 #### Operator methods ####
 #TODO implement Operator methods
