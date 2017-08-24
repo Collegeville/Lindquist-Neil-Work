@@ -781,6 +781,22 @@ end
 
 #### Operator methods ####
 #TODO implement Operator methods
+function apply!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
+    if isFillActive(operator)
+        throw(InvalidStateError("Cannot call apply(...) until fillComplete(...)"))
+    end
+    #TODO implement
+    
+    if mode == NO_TRANS
+        applyNonTranspose!(Y, operator, X, alpha, beta)
+    else
+        applyTranspose(Y, operator, X alpha, beta)
+    end
+end
+
+#TODO implement applyNonTranspose!(...)
+#TODO implement applyTranspose(...)
+    
 
 getDomainMap(matrix::CSRMatrix) = getDomainMap(matrix.myGraph)
 getRangeMap(matrix::CSRMatrix) = getRangeMap(matrix.myGraph)
