@@ -2,6 +2,7 @@ export MultiVector
 export localLength, globalLength, numVectors, map
 export scale!, scale
 export getVectorView, getVectorCopy
+export commReduce
 
 
 """
@@ -166,6 +167,19 @@ end
 function Base.fill!(mVect::MultiVector, values)
     fill!(mVect.data, values)
     mVect
+end
+
+"""
+    commReduce(::MultiVector)
+
+Reduces the content of the MultiVector across all processes.  Note that the MultiVector cannot be distributed globally.
+"""
+function commReduce(mVect::MultiVector)
+    if distributedGlobal(mVect)
+        throw(InvalidArgumentError("Cannot reduce distributed MultiVector"))
+    end
+    
+    mVect.data = sumAll(comm(mVect), mVect.data)
 end
 
 

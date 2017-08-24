@@ -87,6 +87,13 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
     fill!(vect, 8)
     @test 8*ones(Float64, (n, 3)) == vect.data
     
+    
+    #test reduce
+    arr = (10^pid)*ones(Float64, n, 3)
+    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(BlockMap(n, n, comm), arr)
+    commReduce(vect)
+    @test sum(10^i for i in 1:nProcs)*ones(Float64, n, 3) == vect.data
+    
 
     #test imports/exports
     source = MultiVector{Float64, UInt64, UInt16, UInt32}(
