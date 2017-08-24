@@ -197,6 +197,7 @@ end
 function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
         lg::IndexType, numAllocPerRow::Array{<:Integer, 1}) where {
         GID <: Integer, LID <: Integer}
+    numRows = getLocalNumRows(graph)
     @assert(length(numAllocPerRow) == numRows,
         "numAllocRows has length = $(length(numAllocPerRow)) "
         * "!= numRows = $numRows")

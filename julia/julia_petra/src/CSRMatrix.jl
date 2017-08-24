@@ -63,21 +63,27 @@ end
 #TODO document Constructors
 
 function CSRMatrix{Data}(rowMap::BlockMap{GID, PID, LID},
-        maxNumEntriesPerRow::Union{Integer, Array{Integer, 1}}, 
+        maxNumEntriesPerRow::Union{Integer, Array{<:Integer, 1}}, 
+        pftype::ProfileType; plist...) where {Data, GID, PID, LID}
+    CSRMatrix{Data}(rowMap, maxNumEntriesPerRow, pftype, Dict(Array{Tuple{Symbol, Any}}(plist)))
+end
+
+function CSRMatrix{Data}(rowMap::BlockMap{GID, PID, LID},
+        maxNumEntriesPerRow::Union{Integer, Array{<:Integer, 1}}, 
         pftype::ProfileType, plist::Dict{Symbol}) where {Data, GID, PID, LID}
     CSRMatrix{Data}(rowMap, Nullable{BlockMap{GID, PID, LID}}(),
         maxNumEntriesPerRow, pftype, plist)
 end
 function CSRMatrix{Data}(rowMap::BlockMap{GID, PID, LID},
         colMap::BlockMap{GID, PID, LID},
-        maxNumEntriesPerRow::Union{Integer, Array{Integer, 1}}, 
+        maxNumEntriesPerRow::Union{Integer, Array{<:Integer, 1}}, 
         pftype::ProfileType, plist::Dict{Symbol}) where {Data, GID, PID, LID}
     CSRMatrix{Data}(rowMap, Nullable(colMap), maxNumEntriesPerRow,
         pftype, plist)
 end
 function CSRMatrix{Data}(rowMap::BlockMap{GID, PID, LID},
         colMap::Nullable{BlockMap{GID, PID, LID}},
-        maxNumEntriesPerRow::Union{Integer, Array{Integer, 1}}, 
+        maxNumEntriesPerRow::Union{Integer, Array{<:Integer, 1}}, 
         pftype::ProfileType, plist::Dict{Symbol}) where {Data, GID, PID, LID}
     graph = CRSGraph(rowMap, maxNumEntriesPerRow, pftype, plist)
     
@@ -527,9 +533,11 @@ function resumeFill(matrix::CSRMatrix, plist::Dict{Symbol})
     #graph handles fillComplete variable
 end
 
+fillComplete(matrix::CSRMatrix; plist...) = fillComplete(matrix, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
+
 function fillComplete(matrix::CSRMatrix, plist::Dict{Symbol})
     #TODO figure out if the second arg should be getColMap(matrix)
-    fillComplete(getRowMap(matrix), getRowMap(matrix), plist)
+    fillComplete(matrix, getRowMap(matrix), getRowMap(matrix), plist)
 end
 
 function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
@@ -544,12 +552,14 @@ function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
     
     assertNoNonlocalInserts = get(plist, :noNonlocalChanges, false)
     #skipping sort ghosts stuff
-    
+
+    numProcs = numProc(comm(matrix))
+
     needGlobalAssemble = !assertNoNonlocalInserts && numProcs > 1
     if needGlobalAssemble
         globalAssemble(matrix)
     else
-        if numProcs == 1 && length(nonlocals) != 0
+        if numProcs == 1 && length(matrix.nonlocals) != 0
             throw(InvalidStateError("Cannot have nonlocal entries on a serial run.  An invalid entry is present."))
         end
     end
