@@ -100,7 +100,7 @@ end
 Scales the mulitvector in place and returns it
 """
 function Base.scale!(vect::MultiVector{Data, GID, PID, LID}, alpha::Data)::MultiVector{Data, GID, PID, LID} where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
-    vect.data = vect.data*alpha
+    @. vect.data = vect.data*alpha
     vect
 end
 
