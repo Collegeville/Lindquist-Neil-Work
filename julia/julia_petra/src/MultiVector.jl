@@ -46,6 +46,8 @@ function MultiVector{Data, GID, PID, LID}(map::BlockMap{GID, PID, LID}, data::Ar
     MultiVector{Data, GID, PID, LID}(data, localLength, numGlobalElements(map), size(data, 2), map)
 end
 
+## External methods ##
+
 """
     copy(::MutliVector{Data, GID, PID, LID})::MultiVector{Data, GID, PID, LID}
 Returns a copy of the multivector
@@ -54,7 +56,15 @@ function Base.copy(vect::MultiVector{Data, GID, PID, LID})::MultiVector{Data, GI
     MultiVector{Data, GID, PID, LID}(copy(vect.data), vect.localLength, vect.globalLength, vect.numVectors, vect.map)
 end
 
-## External methods ##
+function Base.copy!(dest::MultiVector{Data, GID, PID, LID}, src::MultiVector{Data, GID, PID, LID})::MultiVector{Data, GID, PID, LID} where {Data, GID, PID, LID}
+    copy!(dest.data, src.data)
+    dest.localLength = src.localLength
+    dest.globalLength = src.globalLength
+    dest.numVectors = src.numVectors
+    dest.map = src.map
+    
+    dest
+end
 
 """
     localLength(::MutliVector{Data, GID, PID, LID})::LID

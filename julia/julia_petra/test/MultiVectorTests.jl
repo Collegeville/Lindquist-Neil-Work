@@ -42,6 +42,15 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
     @test vect.data == vect2.data
     @test vect.data !== vect2.data #ensure same contents, but different address
 
+    vect2 = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, 3, false)
+    @test vect2 === copy!(vect2, vect)
+    @test localLength(vect) == localLength(vect2)
+    @test globalLength(vect) == globalLength(vect2)
+    @test numVectors(vect) == numVectors(vect2)
+    @test julia_petra.map(vect) == julia_petra.map(vect2)
+    @test vect.data == vect2.data
+    @test vect.data !== vect2.data
+    
 
     # test scale and scale!
     vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, ones(Float64, n, 3))
