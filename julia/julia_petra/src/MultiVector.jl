@@ -153,6 +153,11 @@ function getVectorCopy(mVect::MultiVector{Data}, column)::Array{Data} where {Dat
     mVect.data[:, column]
 end
 
+function Base.fill!(mVect::MultiVector, values)
+    fill!(mVect.data, values)
+    mVect
+end
+
 
 ## DistObject interface ##
 
