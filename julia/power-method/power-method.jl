@@ -47,7 +47,7 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer, toleran
 end
 
 macro log(values...)
-    :(verbose && println($(values...)))
+    esc(:(verbose && println($(values...))))
 end
 
 function main(comm::Comm{GID, PID, LID}, arg1, numGlobalElements, verbose, Data::Type) where{GID, PID, LID}
@@ -67,7 +67,8 @@ function main(comm::Comm{GID, PID, LID}, arg1, numGlobalElements, verbose, Data:
         end
     end
 
-    A = CSRMatrix{Data}(map, numNz)
+    const A = CSRMatrix{Data}(map, numNz, STATIC_PROFILE)
+    @log "typeof(A) = $(typeof(A))"
 
     values = Data[-1, -1]
     indices = Array{GID, 1}(2)#TODO does this need to be GID?
@@ -75,15 +76,15 @@ function main(comm::Comm{GID, PID, LID}, arg1, numGlobalElements, verbose, Data:
 
     for i = 1:numMyElements
         if myGlobalElements[i] == 0
-            indices = [1]
+            indices = LID[1]
         elseif myGlobalElements[i] == numGlobalElements
-            indices = [numGlobalElements-1]
+            indices = LID[numGlobalElements-1]
         else
-            indices = [myGlobalElements[i], myGlobalElements[i]+2]
+            indices = LID[myGlobalElements[i], myGlobalElements[i]+2]
         end
 
-        insertGlobalValues(myGlobalElements[i], values, indices)
-        insertGlobalValues(myGlobalElements[i], [two], [myGlobalElements[i]])
+        insertGlobalValues(A, myGlobalElements[i], indices, values)
+        insertGlobalValues(A, myGlobalElements[i], LID[myGlobalElements[i]], Data[two])
     end
 
     fillComplete(A)
