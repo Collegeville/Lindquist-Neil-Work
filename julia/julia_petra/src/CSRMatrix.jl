@@ -61,6 +61,7 @@ end
 
 #### Constructors ####
 #TODO document Constructors
+#TODO add wrappers for plist args in CSRMatrix constructors
 
 function CSRMatrix{Data}(rowMap::BlockMap{GID, PID, LID},
         maxNumEntriesPerRow::Union{Integer, Array{<:Integer, 1}}, 
