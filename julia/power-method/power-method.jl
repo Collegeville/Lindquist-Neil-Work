@@ -25,12 +25,12 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
 
     #skipping flop counting
 
-    randn(z.data)
+    randn!(z.data)
 
     valid = false
 
     for iter = 1:niters
-        normz = norm2(z)
+        normz = norm2(z)[1]
         q = scale(z, 1.0/normz)
         apply!(z, A, q, Data(1), Data(0))
         λ = dot(q, z)
@@ -53,7 +53,6 @@ macro log(values...)
 end
 
 function main(comm::Comm{GID, PID, LID}, arg1, numGlobalElements, verbose, Data::Type) where{GID, PID, LID}
-    println("Calling main")
 
     const pid = myPid(comm)
     const nProc = numProc(comm)
@@ -73,8 +72,6 @@ function main(comm::Comm{GID, PID, LID}, arg1, numGlobalElements, verbose, Data:
 
     const A = CSRMatrix{Data}(map, numNz, STATIC_PROFILE)
 
-    println("Filling matrix")
-
     values = Data[-1, -1]
     indices = Array{GID, 1}(2)#TODO does this need to be GID?
     two = Data(2)
@@ -92,19 +89,16 @@ function main(comm::Comm{GID, PID, LID}, arg1, numGlobalElements, verbose, Data:
         insertGlobalValues(A, myGlobalElements[i], LID[myGlobalElements[i]], Data[two])
     end
 
-    println("Completing fill")
     fillComplete(A)
 
     const niters = numGlobalElements*10
     const tolerance = 1.0e-2
 
-    println("doing first power method")
     tic()
     λ, success = powerMethod(A, niters, tolerance, verbose)
     #TODO look into storing FLOPS
     elapsedTime = toc()
 
-    println("Post power method")
 
     @log "λ = $λ; is within tolerance? $success"
     @log "\n\n total time for first solve = $elapsedTime ms\n\n"
