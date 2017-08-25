@@ -2,11 +2,11 @@ export MultiVector
 export localLength, globalLength, numVectors, map
 export scale!, scale
 export getVectorView, getVectorCopy
-export commReduce
+export commReduce, norm2, dot
 
 
 #TODO implement dot(::MultiVector{...}, ::MultiVector{...})::Array{Data, 1}
-#TODO implement norm2(::MultiVector{...})::Array{Data, 1}
+#DECISION figure out if the type hierarchy needs to be reworked to subtype AbstractArray (I'm inclined to say yes, it then allows broadcast to work correctly)
 
 """
 MultiVector represents a dense multi-vector.  Note that all the vectors in a single MultiVector are the same size
@@ -23,11 +23,11 @@ end
 ## Constructors ##
 
 """
-    MultiVector{Data, GID, PID, LID}(::BlockMap{GID, PID, LID}, numVecs::Integer, zeroOut=True)
+    MultiVector{Data, GID, PID, LID}(::BlockMap{GID, PID, LID}, numVecs::Integer, zeroOut=true)
 
 Creates a new MultiVector based on the given map
 """
-function MultiVector{Data, GID, PID, LID}(map::BlockMap{GID, PID, LID}, numVecs::Integer, zeroOut=True) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
+function MultiVector{Data, GID, PID, LID}(map::BlockMap{GID, PID, LID}, numVecs::Integer, zeroOut=true) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
     localLength = numMyElements(map)
     if zeroOut
         data = zeros(Data, (localLength, numVecs))
@@ -98,7 +98,7 @@ function numVectors(vect::MultiVector{Data, GID, PID, LID})::LID where {Data <: 
 end
 
 """
-    numVectors(::MultiVector{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
+    map(::MultiVector{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
 
 Returns the BlockMap used by this multivector
 """
@@ -184,6 +184,37 @@ function commReduce(mVect::MultiVector)
     
     mVect.data = sumAll(comm(mVect), mVect.data)
 end
+
+function norm2(mVect::MultiVector{Data})::AbstractArray{Data, 1} where Data
+    normImpl(mVect, Data(2))
+end
+
+"""
+Handles the non-infinate norms
+"""
+function normImpl(mVect::MultiVector{Data}, normType::Data)::AbstractArray{Data, 1} where Data
+    const numVects = numVectors(mVect)
+    const localVectLength = localLength(mVect)
+    norms = Array{Data, 1}(numVects)
+    for i = 1:numVects
+        sum = Data(0)
+        for j = 1:localVectLength
+            sum += Data(mVect.data[j, i]^normType)
+        end
+        norms[i] = sum
+    end
+
+    sumAll(comm(map(mVect)), norms)
+
+    if normType == Data(2)
+        @. norms = sqrt(norms)
+    else
+        @. norms = norms^(1/normType)
+    end
+    norms
+end
+
+
 
 
 ## DistObject interface ##

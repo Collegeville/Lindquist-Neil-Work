@@ -95,6 +95,17 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
     @test sum(10^i for i in 1:nProcs)*ones(Float64, n, 3) == vect.data
     
 
+    #test norm2
+    arr = ones(Float64, n, 3)
+    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, arr)
+    @assert [sqrt(n*nProcs), sqrt(n*nProcs), sqrt(n*nProcs)] == norm2(vect)
+
+    arr = 2*ones(Float64, n, 3)
+    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, arr)
+    @assert [sqrt(4*n*nProcs), sqrt(4*n*nProcs), sqrt(4*n*nProcs)] == norm2(vect)
+
+
+
     #test imports/exports
     source = MultiVector{Float64, UInt64, UInt16, UInt32}(
         curMap, Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
