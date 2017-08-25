@@ -389,20 +389,26 @@ function getGlobalRowView(graph::CRSGraph{GID}, globalRow::GID)::AbstractArray{G
     end
 end
         
-function getLocalRowView(graph::CRSGraph{GID}, localRow::GID)::AbstractArray{GID, 1} where {GID <: Integer}
-    debug = @debug graph
+function getLocalRowView(graph::CRSGraph{GID}, localRow::GID)::AbstractArray{GID, 1} where {GID}
+    if @debug graph
+        @assert hasRowInfo() "Graph row information was deleted"
+    end
+    rowInfo = getRowInfoFromLocalRowIndex(localRow)
+
+    getLocalRowView(graph, rowInfo)
+end
+
+function getLocalRowView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}
+        )::AbstractArray{GID, 1} where {GID, PID, LID}
+
     if isGloballyIndexed(graph)
         throw(InvalidArgumentError("The graph's indices are currently stored as global indices, so a view with local column indices cannot be returned.  Use getLocalRowCopy(::CRSGraph) instead"))
     end
 
-    if debug
-        @assert hasRowInfo() "Graph row information was deleted"
-    end
-    rowInfo = getRowInfoFromLocalRowIndex(localRow)
-    
     if rowInfo.localRow != 0 && rowInfo.numEntries > 0
         indices = view(getLocalView(graph, rowInfo), 1:rowInfo.numEntries)
-        if debug
+
+        if @debug graph
             @assert(length(indices) == getNumEntriesInLocalRow(graph, localRow),
                 "length(indices) = $(length(indices)) "
                 * "!= getNumEntriesInLocalRow(graph, $localRow) "
@@ -506,10 +512,11 @@ end
 
 function makeColMap(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
     debug = @debug graph
-    const localNumRows = getLocalNumElements(graph)
+    const localNumRows = getLocalNumEntries(graph)
     
     #TODO get rid of this order retention stuff, it has to do with epetra interop
-    const sortEachProcsGIDs = graph.sortGhostsAssociatedWithEachProcessr
+    #sortGhosts... field not present, so just give it false
+    const sortEachProcsGIDs = false#graph.sortGhostsAssociatedWithEachProcessr
     
     #TODO look at FIXME on line 4898
     

@@ -1,4 +1,5 @@
 export CSRMatrix, insertGlobalValues
+#TODO export other CSRMatrix-specific symbols
 
 mutable struct CSRMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: DistRowMatrix{Data, GID, PID, LID}
     rowMap::BlockMap{GID, PID, LID}
@@ -350,14 +351,14 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
     myGraph = matrix.myGraph
     localMatrix = matrix.localMatrix
     
-    matrix.localMatrix.graph.indices = myGraph.localIndices1D
+   matrix.localMatrix.graph.entries = myGraph.localIndices1D
     
     #most of the debug sections were taken out, since they're for debuging Petra itself, and julia doesn't have a compiler option to enable macros
     if getProfileType(matrix) == DYNAMIC_PROFILE
         numRowEntries = myGraph.numRowEntries
         
         ptrs = Array{LID, 1}(localNumRows+1)
-        localTotalNumEntries = computeOffsetsFromCounts(ptrs, numRowEntries)
+        localTotalNumEntries = computeOffsets(ptrs, numRowEntries)
         
         inds = Array{LID, 1}(localTotalNumEntries)
         vals = Array{Data, 1}(localTotalNumEntries)
@@ -373,29 +374,29 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
     elseif getProfileType(matrix) == STATIC_PROFILE
         curRowOffsets = myGraph.rowOffsets
         
-        if myGraph.STORAGE_STATUS == STORAGE_1D_UNPACKED
+        if myGraph.storageStatus == STORAGE_1D_UNPACKED
             #pack row offsets into ptrs
             
             localTotalNumEntries = 0
             
             packedRowOffsets = Array{LID, 1}(localNumRows + 1)
             numRowEnt = myGraph.numRowEntries
-            localTotalNumEntries = computeOffsetsFromCounts(packedRowOffsets, numRowEnt)
+            localTotalNumEntries = computeOffsets(packedRowOffsets, numRowEnt)
             ptrs = packedRowOffsets
             
             inds = Array{LID, 1}(localTotalNumEntries)
             vals = Array{Data, 1}(localTotalNumEntries)
-            
+
             #line 1234
             for row in 1:localNumRows
                 srcPos = curRowOffsets[row]
                 dstPos = ptrs[row]
-                dstEnd = ptrs[row+1]
+                dstEnd = ptrs[row+1]-1
                 dst = dstPos:dstEnd
-                src = range(srcPos, 1, dstEnd-dstPos)
-                
-                vals[dst] = myGraph.localIndices1D[src]
-                inds[dst] = localMatrix.values[src]
+                src = range(srcPos, 1, dstEnd-dstPos+1)
+
+                inds[dst] = myGraph.localIndices1D[src]
+                vals[dst] = localMatrix.values[src]
             end
         else
             #dont have to pack, just set pointers
@@ -419,7 +420,7 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
     end
     
     myGraph.localGraph = LocalCRSGraph(inds, ptrs)
-    matrix.localMatrix = LocalCSRMatrix(getLocalNumCols(matrix), vals, graph.localGraph)
+    matrix.localMatrix = LocalCSRMatrix(myGraph.localGraph, vals, getLocalNumCols(matrix))
 end
         
 function insertNonownedGlobalValues(matrix::CSRMatrix{Data, GID, PID, LID},
@@ -477,8 +478,65 @@ function getDiagCopyWithoutOffsets(rowMap, colMap, A::CSRMatrix{Data}) where {Da
     end
     D
 end
-        
-    
+
+
+#TODO implement sortAndMergeIndicesAndValues(myGraph, isSorted(myGraph), isMerged(myGraph))
+function sortAndMergeIndicesAndValues(matrix::CSRMatrix{Data, GID, PID, LID},
+        sorted, merged) where {Data, GID, PID, LID}
+    graph = getGraph(matrix)
+    localNumRows = getLocalNumRows(graph)
+    totalNumDups = 0
+
+    for localRow in LID(1):localNumRows
+        rowInfo = getRowInfo(graph, localRow)
+        if !sorted
+            inds, vals = getLocalRowView(matrix, rowInfo)
+
+            order = sortperm(inds)
+            permute!(inds, order)
+            permute!(vals, order)
+        end
+        if !merged
+            totalNumDups += mergeRowIndicesAndValues(matrix, rowInfo)
+        end
+    end
+
+    if !sorted
+        graph.indicesAreSorted = true
+    end
+    if !merged
+        graph.nodeNumEntries -= totalNumDups
+        graph.noRedundancies = true
+    end
+end
+
+function mergeRowIndicesAndValues(matrix::CSRMatrix{Data, GID, PID, LID},
+        rowInfo::RowInfo{LID})::LID where {Data, GID, PID, LID}
+
+    graph = getGraph(matrix)
+    indsView, valsView = getLocalRowView(matrix, rowInfo)
+
+    if rowInfo.numEntries != 0
+        newend = 1
+        for cur in 1:rowInfo.numEntries
+            if indsView[newend] != indsView[cur]
+                #new entry, save it
+                newend += 1
+                indsView[newend] = indsView[cur]
+                valsView[newend] = valsView[cur]
+            else
+                #old entry, merge it
+                valsView[newend] += valsView[cur]
+            end
+        end
+    end
+
+    graph.numRowEntries[rowInfo.localRow] = newend
+
+    newend
+end
+
+
 
 #### External methods ####
 #TODO document external methods
@@ -565,18 +623,18 @@ function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
         end
     end
     
-    setDomainRanageMaps(myGraph, domainMap, rangeMap)
+    setDomainRangeMaps(myGraph, domainMap, rangeMap)
     if !hasColMap(myGraph)
         makeColMap(myGraph)
     end
     
     makeIndicesLocal(myGraph)
     
-    sortAndMergeIndicesAndValues(myGraph, isSorted(myGraph), isMerged(myGraph))
+    sortAndMergeIndicesAndValues(matrix, isSorted(myGraph), isMerged(myGraph))
     
     makeImportExport(myGraph)
     computeGlobalConstants(myGraph)
-    graph.fillComplete = true
+    myGraph.fillComplete = true
     checkInternalState(myGraph)
     fillLocalGraphAndMatrix(matrix, plist)
 end
@@ -693,19 +751,28 @@ function getGlobalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
     end
     (indices, values)
 end
-    
+
 function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
         localRow::Integer
         )::Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}} where {
         Data, GID, PID, LID}
+    rowInfo = getRowInfo(matrix.myGraph, localRow)
+    getLocalRowView(matrix, rowInfo)
+end
+
+function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
+        rowInfo::RowInfo{LID}
+        )::Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}} where {
+        Data, GID, PID, LID}
+
     if isGloballyIndexed(matrix)
         throw(InvalidStateError("The matrix is globally indexed, so cannot return a "
                 * "view of the row with local column indices.  Use "
                 * "getLocalalRowCopy(...) instead."))
     end
+
     myGraph = matrix.myGraph
-    
-    rowInfo = getRowInfo(myGraph, localRow)
+
     if rowInfo.localRow != 0 && rowInfo.numEntries > 0
         viewRange = 1:rowInfo.numEntries
         indices = getLocalView(myGraph, rowInfo)[viewRange]

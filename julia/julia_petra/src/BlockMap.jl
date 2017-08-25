@@ -434,10 +434,10 @@ function getLocalMap(map::BlockMap{GID, PID, LID})::BlockMap{GID, PID, LID} wher
     oneToOneIsDetermined = oldData.oneToOneIsDetermined
     oneToOne = oldData.oneToOne
     lastContiguousGID = oldData.lastContiguousGID
-    lastContiguousGIDLoc = oldData.lastCOntiguousGIDLoc
+    lastContiguousGIDLoc = oldData.lastContiguousGIDLoc
     lidHash = copy(oldData.lidHash)
     
-    BlockMap(data)
+    BlockMap{GID, PID, LID}(data)
 end
     
 ##local/global ID accessor methods##
