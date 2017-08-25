@@ -23,6 +23,6 @@ function computeOffsets(rowPtrs::Array{<: Integer, 1}, numEnts::Array{<: Integer
         @inbounds rowPtrs[i] = sum
         @inbounds sum += numEnts[i]
     end
-    @inbounds rowPtrs[numCounts+1:numOffsets] = sum
-    rowPtrs
+    @inbounds rowPtrs[numCounts+1:numOffsets] = sum-1
+    sum-1
 end

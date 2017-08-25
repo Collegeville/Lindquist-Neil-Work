@@ -393,7 +393,7 @@ function getLocalRowView(graph::CRSGraph{GID}, localRow::GID)::AbstractArray{GID
     if @debug graph
         @assert hasRowInfo() "Graph row information was deleted"
     end
-    rowInfo = getRowInfoFromLocalRowIndex(localRow)
+    rowInfo = getRowInfoFromLocalRowIndex(graph, localRow)
 
     getLocalRowView(graph, rowInfo)
 end

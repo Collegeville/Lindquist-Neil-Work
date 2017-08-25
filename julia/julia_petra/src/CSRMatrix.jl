@@ -213,7 +213,7 @@ function getRowMapMultiVector(mat::CSRMatrix{Data, GID, PID, LID}, Y::MultiVecto
         throw(InvalidStateError("Cannot call getRowMapMultiVector wif the matrix is fill active"))
     end
     
-    numVecs = getNumVectors(Y)
+    numVecs = numVectors(Y)
     exporter = getGraph(mat).exporter
     rowMap = getRowMap(mat)
     
@@ -359,7 +359,7 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
         
         ptrs = Array{LID, 1}(localNumRows+1)
         localTotalNumEntries = computeOffsets(ptrs, numRowEntries)
-        
+
         inds = Array{LID, 1}(localTotalNumEntries)
         vals = Array{Data, 1}(localTotalNumEntries)
         
@@ -379,10 +379,9 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
             
             localTotalNumEntries = 0
             
-            packedRowOffsets = Array{LID, 1}(localNumRows + 1)
+            ptrs = Array{LID, 1}(localNumRows + 1)
             numRowEnt = myGraph.numRowEntries
-            localTotalNumEntries = computeOffsets(packedRowOffsets, numRowEnt)
-            ptrs = packedRowOffsets
+            localTotalNumEntries = computeOffsets(ptrs, numRowEnt)
             
             inds = Array{LID, 1}(localTotalNumEntries)
             vals = Array{Data, 1}(localTotalNumEntries)
@@ -391,9 +390,9 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
             for row in 1:localNumRows
                 srcPos = curRowOffsets[row]
                 dstPos = ptrs[row]
-                dstEnd = ptrs[row+1]-1
-                dst = dstPos:dstEnd
-                src = range(srcPos, 1, dstEnd-dstPos+1)
+                dstEnd = ptrs[row+1]
+                dst = dstPos:dstEnd-1
+                src = range(srcPos, 1, dstEnd-dstPos)
 
                 inds[dst] = myGraph.localIndices1D[src]
                 vals[dst] = localMatrix.values[src]
@@ -480,7 +479,6 @@ function getDiagCopyWithoutOffsets(rowMap, colMap, A::CSRMatrix{Data}) where {Da
 end
 
 
-#TODO implement sortAndMergeIndicesAndValues(myGraph, isSorted(myGraph), isMerged(myGraph))
 function sortAndMergeIndicesAndValues(matrix::CSRMatrix{Data, GID, PID, LID},
         sorted, merged) where {Data, GID, PID, LID}
     graph = getGraph(matrix)
@@ -622,18 +620,19 @@ function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
             throw(InvalidStateError("Cannot have nonlocal entries on a serial run.  An invalid entry is present."))
         end
     end
-    
+
     setDomainRangeMaps(myGraph, domainMap, rangeMap)
     if !hasColMap(myGraph)
         makeColMap(myGraph)
     end
-    
+
     makeIndicesLocal(myGraph)
-    
+
     sortAndMergeIndicesAndValues(matrix, isSorted(myGraph), isMerged(myGraph))
-    
+
     makeImportExport(myGraph)
     computeGlobalConstants(myGraph)
+
     myGraph.fillComplete = true
     checkInternalState(myGraph)
     fillLocalGraphAndMatrix(matrix, plist)
@@ -909,7 +908,9 @@ end
 
 #### Operator methods ####
 #TODO implement Operator methods
-function apply!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
+function apply!(Y::MultiVector{Data, GID, PID, LID},
+        operator::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID},
+        mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
     if isFillActive(operator)
         throw(InvalidStateError("Cannot call apply(...) until fillComplete(...)"))
     end
@@ -970,7 +971,7 @@ function applyNonTranspose!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMa
     else
         #don't do export row Map and range map are the same
         
-        if XColmap === Y
+        if XColMap === Y
             
             YRowMap = getRowMapMultiVector(operator, Y, true)
             
@@ -994,6 +995,44 @@ end
     
             
             
+
+
+
+#TODO remove the extra whitespace once this has been merged with the copy on horizon view
+function localApply(Y::MultiVector{Data, GID, PID, LID},
+        A::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID},
+        mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
+
+    if alpha == 0
+        return scale!(Y, beta)
+    end
+
+    rawY = Y.data
+    rawX = X.data
+
+
+    #TODO implement this better, can BLAS be used?
+    if !isTransposed(mode)
+        #TODO look at best way to order the loops to avoid cache misses
+        for vect = LID(1):numVectors(Y)
+            for row = LID(1):getLocalNumRows(A)
+                sum = Data(0)
+                
+                for (ind, val) in zip(getLocalRowView(A, row)...)
+                    sum += val*ind
+                end
+                sum = applyConjugation(mode, sum*alpha)
+                rawY[row, vect] *= beta
+                rawY[row, vect] += sum
+            end
+        end
+    else
+        #TODO implement transposed spmv
+        @assert false "Not yet implemented"
+    end
+    Y
+end
+
 
 getDomainMap(matrix::CSRMatrix) = getDomainMap(matrix.myGraph)
 getRangeMap(matrix::CSRMatrix) = getRangeMap(matrix.myGraph)

@@ -29,9 +29,16 @@ Tells petra whether to use the transpose or conjugate transpose of the matrix
 Checks whether the given TransposeMode is transposed
 """
 @inline function isTransposed(mode::TransposeMode)::Bool
-    mode != TransposeMode.NO_TRANS
+    mode != NO_TRANS
 end
 
+function applyConjugation(mode::TransposeMode, val::T)::T where T
+    if mode == CONJ_TRANS
+        conj(val)
+    else
+        val
+    end
+end
 
 
 

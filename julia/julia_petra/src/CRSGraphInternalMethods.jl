@@ -154,10 +154,10 @@ function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} wher
     end
     
     if !hasRowInfo(graph) || !myLID(graph.rowMap, row)
-        return RowInfo{LID}(graph, 0, 0, 0, 0)
+        return RowInfo{LID}(graph, row, 0, 0, 1)
     end
     
-    offset1D = 0
+    offset1D = 1
     allocSize = 0
     
     if getProfileType(graph) == STATIC_PROFILE
@@ -559,7 +559,6 @@ function makeIndicesLocal(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
             if GID == LID
                 graph.localIndices1D = graph.globalIndices1D
 
-                println("Reusing global index array")
             else
                 @assert(length(graph.rowOffsets) != 0,
                     "length(graph.rowOffsets) == 0.  "
