@@ -83,6 +83,10 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
                 (pid*nProcs+3)*ones(Float64, n), 
                 (pid*nProcs+4)*ones(Float64, n))  == vect2.data
 
+    #test dot
+    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, ones(Float64, n, 3))
+    @test fill(n*nProcs, 3) == dot(vect, vect)
+
     #test fill!
     fill!(vect, 8)
     @test 8*ones(Float64, (n, 3)) == vect.data

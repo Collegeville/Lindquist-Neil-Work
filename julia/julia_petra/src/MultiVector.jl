@@ -149,6 +149,34 @@ function scale(vect::MultiVector{Data, GID, PID, LID}, alpha::Array{Data, 1})::M
 end
 
 
+function Base.dot(vect1::MultiVector{Data, GID, PID, LID}, vect2::MultiVector{Data, GID, PID, LID}
+        )::AbstractArray{Data} where {Data, GID, PID, LID}
+    numVects = numVectors(vect1)
+    length = localLength(vect1)
+    if numVects != numVectors(vect2)
+        throw(InvalidArgumentError("MultiVectors must have the same number of vectors to take the dot product of them"))
+    end
+    if length != localLength(vect2)
+        throw(InvalidArgumentError("Vectors must have the same length to take the dot product of them"))
+    end
+    dotProducts = Array{Data, 1}(numVects)
+
+    data1 = vect1.data
+    data2 = vect2.data
+
+    for vect in 1:numVects
+        sum = Data(0)
+        for i = 1:length
+            sum += data1[i, vect]*data2[i, vect]
+        end
+        dotProducts[vect] = sum
+    end
+
+    dotProducts = sumAll(comm(vect1), dotProducts)
+
+    dotProducts
+end
+
 """
     getVectorView(::MultiVector{Data}, columns)::AbstractArray{Data}
 
