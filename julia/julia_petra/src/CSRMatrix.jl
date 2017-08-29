@@ -835,7 +835,6 @@ function apply!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMatrix{Data, G
     if isFillActive(operator)
         throw(InvalidStateError("Cannot call apply(...) until fillComplete(...)"))
     end
-    #TODO implement
     
     if mode == NO_TRANS
         applyNonTranspose!(Y, operator, X, alpha, beta)
@@ -910,8 +909,83 @@ function applyNonTranspose!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMa
     if YIsReplicated
         commReduce(Y)
     end
+    Y
 end
-#TODO implement applyTranspose!(...)
+
+function applyTranspose!(Yin::MultiVector{Data, GID, PID, LID}, operator::CSRMatrix{Data, GID, PID, LID}, Xin::MultiVector{Data, GID, PID, LID}, mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
+    const ZERO = Data(0)
+    
+    if alpha == ZERO
+        if beta == ZERO
+            fill!(Y, ZERO)
+        elseif beta != Data(1)
+            scale!(Y, beta)
+        end
+        return
+    end
+    
+    numVectors = getNumVectors(Xin)
+    importer = getGraph(operator).importer
+    exporter = getGraph(operator).exporter
+    
+    YIsReplicated = globallyDistributed(Yin)
+    YIsOverwritted = (beta == ZERO)
+    if YIsReplicated && myPID(comm(operator)) != 1
+        beta = ZERO
+    end
+    
+    if isnull(importer)
+        X = copy(Xin)
+    else
+        X
+    end
+    
+    if !isnull(importer)
+        if !isnull(operator.importMV) && getNumVectors(get(operator.importMV)) != numVectors
+            operator.importMV = Nullable{MultiVector{Data, GID, PID, LID}}()
+        end
+        if isnull(operator.importMV)
+            operator.importMV = Nullable(MultiVector(getColMap(operator), numVectors))
+        end
+    end
+    
+    if !isnull(exporter)
+        if !isnull(operator.exportMV) && getNumVectors(get(operator.exportMV)) != numVectors
+            operator.exportMV = Nullable{MultiVector{Data, GID, PID, LID}}()
+        end
+        if isnull(operator.exportMV)
+            operator.exportMV = Nullable(MultiVector(getRowMap(operator), numVectors))
+        end
+    end
+    
+    if !isnull(exporter)
+        doImport(Xin, get(operator.exportMV), get(exporter), INSERT)
+        X = operator.exportMV
+    end
+    
+    if !isnull(importer)
+        localApply(get(operator.importMV), operator, X, mode, alpha, ZERO)
+        
+        if YIsOverwritten
+            fill!(Yin, ZERO)
+        else
+            scale!(Yin, beta)
+        end
+        doExport(get(operator.importMV), Yin, get(importer), ADD)
+    else
+        if X === Yin
+            Y = copy(Yin)
+            localApply(Y, operator, X, mode, alpha, beta)
+            copy!(Yin, Y)
+        else
+            localApply(Y, operator, X, mode, alpha, beta)
+        end
+    end
+    if YIsReplicated
+        commReduce(Yin)
+    end
+    Yin
+end
 
     
             
