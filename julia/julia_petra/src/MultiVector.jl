@@ -7,7 +7,6 @@ export commReduce
 
 #TODO implement dot(::MultiVector{...}, ::MultiVector{...})::Array{Data, 1}
 #TODO implement norm2(::MultiVector{...})::Array{Data, 1}
-#DECISION figure out if the type hierarchy needs to be reworked to subtype AbstractArray (I'm inclined to say yes, it then allows broadcast to work correctly)
 
 """
 MultiVector represents a dense multi-vector.  Note that all the vectors in a single MultiVector are the same size

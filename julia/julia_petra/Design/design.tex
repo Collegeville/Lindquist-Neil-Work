@@ -59,7 +59,7 @@ In both E- and T- -Petras, Operator is an purely abstract class, that various ty
 		\item The SimpleTraits.jl library handles the details, just need a few macro calls to use
 		\begin{itemize}
 			\item Part of Metadata.jl
-			\item Might become part of the official library at somepoint
+			\item Might become part of the official library at some point
 		\end{itemize}
 		\item Seems to be considered the Julian way to emulate multiple inheritance
 		\item Can be used for RowMatrix as well to make that feel like less of a workaround
@@ -73,5 +73,27 @@ In both E- and T- -Petras, Operator is an purely abstract class, that various ty
 My final decision was to have the shared Operator functions accept Any for the "Operator" types.  I chose this approach since it's the simplest to implement and, for this situation, won't need to worry about method collisions or ambiguity.
 
 If complications arise that cause the chosen approach to stop working, Traits seems to be the second best.  Traits can handle the cases when dispatching is useful and seems to be considered Julian.
+
+\section{Should JuliaPetra's Data Structures subtypes of AbstractArray}
+\begin{enumerate}
+	\item Pros
+	\begin{itemize}
+		\item Allows proper behavior with vectorized operators/functions
+		\item Allows the datatypes to be used more widely-spread
+		\item Is conceptually an AbstractArray
+	\end{itemize}
+
+	\item Cons
+	\begin{itemize}
+		\item Should it be treated as the local or global array?
+		\item Requires implemented a large number of methods
+		\item Requires SrcDistObject and DistObject to be implemented as traits
+		\begin{itemize}
+			\item but that would allow target Distribution objects that aren't sources, I don't know if that's ever useful though
+		\end{itemize}
+	\end{itemize}
+\end{enumerate}
+
+The effort for supporting the AbstractArray interface and redoing (Src)DistObject as Traits seems like its currently more effort than its worth.  Additionally, there might be conflicts in design principles that haven't been found yet.  Maybe it can be refactored at another point, but for now it'll be left as is.
 
 \end{document}
