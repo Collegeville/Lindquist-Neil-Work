@@ -71,13 +71,15 @@ function computeGlobalConstants(graph::CRSGraph{GID, PID, LID}) where {
         @assert !null(graph.colMap) "The graph must have a column map at this point"
     end
     
-    computeLocalConstants()
+    computeLocalConstants(graph)
     
+    commObj = comm(map(graph))
+
     #if graph.haveGlobalConstants == false  #short circuited above
-    graph.globalNumEntries, graph.globalNumDiags = sumAll(comm(graph.map),
+    graph.globalNumEntries, graph.globalNumDiags = sumAll(commObj,
         [GID(graph.nodeNumEntries), GID(graph.nodeNumDiags)])
         
-    graph.globalMaxNumRowEntries = maxAll(comm(graph.map), GID(graph.nodeMaxNumRowEntries))
+    graph.globalMaxNumRowEntries = maxAll(commObj, GID(graph.nodeMaxNumRowEntries))
     graph.haveGlobalConstants = true
 end
 
@@ -112,14 +114,14 @@ function computeLocalConstants(graph::CRSGraph{GID, PID, LID}) where {
     #indicesAreAllocated => true
     if  hasRowInfo(graph)
         const numLocalRows = numMyElements(rowMap)
-        for localRow = 1:numLocalRows
+        for localRow = LID(1):numLocalRows
             const globalRow = gid(rowMap, localRow)
             const rowLID = lid(colMap, globalRow)
             
             const rowInfo = getRowInfo(graph, localRow)
             rowView = getLocalView(rowInfo)
 
-            if rowLID in rowView
+            if rowLID in rowView #appears to be broken IDK how or why
                 graph.nodeNumDiags += 1
             end
 
@@ -152,10 +154,10 @@ function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} wher
     end
     
     if !hasRowInfo(graph) || !myLID(graph.rowMap, row)
-        return RowInfo{LID}(graph, 0, 0, 0, 0)
+        return RowInfo{LID}(graph, row, 0, 0, 1)
     end
     
-    offset1D = 0
+    offset1D = 1
     allocSize = 0
     
     if getProfileType(graph) == STATIC_PROFILE
@@ -186,7 +188,7 @@ function getLocalView(rowInfo::RowInfo{LID})::AbstractArray{LID, 1} where LID <:
         start = rowInfo.offset1D
         len = rowInfo.allocSize
         
-        view(graph.localIndices1D, start:len)
+        view(graph.localIndices1D, range(start, 1, len))
     elseif length(graph.localIndices2D[rowInfo.localRow]) != 0
         graph.localIndices2D[rowInfo.localRow]
     else
@@ -197,6 +199,7 @@ end
 function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
         lg::IndexType, numAllocPerRow::Array{<:Integer, 1}) where {
         GID <: Integer, LID <: Integer}
+    numRows = getLocalNumRows(graph)
     @assert(length(numAllocPerRow) == numRows,
         "numAllocRows has length = $(length(numAllocPerRow)) "
         * "!= numRows = $numRows")
@@ -263,16 +266,16 @@ end
     
 function makeImportExport(graph::CRSGraph{GID, PID, LID}) where {
         GID <: Integer, PID <: Integer, LID <: Integer}
-    @assert !null(graph.colMap) "Cannot make imports and exports without a column map"
+    @assert !isnull(graph.colMap) "Cannot make imports and exports without a column map"
     
-    if null(graph.importer)
-        if graph.domainMap != graph.colMap && !isSameAs(graph.domainMap, graph.colMap)
+    if isnull(graph.importer)
+        if get(graph.domainMap) !== get(graph.colMap) && !sameAs(get(graph.domainMap), get(graph.colMap))
             graph.importer = Import(graph.domainMap, graph.colMap, graph.plist)
         end
     end
     
-    if null(graph.exporter)
-        if graph.rangeMap != graph.rowMap && !isSameAs(graph.rangeMap, graph.rowMap)
+    if isnull(graph.exporter)
+        if get(graph.rangeMap) !== graph.rowMap && !sameAs(get(graph.rangeMap), graph.rowMap)
             graph.exporter = Export(graph.rowMap, graph.rangeMap, graph.plist)
         end
     end
@@ -555,11 +558,12 @@ function makeIndicesLocal(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
         if getProfileType(graph) == STATIC_PROFILE
             if GID == LID
                 graph.localIndices1D = graph.globalIndices1D
+
             else
                 @assert(length(graph.rowOffsets) != 0,
                     "length(graph.rowOffsets) == 0.  "
                     * "This should never happen at this point")
-                const numEnt = graph.rowOffsets[localNumRows]
+                const numEnt = graph.rowOffsets[localNumRows+1]
                 graph.localIndices1D = Array{LID, 1}(numEnt)
             end
             
@@ -568,7 +572,7 @@ function makeIndicesLocal(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
             numBad = convertColumnIndicesFromGlobalToLocal(
                         graph.localIndices1D,
                         graph.globalIndices1D,
-                        graph.rowoffsets,
+                        graph.rowOffsets,
                         localColumnMap,
                         numRowEntries)
             
@@ -597,22 +601,22 @@ function makeIndicesLocal(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
     end
     
     graph.localGraph = LocalCRSGraph(graph.localIndices1D, graph.rowOffsets)
-    graph.indexType = LOCAL_INDICES
+    graph.indicesType = LOCAL_INDICES
     checkInternalState(graph)
 end
-                    
-            
+
+
 function convertColumnIndicesFromGlobalToLocal(localColumnIndices::Array{LID, 1},
         globalColumnIndices::Array{GID, 1}, ptr::Array{LID, 1},
         localColumnMap::BlockMap{GID, PID, LID}, numRowEntries::Array{LID, 1})::LID where {
         GID, PID, LID}
-    
+
     localNumRows = max(length(ptr)-1, 0)
     numBad = 0
     for localRow = 1:localNumRows
         offset = ptr[localRow]
         
-        for j = 1:numRowEntries[localRow]
+        for j = 0:numRowEntries[localRow]-1
             gid = globalColumnIndices[offset+j]
             localColumnIndices[offset+j] = lid(localColumnMap, gid)
             if lid == 0
@@ -773,14 +777,15 @@ end
 
 #internal implementation of makeColMap, needed to handle some return and debuging stuff
 #returns Tuple(errCode, colMap)
-function __makeColMap(graph::CRSGraph{GID, PID, LID},domMap::BlockMap{GID, PID, LID},
+function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{BlockMap{GID, PID, LID}},
         sortEachProcsGIDs::Bool) where {GID, PID, LID}
     errCode = 0#TODO improve from int error code
 
-    if isnull(domMap)
+    if isnull(wrappedDomMap)
         colMap = Nullable{BlockMap{GID, PID, LID}}()
     else
         myColumns = GID[]
+        domMap = get(wrappedDomMap)
 
         if isLocallyIndexed(graph)
             wrappedColMap = graph.colMap
@@ -801,6 +806,8 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID},domMap::BlockMap{GID, PID, 
                 end
             end
         else #if graph.isGloballyIndexed
+            const localNumRows = getLocalNumRows(graph)
+
             numLocalColGIDs = 0
             numRemoteColGIDs = 0
 
@@ -813,7 +820,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID},domMap::BlockMap{GID, PID, 
 
             for localRow = 1:localNumRows
                 globalRow = gid(rowMap, localRow)
-                rowGIDs = getGlobalRowView(graph)
+                rowGIDs = getGlobalRowView(graph, globalRow)
 
                 numEnt = length(rowGIDs)
                 if numEnt != 0
@@ -822,7 +829,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID},domMap::BlockMap{GID, PID, 
                         lid = julia_petra.lid(domMap, gid)
                         if lid != 0
                             if !gidIsLocal[lid]
-                                gidIsLocal = true
+                                gidIsLocal[lid] = true
                                 numLocalColGIDs += 1
                             end
                         else

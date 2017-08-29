@@ -8,7 +8,7 @@ A compressed row storage array.  Used by CRSGraph to store local structure.
 `EntriesType` is the type of the data being held
 `IndexType` is the type used to represent the indices
 """
-struct LocalCRSGraph{EntriesType, IndexType <: Integer}
+mutable struct LocalCRSGraph{EntriesType, IndexType <: Integer}
     entries::Array{EntriesType, 1}
     rowMap::Array{IndexType, 1}
 end

@@ -131,7 +131,7 @@ isLocallyIndexed(matrix::RowMatrix) = !isGloballyIndexed(matrix)
 
 #for SrcDistObject
 function map(matrix::RowMatrix)
-    rowMap(matrix)
+    getRowMap(matrix)
 end
 
 
