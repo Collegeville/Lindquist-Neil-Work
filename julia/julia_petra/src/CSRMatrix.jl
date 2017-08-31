@@ -4,8 +4,7 @@ export CSRMatrix, insertGlobalValues
 mutable struct CSRMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: DistRowMatrix{Data, GID, PID, LID}
     rowMap::BlockMap{GID, PID, LID}
     colMap::Nullable{BlockMap{GID, PID, LID}}
-    
-    #TODO look into how nessacery these are
+
     importMV::Nullable{MultiVector{Data, GID, PID, LID}}
     exportMV::Nullable{MultiVector{Data, GID, PID, LID}}
 
@@ -62,19 +61,24 @@ end
 
 #### Constructors ####
 #TODO document Constructors
-#TODO add wrappers for plist args in CSRMatrix constructors
 
 function CSRMatrix{Data}(rowMap::BlockMap{GID, PID, LID},
         maxNumEntriesPerRow::Union{Integer, Array{<:Integer, 1}}, 
         pftype::ProfileType; plist...) where {Data, GID, PID, LID}
     CSRMatrix{Data}(rowMap, maxNumEntriesPerRow, pftype, Dict(Array{Tuple{Symbol, Any}}(plist)))
 end
-
 function CSRMatrix{Data}(rowMap::BlockMap{GID, PID, LID},
         maxNumEntriesPerRow::Union{Integer, Array{<:Integer, 1}}, 
         pftype::ProfileType, plist::Dict{Symbol}) where {Data, GID, PID, LID}
     CSRMatrix{Data}(rowMap, Nullable{BlockMap{GID, PID, LID}}(),
         maxNumEntriesPerRow, pftype, plist)
+end
+
+function CSRMatrix{Data}(rowMap::BlockMap{GID, PID, LID},
+        colMap::BlockMap{GID, PID, LID},
+        maxNumEntriesPerRow::Union{Integer, Array{<:Integer, 1}}, 
+        pftype::ProfileType; plist...) where {Data, GID, PID, LID}
+    CSRMatrix{Data}(rowMap, colMap, maxNumEntriesPerRow, pftype, Dict(Array{Tuple{Symbol, Any}}(plist)))
 end
 function CSRMatrix{Data}(rowMap::BlockMap{GID, PID, LID},
         colMap::BlockMap{GID, PID, LID},
@@ -82,6 +86,13 @@ function CSRMatrix{Data}(rowMap::BlockMap{GID, PID, LID},
         pftype::ProfileType, plist::Dict{Symbol}) where {Data, GID, PID, LID}
     CSRMatrix{Data}(rowMap, Nullable(colMap), maxNumEntriesPerRow,
         pftype, plist)
+end
+
+function CSRMatrix{Data}(rowMap::BlockMap{GID, PID, LID},
+        colMap::Nullable{BlockMap{GID, PID, LID}},
+        maxNumEntriesPerRow::Union{Integer, Array{<:Integer, 1}}, 
+        pftype::ProfileType; plist...) where {Data, GID, PID, LID}
+    CSRMatrix{Data}(rowMap, colMap, maxNumEntriesPerRow, pftype, Dict(Array{Tuple{Symbol, Any}}(plist)))
 end
 function CSRMatrix{Data}(rowMap::BlockMap{GID, PID, LID},
         colMap::Nullable{BlockMap{GID, PID, LID}},
@@ -97,6 +108,10 @@ function CSRMatrix{Data}(rowMap::BlockMap{GID, PID, LID},
     matrix
 end
 
+function CSRMatrix{Data}(graph::CRSGraph{GID, PID, LID}; plist...
+        ) where {Data, GID, PID, LID}
+    CSRMatrix{Data}(graph, Dict(Array{Tuple{Symbol, Any}}(plist)))
+end
 function CSRMatrix{Data}(graph::CRSGraph{GID, PID, LID},plist::Dict{Symbol}
         ) where {Data, GID, PID, LID}
     numCols = numMyElements(getColMap(graph))
@@ -107,6 +122,11 @@ function CSRMatrix{Data}(graph::CRSGraph{GID, PID, LID},plist::Dict{Symbol}
     CSRMatrix(graph.rowMap, graph.colMap, graph, localMatrix, plist)
 end
 
+function CSRMatrix(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
+        rowOffsets::Array{LID, 1}, colIndices::Array{LID, 1}, values::Array{Data, 1};
+        plist...) where {Data, GID, PID, LID}
+    CSRMatrix(rowMap, colMap, rowOffsets, colIndices, values, Dict(Array{Tuple{Symbol, Any}}(plist)))
+end
 function CSRMatrix(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
         rowOffsets::Array{LID, 1}, colIndices::Array{LID, 1}, values::Array{Data, 1},
         plist::Dict{Symbol}) where {Data, GID, PID, LID}
@@ -126,7 +146,11 @@ function CSRMatrix(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, L
     CSRMatrix(rowMap, Nullable(colMap), graph, localMatrix, plist)
 end
 
-
+function CSRMatrix(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
+        localMatrix::LocalCSRMatrix{Data, LID}; plist...
+        ) where {Data, GID, PID, LID}
+    CSRMatrix(rowMap, colMap, localMatrix, Dict(Array{Tuple{Symbol, Any}}(plist)))
+end
 function CSRMatrix(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
         localMatrix::LocalCSRMatrix{Data, LID}, plist::Dict{Symbol}
         ) where {Data, GID, PID, LID}
@@ -139,6 +163,11 @@ function CSRMatrix(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, L
     matrix
 end
 
+function CSRMatrix(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
+        localMatrix::AbstractArray{Data, 2}; plist...
+        ) where {Data, GID, PID, LID}
+    CSRMatrix(rowmap, colMap, localMatrix, Dict(Array{Tuple{Symbol, Any}}(plist)))
+end
 function CSRMatrix(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
         localMatrix::AbstractArray{Data, 2}, plist::Dict{Symbol}
         ) where {Data, GID, PID, LID}
@@ -1066,13 +1095,7 @@ function applyTranspose!(Yin::MultiVector{Data, GID, PID, LID}, operator::CSRMat
     Yin
 end
 
-    
-            
-            
 
-
-
-#TODO remove the extra whitespace once this has been merged with the copy on horizon view
 function localApply(Y::MultiVector{Data, GID, PID, LID},
         A::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID},
         mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}

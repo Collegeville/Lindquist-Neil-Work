@@ -777,8 +777,8 @@ end
 
 #internal implementation of makeColMap, needed to handle some return and debuging stuff
 #returns Tuple(errCode, colMap)
-function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{BlockMap{GID, PID, LID}},
-        sortEachProcsGIDs::Bool) where {GID, PID, LID}
+function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{BlockMap{GID, PID, LID}}
+        ) where {GID, PID, LID}
     errCode = 0#TODO improve from int error code
 
     if isnull(wrappedDomMap)
@@ -786,7 +786,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
     else
         myColumns = GID[]
         domMap = get(wrappedDomMap)
-
+        
         if isLocallyIndexed(graph)
             wrappedColMap = graph.colMap
 
@@ -813,7 +813,6 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
 
             gidIsLocal = zeros(Bool, localNumRows)
             remoteGIDSet = Set()
-            remoteGIDUnorderedVector = GID[]
 
             #if rowMap != null
             const rowMap = graph.rowMap
@@ -835,10 +834,6 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
                         else
                             if !in(remoteGIDSet, gid)
                                 push!(remoteGIDSet, gid)
-                                if !sortEachProcsGIDs
-                                    #user wants order retained
-                                    push!(remoteGIDUnorderedVector, gid)
-                                end
                                 numRemoteColGIDs += 1
                             end
                         end
@@ -859,11 +854,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
             localColGIDs  = view(myColumns, 1:numLocalColGIDs)
             remoteColGIDs = view(myColumns, numLocalColGIDs+1:numRemoteColGIDs)
 
-            if sortEachProcsGIDs
-                remoteColGIDs[:] = [el for el in remoteGIDSet]
-            else
-                remoteColGIDs[:] = remoteGIDUnorderedVector
-            end
+            remoteColGIDs[:] = [el for el in remoteGIDSet]
 
             remotePIDs = Array{PID, 1}(numRemoteColGIDs)
 

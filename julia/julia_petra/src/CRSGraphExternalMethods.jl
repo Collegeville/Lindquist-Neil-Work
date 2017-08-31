@@ -473,10 +473,6 @@ function fillComplete(graph::CRSGraph{GID, PID, LID}, domainMap::BlockMap{GID, P
        
     const numProcs = numProc(comm(graph))
     
-    if haskey(plist, :sortColumnMapGhostGIDs)
-        graph.sortGhostsAssociatedWithEachProcessor = get(plist, :sortColumnMapGhostGIDs, :VERY_BAD)
-    end
-    
     const assertNoNonlocalInserts = get(plist, :noNonlocalChanges, false)
     
     const mayNeedGlobalAssemble = !assertNoNonlocalInserts && numProcs > 1
@@ -514,13 +510,9 @@ function makeColMap(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
     debug = @debug graph
     const localNumRows = getLocalNumEntries(graph)
     
-    #TODO get rid of this order retention stuff, it has to do with epetra interop
-    #sortGhosts... field not present, so just give it false
-    const sortEachProcsGIDs = false#graph.sortGhostsAssociatedWithEachProcessr
-    
     #TODO look at FIXME on line 4898
     
-    errCode, colMap = __makeColMap(graph, graph.domainMap, sortEachProcsGIDs)
+    errCode, colMap = __makeColMap(graph, graph.domainMap, false)
     if debug
         comm = julia_petra.comm(graph)
         localSuccess = (errCode == 0)? 1 : 0
