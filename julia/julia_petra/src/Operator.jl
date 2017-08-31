@@ -17,10 +17,10 @@ apply!(Y::MultiVector{Data, GID, PID, LID}, operator::Op{Data, GID, PID, LID}, X
         If alpha == 0, apply MAY short-circuit the operator, so that any values in X (including NaNs) are ignored
 
 
-domainMap(operator::Op{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
+getDomainMap(operator::Op{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
     Returns the BlockMap associated with the domain of this operation
 
-rangeMap(operator::Op{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
+getRangeMap(operator::Op{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
     Returns the BlockMap associated with the range of this operation
 The field operators contains all types that have had ``@operatorFunctions`` called on them
 """

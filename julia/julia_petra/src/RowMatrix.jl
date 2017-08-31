@@ -60,6 +60,7 @@ Additionally, the following method must be implemented to fufil the operator int
 
     apply!(matrix::RowMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, Y::MultiVector{Data, GID, PID, LID}, mode::TransposeMode, alpha::Data, beta::Data)
 
+However, the following methods are implemented by redirecting the call to the matrix's graph by calling `getGraph(matrix)`.
     domainMap(operator::RowMatrix{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
 
     rangeMap(operator::RowMatrix{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
@@ -67,7 +68,7 @@ Additionally, the following method must be implemented to fufil the operator int
 The required methods from DistObject must also be implemented.  `map(...)`, as required by SrcDistObject, is implemented to forward the call to `rowMap(...)`
 
 
-The following methods are currently implemented by redirecting the call to the matrices' graph by calling `getGraph(matrix)`.  It is recommended that the implmenting class implements these more efficiently.
+The following methods are currently implemented by redirecting the call to the matrix's graph by calling `getGraph(matrix)`.  It is recommended that the implmenting class implements these more efficiently.
 
     isFillComplete(mat::RowMatrix)
 Whether `fillComplete(...)` has been called
@@ -312,6 +313,10 @@ function pack(mat::RowMatrix{Data, GID, PID, LID}, exportLIDs::Array{LID, 1},
         distor::Distributor{GID, PID, LID})::Array{Array{GID, 1}, Array{Data, 1}} where {Data, GID, PID, LID}
     throw(InvalidStateError("No pack implementation for objects of type $(typeof(mat))"))
 end
+
+
+getDomainMap(mat::RowMatrix) = getDomainMap(getGraph(mat))
+getRangeMap(mat::RowMatrix) = getRangeMap(getGraph(mat))
 
 
 #### required method documentation stubs ####

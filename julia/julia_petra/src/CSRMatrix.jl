@@ -936,7 +936,6 @@ end
 
 
 #### Operator methods ####
-#TODO implement Operator methods
 function apply!(Y::MultiVector{Data, GID, PID, LID},
         operator::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID},
         mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
@@ -1129,7 +1128,3 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
     end
     Y
 end
-
-
-getDomainMap(matrix::CSRMatrix) = getDomainMap(matrix.myGraph)
-getRangeMap(matrix::CSRMatrix) = getRangeMap(matrix.myGraph)
