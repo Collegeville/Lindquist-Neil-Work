@@ -21,7 +21,7 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
         tolerance::Data, verbose::Bool)::Tuple{Data, Bool} where {Data, GID, PID, LID}
     q = MultiVector{Data, GID, PID, LID}(getRowMap(A), 1)
     z = MultiVector{Data, GID, PID, LID}(getRowMap(A), 1)
-    reside = MultiVector{Data, GID, PID, LID}(getRowMap(A), 1)
+    resid = MultiVector{Data, GID, PID, LID}(getRowMap(A), 1)
 
     #skipping flop counting
 
@@ -33,11 +33,11 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
         normz = norm2(z)[1]
         q = scale(z, 1.0/normz)
         apply!(z, A, q, Data(1), Data(0))
-        λ = dot(q, z)
-        if iter%100 || iter+1 == niters
+        λ = dot(q, z)[1]
+        if iter%100 != 0 || iter+1 == niters
             #TODO improve - currently works, but is a little bit of a hack around MultiVector's lack of math operators
-            @. resid.data = residual - λ*q.data
-            residual = norm2(resid)
+            @. resid.data = z.data - λ*q.data
+            residual = norm2(resid)[1]
 
             verbose && print("Iter = $iter, λ = $λ, residual of A*q-λ*q = $residual\n")
             if residual < tolerance
@@ -94,6 +94,9 @@ function main(comm::Comm{GID, PID, LID}, arg1, numGlobalElements, verbose, Data:
     const niters = numGlobalElements*10
     const tolerance = 1.0e-2
 
+    #compile all the nessacery methods before timing
+    powerMethod(A, niters, tolerance, verbose)
+
     tic()
     λ, success = powerMethod(A, niters, tolerance, verbose)
     #TODO look into storing FLOPS
@@ -101,12 +104,12 @@ function main(comm::Comm{GID, PID, LID}, arg1, numGlobalElements, verbose, Data:
 
 
     @log "λ = $λ; is within tolerance? $success"
-    @log "\n\n total time for first solve = $elapsedTime ms\n\n"
+    @log "\n\n total time for first solve = $elapsedTime sec\n\n"
     @log "increasing magnitude of first diagonal term, solving again\n\n"
 
-    if myGID(A, 1)
-        rowInds, rowVals = getGlobalRowView(A, 0)
-        for i = 1:numGlobalEntries(A, 0)
+    if myGID(map, 1)
+        rowInds, rowVals = getLocalRowView(A, 0)
+        for i = 1:getNumEntriesInGlobalRow(A, 0)
             if rowInds[i] == 0
                 #using a view, so values update the original
                 rowVals[i] *= 10
@@ -121,7 +124,7 @@ function main(comm::Comm{GID, PID, LID}, arg1, numGlobalElements, verbose, Data:
     @log ""
 
     @log "λ = $λ; is within tolerance? $success"
-    @log "\n\n total time for second solve = $elapsedTime ms\n\n"
+    @log "\n\n total time for second solve = $elapsedTime sec\n\n"
 end
 
 
