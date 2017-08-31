@@ -13,18 +13,18 @@ end
 
 ## Constructors ##
 
-function Export(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{Array{PID}}=Nullable{Array{PID}}(); plist...) where {GID <: Integer, PID <: Integer, LID <: Integer}
+function Export(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{AbstractArray{PID}}=Nullable{AbstractArray{PID}}(); plist...) where {GID <: Integer, PID <: Integer, LID <: Integer}
     Export(source, target,
         Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
 end
 
 function Export(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID},
         plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
-    Export(source, target, Nullable{Array{PID}}(), plist)
+    Export(source, target, Nullable{AbstractArray{PID}}(), plist)
 end
 
 function Export(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID},
-        remotePIDs::Nullable{Array{PID}}, plist::Dict{Symbol}) where {
+        remotePIDs::Nullable{AbstractArray{PID}}, plist::Dict{Symbol}) where {
             GID <: Integer, PID <: Integer, LID <: Integer}
     const debug = get(plist, :debug, false)
 
@@ -52,7 +52,7 @@ end
 
 ## internal construction methods ##
 
-function setupSamePermuteExport(expor::Export{GID, PID, LID})::Array{GID} where {GID <: Integer, PID <: Integer, LID <: Integer}
+function setupSamePermuteExport(expor::Export{GID, PID, LID})::AbstractArray{GID} where {GID <: Integer, PID <: Integer, LID <: Integer}
     
     data = expor.exportData
     
@@ -143,7 +143,7 @@ function setupSamePermuteExport(expor::Export{GID, PID, LID})::Array{GID} where 
     exportGIDs
 end
     
-function setupRemote(expor::Export{GID, PID, LID}, exportGIDs::Array{GID, 1}) where {GID <: Integer, PID <: Integer, LID <: Integer}
+function setupRemote(expor::Export{GID, PID, LID}, exportGIDs::AbstractArray{GID, 1}) where {GID <: Integer, PID <: Integer, LID <: Integer}
     
     data = expor.exportData
     

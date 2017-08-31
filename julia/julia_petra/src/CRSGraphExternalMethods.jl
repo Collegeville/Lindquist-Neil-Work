@@ -60,7 +60,7 @@ function getLocalRowCopy(graph::CRSGraph{GID, PID, LID}, localRow::LID)::Array{L
     Array{LID, 1}(getLocalRowView(graph, localRow))
 end
 
-function pack(source::CRSGraph{GID, PID, LID}, exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID})::Array{Array{LID, 1}, 1} where {GID, PID, LID}
+function pack(source::CRSGraph{GID, PID, LID}, exportLIDs::AbstractArray{LID, 1}, distor::Distributor{GID, PID, LID})::Array{Array{LID, 1}, 1} where {GID, PID, LID}
     srcMap = map(source)
     [getGlobalRowCopy(source, gid(srcMap, lid)) for lid in exportLIDs]
 end
@@ -75,7 +75,7 @@ end
 
 function copyAndPermute(source::RowGraph{GID, PID, LID},
         target::CRSGraph{GID, PID, LID}, numSameIDs::LID,
-        permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1}) where {
+        permuteToLIDs::AbstractArray{LID, 1}, permuteFromLIDs::AbstractArray{LID, 1}) where {
         GID, PID, LID}
     copyAndPermuteNoViewMode(source, target,
         numSameIDs, permuteToLIDs, permuteFromLIDs)
@@ -83,7 +83,7 @@ end
 
 function copyAndPermute(source::CRSGraph{GID, PID, LID},
         target::CRSGraph{GID, PID, LID}, numSameIDs::LID,
-        permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1}) where {
+        permuteToLIDs::AbstractArray{LID, 1}, permuteFromLIDs::AbstractArray{LID, 1}) where {
         GID, PID, LID}
     if isFillComplete(target)
         throw(InvalidStateError("Target cannot be fill complete"))
@@ -120,7 +120,7 @@ end
             
 function copyAndPermuteNoViewMode(source::RowGraph{GID, PID, LID},
         target::CRSGraph{GID, PID, LID}, numSameIDs::LID,
-        permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1}) where {
+        permuteToLIDs::AbstractArray{LID, 1}, permuteFromLIDs::AbstractArray{LID, 1}) where {
         GID, PID, LID}
     if length(permuteToLIDs) != length(premuteFromLIDs)
         throw(InvalidArgumentError("permuteToLIDs and "
@@ -149,7 +149,7 @@ end
     
 
 function packAndPrepare(source::RowGraph{GID, PID, LID},
-        target::CRSGraph{GID, PID, LID}, exportLIDs::Array{LID, 1},
+        target::CRSGraph{GID, PID, LID}, exportLIDs::AbstractArray{LID, 1},
         distor::Distributor{GID, PID, LID})::Array{GID, 1} where {
         GID, PID, LID}
 
@@ -157,7 +157,7 @@ function packAndPrepare(source::RowGraph{GID, PID, LID},
 end
 
 function unpackAndCombine(target::CRSGraph{GID, PID, LID},
-        importLIDs::Array{LID, 1}, imports::Array,
+        importLIDs::AbstractArray{LID, 1}, imports::AbstractArray,
         distor::Distributor{GID, PID, LID}, cm::CombineMode) where {
         GID, PID, LID}
     #should be caught else where
@@ -543,12 +543,12 @@ Whether duplicate column indices in each row have been merged
 isMerged(graph::CRSGraph) = graph.noRedundancies
 
 """
-    setAllIndices(graph::CRSGraph{GID, PID, LID}, rowPointers::Array{LID, 1}, columnIndices::Array{LID, 1})
+    setAllIndices(graph::CRSGraph{GID, PID, LID}, rowPointers::Array{LID, 1}, columnIndices::AbstractArray{LID, 1})
 
 Sets the graph's data directly, using 1D storage
 """
 function setAllIndices(graph::CRSGraph{GID, PID, LID},
-        rowPointers::Array{LID, 1},columnIndices::Array{LID, 1}) where {
+        rowPointers::AbstractArray{LID, 1},columnIndices::Array{LID, 1}) where {
         GID, PID, LID <: Integer}
     
     localNumRows = getLocalNumRows(graph)

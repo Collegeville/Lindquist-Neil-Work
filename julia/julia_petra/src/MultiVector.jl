@@ -36,11 +36,11 @@ function MultiVector{Data, GID, PID, LID}(map::BlockMap{GID, PID, LID}, numVecs:
 end
 
 """
-    MultiVector{Data, GID, PID, LID}(map::BlockMap{GID, PID, LID}, data::Array{Data, 2})
+    MultiVector{Data, GID, PID, LID}(map::BlockMap{GID, PID, LID}, data::AbstractArray{Data, 2})
 
 Creates a new MultiVector wrapping the given array.  Changes to the MultiVector or Array will affect the other
 """
-function MultiVector{Data, GID, PID, LID}(map::BlockMap{GID, PID, LID}, data::Array{Data, 2}) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
+function MultiVector{Data, GID, PID, LID}(map::BlockMap{GID, PID, LID}, data::AbstractArray{Data, 2}) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
     localLength = numMyElements(map)
     if size(data, 1) != localLength
         throw(InvalidArgumentError("Length of vectors does not match local length indicated by map"))
@@ -126,11 +126,11 @@ function scale(vect::MultiVector{Data, GID, PID, LID}, alpha::Data)::MultiVector
 end
 
 """
-    scale!(::MultiVector{Data, GID, PID, LID}, ::Array{Data, 1})::MultiVector{Data, GID, PID, LID}
+    scale!(::MultiVector{Data, GID, PID, LID}, ::AbstractArray{Data, 1})::MultiVector{Data, GID, PID, LID}
 
 Scales each column of the mulitvector in place and returns it
 """
-function Base.scale!(vect::MultiVector{Data, GID, PID, LID}, alpha::Array{Data, 1})::MultiVector{Data, GID, PID, LID} where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
+function Base.scale!(vect::MultiVector{Data, GID, PID, LID}, alpha::AbstractArray{Data, 1})::MultiVector{Data, GID, PID, LID} where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
     for v = 1:vect.numVectors
         vect.data[:, v] *= alpha[v]
     end
@@ -138,11 +138,11 @@ function Base.scale!(vect::MultiVector{Data, GID, PID, LID}, alpha::Array{Data, 
 end
 
 """
-    scale(::MultiVector{Data, GID, PID, LID}, ::Array{Data, 1})::MultiVector{Data, GID, PID, LID}
+    scale(::MultiVector{Data, GID, PID, LID}, ::AbstractArray{Data, 1})::MultiVector{Data, GID, PID, LID}
 
 Scales each column of a copy of the mulitvector and returns the copy
 """
-function scale(vect::MultiVector{Data, GID, PID, LID}, alpha::Array{Data, 1})::MultiVector{Data, GID, PID, LID} where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
+function scale(vect::MultiVector{Data, GID, PID, LID}, alpha::AbstractArray{Data, 1})::MultiVector{Data, GID, PID, LID} where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
     scale!(copy(vect), alpha)
 end
 
@@ -256,7 +256,7 @@ end
 
 function copyAndPermute(source::MultiVector{Data, GID, PID, LID},
         target::MultiVector{Data, GID, PID, LID}, numSameIDs::LID,
-        permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1}
+        permuteToLIDs::AbstractArray{LID, 1}, permuteFromLIDs::AbstractArray{LID, 1}
         ) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
     target.data[1:numSameIDs, :] = source.data[1:numSameIDs, :]
     #don't need to sort permute[To/From]LIDs, since the orders match
@@ -264,7 +264,7 @@ function copyAndPermute(source::MultiVector{Data, GID, PID, LID},
 end
 
 function packAndPrepare(source::MultiVector{Data, GID, PID, LID},
-        target::MultiVector{Data, GID, PID, LID}, exportLIDs::Array{LID, 1},
+        target::MultiVector{Data, GID, PID, LID}, exportLIDs::AbstractArray{LID, 1},
         distor::Distributor{GID, PID, LID})::Array where {
             Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
     exports = Array{Array{Data, 1}}(length(exportLIDs))
@@ -275,7 +275,7 @@ function packAndPrepare(source::MultiVector{Data, GID, PID, LID},
 end
 
 function unpackAndCombine(target::MultiVector{Data, GID, PID, LID},
-        importLIDs::Array{LID, 1}, imports::Array,
+        importLIDs::AbstractArray{LID, 1}, imports::AbstractArray,
         distor::Distributor{GID, PID, LID},cm::CombineMode) where {
             Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
     for i = 1:length(importLIDs)

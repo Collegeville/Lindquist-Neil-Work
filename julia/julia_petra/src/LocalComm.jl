@@ -16,27 +16,27 @@ function barrier(comm::LocalComm)
     throw(InvalidStateError("Cannot call barrier on a local comm"))
 end
 
-function broadcastAll(comm::LocalComm, v::Array, root::Integer)
+function broadcastAll(comm::LocalComm, v::AbstractArray, root::Integer)
     throw(InvalidStateError("Cannot call broadcastAll on a local comm"))
 end
 
-function gatherAll(comm::LocalComm, v::Array)
+function gatherAll(comm::LocalComm, v::AbstractArray)
     throw(InvalidStateError("Cannot call gatherAll on a local comm"))
 end
 
-function sumAll(comm::LocalComm, v::Array)
+function sumAll(comm::LocalComm, v::AbstractArray)
     throw(InvalidStateError("Cannot call sumAll on a local comm"))
 end
 
-function maxAll(comm::LocalComm, v::Array)
+function maxAll(comm::LocalComm, v::AbstractArray)
     throw(InvalidStateError("Cannot call maxAll on a local comm"))
 end
 
-function minAll(comm::LocalComm, v::Array)
+function minAll(comm::LocalComm, v::AbstractArray)
     throw(InvalidStateError("Cannot call minAll on a local comm"))
 end
 
-function scanSum(comm::LocalComm, v::Array)
+function scanSum(comm::LocalComm, v::AbstractArray)
     throw(InvalidStateError("Cannot call scanSum on a local comm"))
 end
 

@@ -19,17 +19,19 @@ end
 ## Constructors ##
 
 function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID},
-        userRemotePIDs::Array{PID}, remoteGIDs::Array{GID}, userExportLIDs::Array{LID},
-        userExportPIDs::Array{PID}, useRemotePIDGID::Bool,
-        ; plist...) where {GID <: Integer, PID <: Integer, LID <: Integer}
+        userRemotePIDs::AbstractArray{PID}, remoteGIDs::AbstractArray{GID},
+        userExportLIDs::AbstractArray{LID}, userExportPIDs::AbstractArray{PID},
+        useRemotePIDGID::Bool; plist...) where {
+        GID <: Integer, PID <: Integer, LID <: Integer}
     Import{GID, PID, LID}(source, target, userRemotePIDs, remoteGIDs,
-        userExportLIDs, userExportPIDs, useREmotePIDGID, Dict(plist))
+        userExportLIDs, userExportPIDs, useRemotePIDGID, Dict(plist))
 end
 
 function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID},
-        userRemotePIDs::Array{PID}, remoteGIDs::Array{GID}, userExportLIDs::Array{LID},
-        userExportPIDs::Array{PID}, useRemotePIDGID::Bool,
-        plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
+        userRemotePIDs::AbstractArray{PID}, remoteGIDs::AbstractArray{GID},
+        userExportLIDs::AbstractArray{LID}, userExportPIDs::AbstractArray{PID},
+        useRemotePIDGID::Bool, plist::Dict{Symbol}
+        ) where {GID <: Integer, PID <: Integer, LID <: Integer}
     
     importData = ImportExportData(source, target)
     const debug = get(plist, :debug, false)
@@ -91,16 +93,16 @@ function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
     Import(debug, importData)
 end
 
-function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{Array{PID}}=Nullable{Array{PID}}(); plist...) where {GID <: Integer, PID <: Integer, LID <: Integer}
+function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{AbstractArray{PID}}=Nullable{AbstractArray{PID}}(); plist...) where {GID <: Integer, PID <: Integer, LID <: Integer}
     Import(source, target, remotePIDs, 
         Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
 end
 
 function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
-    Import(source, target, Nullable{Array{PID}}(), plist)
+    Import(source, target, Nullable{AbstractArray{PID}}(), plist)
 end
 
-function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{Array{PID}}, plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
+function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{AbstractArray{PID}}, plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
     const debug = get(plist, :debug, false)
 
     if debug
@@ -183,7 +185,7 @@ function getIDSources(data, remoteGIDs, useRemotes=true)
     end
 end
 
-function setupExport(impor::Import{GID, PID, LID}, remoteGIDs::Array{GID}, userRemotePIDs::Nullable{Array{PID}}) where {GID <: Integer, PID <: Integer, LID <: Integer}
+function setupExport(impor::Import{GID, PID, LID}, remoteGIDs::AbstractArray{GID}, userRemotePIDs::Nullable{AbstractArray{PID}}) where {GID <: Integer, PID <: Integer, LID <: Integer}
     data = impor.importData
     const source = sourceMap(impor)
     

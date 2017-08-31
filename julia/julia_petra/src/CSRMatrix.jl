@@ -123,12 +123,12 @@ function CSRMatrix{Data}(graph::CRSGraph{GID, PID, LID},plist::Dict{Symbol}
 end
 
 function CSRMatrix(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
-        rowOffsets::Array{LID, 1}, colIndices::Array{LID, 1}, values::Array{Data, 1};
+        rowOffsets::AbstractArray{LID, 1}, colIndices::AbstractArray{LID, 1}, values::AbstractArray{Data, 1};
         plist...) where {Data, GID, PID, LID}
     CSRMatrix(rowMap, colMap, rowOffsets, colIndices, values, Dict(Array{Tuple{Symbol, Any}}(plist)))
 end
 function CSRMatrix(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
-        rowOffsets::Array{LID, 1}, colIndices::Array{LID, 1}, values::Array{Data, 1},
+        rowOffsets::AbstractArray{LID, 1}, colIndices::AbstractArray{LID, 1}, values::AbstractArray{Data, 1},
         plist::Dict{Symbol}) where {Data, GID, PID, LID}
     
     #check user's input.  Might throw on only some processes, causing deadlock
@@ -452,7 +452,7 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
 end
         
 function insertNonownedGlobalValues(matrix::CSRMatrix{Data, GID, PID, LID},
-        globalRow::GID, indices::Array{GID, 1}, values::Array{Data, 1}
+        globalRow::GID, indices::AbstractArray{GID, 1}, values::AbstractArray{Data, 1}
         ) where {Data, GID, PID, LID}
     
     curRow = matrix.nonlocals[globalRow]
@@ -840,14 +840,14 @@ function getLocalDiagCopy(matrix::CSRMatrix{Data, GID, PID, LID})::MultiVector{D
     end
 end
 
-function leftScale!(matrix::CSRMatrix{Data}, X::Array{Data, 1}) where {Data <: Number}
+function leftScale!(matrix::CSRMatrix{Data}, X::AbstractArray{Data, 1}) where {Data <: Number}
     for row in 1:getLocalNumRows(matrix)
         _, vals = getLocalRowView(matrix, row)
         LinAlg.scale!(vals, X[row])
     end
 end
 
-function rightScale!(matrix::CSRMatrix{Data}, X::Array{Data, 1}) where {Data <: Number}
+function rightScale!(matrix::CSRMatrix{Data}, X::AbstractArray{Data, 1}) where {Data <: Number}
     for row in 1:getLocalNumRows(matrix)
         inds, vals = getLocalRowView(matrix, row)
         for entry in 1:length(inds)
@@ -866,7 +866,7 @@ end
 
 function copyAndPermute(source::RowMatrix{Data, GID, PID, LID},
         target::CSRMatrix{Data, GID, PID, LID}, numSameIDs::LID,
-        permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1}
+        permuteToLIDs::AbstractArray{LID, 1}, permuteFromLIDs::AbstractArray{LID, 1}
         ) where {Data, GID, PID, LID}
     sourceIsLocallyIndexed = isLocallyIndexed(source)
 
@@ -922,7 +922,7 @@ function pack(source::CSRMatrix{Data, GID, PID, LID}, exportLIDs::AbstractArray{
 end
 
 function unpackAndCombine(target::CSRMatrix{Data, GID, PID, LID},
-        importLIDs::Array{LID, 1}, imports::Array, distor::Distributor{GID, PID, LID},
+        importLIDs::AbstractArray{LID, 1}, imports::AbstractArray, distor::Distributor{GID, PID, LID},
         cm::CombineMode) where{Data, GID, PID, LID}
 
     numImportLIDs = length(importLIDs)

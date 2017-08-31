@@ -43,37 +43,37 @@ function barrier(comm::MPIComm)
     MPI.Barrier(comm.mpiComm)
 end
 
-function broadcastAll(comm::MPIComm, myvals::Array{T}, root::Integer)::Array{T} where T
+function broadcastAll(comm::MPIComm, myvals::AbstractArray{T}, root::Integer)::Array{T} where T
     vals = copy(myvals)
     result = MPI.Bcast!(vals, root-1, comm.mpiComm)
     result
 end
 
-function gatherAll(comm::MPIComm, myVals::Array{T})::Array{T} where T
+function gatherAll(comm::MPIComm, myVals::AbstractArray{T})::Array{T} where T
     MPI.Allgather(myVals, comm.mpiComm)
 end
 
-function sumAll(comm::MPIComm, partialsums::Array{T})::Array{T} where T
+function sumAll(comm::MPIComm, partialsums::AbstractArray{T})::Array{T} where T
     MPI.allreduce(partialsums, +, comm.mpiComm)
 end
 
-function maxAll(comm::MPIComm, partialmaxes::Array{T})::Array{T} where T
+function maxAll(comm::MPIComm, partialmaxes::AbstractArray{T})::Array{T} where T
     MPI.allreduce(partialmaxes, max, comm.mpiComm)
 end
 
-function maxAll(comm::MPIComm, partialmaxes::Array{Bool})::Array{Bool}
+function maxAll(comm::MPIComm, partialmaxes::AbstractArray{Bool})::Array{Bool}
     Array{Bool}(maxAll(comm, Array{UInt8}(partialmaxes)))
 end
 
-function minAll(comm::MPIComm, partialmins::Array{T})::Array{T} where T
+function minAll(comm::MPIComm, partialmins::AbstractArray{T})::Array{T} where T
     MPI.allreduce(partialmins, min, comm.mpiComm)
 end
 
-function minAll(comm::MPIComm, partialmins::Array{Bool})::Array{Bool}
+function minAll(comm::MPIComm, partialmins::AbstractArray{Bool})::Array{Bool}
     Array{Bool}(minAll(comm, Array{UInt8}(partialmins)))
 end
 
-function scanSum(comm::MPIComm, myvals::Array{T})::Array{T} where T
+function scanSum(comm::MPIComm, myvals::AbstractArray{T})::Array{T} where T
     MPI.Scan(myvals, length(myvals), MPI.SUM, comm.mpiComm)
 end
 

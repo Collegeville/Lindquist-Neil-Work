@@ -120,7 +120,7 @@ function generateContent(dir::BasicDirectory{GID, PID, LID}, map::BlockMap{GID, 
 end
 
 
-function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::BlockMap{GID, PID, LID}, globalEntries::Array{GID},
+function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::BlockMap{GID, PID, LID}, globalEntries::AbstractArray{GID},
         high_rank_sharing_procs::Bool)::Tuple{Array{PID}, Array{LID}} where GID <: Integer where PID <: Integer where LID <: Integer
     numEntries = length(globalEntries)
     procs = Array{PID}(numEntries)

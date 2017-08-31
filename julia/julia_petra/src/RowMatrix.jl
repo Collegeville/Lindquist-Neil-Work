@@ -28,7 +28,7 @@ All subtypes must have the following methods, with Impl standing in for the subt
     getGraph(mat::RowMatrix)
 Returns the graph that represents the structure of the row matrix
 
-    getGlobalRowCopy(matrix::RowMatrix{Data, GID, PID, LID}, globalRow::Integer)::Tuple{Array{GID, 1}, Array{Data, 1}}
+    getGlobalRowCopy(matrix::RowMatrix{Data, GID, PID, LID}, globalRow::Integer)::Tuple{AbstractArray{GID, 1}, Array{Data, 1}}
 Returns a copy of the given row using global indices
 
     getLocalRowCopy(matrix::RowMatrix{Data, GID, PID, LID},localRow::Integer)::Tuple{AbstractArray{LID, 1}, AbstractArray{Data, 1}}
@@ -46,13 +46,13 @@ Returns the number of diagonal element on the calling processor
     getLocalDiagCopy(matrix::RowMatrix{Data, GID, PID, LID})::MultiVector{Data, GID, PID, LID}
 Returns a copy of the diagonal elements on the calling processor
 
-    leftScale!(matrix::Impl{Data, GID, PID, LID}, X::Array{Data, 1})
+    leftScale!(matrix::Impl{Data, GID, PID, LID}, X::AbstractArray{Data, 1})
 Scales matrix on the left with X
 
-    rightScale!(matrix::Impl{Data, GID, PID, LID}, X::Array{Data, 1})
+    rightScale!(matrix::Impl{Data, GID, PID, LID}, X::AbstractArray{Data, 1})
 Scales matrix on the right with X
 
-    pack(::RowGraph{GID, PID, LID}, exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID})::Array{Array{LID, 1}}
+    pack(::RowGraph{GID, PID, LID}, exportLIDs::AbstractArray{LID, 1}, distor::Distributor{GID, PID, LID})::AbstractArray{AbstractArray{LID, 1}}
 Packs this object's data for import or export
 
 
@@ -305,12 +305,12 @@ Whether the matrix is upper triangular
 isUpperTriangular(mat::RowMatrix) = isUpperTriangular(getGraph(mat))
 
 """
-    pack(::RowMatrix{GID, PID, LID}, exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID})::Array{Array{LID, 1}}
+    pack(::RowMatrix{GID, PID, LID}, exportLIDs::AbstractArray{LID, 1}, distor::Distributor{GID, PID, LID})::AbstractArray{AbstractArray{GID, 1}, AbstractArray{Data, 1}}
 
 Packs this object's data for import or export
 """
-function pack(mat::RowMatrix{Data, GID, PID, LID}, exportLIDs::Array{LID, 1},
-        distor::Distributor{GID, PID, LID})::Array{Array{GID, 1}, Array{Data, 1}} where {Data, GID, PID, LID}
+function pack(mat::RowMatrix{Data, GID, PID, LID}, exportLIDs::AbstractArray{LID, 1},
+        distor::Distributor{GID, PID, LID}) where {Data, GID, PID, LID}
     throw(InvalidStateError("No pack implementation for objects of type $(typeof(mat))"))
 end
 
@@ -329,7 +329,7 @@ Returns the graph that represents the structure of the row matrix
 function getGraph end
 
 """
-    getGlobalRowCopy(matrix::RowMatrix{Data, GID, PID, LID}, globalRow::Integer)::Tuple{Array{GID, 1}, Array{Data, 1}}
+    getGlobalRowCopy(matrix::RowMatrix{Data, GID, PID, LID}, globalRow::Integer)::Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}}
 
 Returns a copy of the given row using global indices
 """
@@ -364,14 +364,14 @@ Returns a copy of the diagonal elements on the calling processor
 function getLocalDiagCopy end
 
 """
-    leftScale!(matrix::Impl{Data, GID, PID, LID}, X::Array{Data})
+    leftScale!(matrix::Impl{Data, GID, PID, LID}, X::AbstractArray{Data})
 
 Scales matrix on the left with X
 """
 function leftScale! end
 
 """
-    rightScale!(matrix::Impl{Data, GID, PID, LID}, X::Array{Data})
+    rightScale!(matrix::Impl{Data, GID, PID, LID}, X::AbstractArray{Data})
 
 Scales matrix on the right with X
 """

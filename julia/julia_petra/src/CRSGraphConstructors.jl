@@ -218,35 +218,35 @@ function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID
     graph
 end
 
-function CRSGraph(rowMap::BlockMap{GID, PID, LID}, numEntPerRow::Array{<:Integer, 1},
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, numEntPerRow::AbstractArray{<:Integer, 1},
         pftype::ProfileType; plist...)  where {
         GID <: Integer, PID <: Integer, LID <: Integer}
     CRSGraph(rowMap, numEntPerRow, pftype, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
 end
-function CRSGraph(rowMap::BlockMap{GID, PID, LID}, numEntPerRow::Array{<:Integer, 1},
+function CRSGraph(rowMap::BlockMap{GID, PID, LID}, numEntPerRow::AbstractArray{<:Integer, 1},
         pftype::ProfileType, plist::Dict{Symbol})  where {
         GID <: Integer, PID <: Integer, LID <: Integer}
     CRSGraph(rowMap, Nullable{BlockMap{GID, PID, LID}}(), numEntPerRow, pftype, plist)
 end
 
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
-        numEntPerRow::Array{<:Integer, 1}, pftype::ProfileType;
+        numEntPerRow::AbstractArray{<:Integer, 1}, pftype::ProfileType;
         plist...)  where {GID <: Integer, PID <: Integer, LID <: Integer}
     CRSGraph(rowMap, colMap, numEntPerRow, pftype, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
 end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
-        numEntPerRow::Array{<:Integer, 1}, pftype::ProfileType,
+        numEntPerRow::AbstractArray{<:Integer, 1}, pftype::ProfileType,
         plist::Dict{Symbol})  where {GID <: Integer, PID <: Integer, LID <: Integer}
     CRSGraph(rowMap, Nullable(colMap), numEntPerRow, pftype, plist)
 end
 
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}},
-        numEntPerRow::Array{<:Integer, 1}, pftype::ProfileType;
+        numEntPerRow::AbstractArray{<:Integer, 1}, pftype::ProfileType;
         plist...)  where {GID <: Integer, PID <: Integer, LID <: Integer}
     CRSGraph(rowMap, colMap, numEntPerRow, pftype, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
 end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::Nullable{BlockMap{GID, PID, LID}},
-        numEntPerRow::Array{<:Integer, 1}, pftype::ProfileType,
+        numEntPerRow::AbstractArray{<:Integer, 1}, pftype::ProfileType,
         plist::Dict{Symbol})  where {GID <: Integer, PID <: Integer, LID <: Integer}
     graph = CRSGraph(
         rowMap,
@@ -293,12 +293,12 @@ end
 
 
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
-        rowPointers::Array{LID, 1}, columnIndices::Array{LID, 1};
+        rowPointers::AbstractArray{LID, 1}, columnIndices::Array{LID, 1};
         plist...) where {GID <: Integer, PID <: Integer, LID <: Integer}
     CRSGraph(rowMap, colMap, rowPointers, columnIndices, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
 end
 function CRSGraph(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
-        rowPointers::Array{LID, 1}, columnIndices::Array{LID, 1},
+        rowPointers::AbstractArray{LID, 1}, columnIndices::Array{LID, 1},
         plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
     graph = CRSGraph(
         rowMap,

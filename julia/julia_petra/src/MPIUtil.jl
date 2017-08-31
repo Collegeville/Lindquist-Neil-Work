@@ -11,7 +11,7 @@ function MPI_Rsend{T}(buf::MPI.MPIBuffertype{T}, count::Integer,
         buf, &count, &MPI.mpitype(T), &dest, &tag, &comm.val, &0)
 end
 
-function MPI_Rsend{T}(buf::Array{T}, dest::Integer, tag::Integer, comm::MPI.Comm)
+function MPI_Rsend{T}(buf::AbstractArray{T}, dest::Integer, tag::Integer, comm::MPI.Comm)
     MPI_Rsend(buf, length(buf), dest, tag, comm)
 end
 

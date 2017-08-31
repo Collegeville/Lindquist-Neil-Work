@@ -11,7 +11,7 @@ end
 getLocalGraph(graph::CRSGraph) = graph.localGraph
 
 
-function updateGlobalAllocAndValues(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}, newAllocSize::Integer, rowValues::Array{Data, 1})::RowInfo{LID} where {Data, GID, PID, LID}
+function updateGlobalAllocAndValues(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}, newAllocSize::Integer, rowValues::AbstractArray{Data, 1})::RowInfo{LID} where {Data, GID, PID, LID}
     
     resize!(graph.globalIndices2D[rowInfo.localRow], newAllocSize)
     resize!(rowVals, newAllocSize)
@@ -197,7 +197,7 @@ function getLocalView(rowInfo::RowInfo{LID})::AbstractArray{LID, 1} where LID <:
 end
 
 function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
-        lg::IndexType, numAllocPerRow::Array{<:Integer, 1}) where {
+        lg::IndexType, numAllocPerRow::AbstractArray{<:Integer, 1}) where {
         GID <: Integer, LID <: Integer}
     numRows = getLocalNumRows(graph)
     @assert(length(numAllocPerRow) == numRows,
@@ -606,10 +606,10 @@ function makeIndicesLocal(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
 end
 
 
-function convertColumnIndicesFromGlobalToLocal(localColumnIndices::Array{LID, 1},
-        globalColumnIndices::Array{GID, 1}, ptr::Array{LID, 1},
-        localColumnMap::BlockMap{GID, PID, LID}, numRowEntries::Array{LID, 1})::LID where {
-        GID, PID, LID}
+function convertColumnIndicesFromGlobalToLocal(localColumnIndices::AbstractArray{LID, 1},
+        globalColumnIndices::AbstractArray{GID, 1}, ptr::AbstractArray{LID, 1},
+        localColumnMap::BlockMap{GID, PID, LID}, numRowEntries::AbstractArray{LID, 1}
+        )::LID where {GID, PID, LID}
 
     localNumRows = max(length(ptr)-1, 0)
     numBad = 0

@@ -4,7 +4,7 @@ export createDirectory
 # has to be split from the declaration of Directory due to dependancy on files that require Directory
 
 function getDirectoryEntries(directory::Directory{GID, PID, LID}, map::BlockMap{GID, PID, LID},
-        globalEntries::Array{GID})::Tuple{Array{PID}, Array{LID}} where GID <: Integer where PID <: Integer where LID <: Integer
+        globalEntries::AbstractArray{GID})::Tuple{AbstractArray{PID}, AbstractArray{LID}} where GID <: Integer where PID <: Integer where LID <: Integer
     getDirectoryEntries(directory, map, globalEntries, false)
 end
 
@@ -21,7 +21,7 @@ end
 #### required methods documentation stubs ####
 
 """
-    getDirectoryEntries(directory, map::BlockMap{GID, PID, LID}, globalEntries::Array{GID}, high_rank_sharing_procs::Bool)::Tuple{Array{PID}, Array{LID}}
+    getDirectoryEntries(directory, map::BlockMap{GID, PID, LID}, globalEntries::AbstractArray{GID}, high_rank_sharing_procs::Bool)::Tuple{AbstractArray{PID}, AbstractArray{LID}}
 
 Returns processor and local id infor for non-local map entries.  Returns a tuple containing
 1. an Array of processors owning the global ID's in question

@@ -9,8 +9,8 @@ elements.
 All subtypes must have the following methods, with DirectoryImpl standing in for
 the subtype:
 
-getDirectoryEntries(directory::DirectoryImpl, map::BlockMap, globalEntries::Array{GID},
-        high_rank_sharing_procs::Bool)::Tuple{Array{PID}, Array{LID}}
+getDirectoryEntries(directory::DirectoryImpl, map::BlockMap, globalEntries::AbstractArray{GID},
+        high_rank_sharing_procs::Bool)::Tuple{AbstractArray{PID}, AbstractArray{LID}}
         where GID <: Integer where PID <: Integer where LID <:Integer
     - Returns processor and local id infor for non-local map entries.  Returns a tuple
         containing

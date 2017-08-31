@@ -2,7 +2,7 @@
 #used in implementation of CRSGraph, CSRMatrix and, if added, FixedHashTable
 
 
-function computeOffsets(rowPtrs::Array{<: Integer, 1}, numEnts::Integer)
+function computeOffsets(rowPtrs::AbstractArray{<: Integer, 1}, numEnts::Integer)
     numOffsets = length(rowPtrs)
     @simd for i = 1:numOffsets
         @inbounds rowPtrs[i] = numEnts*(i-1)+1
@@ -11,7 +11,7 @@ function computeOffsets(rowPtrs::Array{<: Integer, 1}, numEnts::Integer)
 end
 
 
-function computeOffsets(rowPtrs::Array{<: Integer, 1}, numEnts::Array{<: Integer, 1})
+function computeOffsets(rowPtrs::AbstractArray{<: Integer, 1}, numEnts::Array{<: Integer, 1})
     numOffsets = length(rowPtrs)
     numCounts = length(numEnts)
     if numCounts >= numOffsets
