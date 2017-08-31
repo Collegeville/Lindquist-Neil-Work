@@ -232,7 +232,7 @@ function normImpl(mVect::MultiVector{Data}, normType::Data)::AbstractArray{Data,
         norms[i] = sum
     end
 
-    sumAll(comm(map(mVect)), norms)
+    norms = sumAll(comm(map(mVect)), norms)
 
     if normType == Data(2)
         @. norms = sqrt(norms)

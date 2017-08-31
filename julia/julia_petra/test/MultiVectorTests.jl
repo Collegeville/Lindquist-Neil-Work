@@ -102,11 +102,11 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
     #test norm2
     arr = ones(Float64, n, 3)
     vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, arr)
-    @assert [sqrt(n*nProcs), sqrt(n*nProcs), sqrt(n*nProcs)] == norm2(vect)
+    @test [sqrt(n*nProcs), sqrt(n*nProcs), sqrt(n*nProcs)] == norm2(vect)
 
     arr = 2*ones(Float64, n, 3)
     vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, arr)
-    @assert [sqrt(4*n*nProcs), sqrt(4*n*nProcs), sqrt(4*n*nProcs)] == norm2(vect)
+    @test [sqrt(4*n*nProcs), sqrt(4*n*nProcs), sqrt(4*n*nProcs)] == norm2(vect)
 
 
 
