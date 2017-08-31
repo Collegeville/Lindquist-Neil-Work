@@ -755,7 +755,7 @@ function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
         localRow::Integer
         )::Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}} where {
         Data, GID, PID, LID}
-    rowInfo = getRowInfo(matrix.myGraph, localRow)
+    rowInfo = getRowInfo(matrix.myGraph, LID(localRow))
     getLocalRowView(matrix, rowInfo)
 end
 
