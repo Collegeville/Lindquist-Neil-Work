@@ -4,9 +4,16 @@
 \author{Neil Lindquist}
 
 \begin{document}
+	
+\section{General Design}
+Most of the design follows either EPetra or TPetra fairly closely.  The Comm, BlockMap, Distributor and Directory are all based off EPetra, since TPetra has many references to Kokkos and other packages that are not, currently, being implemented in Julia.
+The data structures, such as SrcDistObject, RowMatrix, Operator, Multivector are all based off TPetra, since TPetra has templating, as opposed to EPetra's hard coded types.
+There are some, minor deviations from the original -Petras.
+	One such example is the documentation for DistObject methods being written in the context of multiple dispatch, where the method can belong to both argument types (source and destination).  
+	Another, common, example is the addition of \(!\)'s to the names of destructive functions to follow Julia's conventions.
 
 \section{The Operator Inheritance}
-In both E and T petras, Operator is an purely abstract class, that various types, including RowMatrix, implement.  However, Julia does not allow a type to have multiple supertypes.  However, there are a few methods that are shared between all types of Operators (mainly overloads that call another version).  I found multiple approaches to implement Operator.
+In both E- and T- -Petras, Operator is an purely abstract class, that various types, including RowMatrix, implement.  However, Julia does not allow a type to have multiple supertypes.  However, there are a few methods that are shared between all types of Operators (mainly overloads that call another version).  I found multiple approaches to implement Operator.
 \begin{enumerate}
 	\item Let the shared methods accept operators of type Any and duck-type
 	\begin{itemize}
@@ -52,7 +59,7 @@ In both E and T petras, Operator is an purely abstract class, that various types
 		\item The SimpleTraits.jl library handles the details, just need a few macro calls to use
 		\begin{itemize}
 			\item Part of Metadata.jl
-			\item Might become part of the official library at somepoint
+			\item Might become part of the official library at some point
 		\end{itemize}
 		\item Seems to be considered the Julian way to emulate multiple inheritance
 		\item Can be used for RowMatrix as well to make that feel like less of a workaround
@@ -66,5 +73,27 @@ In both E and T petras, Operator is an purely abstract class, that various types
 My final decision was to have the shared Operator functions accept Any for the "Operator" types.  I chose this approach since it's the simplest to implement and, for this situation, won't need to worry about method collisions or ambiguity.
 
 If complications arise that cause the chosen approach to stop working, Traits seems to be the second best.  Traits can handle the cases when dispatching is useful and seems to be considered Julian.
+
+\section{Should JuliaPetra's Data Structures subtypes of AbstractArray}
+\begin{enumerate}
+	\item Pros
+	\begin{itemize}
+		\item Allows proper behavior with vectorized operators/functions
+		\item Allows the datatypes to be used more widely-spread
+		\item Is conceptually an AbstractArray
+	\end{itemize}
+
+	\item Cons
+	\begin{itemize}
+		\item Should it be treated as the local or global array?
+		\item Requires implemented a large number of methods
+		\item Requires SrcDistObject and DistObject to be implemented as traits
+		\begin{itemize}
+			\item but that would allow target Distribution objects that aren't sources, I don't know if that's ever useful though
+		\end{itemize}
+	\end{itemize}
+\end{enumerate}
+
+The effort for supporting the AbstractArray interface and redoing (Src)DistObject as Traits seems like its currently more effort than its worth.  Additionally, there might be conflicts in design principles that haven't been found yet.  Maybe it can be refactored at another point, but for now it'll be left as is.
 
 \end{document}

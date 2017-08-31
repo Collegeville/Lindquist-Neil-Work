@@ -389,20 +389,26 @@ function getGlobalRowView(graph::CRSGraph{GID}, globalRow::GID)::AbstractArray{G
     end
 end
         
-function getLocalRowView(graph::CRSGraph{GID}, localRow::GID)::AbstractArray{GID, 1} where {GID <: Integer}
-    debug = @debug graph
+function getLocalRowView(graph::CRSGraph{GID}, localRow::GID)::AbstractArray{GID, 1} where {GID}
+    if @debug graph
+        @assert hasRowInfo() "Graph row information was deleted"
+    end
+    rowInfo = getRowInfoFromLocalRowIndex(graph, localRow)
+
+    getLocalRowView(graph, rowInfo)
+end
+
+function getLocalRowView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}
+        )::AbstractArray{GID, 1} where {GID, PID, LID}
+
     if isGloballyIndexed(graph)
         throw(InvalidArgumentError("The graph's indices are currently stored as global indices, so a view with local column indices cannot be returned.  Use getLocalRowCopy(::CRSGraph) instead"))
     end
 
-    if debug
-        @assert hasRowInfo() "Graph row information was deleted"
-    end
-    rowInfo = getRowInfoFromLocalRowIndex(localRow)
-    
     if rowInfo.localRow != 0 && rowInfo.numEntries > 0
         indices = view(getLocalView(graph, rowInfo), 1:rowInfo.numEntries)
-        if debug
+
+        if @debug graph
             @assert(length(indices) == getNumEntriesInLocalRow(graph, localRow),
                 "length(indices) = $(length(indices)) "
                 * "!= getNumEntriesInLocalRow(graph, $localRow) "
@@ -467,10 +473,6 @@ function fillComplete(graph::CRSGraph{GID, PID, LID}, domainMap::BlockMap{GID, P
        
     const numProcs = numProc(comm(graph))
     
-    if haskey(plist, :sortColumnMapGhostGIDs)
-        graph.sortGhostsAssociatedWithEachProcessor = get(plist, :sortColumnMapGhostGIDs, :VERY_BAD)
-    end
-    
     const assertNoNonlocalInserts = get(plist, :noNonlocalChanges, false)
     
     const mayNeedGlobalAssemble = !assertNoNonlocalInserts && numProcs > 1
@@ -506,14 +508,11 @@ end
 
 function makeColMap(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
     debug = @debug graph
-    const localNumRows = getLocalNumElements(graph)
-    
-    #TODO get rid of this order retention stuff, it has to do with epetra interop
-    const sortEachProcsGIDs = graph.sortGhostsAssociatedWithEachProcessr
+    const localNumRows = getLocalNumEntries(graph)
     
     #TODO look at FIXME on line 4898
     
-    errCode, colMap = __makeColMap(graph, graph.domainMap, sortEachProcsGIDs)
+    errCode, colMap = __makeColMap(graph, graph.domainMap, false)
     if debug
         comm = julia_petra.comm(graph)
         localSuccess = (errCode == 0)? 1 : 0

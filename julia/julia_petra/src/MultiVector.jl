@@ -2,7 +2,8 @@ export MultiVector
 export localLength, globalLength, numVectors, map
 export scale!, scale
 export getVectorView, getVectorCopy
-export commReduce
+export commReduce, norm2
+
 
 
 """
@@ -20,11 +21,11 @@ end
 ## Constructors ##
 
 """
-    MultiVector{Data, GID, PID, LID}(::BlockMap{GID, PID, LID}, numVecs::Integer, zeroOut=True)
+    MultiVector{Data, GID, PID, LID}(::BlockMap{GID, PID, LID}, numVecs::Integer, zeroOut=true)
 
 Creates a new MultiVector based on the given map
 """
-function MultiVector{Data, GID, PID, LID}(map::BlockMap{GID, PID, LID}, numVecs::Integer, zeroOut=True) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
+function MultiVector{Data, GID, PID, LID}(map::BlockMap{GID, PID, LID}, numVecs::Integer, zeroOut=true) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
     localLength = numMyElements(map)
     if zeroOut
         data = zeros(Data, (localLength, numVecs))
@@ -95,7 +96,7 @@ function numVectors(vect::MultiVector{Data, GID, PID, LID})::LID where {Data <: 
 end
 
 """
-    numVectors(::MultiVector{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
+    map(::MultiVector{Data, GID, PID, LID})::BlockMap{GID, PID, LID}
 
 Returns the BlockMap used by this multivector
 """
@@ -146,6 +147,34 @@ function scale(vect::MultiVector{Data, GID, PID, LID}, alpha::Array{Data, 1})::M
 end
 
 
+function Base.dot(vect1::MultiVector{Data, GID, PID, LID}, vect2::MultiVector{Data, GID, PID, LID}
+        )::AbstractArray{Data} where {Data, GID, PID, LID}
+    numVects = numVectors(vect1)
+    length = localLength(vect1)
+    if numVects != numVectors(vect2)
+        throw(InvalidArgumentError("MultiVectors must have the same number of vectors to take the dot product of them"))
+    end
+    if length != localLength(vect2)
+        throw(InvalidArgumentError("Vectors must have the same length to take the dot product of them"))
+    end
+    dotProducts = Array{Data, 1}(numVects)
+
+    data1 = vect1.data
+    data2 = vect2.data
+
+    for vect in 1:numVects
+        sum = Data(0)
+        for i = 1:length
+            sum += data1[i, vect]*data2[i, vect]
+        end
+        dotProducts[vect] = sum
+    end
+
+    dotProducts = sumAll(comm(vect1), dotProducts)
+
+    dotProducts
+end
+
 """
     getVectorView(::MultiVector{Data}, columns)::AbstractArray{Data}
 
@@ -181,6 +210,37 @@ function commReduce(mVect::MultiVector)
     
     mVect.data = sumAll(comm(mVect), mVect.data)
 end
+
+function norm2(mVect::MultiVector{Data})::AbstractArray{Data, 1} where Data
+    normImpl(mVect, Data(2))
+end
+
+"""
+Handles the non-infinate norms
+"""
+function normImpl(mVect::MultiVector{Data}, normType::Data)::AbstractArray{Data, 1} where Data
+    const numVects = numVectors(mVect)
+    const localVectLength = localLength(mVect)
+    norms = Array{Data, 1}(numVects)
+    for i = 1:numVects
+        sum = Data(0)
+        for j = 1:localVectLength
+            sum += Data(mVect.data[j, i]^normType)
+        end
+        norms[i] = sum
+    end
+
+    norms = sumAll(comm(map(mVect)), norms)
+
+    if normType == Data(2)
+        @. norms = sqrt(norms)
+    else
+        @. norms = norms^(1/normType)
+    end
+    norms
+end
+
+
 
 
 ## DistObject interface ##
