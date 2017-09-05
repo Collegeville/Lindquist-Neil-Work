@@ -31,7 +31,19 @@ function LocalCSRMatrix(nRows::Integer, nCols::Integer,
     LocalCSRMatrix(LocalCRSGraph(cols, rows), vals, IndexType(nCols))
 end
 
-#TODO need (numCols, values, localGraph) constructor
+"""
+    LocalCSRMatrix(numCols::IndexType, values::AbstractArray{Data, 1}, localGraph::LocalCRSGraph{IndexType, IndexType}) where {IndexType, Data <: Number}
+  
+Creates the specified LocalCSRMatrix
+"""
+function LocalCSRMatrix(numCols::IndexType, values::AbstractArray{Data, 1},
+        localGraph::LocalCRSGraph{IndexType, IndexType}) where {IndexType, Data <: Number}
+    if numCols < 0
+        throw(InvalidArgumentError("Cannot have a negative number of rows"))
+    end
+    
+    LocalCSRMatrix(localGraph, values, numCols)
+end
 
 
 """
