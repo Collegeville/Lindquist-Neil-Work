@@ -39,8 +39,6 @@ barrier(serialComm)
 serialDistributor = createDistributor(serialComm)
 @test typeof(serialDistributor) <: Distributor
 
-# TODO test createDirectory
-
 
 ### test Serial Distributor ###
 

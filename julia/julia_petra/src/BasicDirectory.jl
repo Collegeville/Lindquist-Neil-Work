@@ -18,19 +18,19 @@ type BasicDirectory{GID <: Integer, PID <:Integer, LID <: Integer} <: Directory{
     localIndexList::Array{LID}
     allMinGIDs::Array{GID}
     
-    function BasicDirectory{GID, PID, LID}(map::BlockMap{GID, PID, LID}) where GID <: Integer where PID <:Integer where LID <: Integer
+    function BasicDirectory{GID, PID, LID}(map::BlockMap{GID, PID, LID}) where {GID, PID, LID}
         
         if !(distributedGlobal(map))
-            new(map, Nullable{BlockMap}(), [], [], false, [], [])
+            new(map, Nullable{BlockMap}(), [], [], numProc(comm(map))!=1, [], [])
         elseif linearMap(map)
             commObj = comm(map)
             
-            minMyGIDVal = minMyGID(map)
-            allMinGIDs = gatherAll(commObj, minMyGIDVal)
+            allMinGIDs = gatherAll(commObj, minMyGID(map))
             allMinGIDs = vcat(allMinGIDs, [1+maxAllGID(map)])
             
+            entryOnMultipleProcs = unique(allMinGIDs) != allMinGIDs
             
-            new(map, Nullable{BlockMap}(), [], [], false, [], allMinGIDs)
+            new(map, Nullable{BlockMap}(), [], [], entryOnMultipleProcs, [], allMinGIDs)
         else
             generateContent(
                 new(map, Nullable{BlockMap}(), [], [], false, [], []),
@@ -89,7 +89,7 @@ function generateContent(dir::BasicDirectory{GID, PID, LID}, map::BlockMap{GID, 
         proc = importElements[i][2]
         if dir.procList[currLID] >= 0
             if dir.procList[currLID] != proc
-                if dir.procLists == []
+                if dir.procListLists == []
                     numProcLists = numMyElements(directoryMap)
                     procListLists = Array{Array{PID}}(numProcLists)
                     fill!(procListLists, [])
@@ -111,9 +111,8 @@ function generateContent(dir::BasicDirectory{GID, PID, LID}, map::BlockMap{GID, 
 
         dir.localIndexList[currLID] = importElements[i][3]
     end
-
-    localVal = numProcLists
-    globalVal = maxAll(commObj, localVal)
+    
+    globalVal = maxAll(commObj, numProcLists)
     dir.entryOnMultipleProcs = globalval > 0 ? true : false;
 
     dir

@@ -29,6 +29,9 @@ const noUtil = in("--util", ARGS) #don't run tests on Misc Utils
             
             include("LocalCommTests.jl")
             runLocalCommTests(serialComm)
+            
+            include("BasicDirectoryTests.jl")
+            basicDirectoryTests(serialComm)
         end
     end
 
