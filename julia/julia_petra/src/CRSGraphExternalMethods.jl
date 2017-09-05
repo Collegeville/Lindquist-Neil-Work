@@ -512,13 +512,12 @@ function makeColMap(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
     
     #TODO look at FIXME on line 4898
     
-    errCode, colMap = __makeColMap(graph, graph.domainMap, false)
+    error, colMap = __makeColMap(graph, graph.domainMap, false)
     if debug
         comm = julia_petra.comm(graph)
-        localSuccess = (errCode == 0)? 1 : 0
-        globalSuccess = minAll(comm, localSuccess)
+        globalError = maxAll(comm, error)
         
-        if globalSuccess != 1
+        if globalError
             error("makeColMap reports an error on at least one process")
         end
     end

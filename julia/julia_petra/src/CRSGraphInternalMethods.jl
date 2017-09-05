@@ -776,10 +776,10 @@ end
 
 
 #internal implementation of makeColMap, needed to handle some return and debuging stuff
-#returns Tuple(errCode, colMap)
+#returns Tuple(error, colMap)
 function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{BlockMap{GID, PID, LID}}
         ) where {GID, PID, LID}
-    errCode = 0#TODO improve from int error code
+    error = false
 
     if isnull(wrappedDomMap)
         colMap = Nullable{BlockMap{GID, PID, LID}}()
@@ -793,7 +793,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
             if isnull(wrappedColMap)
                 warn("$(myPid(comm(graph))): The graph is locally indexed, but does not have a column map")
 
-                errCode = -1
+                error = true
             else
                 colMap = get(wrappedColMap)
                 if linearMap(colMap) #i think isContiguous(map) <=> linearMap(map)?
@@ -845,10 +845,10 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
         #line 214, abunch of explanation of serial short circuit
         if numProc(comm(domMap)) == 1
             if numRemoteColGIDs != 0
-                errCode = -2
+                error = true
             end
             if numLocalColGIDs == localNumRows
-                return (errCode, domMap)
+                return (error, domMap)
             end
             resize!(myColumns, numLocalColGIDs+numRemoteColGIDs)
             localColGIDs  = view(myColumns, 1:numLocalColGIDs)
@@ -863,7 +863,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
                 if @debug graph
                     warn("Some column indices are not in the domain Map")
                 end
-                errCode = 3
+                error = true
             end
 
             order = sortperm(remotePIDs)
@@ -908,10 +908,10 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
                             * "!= numLocalColGIDs = $numLocalColGIDs.  "
                             * "This should not happen.")
                     end
-                    errCode = -4
+                    error = true
                 end
             end
         end
     end
-    return(errCode, BlockMap(-1, -1, myColumns, comm(domMap)))
+    return(error, BlockMap(-1, -1, myColumns, comm(domMap)))
 end
