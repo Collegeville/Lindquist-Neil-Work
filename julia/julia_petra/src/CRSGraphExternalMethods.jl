@@ -512,7 +512,7 @@ function makeColMap(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
     
     #TODO look at FIXME on line 4898
     
-    error, colMap = __makeColMap(graph, graph.domainMap, false)
+    error, colMap = __makeColMap(graph, graph.domainMap)
     if debug
         comm = julia_petra.comm(graph)
         globalError = maxAll(comm, error)

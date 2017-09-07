@@ -1115,7 +1115,7 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
                 sum = Data(0)
                 
                 for (ind, val) in zip(getLocalRowView(A, row)...)
-                    sum += val*ind
+                    sum += val*X.data[ind, vect]
                 end
                 sum = applyConjugation(mode, sum*alpha)
                 rawY[row, vect] *= beta
@@ -1123,8 +1123,14 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
             end
         end
     else
-        #TODO implement transposed spmv
-        @assert false "Not yet implemented"
+        rawY *= beta
+        for vect = LID(1):numVectors(Y)
+            for mRow in LID(1):getLocalNumRows(A)
+                for (ind, val) in zip(getLocalRowView(A, mRow)...)
+                    rawY[ind, vect] += applyConjugation(mode, alpha*X.data[mRow, vect]*val)
+                end
+            end
+        end
     end
     Y
 end

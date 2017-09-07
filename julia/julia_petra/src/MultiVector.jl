@@ -40,7 +40,7 @@ end
 
 Creates a new MultiVector wrapping the given array.  Changes to the MultiVector or Array will affect the other
 """
-function MultiVector{Data, GID, PID, LID}(map::BlockMap{GID, PID, LID}, data::AbstractArray{Data, 2}) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
+function MultiVector(map::BlockMap{GID, PID, LID}, data::AbstractArray{Data, 2}) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
     localLength = numMyElements(map)
     if size(data, 1) != localLength
         throw(InvalidArgumentError("Length of vectors does not match local length indicated by map"))
