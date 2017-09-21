@@ -355,9 +355,13 @@ end
 function getLocalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}) where {GID <: Integer, PID, LID <: Integer}
     if rowInfo.allocSize > 0
         if length(graph.localIndices1D) != 0
-            range = rowInfo.offset1D : rowInfo.offset1D + rowInfo.allocSize
+            println("1d storage")
+            range = rowInfo.offset1D : rowInfo.offset1D + rowInfo.allocSize-1
+            println("range = $range")
+            println("1d indices = $(graph.localIndices1D)")
             return view(graph.localIndices1D, range)
         elseif length(graph.localIndices2D[rowInfo.localRow]) == 0
+            println("2d storage")
             return localIndices2D[rowInfo.localRow]
         end
     end

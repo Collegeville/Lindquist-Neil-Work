@@ -419,9 +419,9 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
             for row in 1:localNumRows
                 srcPos = curRowOffsets[row]
                 dstPos = ptrs[row]
-                dstEnd = ptrs[row+1]
-                dst = dstPos:dstEnd-1
-                src = range(srcPos, 1, dstEnd-dstPos)
+                dstEnd = ptrs[row+1]-1
+                dst = dstPos:dstEnd
+                src = range(srcPos, 1, dstEnd-dstPos+1)
 
                 inds[dst] = myGraph.localIndices1D[src]
                 vals[dst] = localMatrix.values[src]
@@ -467,7 +467,7 @@ end
 
 function getView(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID}) where {Data, GID, PID, LID}
     if getProfileType(matrix) == STATIC_PROFILE && rowInfo.allocSize > 0
-        range = rowInfo.offset1D:rowInfo.offset1D+rowInfo.allocSize
+        range = rowInfo.offset1D:rowInfo.offset1D+rowInfo.allocSize-1
         view(matrix.localMatrix.values, range)
     elseif getProfileType(matrix) == DYNAMIC_PROFILE
         matrix.values2D[rowInfo.localRow]
@@ -556,6 +556,8 @@ function mergeRowIndicesAndValues(matrix::CSRMatrix{Data, GID, PID, LID},
                 valsView[newend] += valsView[cur]
             end
         end
+    else
+        newend = 0
     end
 
     graph.numRowEntries[rowInfo.localRow] = newend
@@ -654,12 +656,22 @@ function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
     if !hasColMap(myGraph)
         makeColMap(myGraph)
     end
-
+    
     makeIndicesLocal(myGraph)
+    
+    println("\n after making indices local")
+    println("mat.myGraph.localIndices1D = $(matrix.myGraph.localIndices1D)")
+    println("mat.myGraph.globalIndices1D = $(matrix.myGraph.globalIndices1D)")
+    println("mat.myGraph.rowOffsets = $(matrix.myGraph.rowOffsets)")
+
+    println("mat.myGraph.localIndices2D = $(matrix.myGraph.localIndices2D)")
+    println("mat.myGraph.globalIndices2D = $(matrix.myGraph.globalIndices2D)")
+    println("mat.myGraph.numRowEntries = $(matrix.myGraph.numRowEntries)")
 
     sortAndMergeIndicesAndValues(matrix, isSorted(myGraph), isMerged(myGraph))
 
     makeImportExport(myGraph)
+    println("colmap=$(myGraph.colMap)")
     computeGlobalConstants(myGraph)
 
     myGraph.fillComplete = true
@@ -740,15 +752,23 @@ function getLocalRowCopy(matrix::CSRMatrix{Data, GID, PID, LID},
     rowInfo = getRowInfo(myGraph, LID(localRow))
     viewRange = 1:rowInfo.numEntries
     
+    println("view range = $viewRange")
+    
     if rowInfo.localRow != 0
+        println("is local row")
         if isLocallyIndexed(myGraph)
-            curLocalIndices = getLocalView(myGraph, rowInfo)[viewRange]
+            println("is locally indexed")
+            curLocalIndices = Array{LID}(getLocalView(myGraph, rowInfo)[viewRange])
         else
+            println("is globally indexed")
             colMap = getColMap(myGraph)
             curGlobalIndices = getGlobalView(myGraph, rowInfo)[viewRange]
             curLocalIndices = @. lid(colMap, curLocalIndices)
         end
-        curValues = getView(matrix, rowInfo)[viewRange]
+        curValues = Array{Data}(getView(matrix, rowInfo)[viewRange])
+        
+        println("cur local indices = $curLocalIndices")
+        println("cur vals = $curValues")
         
         (curLocalIndices, curValues)
     else
@@ -1113,6 +1133,8 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
         for vect = LID(1):numVectors(Y)
             for row = LID(1):getLocalNumRows(A)
                 sum = Data(0)
+                
+                println("row=$row, local row view: $(getLocalRowView(A, row))")
                 
                 for (ind, val) in zip(getLocalRowView(A, row)...)
                     sum += val*X.data[ind, vect]

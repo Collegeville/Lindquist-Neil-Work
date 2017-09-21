@@ -131,23 +131,16 @@ end
 
 Constructor for user-defined arbitrary distribution of elements
 """
-function BlockMap(numGlobalElements::Integer, numMyElements::Integer,
-        myGlobalElements::AbstractArray{<:Integer}, comm::Comm{GID, PID,LID}
+function BlockMap(myGlobalElements::AbstractArray{<:Integer}, comm::Comm{GID, PID,LID}
         ) where GID <: Integer where PID <: Integer where LID <: Integer
-    BlockMap(GID(numGlobalElements), LID(numMyElements), Array{GID}(myGlobalElements), comm)
+    BlockMap(Array{GID}(myGlobalElements), comm)
 end
 
-function BlockMap(numGlobalElements::GID, numMyElements::LID,
-        myGlobalElements::AbstractArray{GID}, comm::Comm{GID, PID,LID}
+function BlockMap(myGlobalElements::AbstractArray{GID}, comm::Comm{GID, PID,LID}
         ) where GID <: Integer where PID <: Integer where LID <: Integer
-    if numGlobalElements < -1 
-        throw(InvalidArgumentError("NumGlobalElements = $(numGlobalElements).  Should be >= -1"))
-    end
-    if numMyElements < 0
-        throw(InvalidArgumentError("NumMyElements = $(numMyElements). Should be >= 0"))
-    end
+    numMyElements = LID(length(myGlobalElements))
     
-    const data = BlockMapData(numGlobalElements, comm)
+    const data = BlockMapData(GID(0), comm)
     const map = BlockMap{GID, PID, LID}(data)
     
     data.numMyElements = numMyElements
@@ -176,16 +169,13 @@ function BlockMap(numGlobalElements::GID, numMyElements::LID,
     
     data.linearMap = Bool(minAll(data.comm, linear))
     
-    data.distributedGlobal = isDistributedGlobal(map, numGlobalElements, numMyElements)
     
-    if !data.distributedGlobal || numProc(comm) == 1
+    if numProc(comm) == 1
         data.numGlobalElements = data.numMyElements
-        checkValidNGE(map, numGlobalElements)
         data.minAllGID = data.minMyGID
         data.maxAllGID = data.maxMyGID
     else
         data.numGlobalElements = sumAll(data.comm, data.numMyElements)
-        checkValidNGE(map, numGlobalElements)
         
         tmp_send = [
             -((data.numMyElements > 0
@@ -199,8 +189,9 @@ function BlockMap(numGlobalElements::GID, numMyElements::LID,
             
         data.minAllGID = -tmp_recv[1]
         data.maxAllGID =  tmp_recv[2]
-            
     end
+    
+    data.distributedGlobal = isDistributedGlobal(map, data.numGlobalElements, numMyElements)
     
     EndOfConstructorOps(map)
     map
@@ -319,8 +310,9 @@ function GlobalToLocalSetup(map::BlockMap)
     
     val = myGlobalElements[1]
     i = 1
-    for i = 1:numMyElements
-        if val != myGlobalElements[i]
+    for i = 1:numMyElements-1
+        println("i=$i, val=$val, gid[$i]=$(myGlobalElements[i])")
+        if val+1 != myGlobalElements[i+1]
             break
         end
         val += 1
@@ -339,7 +331,7 @@ function GlobalToLocalSetup(map::BlockMap)
         sizehint!(data.lidHash, numMyElements - i + 2)
         
         for i = i:numMyElements
-            data.lidHash[myGlobalElement[i]] = i
+            data.lidHash[myGlobalElements[i]] = i
         end
     end
     map
@@ -421,23 +413,23 @@ function getLocalMap(map::BlockMap{GID, PID, LID})::BlockMap{GID, PID, LID} wher
     oldData = map.data
     data = BlockMapData(oldData.numGlobalElements, LocalComm(oldData.comm))
     
-    directory = Nullable{Directory}()
-    lid = copy(oldData.lid)
-    myGlobalElements =  copy(oldData.myGlobalElements)
-    numMyElements = oldData.numMyElements
-    minAllGID = oldData.minAllGID
-    maxAllGID = oldData.maxAllGID
-    minMyGID = oldData.minMyGID
-    maxMyGID = oldData.maxMyGID
-    minLID = oldData.minLID
-    maxLID = oldData.maxLID
-    linearMap = oldData.linearMap
-    distributedGlobal = oldData.distributedGlobal
-    oneToOneIsDetermined = oldData.oneToOneIsDetermined
-    oneToOne = oldData.oneToOne
-    lastContiguousGID = oldData.lastContiguousGID
-    lastContiguousGIDLoc = oldData.lastContiguousGIDLoc
-    lidHash = copy(oldData.lidHash)
+    data.directory = Nullable{Directory}()
+    data.lid = copy(oldData.lid)
+    data.myGlobalElements =  copy(oldData.myGlobalElements)
+    data.numMyElements = oldData.numMyElements
+    data.minAllGID = oldData.minAllGID
+    data.maxAllGID = oldData.maxAllGID
+    data.minMyGID = oldData.minMyGID
+    data.maxMyGID = oldData.maxMyGID
+    data.minLID = oldData.minLID
+    data.maxLID = oldData.maxLID
+    data.linearMap = oldData.linearMap
+    data.distributedGlobal = oldData.distributedGlobal
+    data.oneToOneIsDetermined = oldData.oneToOneIsDetermined
+    data.oneToOne = oldData.oneToOne
+    data.lastContiguousGID = oldData.lastContiguousGID
+    data.lastContiguousGIDLoc = oldData.lastContiguousGIDLoc
+    data.lidHash = copy(oldData.lidHash)
     
     BlockMap{GID, PID, LID}(data)
 end
@@ -484,7 +476,11 @@ function lid(map::BlockMap{GID, PID, LID}, gid::Integer)::LID where GID <: Integ
         return gid - data.myGlobalElements[1] + 1
     end
 
-    return data.lidHash[gid]
+    if haskey(data.lidHash, gid)
+        return data.lidHash[gid]
+    else
+        0
+    end
 end
 
 """
