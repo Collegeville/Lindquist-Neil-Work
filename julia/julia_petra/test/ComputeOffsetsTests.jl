@@ -6,7 +6,7 @@ julia_petra.computeOffsets(rowPtrs, 9)
 rowPtrs = Array{Int, 1}(30)
 numEnts = collect(1:29)
 @test sum(1:29) == julia_petra.computeOffsets(rowPtrs, numEnts)
-@test vcat([sum(numEnts[1:i-1])+1 for i = 1:29], sum(numEnts[1:29])) == rowPtrs
+@test [sum(numEnts[1:i-1])+1 for i = 1:30] == rowPtrs
 
 @test_throws InvalidArgumentError julia_petra.computeOffsets(rowPtrs, Array{Int, 1}(30))
 @test_throws InvalidArgumentError julia_petra.computeOffsets(rowPtrs, Array{Int, 1}(31))

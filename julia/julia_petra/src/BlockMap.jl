@@ -311,7 +311,6 @@ function GlobalToLocalSetup(map::BlockMap)
     val = myGlobalElements[1]
     i = 1
     for i = 1:numMyElements-1
-        println("i=$i, val=$val, gid[$i]=$(myGlobalElements[i])")
         if val+1 != myGlobalElements[i+1]
             break
         end

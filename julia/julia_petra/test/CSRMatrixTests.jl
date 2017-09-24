@@ -86,26 +86,34 @@ insertGlobalValues(mat, 1, LID[1, 2], Data[2, 3])
 insertGlobalValues(mat, 2, LID[1, 2], Data[5, 7])
 fillComplete(mat)
 
+@test [1, 2, 1, 2] == (mat.myGraph.localIndices1D)
+@test (LID[1, 2], Data[2, 3]) == getLocalRowCopy(mat, 1)
+@test (LID[1, 2], Data[5, 7]) == getLocalRowCopy(mat, 2)
+@test (LID[1, 2], Data[2, 3]) == getLocalRowView(mat, 1)
+@test (LID[1, 2], Data[5, 7]) == getLocalRowView(mat, 2)
+
+
+
 Y = MultiVector(map, diagm(Data(1):2))
 X = MultiVector(map, fill(Data(2), 2, 2))
 
-apply!(Y, mat, X, NO_TRANS, Data(3), Data(.5))
+@test Y === apply!(Y, mat, X, NO_TRANS, Data(3), Data(.5))
 
 @test fill(2, 2, 2) == X.data #ensure X isn't mutated
 exp = Array{Data, 2}(2, 2)
-exp[:, 1] = [30.5, 30]
-exp[:, 2] = [72,   73]
+exp[1, :] = [30.5, 30]
+exp[2, :] = [72,   73]
 @test exp == Y.data
 
 
 
 Y = MultiVector(map, diagm(Data(1):2))
-#X = MultiVector(map, fill(Data(2), 2, 2))
+X = MultiVector(map, fill(Data(2), 2, 2)) #ensure bugs in the previous test don't affect this test
 
-apply!(Y, mat, X, NO_TRANS, Float32(3), Float32(.5))
+@test Y === apply!(Y, mat, X, TRANS, Float32(3), Float32(.5))
 
 @test fill(2, 2, 2) == X.data #ensure X isn't mutated
 exp = Array{Data, 2}(2, 2)
-exp[:, 1] = [42.5, 42]
-exp[:, 2] = [20,   21]
+exp[1, :] = [42.5, 42]
+exp[2, :] = [20,   21]
 @test exp == Y.data

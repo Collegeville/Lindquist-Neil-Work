@@ -414,15 +414,16 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
             
             inds = Array{LID, 1}(localTotalNumEntries)
             vals = Array{Data, 1}(localTotalNumEntries)
-
+            
             #line 1234
             for row in 1:localNumRows
+                println("row=$row")
                 srcPos = curRowOffsets[row]
                 dstPos = ptrs[row]
                 dstEnd = ptrs[row+1]-1
                 dst = dstPos:dstEnd
                 src = range(srcPos, 1, dstEnd-dstPos+1)
-
+                
                 inds[dst] = myGraph.localIndices1D[src]
                 vals[dst] = localMatrix.values[src]
             end
@@ -658,15 +659,25 @@ function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
     end
     
     makeIndicesLocal(myGraph)
+    
+    println("inds = $(myGraph.localIndices1D)")
 
     sortAndMergeIndicesAndValues(matrix, isSorted(myGraph), isMerged(myGraph))
 
+    println("inds = $(myGraph.localIndices1D)")
+    
     makeImportExport(myGraph)
     computeGlobalConstants(myGraph)
 
+    println("inds = $(myGraph.localIndices1D)")
+    
     myGraph.fillComplete = true
     checkInternalState(myGraph)
+    
+    println("inds = $(myGraph.localIndices1D)")
     fillLocalGraphAndMatrix(matrix, plist)
+    
+    println("inds = $(myGraph.localIndices1D)")
 end
     
 
@@ -941,6 +952,7 @@ end
 function apply!(Y::MultiVector{Data, GID, PID, LID},
         operator::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID},
         mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
+    
     if isFillActive(operator)
         throw(InvalidStateError("Cannot call apply(...) until fillComplete(...)"))
     end
@@ -948,12 +960,14 @@ function apply!(Y::MultiVector{Data, GID, PID, LID},
     if mode == NO_TRANS
         applyNonTranspose!(Y, operator, X, alpha, beta)
     else
-        applyTranspose!(Y, operator, X, alpha, beta)
+        applyTranspose!(Y, operator, X, mode, alpha, beta)
     end
 end
 
 function applyNonTranspose!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, alpha::Data, beta::Data) where {Data, GID, PID, LID}
     const ZERO = Data(0)
+    
+    println("non transposed apply")
     
     if alpha == ZERO
         if beta == ZERO
@@ -963,6 +977,8 @@ function applyNonTranspose!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMa
         end
         return
     end
+    
+    println("no shortcircuit")
     
     #These are nullable
     importer = getGraph(operator).importer
@@ -1033,11 +1049,11 @@ function applyTranspose!(Yin::MultiVector{Data, GID, PID, LID}, operator::CSRMat
         return
     end
     
-    numVectors = getNumVectors(Xin)
+    nVects = numVectors(Xin)
     importer = getGraph(operator).importer
     exporter = getGraph(operator).exporter
     
-    YIsReplicated = globallyDistributed(Yin)
+    YIsReplicated = distributedGlobal(Yin)
     YIsOverwritted = (beta == ZERO)
     if YIsReplicated && myPID(comm(operator)) != 1
         beta = ZERO
@@ -1050,20 +1066,20 @@ function applyTranspose!(Yin::MultiVector{Data, GID, PID, LID}, operator::CSRMat
     end
     
     if !isnull(importer)
-        if !isnull(operator.importMV) && getNumVectors(get(operator.importMV)) != numVectors
+        if !isnull(operator.importMV) && getNumVectors(get(operator.importMV)) != nVects
             operator.importMV = Nullable{MultiVector{Data, GID, PID, LID}}()
         end
         if isnull(operator.importMV)
-            operator.importMV = Nullable(MultiVector(getColMap(operator), numVectors))
+            operator.importMV = Nullable(MultiVector(getColMap(operator), nVects))
         end
     end
     
     if !isnull(exporter)
-        if !isnull(operator.exportMV) && getNumVectors(get(operator.exportMV)) != numVectors
+        if !isnull(operator.exportMV) && getNumVectors(get(operator.exportMV)) != nVects
             operator.exportMV = Nullable{MultiVector{Data, GID, PID, LID}}()
         end
         if isnull(operator.exportMV)
-            operator.exportMV = Nullable(MultiVector(getRowMap(operator), numVectors))
+            operator.exportMV = Nullable(MultiVector(getRowMap(operator), nVects))
         end
     end
     
@@ -1087,7 +1103,7 @@ function applyTranspose!(Yin::MultiVector{Data, GID, PID, LID}, operator::CSRMat
             localApply(Y, operator, X, mode, alpha, beta)
             copy!(Yin, Y)
         else
-            localApply(Y, operator, X, mode, alpha, beta)
+            localApply(Yin, operator, X, mode, alpha, beta)
         end
     end
     if YIsReplicated
@@ -1101,7 +1117,9 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
         A::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID},
         mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
 
-    if alpha == 0
+    println("doing local apply: a=$alpha, b=$beta, trans mode=$mode")
+    
+    if alpha == Data(0)
         return scale!(Y, beta)
     end
 
@@ -1111,25 +1129,30 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
 
     #TODO implement this better, can BLAS be used?
     if !isTransposed(mode)
+        println("not transposed")
         #TODO look at best way to order the loops to avoid cache misses
         for vect = LID(1):numVectors(Y)
             for row = LID(1):getLocalNumRows(A)
                 sum = Data(0)
-                
+                println("vect=$vect, row=$row")
                 for (ind, val) in zip(getLocalRowView(A, row)...)
-                    sum += val*X.data[ind, vect]
+                    println("ind=$ind, val=$val, xVal=$(rawX[ind, vect])")
+                    sum += val*rawX[ind, vect]
                 end
                 sum = applyConjugation(mode, sum*alpha)
+                println("vect=$vect, row=$row, sum=$sum, Y=$(rawY[row, vect]), beta=$beta")
                 rawY[row, vect] *= beta
                 rawY[row, vect] += sum
+                println("new Y = $(rawY[row, vect])")
             end
         end
     else
+        println("transposed")
         rawY *= beta
         for vect = LID(1):numVectors(Y)
             for mRow in LID(1):getLocalNumRows(A)
                 for (ind, val) in zip(getLocalRowView(A, mRow)...)
-                    rawY[ind, vect] += applyConjugation(mode, alpha*X.data[mRow, vect]*val)
+                    rawY[ind, vect] += applyConjugation(mode, alpha*rawX[mRow, vect]*val)
                 end
             end
         end
