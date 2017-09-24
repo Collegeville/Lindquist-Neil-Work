@@ -61,32 +61,13 @@ row = getGlobalRowView(mat, 2)
 @test GID[1, 3, 4] == row[1]
 @test Data[2.5, 6.21, 77] == row[2]
 
-println("\n\nBefore filling:")
-println("mat.myGraph.localIndices1D = $(mat.myGraph.localIndices1D)")
-println("mat.myGraph.globalIndices1D = $(mat.myGraph.globalIndices1D)")
-println("mat.myGraph.rowOffsets = $(mat.myGraph.rowOffsets)")
-
-println("mat.myGraph.localIndices2D = $(mat.myGraph.localIndices2D)")
-println("mat.myGraph.globalIndices2D = $(mat.myGraph.globalIndices2D)")
-println("mat.myGraph.numRowEntries = $(mat.myGraph.numRowEntries)")
-
 fillComplete(mat)
-println("\n\nafter filling:")
-println("mat.myGraph.localIndices1D = $(mat.myGraph.localIndices1D)")
-println("mat.myGraph.globalIndices1D = $(mat.myGraph.globalIndices1D)")
-println("mat.myGraph.rowOffsets = $(mat.myGraph.rowOffsets)")
 
-println("mat.myGraph.localIndices2D = $(mat.myGraph.localIndices2D)")
-println("mat.myGraph.globalIndices2D = $(mat.myGraph.globalIndices2D)")
-println("mat.myGraph.numRowEntries = $(mat.myGraph.numRowEntries)")
-
-println("getting local row copy")
 row = getLocalRowCopy(mat, 2)
 @test isa(row, Tuple{<: AbstractArray{LID, 1}, <: AbstractArray{Data, 1}})
 @test LID[1, 2, 3] == row[1]
 @test Data[2.5, 6.21, 77] == row[2]
 
-println("getting local row view")
 row = getLocalRowView(mat, 2)
 @test isa(row, Tuple{<: AbstractArray{LID, 1}, <: AbstractArray{Data, 1}})
 @test LID[1, 2, 3] == row[1]
@@ -108,13 +89,13 @@ fillComplete(mat)
 Y = MultiVector(map, diagm(Data(1):2))
 X = MultiVector(map, fill(Data(2), 2, 2))
 
-apply!(Y, mat, X, NO_TRANS, Float32(3), Float32(.5))
+apply!(Y, mat, X, NO_TRANS, Data(3), Data(.5))
 
-@assert fill(2, 2, 2) == X #ensure X isn't mutated
+@test fill(2, 2, 2) == X.data #ensure X isn't mutated
 exp = Array{Data, 2}(2, 2)
 exp[:, 1] = [30.5, 30]
 exp[:, 2] = [72,   73]
-@assert exp == Y.data
+@test exp == Y.data
 
 
 
@@ -123,8 +104,8 @@ Y = MultiVector(map, diagm(Data(1):2))
 
 apply!(Y, mat, X, NO_TRANS, Float32(3), Float32(.5))
 
-@assert fill(2, 2, 2) == X #ensure X isn't mutated
+@test fill(2, 2, 2) == X.data #ensure X isn't mutated
 exp = Array{Data, 2}(2, 2)
 exp[:, 1] = [42.5, 42]
 exp[:, 2] = [20,   21]
-@assert exp == Y.data
+@test exp == Y.data

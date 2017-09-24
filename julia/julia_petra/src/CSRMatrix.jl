@@ -658,20 +658,10 @@ function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
     end
     
     makeIndicesLocal(myGraph)
-    
-    println("\n after making indices local")
-    println("mat.myGraph.localIndices1D = $(matrix.myGraph.localIndices1D)")
-    println("mat.myGraph.globalIndices1D = $(matrix.myGraph.globalIndices1D)")
-    println("mat.myGraph.rowOffsets = $(matrix.myGraph.rowOffsets)")
-
-    println("mat.myGraph.localIndices2D = $(matrix.myGraph.localIndices2D)")
-    println("mat.myGraph.globalIndices2D = $(matrix.myGraph.globalIndices2D)")
-    println("mat.myGraph.numRowEntries = $(matrix.myGraph.numRowEntries)")
 
     sortAndMergeIndicesAndValues(matrix, isSorted(myGraph), isMerged(myGraph))
 
     makeImportExport(myGraph)
-    println("colmap=$(myGraph.colMap)")
     computeGlobalConstants(myGraph)
 
     myGraph.fillComplete = true
@@ -752,23 +742,15 @@ function getLocalRowCopy(matrix::CSRMatrix{Data, GID, PID, LID},
     rowInfo = getRowInfo(myGraph, LID(localRow))
     viewRange = 1:rowInfo.numEntries
     
-    println("view range = $viewRange")
-    
     if rowInfo.localRow != 0
-        println("is local row")
         if isLocallyIndexed(myGraph)
-            println("is locally indexed")
             curLocalIndices = Array{LID}(getLocalView(myGraph, rowInfo)[viewRange])
         else
-            println("is globally indexed")
             colMap = getColMap(myGraph)
             curGlobalIndices = getGlobalView(myGraph, rowInfo)[viewRange]
             curLocalIndices = @. lid(colMap, curLocalIndices)
         end
         curValues = Array{Data}(getView(matrix, rowInfo)[viewRange])
-        
-        println("cur local indices = $curLocalIndices")
-        println("cur vals = $curValues")
         
         (curLocalIndices, curValues)
     else
@@ -802,7 +784,7 @@ end
 
 function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
         localRow::Integer
-        )::Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}} where {
+        )::Tuple{AbstractArray{LID, 1}, AbstractArray{Data, 1}} where {
         Data, GID, PID, LID}
     rowInfo = getRowInfo(matrix.myGraph, LID(localRow))
     getLocalRowView(matrix, rowInfo)
@@ -810,7 +792,7 @@ end
 
 function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
         rowInfo::RowInfo{LID}
-        )::Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}} where {
+        )::Tuple{AbstractArray{LID, 1}, AbstractArray{Data, 1}} where {
         Data, GID, PID, LID}
 
     if isGloballyIndexed(matrix)
@@ -1133,8 +1115,6 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
         for vect = LID(1):numVectors(Y)
             for row = LID(1):getLocalNumRows(A)
                 sum = Data(0)
-                
-                println("row=$row, local row view: $(getLocalRowView(A, row))")
                 
                 for (ind, val) in zip(getLocalRowView(A, row)...)
                     sum += val*X.data[ind, vect]
