@@ -115,5 +115,5 @@ X = MultiVector(map, fill(Data(2), 2, 2)) #ensure bugs in the previous test don'
 @test fill(2, 2, 2) == X.data #ensure X isn't mutated
 exp = Array{Data, 2}(2, 2)
 exp[1, :] = [42.5, 42]
-exp[2, :] = [20,   21]
+exp[2, :] = [60,   61]
 @test exp == Y.data

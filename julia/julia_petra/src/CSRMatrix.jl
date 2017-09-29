@@ -417,7 +417,6 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
             
             #line 1234
             for row in 1:localNumRows
-                println("row=$row")
                 srcPos = curRowOffsets[row]
                 dstPos = ptrs[row]
                 dstEnd = ptrs[row+1]-1
@@ -659,25 +658,16 @@ function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
     end
     
     makeIndicesLocal(myGraph)
-    
-    println("inds = $(myGraph.localIndices1D)")
 
     sortAndMergeIndicesAndValues(matrix, isSorted(myGraph), isMerged(myGraph))
-
-    println("inds = $(myGraph.localIndices1D)")
     
     makeImportExport(myGraph)
     computeGlobalConstants(myGraph)
-
-    println("inds = $(myGraph.localIndices1D)")
     
     myGraph.fillComplete = true
     checkInternalState(myGraph)
     
-    println("inds = $(myGraph.localIndices1D)")
     fillLocalGraphAndMatrix(matrix, plist)
-    
-    println("inds = $(myGraph.localIndices1D)")
 end
     
 
@@ -967,8 +957,6 @@ end
 function applyNonTranspose!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, alpha::Data, beta::Data) where {Data, GID, PID, LID}
     const ZERO = Data(0)
     
-    println("non transposed apply")
-    
     if alpha == ZERO
         if beta == ZERO
             fill!(Y, ZERO)
@@ -977,8 +965,6 @@ function applyNonTranspose!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMa
         end
         return
     end
-    
-    println("no shortcircuit")
     
     #These are nullable
     importer = getGraph(operator).importer
@@ -1116,39 +1102,31 @@ end
 function localApply(Y::MultiVector{Data, GID, PID, LID},
         A::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID},
         mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
-
-    println("doing local apply: a=$alpha, b=$beta, trans mode=$mode")
     
     if alpha == Data(0)
         return scale!(Y, beta)
     end
 
-    rawY = Y.data
-    rawX = X.data
+    const rawY = Y.data
+    const rawX = X.data
 
 
     #TODO implement this better, can BLAS be used?
     if !isTransposed(mode)
-        println("not transposed")
         #TODO look at best way to order the loops to avoid cache misses
         for vect = LID(1):numVectors(Y)
             for row = LID(1):getLocalNumRows(A)
                 sum = Data(0)
-                println("vect=$vect, row=$row")
                 for (ind, val) in zip(getLocalRowView(A, row)...)
-                    println("ind=$ind, val=$val, xVal=$(rawX[ind, vect])")
                     sum += val*rawX[ind, vect]
                 end
                 sum = applyConjugation(mode, sum*alpha)
-                println("vect=$vect, row=$row, sum=$sum, Y=$(rawY[row, vect]), beta=$beta")
                 rawY[row, vect] *= beta
                 rawY[row, vect] += sum
-                println("new Y = $(rawY[row, vect])")
             end
         end
     else
-        println("transposed")
-        rawY *= beta
+        rawY[:, :] *= beta
         for vect = LID(1):numVectors(Y)
             for mRow in LID(1):getLocalNumRows(A)
                 for (ind, val) in zip(getLocalRowView(A, mRow)...)
