@@ -63,7 +63,7 @@ function main(comm::Comm{GID, PID, LID}, arg1, numGlobalElements, verbose, Data:
     myGlobalElements = julia_petra.myGlobalElements(map)
     numNz = Array{GID, 1}(numMyElements)
     for i = 1:numMyElements
-        if myGlobalElements[i] == 0 || myGlobalElements[i] == numGlobalElements
+        if myGlobalElements[i] == 1 || myGlobalElements[i] == numGlobalElements
             numNz[i] = 2
         else
             numNz[i] = 3
@@ -77,12 +77,12 @@ function main(comm::Comm{GID, PID, LID}, arg1, numGlobalElements, verbose, Data:
     two = Data(2)
 
     for i = 1:numMyElements
-        if myGlobalElements[i] == 0
+        if myGlobalElements[i] == 1
             indices = LID[1]
         elseif myGlobalElements[i] == numGlobalElements
-            indices = LID[numGlobalElements-1]
+            indices = LID[numGlobalElements-2]
         else
-            indices = LID[myGlobalElements[i], myGlobalElements[i]+2]
+            indices = LID[myGlobalElements[i]-1, myGlobalElements[i]+1]
         end
 
         insertGlobalValues(A, myGlobalElements[i], indices, values)
