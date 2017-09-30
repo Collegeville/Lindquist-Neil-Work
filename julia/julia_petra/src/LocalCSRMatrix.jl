@@ -2,7 +2,7 @@ export LocalCSRMatrix, numRows, numCols, getRowView
 
 struct LocalCSRMatrix{Data, IndexType <: Integer}
     graph::LocalCRSGraph{IndexType, IndexType}
-    values::Array{Data, 1}
+    values::AbstractArray{Data, 1}
 
     numCols::IndexType
 end
@@ -17,13 +17,13 @@ function LocalCSRMatrix{Data, IndexType}() where {Data, IndexType}
 end
 
 """
-    LocalCSRMatrix(nRows::Integer, nCols::Integer, vals::Array{Data, 1}, rows::Array{IndexType, 1}, cols::Array{IndexType, 1}}
+    LocalCSRMatrix(nRows::Integer, nCols::Integer, vals::AbstractArray{Data, 1}, rows::AbstractArray{IndexType, 1}, cols::AbstractArray{IndexType, 1}}
   
 Creates the specified LocalCSRMatrix
 """
 function LocalCSRMatrix(nRows::Integer, nCols::Integer,
-        vals::Array{Data, 1}, rows::Array{IndexType, 1},
-        cols::Array{IndexType, 1}) where {Data, IndexType}
+        vals::AbstractArray{Data, 1}, rows::AbstractArray{IndexType, 1},
+        cols::AbstractArray{IndexType, 1}) where {Data, IndexType}
     if length(rows) != nRows + 1
         throw(InvalidArgumentError("length(rows) = $(length(rows)) != nRows+1 "
                 * "= $(nRows + 1)"))
@@ -31,7 +31,19 @@ function LocalCSRMatrix(nRows::Integer, nCols::Integer,
     LocalCSRMatrix(LocalCRSGraph(cols, rows), vals, IndexType(nCols))
 end
 
-#TODO need (numCols, values, localGraph) constructor
+"""
+    LocalCSRMatrix(numCols::IndexType, values::AbstractArray{Data, 1}, localGraph::LocalCRSGraph{IndexType, IndexType}) where {IndexType, Data <: Number}
+  
+Creates the specified LocalCSRMatrix
+"""
+function LocalCSRMatrix(numCols::IndexType, values::AbstractArray{Data, 1},
+        localGraph::LocalCRSGraph{IndexType, IndexType}) where {IndexType, Data <: Number}
+    if numCols < 0
+        throw(InvalidArgumentError("Cannot have a negative number of rows"))
+    end
+    
+    LocalCSRMatrix(localGraph, values, numCols)
+end
 
 
 """

@@ -42,7 +42,7 @@ function remoteLIDs(data::ImportExportData{GID, PID, LID})::Array{LID} where GID
     data.remoteLIDs
 end
 
-function remoteLIDs(data::ImportExportData{GID, PID, LID}, remoteLIDs::Array{<: Integer}) where GID <: Integer where PID <: Integer where LID <: Integer
+function remoteLIDs(data::ImportExportData{GID, PID, LID}, remoteLIDs::AbstractArray{<: Integer}) where GID <: Integer where PID <: Integer where LID <: Integer
     data.remoteLIDs = remoteLIDs
 end
 
@@ -50,7 +50,7 @@ function exportLIDs(data::ImportExportData{GID, PID, LID})::Array{LID} where GID
     data.exportLIDs
 end
 
-function exportLIDs(data::ImportExportData{GID, PID, LID}, exportLIDs::Array{<: Integer}) where GID <: Integer where PID <: Integer where LID <: Integer
+function exportLIDs(data::ImportExportData{GID, PID, LID}, exportLIDs::AbstractArray{<: Integer}) where GID <: Integer where PID <: Integer where LID <: Integer
     data.exportLIDs = exportLIDs
 end
 
@@ -58,7 +58,7 @@ function exportPIDs(data::ImportExportData{GID, PID, LID})::Array{PID} where GID
     data.exportPIDs
 end
 
-function exportPIDs(data::ImportExportData{GID, PID, LID}, exportPIDs::Array{<: Integer}) where GID <: Integer where PID <: Integer where LID <: Integer
+function exportPIDs(data::ImportExportData{GID, PID, LID}, exportPIDs::AbstractArray{<: Integer}) where GID <: Integer where PID <: Integer where LID <: Integer
     data.exportPIDs = exportPIDs
 end
 

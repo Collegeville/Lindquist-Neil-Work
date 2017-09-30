@@ -18,30 +18,30 @@ function barrier(comm::SerialComm)
 end
 
 
-function broadcastAll(comm::SerialComm, myVals::Array{T}, root::Integer)::Array{T} where T
+function broadcastAll(comm::SerialComm, myVals::AbstractArray{T}, root::Integer)::Array{T} where T
     if root != 1 
         throw(InvalidArgumentError("SerialComm can only accept PID of 1"))
     end
     myVals
 end
 
-function gatherAll(comm::SerialComm, myVals::Array{T})::Array{T} where T
+function gatherAll(comm::SerialComm, myVals::AbstractArray{T})::Array{T} where T
     myVals
 end
 
-function sumAll(comm::SerialComm, partialsums::Array{T})::Array{T} where T
+function sumAll(comm::SerialComm, partialsums::AbstractArray{T})::Array{T} where T
     partialsums
 end
 
-function maxAll(comm::SerialComm, partialmaxes::Array{T})::Array{T} where T
+function maxAll(comm::SerialComm, partialmaxes::AbstractArray{T})::Array{T} where T
     partialmaxes
 end
 
-function minAll(comm::SerialComm, partialmins::Array{T})::Array{T} where T
+function minAll(comm::SerialComm, partialmins::AbstractArray{T})::Array{T} where T
     partialmins
 end
 
-function scanSum(comm::SerialComm, myvals::Array{T})::Array{T} where T
+function scanSum(comm::SerialComm, myvals::AbstractArray{T})::Array{T} where T
     myvals
 end
 

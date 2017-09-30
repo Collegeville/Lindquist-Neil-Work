@@ -123,12 +123,12 @@ function CSRMatrix{Data}(graph::CRSGraph{GID, PID, LID},plist::Dict{Symbol}
 end
 
 function CSRMatrix(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
-        rowOffsets::Array{LID, 1}, colIndices::Array{LID, 1}, values::Array{Data, 1};
+        rowOffsets::AbstractArray{LID, 1}, colIndices::AbstractArray{LID, 1}, values::AbstractArray{Data, 1};
         plist...) where {Data, GID, PID, LID}
     CSRMatrix(rowMap, colMap, rowOffsets, colIndices, values, Dict(Array{Tuple{Symbol, Any}}(plist)))
 end
 function CSRMatrix(rowMap::BlockMap{GID, PID, LID}, colMap::BlockMap{GID, PID, LID},
-        rowOffsets::Array{LID, 1}, colIndices::Array{LID, 1}, values::Array{Data, 1},
+        rowOffsets::AbstractArray{LID, 1}, colIndices::AbstractArray{LID, 1}, values::AbstractArray{Data, 1},
         plist::Dict{Symbol}) where {Data, GID, PID, LID}
     
     #check user's input.  Might throw on only some processes, causing deadlock
@@ -414,15 +414,15 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
             
             inds = Array{LID, 1}(localTotalNumEntries)
             vals = Array{Data, 1}(localTotalNumEntries)
-
+            
             #line 1234
             for row in 1:localNumRows
                 srcPos = curRowOffsets[row]
                 dstPos = ptrs[row]
-                dstEnd = ptrs[row+1]
-                dst = dstPos:dstEnd-1
-                src = range(srcPos, 1, dstEnd-dstPos)
-
+                dstEnd = ptrs[row+1]-1
+                dst = dstPos:dstEnd
+                src = range(srcPos, 1, dstEnd-dstPos+1)
+                
                 inds[dst] = myGraph.localIndices1D[src]
                 vals[dst] = localMatrix.values[src]
             end
@@ -452,7 +452,7 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
 end
         
 function insertNonownedGlobalValues(matrix::CSRMatrix{Data, GID, PID, LID},
-        globalRow::GID, indices::Array{GID, 1}, values::Array{Data, 1}
+        globalRow::GID, indices::AbstractArray{GID, 1}, values::AbstractArray{Data, 1}
         ) where {Data, GID, PID, LID}
     
     curRow = matrix.nonlocals[globalRow]
@@ -467,7 +467,7 @@ end
 
 function getView(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID}) where {Data, GID, PID, LID}
     if getProfileType(matrix) == STATIC_PROFILE && rowInfo.allocSize > 0
-        range = rowInfo.offset1D:rowInfo.offset1D+rowInfo.allocSize
+        range = rowInfo.offset1D:rowInfo.offset1D+rowInfo.allocSize-1
         view(matrix.localMatrix.values, range)
     elseif getProfileType(matrix) == DYNAMIC_PROFILE
         matrix.values2D[rowInfo.localRow]
@@ -556,6 +556,8 @@ function mergeRowIndicesAndValues(matrix::CSRMatrix{Data, GID, PID, LID},
                 valsView[newend] += valsView[cur]
             end
         end
+    else
+        newend = 0
     end
 
     graph.numRowEntries[rowInfo.localRow] = newend
@@ -594,11 +596,11 @@ function insertGlobalValues(matrix::CSRMatrix{Data, GID, PID, LID}, globalRow::I
         
         rowInfo = getRowInfo(myGraph, localRow)
         curNumEntries = rowInfo.numEntries
-        newNumEntries = curNumEntries = length(numEntriesToInsert)
+        newNumEntries = curNumEntries + length(numEntriesToInsert)
         if newNumEntries > rowInfo.allocSize
             if(getProfileType(matrix) == STATIC_PROFILE 
                     && newNumEntries > rowInfo.allocSize)
-                throw(InvalidArgumentException("number of new indices exceed "
+                throw(InvalidArgumentError("number of new indices exceed "
                         * "statically allocated graph structure"))
             end
             
@@ -654,16 +656,17 @@ function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
     if !hasColMap(myGraph)
         makeColMap(myGraph)
     end
-
+    
     makeIndicesLocal(myGraph)
 
     sortAndMergeIndicesAndValues(matrix, isSorted(myGraph), isMerged(myGraph))
-
+    
     makeImportExport(myGraph)
     computeGlobalConstants(myGraph)
-
+    
     myGraph.fillComplete = true
     checkInternalState(myGraph)
+    
     fillLocalGraphAndMatrix(matrix, plist)
 end
     
@@ -742,13 +745,13 @@ function getLocalRowCopy(matrix::CSRMatrix{Data, GID, PID, LID},
     
     if rowInfo.localRow != 0
         if isLocallyIndexed(myGraph)
-            curLocalIndices = getLocalView(myGraph, rowInfo)[viewRange]
+            curLocalIndices = Array{LID}(getLocalView(myGraph, rowInfo)[viewRange])
         else
             colMap = getColMap(myGraph)
             curGlobalIndices = getGlobalView(myGraph, rowInfo)[viewRange]
             curLocalIndices = @. lid(colMap, curLocalIndices)
         end
-        curValues = getView(matrix, rowInfo)[viewRange]
+        curValues = Array{Data}(getView(matrix, rowInfo)[viewRange])
         
         (curLocalIndices, curValues)
     else
@@ -782,7 +785,7 @@ end
 
 function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
         localRow::Integer
-        )::Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}} where {
+        )::Tuple{AbstractArray{LID, 1}, AbstractArray{Data, 1}} where {
         Data, GID, PID, LID}
     rowInfo = getRowInfo(matrix.myGraph, LID(localRow))
     getLocalRowView(matrix, rowInfo)
@@ -790,7 +793,7 @@ end
 
 function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
         rowInfo::RowInfo{LID}
-        )::Tuple{AbstractArray{GID, 1}, AbstractArray{Data, 1}} where {
+        )::Tuple{AbstractArray{LID, 1}, AbstractArray{Data, 1}} where {
         Data, GID, PID, LID}
 
     if isGloballyIndexed(matrix)
@@ -840,14 +843,14 @@ function getLocalDiagCopy(matrix::CSRMatrix{Data, GID, PID, LID})::MultiVector{D
     end
 end
 
-function leftScale!(matrix::CSRMatrix{Data}, X::Array{Data, 1}) where {Data <: Number}
+function leftScale!(matrix::CSRMatrix{Data}, X::AbstractArray{Data, 1}) where {Data <: Number}
     for row in 1:getLocalNumRows(matrix)
         _, vals = getLocalRowView(matrix, row)
         LinAlg.scale!(vals, X[row])
     end
 end
 
-function rightScale!(matrix::CSRMatrix{Data}, X::Array{Data, 1}) where {Data <: Number}
+function rightScale!(matrix::CSRMatrix{Data}, X::AbstractArray{Data, 1}) where {Data <: Number}
     for row in 1:getLocalNumRows(matrix)
         inds, vals = getLocalRowView(matrix, row)
         for entry in 1:length(inds)
@@ -866,7 +869,7 @@ end
 
 function copyAndPermute(source::RowMatrix{Data, GID, PID, LID},
         target::CSRMatrix{Data, GID, PID, LID}, numSameIDs::LID,
-        permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1}
+        permuteToLIDs::AbstractArray{LID, 1}, permuteFromLIDs::AbstractArray{LID, 1}
         ) where {Data, GID, PID, LID}
     sourceIsLocallyIndexed = isLocallyIndexed(source)
 
@@ -922,7 +925,7 @@ function pack(source::CSRMatrix{Data, GID, PID, LID}, exportLIDs::AbstractArray{
 end
 
 function unpackAndCombine(target::CSRMatrix{Data, GID, PID, LID},
-        importLIDs::Array{LID, 1}, imports::Array, distor::Distributor{GID, PID, LID},
+        importLIDs::AbstractArray{LID, 1}, imports::AbstractArray, distor::Distributor{GID, PID, LID},
         cm::CombineMode) where{Data, GID, PID, LID}
 
     numImportLIDs = length(importLIDs)
@@ -939,6 +942,7 @@ end
 function apply!(Y::MultiVector{Data, GID, PID, LID},
         operator::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID},
         mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
+    
     if isFillActive(operator)
         throw(InvalidStateError("Cannot call apply(...) until fillComplete(...)"))
     end
@@ -946,7 +950,7 @@ function apply!(Y::MultiVector{Data, GID, PID, LID},
     if mode == NO_TRANS
         applyNonTranspose!(Y, operator, X, alpha, beta)
     else
-        applyTranspose!(Y, operator, X, alpha, beta)
+        applyTranspose!(Y, operator, X, mode, alpha, beta)
     end
 end
 
@@ -1031,11 +1035,11 @@ function applyTranspose!(Yin::MultiVector{Data, GID, PID, LID}, operator::CSRMat
         return
     end
     
-    numVectors = getNumVectors(Xin)
+    nVects = numVectors(Xin)
     importer = getGraph(operator).importer
     exporter = getGraph(operator).exporter
     
-    YIsReplicated = globallyDistributed(Yin)
+    YIsReplicated = distributedGlobal(Yin)
     YIsOverwritted = (beta == ZERO)
     if YIsReplicated && myPID(comm(operator)) != 1
         beta = ZERO
@@ -1048,20 +1052,20 @@ function applyTranspose!(Yin::MultiVector{Data, GID, PID, LID}, operator::CSRMat
     end
     
     if !isnull(importer)
-        if !isnull(operator.importMV) && getNumVectors(get(operator.importMV)) != numVectors
+        if !isnull(operator.importMV) && getNumVectors(get(operator.importMV)) != nVects
             operator.importMV = Nullable{MultiVector{Data, GID, PID, LID}}()
         end
         if isnull(operator.importMV)
-            operator.importMV = Nullable(MultiVector(getColMap(operator), numVectors))
+            operator.importMV = Nullable(MultiVector(getColMap(operator), nVects))
         end
     end
     
     if !isnull(exporter)
-        if !isnull(operator.exportMV) && getNumVectors(get(operator.exportMV)) != numVectors
+        if !isnull(operator.exportMV) && getNumVectors(get(operator.exportMV)) != nVects
             operator.exportMV = Nullable{MultiVector{Data, GID, PID, LID}}()
         end
         if isnull(operator.exportMV)
-            operator.exportMV = Nullable(MultiVector(getRowMap(operator), numVectors))
+            operator.exportMV = Nullable(MultiVector(getRowMap(operator), nVects))
         end
     end
     
@@ -1085,7 +1089,7 @@ function applyTranspose!(Yin::MultiVector{Data, GID, PID, LID}, operator::CSRMat
             localApply(Y, operator, X, mode, alpha, beta)
             copy!(Yin, Y)
         else
-            localApply(Y, operator, X, mode, alpha, beta)
+            localApply(Yin, operator, X, mode, alpha, beta)
         end
     end
     if YIsReplicated
@@ -1098,13 +1102,13 @@ end
 function localApply(Y::MultiVector{Data, GID, PID, LID},
         A::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID},
         mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
-
-    if alpha == 0
+    
+    if alpha == Data(0)
         return scale!(Y, beta)
     end
 
-    rawY = Y.data
-    rawX = X.data
+    const rawY = Y.data
+    const rawX = X.data
 
 
     #TODO implement this better, can BLAS be used?
@@ -1113,9 +1117,8 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
         for vect = LID(1):numVectors(Y)
             for row = LID(1):getLocalNumRows(A)
                 sum = Data(0)
-                
                 for (ind, val) in zip(getLocalRowView(A, row)...)
-                    sum += val*ind
+                    sum += val*rawX[ind, vect]
                 end
                 sum = applyConjugation(mode, sum*alpha)
                 rawY[row, vect] *= beta
@@ -1123,8 +1126,14 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
             end
         end
     else
-        #TODO implement transposed spmv
-        @assert false "Not yet implemented"
+        rawY[:, :] *= beta
+        for vect = LID(1):numVectors(Y)
+            for mRow in LID(1):getLocalNumRows(A)
+                for (ind, val) in zip(getLocalRowView(A, mRow)...)
+                    rawY[ind, vect] += applyConjugation(mode, alpha*rawX[mRow, vect]*val)
+                end
+            end
+        end
     end
     Y
 end

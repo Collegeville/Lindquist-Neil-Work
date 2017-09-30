@@ -26,7 +26,7 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
 
     # test wrapper constructor
     arr = Array{Float64, 2}(n, 3)
-    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, arr)
+    vect = MultiVector(curMap, arr)
     @test n == localLength(vect)
     @test nProcs*n == globalLength(vect)
     @test 3 == numVectors(vect)
@@ -53,18 +53,18 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
     
 
     # test scale and scale!
-    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, ones(Float64, n, 3))
+    vect = MultiVector(curMap, ones(Float64, n, 3))
     @test vect == scale!(vect, pid*5.0)
     @test pid*5*ones(Float64, (n, 3)) == vect.data
 
-    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, ones(Float64, n, 3))
+    vect = MultiVector(curMap, ones(Float64, n, 3))
     vect2 = scale(vect, pid*5.0)
     @test vect !== vect2
     @test pid*5*ones(Float64, (n, 3)) == vect2.data
 
     increase = pid*nProcs
     
-    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, ones(Float64, n, 3))
+    vect = MultiVector(curMap, ones(Float64, n, 3))
     @test vect == scale!(vect, increase+[2.0, 3.0, 4.0])
     @test hcat( (increase+2)*ones(Float64, n),
                 (increase+3)*ones(Float64, n), 
@@ -76,7 +76,7 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
         @test act == getVectorCopy(vect, i)
     end
 
-    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, ones(Float64, n, 3))
+    vect = MultiVector(curMap, ones(Float64, n, 3))
     vect2 = scale(vect, pid*nProcs+[2.0, 3.0, 4.0])
     @test vect !== vect2
     @test hcat( (pid*nProcs+2)*ones(Float64, n),
@@ -84,7 +84,7 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
                 (pid*nProcs+4)*ones(Float64, n))  == vect2.data
 
     #test dot
-    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, ones(Float64, n, 3))
+    vect = MultiVector(curMap, ones(Float64, n, 3))
     @test fill(n*nProcs, 3) == dot(vect, vect)
 
     #test fill!
@@ -94,48 +94,48 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
     
     #test reduce
     arr = (10^pid)*ones(Float64, n, 3)
-    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(BlockMap(n, n, comm), arr)
+    vect = MultiVector(BlockMap(n, n, comm), arr)
     commReduce(vect)
     @test sum(10^i for i in 1:nProcs)*ones(Float64, n, 3) == vect.data
     
 
     #test norm2
     arr = ones(Float64, n, 3)
-    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, arr)
+    vect = MultiVector(curMap, arr)
     @test [sqrt(n*nProcs), sqrt(n*nProcs), sqrt(n*nProcs)] == norm2(vect)
 
     arr = 2*ones(Float64, n, 3)
-    vect = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, arr)
+    vect = MultiVector(curMap, arr)
     @test [sqrt(4*n*nProcs), sqrt(4*n*nProcs), sqrt(4*n*nProcs)] == norm2(vect)
 
 
 
     #test imports/exports
-    source = MultiVector{Float64, UInt64, UInt16, UInt32}(
-        curMap, Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
+    source = MultiVector(curMap,
+        Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
     target = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, 3, false)
     impor = Import(curMap, curMap)
     doImport(source, target, impor, REPLACE)
     @test reshape(Array{Float64, 1}(collect(1:(3*n))), (n, 3)) == target.data
 
 
-    source = MultiVector{Float64, UInt64, UInt16, UInt32}(
-        curMap, Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
+    source = MultiVector(curMap,
+        Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
     target = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, 3, false)
     expor = Export(curMap, curMap)
     doExport(source, target, expor, REPLACE)
     @test reshape(Array{Float64, 1}(collect(1:(3*n))), (n, 3)) == target.data
 
-    source = MultiVector{Float64, UInt64, UInt16, UInt32}(
-        curMap, Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
+    source = MultiVector(curMap,
+        Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
     target = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, 3, false)
     impor = Import(curMap, curMap)
     doExport(source, target, impor, REPLACE)
     @test reshape(Array{Float64, 1}(collect(1:(3*n))), (n, 3)) == target.data
 
 
-    source = MultiVector{Float64, UInt64, UInt16, UInt32}(
-        curMap, Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
+    source = MultiVector(curMap,
+        Array{Float64, 2}(reshape(collect(1:(3*n)), (n, 3))))
     target = MultiVector{Float64, UInt64, UInt16, UInt32}(curMap, 3, false)
     expor = Export(curMap, curMap)
     doImport(source, target, expor, REPLACE)

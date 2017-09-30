@@ -31,14 +31,14 @@ function Base.nnz(row::SparseRowView{Data, IndexType}) where{Data, IndexType}
 end
 
 """
-    vals(::SparseRowView{Data, IndexType})::Array{Data, 1}
+    vals(::SparseRowView{Data, IndexType})::AbstractArray{Data, 1}
 
 Gets the values of the row
 """
 vals(row::SparseRowView) = row.vals
 
 """
-    cols(::SparseRowView{Data, IndexType})::Array{IndexType, 1}
+    cols(::SparseRowView{Data, IndexType})::AbstractArray{IndexType, 1}
 
 Gets the column indices of the row
 """

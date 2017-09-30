@@ -69,5 +69,5 @@ map = BlockMap(20, comm)
 map = BlockMap(20, 5, comm)
 @MPIMapTests
 
-map = BlockMap(20, 5, collect((1:5) + 5*(pid - 1)), comm)
+map = BlockMap(collect((1:5) + 5*(pid - 1)), comm)
 @MPIMapTests

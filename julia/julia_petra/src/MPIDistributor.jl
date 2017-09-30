@@ -64,7 +64,7 @@ end
 
 
 #### internal methods ####
-function createSendStructure(dist::MPIDistributor{GID, PID}, pid::PID, nProcs::PID, exportPIDs::Array{PID}) where GID <: Integer where PID <: Integer
+function createSendStructure(dist::MPIDistributor{GID, PID}, pid::PID, nProcs::PID, exportPIDs::AbstractArray{PID}) where GID <: Integer where PID <: Integer
     
     numExports = length(exportPIDs)
     dist.numExports = numExports
@@ -272,7 +272,7 @@ function computeRecvs(dist::MPIDistributor{GID, PID, LID}, myProc::PID, nProcs::
     dist        
 end
 
-function computeSends(dist::MPIDistributor{GID, PID, LID}, remoteGIDs::Array{GID}, remotePIDs::Array{PID})::Tuple{Array{GID}, Array{PID}} where GID <:Integer where PID <:Integer where LID <:Integer
+function computeSends(dist::MPIDistributor{GID, PID, LID}, remoteGIDs::AbstractArray{GID}, remotePIDs::AbstractArray{PID})::Tuple{AbstractArray{GID}, AbstractArray{PID}} where GID <:Integer where PID <:Integer where LID <:Integer
     numImports = length(remoteGIDs)
 
     tmpPlan = MPIDistributor(dist.comm)
@@ -340,7 +340,7 @@ end
 
 #### Distributor interface ####
 
-function createFromSends(dist::MPIDistributor{GID, PID, LID}, exportPIDs::Array{PID})::Integer where GID <:Integer where PID <:Integer where LID <:Integer
+function createFromSends(dist::MPIDistributor{GID, PID, LID}, exportPIDs::AbstractArray{PID})::Integer where GID <:Integer where PID <:Integer where LID <:Integer
     pid = myPid(dist.comm)
     nProcs = numProc(dist.comm)
     createSendStructure(dist, pid, nProcs, exportPIDs)
@@ -355,7 +355,7 @@ function createFromSends(dist::MPIDistributor{GID, PID, LID}, exportPIDs::Array{
 end
 
 
-function createFromRecvs(dist::MPIDistributor{GID, PID}, remoteGIDs::Array{GID}, remotePIDs::Array{PID})::Tuple{Array{GID}, Array{PID}} where GID <: Integer where PID <: Integer
+function createFromRecvs(dist::MPIDistributor{GID, PID}, remoteGIDs::AbstractArray{GID}, remotePIDs::AbstractArray{PID})::Tuple{AbstractArray{GID}, AbstractArray{PID}} where GID <: Integer where PID <: Integer
     if length(remoteGIDs) != length(remotePIDs)
         throw(InvalidArgumentError("remote lists must be the same length"))
     end
@@ -366,7 +366,7 @@ function createFromRecvs(dist::MPIDistributor{GID, PID}, remoteGIDs::Array{GID},
     exportGIDs, exportPIDs
 end
 
-function resolvePosts(dist::MPIDistributor, exportObjs::Array{T}) where T
+function resolvePosts(dist::MPIDistributor, exportObjs::AbstractArray{T}) where T
     myProc = myPid(dist.comm) 
     
     selfRecvAddress = 0
@@ -503,7 +503,7 @@ function resolveWaits(dist::MPIDistributor)::Array
 end
 
 
-function resolveReversePosts(dist::MPIDistributor, exportObjs::Array)
+function resolveReversePosts(dist::MPIDistributor, exportObjs::AbstractArray)
     if dist.indices_to != []
         throw(InvalidStateError("Cannot do reverse comm when data is not blocked by processor"))
     end

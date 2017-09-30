@@ -24,6 +24,9 @@ try
                 
                 include("LocalCommTests.jl")
                 runLocalCommTests(comm)
+                
+                include("BasicDirectoryTests.jl")
+                basicDirectoryTests(comm)
             end
 
             @testset "Data MPI Tests" begin

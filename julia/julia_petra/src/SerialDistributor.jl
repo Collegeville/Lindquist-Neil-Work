@@ -6,8 +6,8 @@ export SerialDistributor
 Creates a distributor to work with SerialComm
 """
 type SerialDistributor{GID <: Integer, PID <:Integer, LID <: Integer} <: Distributor{GID, PID, LID}
-    post::Nullable{Array}
-    reversePost::Nullable{Array}
+    post::Nullable{AbstractArray}
+    reversePost::Nullable{AbstractArray}
     
     function SerialDistributor{GID, PID, LID}() where GID <: Integer where PID <: Integer where LID <: Integer
         new(nothing, nothing)
@@ -16,7 +16,7 @@ end
 
 
 function createFromSends(dist::SerialDistributor{GID, PID, LID},
-        exportPIDs::Array{PID})::Integer where GID <: Integer where PID <: Integer where LID <: Integer
+        exportPIDs::AbstractArray{PID})::Integer where GID <: Integer where PID <: Integer where LID <: Integer
     for id in exportPIDs
         if id != 1
             throw(InvalidArgumentError("SerialDistributor can only accept PID of 1"))
@@ -26,11 +26,8 @@ function createFromSends(dist::SerialDistributor{GID, PID, LID},
 end
 
 function createFromRecvs(
-        dist::SerialDistributor{GID, PID, LID}, remoteGIDs::Array{GID}, remotePIDs::Array{PID}
-        )::Tuple{Array{GID}, Array{PID}} where GID <: Integer where PID <: Integer where LID <: Integer
-    if length(remoteGIDs) != length(remotePIDs)
-        throw(InvalidArgumentError("Number of GIDs and PIDs must be the same"))
-    end
+        dist::SerialDistributor{GID, PID, LID}, remoteGIDs::AbstractArray{GID}, remotePIDs::AbstractArray{PID}
+        )::Tuple{AbstractArray{GID}, AbstractArray{PID}} where GID <: Integer where PID <: Integer where LID <: Integer
     for id in remotePIDs
         if id != 1
             throw(InvalidArgumentError("SerialDistributor can only accept PID of 1"))
@@ -39,39 +36,39 @@ function createFromRecvs(
     remoteGIDs,remotePIDs
 end
 
-function resolve(dist::SerialDistributor, exportObjs::Array{T})::Array{T} where T
+function resolve(dist::SerialDistributor, exportObjs::AbstractArray{T})::AbstractArray{T} where T
     exportObjs
 end
 
-function resolveReverse(dist::SerialDistributor, exportObjs::Array{T})::Array{T} where T
+function resolveReverse(dist::SerialDistributor, exportObjs::AbstractArray{T})::AbstractArray{T} where T
     exportObjs
 end
 
-function resolvePosts(dist::SerialDistributor, exportObjs::Array)
+function resolvePosts(dist::SerialDistributor, exportObjs::AbstractArray)
     dist.post = Nullable(exportObjs)
 end
 
-function resolveWaits(dist::SerialDistributor)::Array
+function resolveWaits(dist::SerialDistributor)::AbstractArray
     if isnull(dist.post)
         throw(InvalidStateError("Must post before waiting"))
     end
     
     result = get(dist.post)
-    dist.post = Nullable{Array}()
+    dist.post = Nullable{AbstractArray}()
     result
 end
 
-function resolveReversePosts(dist::SerialDistributor, exportObjs::Array) 
+function resolveReversePosts(dist::SerialDistributor, exportObjs::AbstractArray) 
     dist.reversePost = Nullable(exportObjs)
 end
 
-function resolveReverseWaits(dist::SerialDistributor)::Array
+function resolveReverseWaits(dist::SerialDistributor)::AbstractArray
      if isnull(dist.reversePost)
         throw(InvalidStateError("Must reverse post before reverse waiting"))
     end
     
     result = get(dist.reversePost)
-    dist.reversePost = Nullable{Array}()
+    dist.reversePost = Nullable{AbstractArray}()
     result
 end
 

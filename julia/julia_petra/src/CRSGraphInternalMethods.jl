@@ -11,7 +11,7 @@ end
 getLocalGraph(graph::CRSGraph) = graph.localGraph
 
 
-function updateGlobalAllocAndValues(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}, newAllocSize::Integer, rowValues::Array{Data, 1})::RowInfo{LID} where {Data, GID, PID, LID}
+function updateGlobalAllocAndValues(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}, newAllocSize::Integer, rowValues::AbstractArray{Data, 1})::RowInfo{LID} where {Data, GID, PID, LID}
     
     resize!(graph.globalIndices2D[rowInfo.localRow], newAllocSize)
     resize!(rowVals, newAllocSize)
@@ -197,7 +197,7 @@ function getLocalView(rowInfo::RowInfo{LID})::AbstractArray{LID, 1} where LID <:
 end
 
 function allocateIndices(graph::CRSGraph{GID, <:Integer, LID},
-        lg::IndexType, numAllocPerRow::Array{<:Integer, 1}) where {
+        lg::IndexType, numAllocPerRow::AbstractArray{<:Integer, 1}) where {
         GID <: Integer, LID <: Integer}
     numRows = getLocalNumRows(graph)
     @assert(length(numAllocPerRow) == numRows,
@@ -270,7 +270,7 @@ function makeImportExport(graph::CRSGraph{GID, PID, LID}) where {
     
     if isnull(graph.importer)
         if get(graph.domainMap) !== get(graph.colMap) && !sameAs(get(graph.domainMap), get(graph.colMap))
-            graph.importer = Import(graph.domainMap, graph.colMap, graph.plist)
+            graph.importer = Import(get(graph.domainMap), get(graph.colMap), graph.plist)
         end
     end
     
@@ -578,7 +578,7 @@ function makeIndicesLocal(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
             
             if numBad != 0
                 throw(InvalidArgumentError("When converting column indices from "
-                        * "global to local, we enchoundered $numBad indices that "
+                        * "global to local, we encountered $numBad indices that "
                         * "do not live in the column map on this process"))
             end
             
@@ -606,11 +606,11 @@ function makeIndicesLocal(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
 end
 
 
-function convertColumnIndicesFromGlobalToLocal(localColumnIndices::Array{LID, 1},
-        globalColumnIndices::Array{GID, 1}, ptr::Array{LID, 1},
-        localColumnMap::BlockMap{GID, PID, LID}, numRowEntries::Array{LID, 1})::LID where {
-        GID, PID, LID}
-
+function convertColumnIndicesFromGlobalToLocal(localColumnIndices::AbstractArray{LID, 1},
+        globalColumnIndices::AbstractArray{GID, 1}, ptr::AbstractArray{LID, 1},
+        localColumnMap::BlockMap{GID, PID, LID}, numRowEntries::AbstractArray{LID, 1}
+        )::LID where {GID, PID, LID}
+    
     localNumRows = max(length(ptr)-1, 0)
     numBad = 0
     for localRow = 1:localNumRows
@@ -619,7 +619,7 @@ function convertColumnIndicesFromGlobalToLocal(localColumnIndices::Array{LID, 1}
         for j = 0:numRowEntries[localRow]-1
             gid = globalColumnIndices[offset+j]
             localColumnIndices[offset+j] = lid(localColumnMap, gid)
-            if lid == 0
+            if localColumnIndices[offset+j] == 0
                 numBad += 1
             end
         end
@@ -776,10 +776,10 @@ end
 
 
 #internal implementation of makeColMap, needed to handle some return and debuging stuff
-#returns Tuple(errCode, colMap)
+#returns Tuple(error, colMap)
 function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{BlockMap{GID, PID, LID}}
         ) where {GID, PID, LID}
-    errCode = 0#TODO improve from int error code
+    error = false
 
     if isnull(wrappedDomMap)
         colMap = Nullable{BlockMap{GID, PID, LID}}()
@@ -793,7 +793,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
             if isnull(wrappedColMap)
                 warn("$(myPid(comm(graph))): The graph is locally indexed, but does not have a column map")
 
-                errCode = -1
+                error = true
             else
                 colMap = get(wrappedColMap)
                 if linearMap(colMap) #i think isContiguous(map) <=> linearMap(map)?
@@ -845,73 +845,73 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
         #line 214, abunch of explanation of serial short circuit
         if numProc(comm(domMap)) == 1
             if numRemoteColGIDs != 0
-                errCode = -2
+                error = true
             end
             if numLocalColGIDs == localNumRows
-                return (errCode, domMap)
+                return (error, domMap)
             end
-            resize!(myColumns, numLocalColGIDs+numRemoteColGIDs)
-            localColGIDs  = view(myColumns, 1:numLocalColGIDs)
-            remoteColGIDs = view(myColumns, numLocalColGIDs+1:numRemoteColGIDs)
+        end
+        resize!(myColumns, numLocalColGIDs+numRemoteColGIDs)
+        localColGIDs  = view(myColumns, 1:numLocalColGIDs)
+        remoteColGIDs = view(myColumns, numLocalColGIDs+1:numRemoteColGIDs)
 
-            remoteColGIDs[:] = [el for el in remoteGIDSet]
+        remoteColGIDs[:] = [el for el in remoteGIDSet]
 
-            remotePIDs = Array{PID, 1}(numRemoteColGIDs)
+        remotePIDs = Array{PID, 1}(numRemoteColGIDs)
 
-            remotePIDs = remoteIDList(domMap, remoteColGIDs)
-            if any(remotePIDs .== 0)
-                if @debug graph
-                    warn("Some column indices are not in the domain Map")
-                end
-                errCode = 3
+        remotePIDs = remoteIDList(domMap, remoteColGIDs)[1]
+        if any(remotePIDs .== 0)
+            if @debug graph
+                warn("Some column indices are not in the domain Map")
             end
+            error = true
+        end
 
-            order = sortperm(remotePIDs)
-            permute!(remotePIDs, order)
-            permute!(remoteColGIDs, order)
+        order = sortperm(remotePIDs)
+        permute!(remotePIDs, order)
+        permute!(remoteColGIDs, order)
 
-            #line 333
+        #line 333
 
-            numDomainELts = numMyElements(domMap)
-            if numLocalColGIDs == numDomainElts
-                if linearMap(domMap) #I think isContiguous() <=> linearMap()
-                    localColGIDs[1:numLocalColGIDs] = minMyGIDs(domMap)
-                else
-                    domElts = myGlobalElements(domMap)
-                    localColGIDs[1:length(domElts)] = domElts
+        numDomainElts = numMyElements(domMap)
+        if numLocalColGIDs == numDomainElts
+            if linearMap(domMap) #I think isContiguous() <=> linearMap()
+                localColGIDs[1:numLocalColGIDs] = minMyGIDs(domMap)
+            else
+                domElts = myGlobalElements(domMap)
+                localColGIDs[1:length(domElts)] = domElts
+            end
+        else
+            numLocalCount = 1
+            if linearMap(domMap) #I think isContiguous() <=> linearMap()
+                curColMapGID = minMyGID(domMap)
+                for i = 1:numDomainElts
+                    if gidIsLocal[i]
+                        localColGIDs[numLocalCount] = curColMapGID
+                        numLocalCount += 1
+                    end
+                    curColMapGID += 1
                 end
             else
-                numLocalCount = 0
-                if linearMap(domMap) #I think isContiguous() <=> linearMap()
-                    curColMapGID = minMyGIDs(domMap)
-                    for i = 1:numDomainElts
-                        if gidIsLocal[i]
-                            localColGIDs[numLocalCount] = curColMapGID
-                            numLocalCount += 1
-                        end
-                        curColMapGID += 1
+                domainElts = myGlobalElement(domMap)
+                for i = 1:numDomainElts
+                    if gidIsLocal[i]
+                        localColGIDs[numLocalCount] = domainElts[i]
+                        numLocalCount += 1
                     end
-                else
-                    domainElts = myGlobalElement(domMap)
-                    for i = 1:numDomainElts
-                        if gidIsLocal[i]
-                            localColGIDs[numLocalCount] = domainElts[i]
-                            numLocalCount += 1
-                        end
-                        curColMapGID += 1
-                    end
+                    curColMapGID += 1
                 end
+            end
 
-                if numLocalCount != numLocalColGIDs
-                    if @debug graph
-                        warn("$(myPid(comm(graph))): numLocalCount = $numLocalCount "
-                            * "!= numLocalColGIDs = $numLocalColGIDs.  "
-                            * "This should not happen.")
-                    end
-                    errCode = -4
+            if numLocalCount != numLocalColGIDs
+                if @debug graph
+                    warn("$(myPid(comm(graph))): numLocalCount = $numLocalCount "
+                        * "!= numLocalColGIDs = $numLocalColGIDs.  "
+                        * "This should not happen.")
                 end
+                error = true
             end
         end
     end
-    return(errCode, BlockMap(-1, -1, myColumns, comm(domMap)))
+    return(error, BlockMap(myColumns, comm(domMap)))
 end

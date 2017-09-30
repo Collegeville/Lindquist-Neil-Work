@@ -103,13 +103,13 @@ Whether the graph is using global indices
     isFillComplete(::RowGraph)
 Whether `fillComplete()` has been called
 
-    getGlobalRowCopy(::RowGraph{GID, PID, LID}, row::GID)::Array{GID, 1}
+    getGlobalRowCopy(::RowGraph{GID, PID, LID}, row::GID)::AbstractArray{GID, 1}
 Extracts a copy of the given row of the graph
 
-    getLocalRowCopy(::RowGraph{GID, PID, LID}, row::LID)::Array{LID, 1}
+    getLocalRowCopy(::RowGraph{GID, PID, LID}, row::LID)::AbstractArray{LID, 1}
 Extracts a copy of the given row of the graph
 
-    pack(::RowGraph{GID, PID, LID}, exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID})::Array{Array{LID, 1}}
+    pack(::RowGraph{GID, PID, LID}, exportLIDs::AbstractArray{LID, 1}, distor::Distributor{GID, PID, LID})::AbstractArray{AbstractArray{LID, 1}}
 Packs this object's data for import or export
 """
 const RowGraph{GID <: Integer, PID <: Integer, LID <: Integer} = Union{SrcDistRowGraph{GID, PID, LID}, DistRowGraph{GID, PID, LID}}
@@ -143,22 +143,22 @@ function getNumEntriesInLocalRow(graph::RowGraph{GID, PID, LID},
 end
 
 """
-    getGlobalRowCopy(::RowGraph{GID, PID, LID}, row::Integer)::Array{GID, 1}
+    getGlobalRowCopy(::RowGraph{GID, PID, LID}, row::Integer)::AbstractArray{GID, 1}
 
 Extracts a copy of the given row of the graph
 """
 function getGlobalRowCopy(graph::RowGraph{GID, PID, LID},
-        row::Integer)::Array{GID, 1} where{GID, PID, LID}
+        row::Integer)::AbstractArray{GID, 1} where{GID, PID, LID}
     getGlobalRowCopy(graph, GID(row))
 end
 
 """
-    getLocalRowCopy(::RowGraph{GID, PID, LID}, row::Integer)::Array{LID, 1}
+    getLocalRowCopy(::RowGraph{GID, PID, LID}, row::Integer)::AbstractArray{LID, 1}
 
 Extracts a copy of the given row of the graph
 """
 function getLocalRowCopy(graph::RowGraph{GID, PID, LID},
-        row::Integer)::Array{LID, 1} where{GID, PID, LID}
+        row::Integer)::AbstractArray{LID, 1} where{GID, PID, LID}
     getLocalRowCopy(graph, LID(row))
 end
 
@@ -339,7 +339,7 @@ Whether the graph is using global indices
 function isGloballyIndexed end
 
 """
-    pack(::RowGraph{GID, PID, LID}, exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID})::Array{Array{LID, 1}}
+    pack(::RowGraph{GID, PID, LID}, exportLIDs::AbstractArray{LID, 1}, distor::Distributor{GID, PID, LID})::AbstractArray{AbstractArray{LID, 1}}
 
 Packs this object's data for import or export
 """

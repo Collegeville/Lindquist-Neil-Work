@@ -16,14 +16,14 @@ To support transfers the following methods must be implemented for the source ty
     checkSizes(source::<:SrcDistObject{GID, PID, LID}, target::<:DistObject{GID, PID, LID})::Bool
 Whether the source and target are compatible for a transfer
 
-    copyAndPermute(source::<:SrcDistObject{GID, PID, LID}, target::<:DistObject{GID, PID, LID}, numSameIDs::LID, permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1})
+    copyAndPermute(source::<:SrcDistObject{GID, PID, LID}, target::<:DistObject{GID, PID, LID}, numSameIDs::LID, permuteToLIDs::AbstractArray{LID, 1}, permuteFromLIDs::AbstractArray{LID, 1})
 Perform copies and permutations that are local to this process.
 
-    packAndPrepare(source::<:SrcDistObject{GID, PID, LID}, target::<:DistObjectGID, PID, LID}, exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID})::Array
+    packAndPrepare(source::<:SrcDistObject{GID, PID, LID}, target::<:DistObjectGID, PID, LID}, exportLIDs::AbstractArray{LID, 1}, distor::Distributor{GID, PID, LID})::AbstractArray
 Perform any packing or preparation required for communications.  The
 method returns the array of objects to export
 
-    unpackAndCombine(target::<:DistObject{GID, PID, LID},importLIDs::Array{LID, 1}, imports::Array, distor::Distributor{GID, PID, LID}, cm::CombineMode)
+    unpackAndCombine(target::<:DistObject{GID, PID, LID},importLIDs::AbstractArray{LID, 1}, imports::AAbstractrray, distor::Distributor{GID, PID, LID}, cm::CombineMode)
 Perform any unpacking and combining after communication
 """
 abstract type DistObject{GID <:Integer, PID <: Integer, LID <: Integer} <: SrcDistObject{GID, PID, LID}
@@ -99,15 +99,15 @@ function checkSizes(source::SrcDistObject{GID, PID, LID},
 end
 
 """
-    doTransfer(src::SrcDistObject{GID, PID, LID}, target::Impl{GID, PID, LID}, cm::CombineMode, numSameIDs::LID, permuteToLIDs::Array{LID, 1}, permuteFromLIDs::Array{LID, 1}, remoteLIDs::Array{LID, 1}, exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID}, reversed::Bool)
+    doTransfer(src::SrcDistObject{GID, PID, LID}, target::Impl{GID, PID, LID}, cm::CombineMode, numSameIDs::LID, permuteToLIDs::AbstractArray{LID, 1}, permuteFromLIDs::AbstractArray{LID, 1}, remoteLIDs::AbstractArray{LID, 1}, exportLIDs::AbstractArray{LID, 1}, distor::Distributor{GID, PID, LID}, reversed::Bool)
 
 Perform actual redistribution of data across memory images
 """
 function doTransfer(source::SrcDistObject{GID, PID, LID},
         target::DistObject{GID, PID, LID}, cm::CombineMode,
-        numSameIDs::LID, permuteToLIDs::Array{LID, 1},
-        permuteFromLIDs::Array{LID, 1}, remoteLIDs::Array{LID, 1},
-        exportLIDs::Array{LID, 1}, distor::Distributor{GID, PID, LID},
+        numSameIDs::LID, permuteToLIDs::AbstractArray{LID, 1},
+        permuteFromLIDs::AbstractArray{LID, 1}, remoteLIDs::AbstractArray{LID, 1},
+        exportLIDs::AbstractArray{LID, 1}, distor::Distributor{GID, PID, LID},
         reversed::Bool) where {GID <: Integer, PID <: Integer, LID <: Integer}
     
     debug = false #DECISION add plist for debug setting? get debug from (im/ex)porter?

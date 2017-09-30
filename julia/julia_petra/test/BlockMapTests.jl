@@ -110,17 +110,12 @@ SerialMapTests(map, map2, diffMap)
 
 
 ## constructor 3 ##
-@test_throws InvalidArgumentError BlockMap(-8, 4, [1, 2, 3, 4], commVal)
-@test_throws InvalidArgumentError BlockMap(-2, 4, [1, 2, 3, 4], commVal)
-@test_throws InvalidArgumentError BlockMap(5, -6, [1, 2, 3, 4, 5], commVal)
-@test_throws InvalidArgumentError BlockMap(4, -1, [1, 2, 3, 4], commVal)
+BlockMap(Int[], commVal)
+BlockMap([1], commVal)
 
-BlockMap(0, 0, Int[], commVal)
-BlockMap(1, 1, [1], commVal)
-
-map = BlockMap(5, 5, [1, 2, 3, 4, 5], commVal)
-map2 = BlockMap(5, 5, [1, 2, 3, 4, 5], commVal)
-diffMap = BlockMap(6, 6, [1, 2, 3, 4, 5, 6], commVal)
+map = BlockMap([1, 2, 3, 4, 5], commVal)
+map2 = BlockMap([1, 2, 3, 4, 5], commVal)
+diffMap = BlockMap([1, 2, 3, 4, 5, 6], commVal)
 #@SerialMapTests
 SerialMapTests(map, map2, diffMap)
 

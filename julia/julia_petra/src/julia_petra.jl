@@ -1,7 +1,5 @@
 module julia_petra
 
-#TODO refactor to accept AbstractArray's instead of Array's
-
 # Internal Utilities
 include("Enums.jl")
 include("Error.jl")
