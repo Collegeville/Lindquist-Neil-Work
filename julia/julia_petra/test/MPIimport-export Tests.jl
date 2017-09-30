@@ -1,7 +1,7 @@
 n = 4
 
 srcMap = BlockMap(4*n, comm)
-desMap = BlockMap(4*n, n, collect((1:n) + n*(pid%4)), comm)
+desMap = BlockMap(collect((1:n) + n*(pid%4)), comm)
 
 function basicMPITest(impor, debugSetting=false)
     if isa(impor, Import)
