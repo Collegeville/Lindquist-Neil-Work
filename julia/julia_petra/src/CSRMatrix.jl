@@ -596,11 +596,11 @@ function insertGlobalValues(matrix::CSRMatrix{Data, GID, PID, LID}, globalRow::I
         
         rowInfo = getRowInfo(myGraph, localRow)
         curNumEntries = rowInfo.numEntries
-        newNumEntries = curNumEntries = length(numEntriesToInsert)
+        newNumEntries = curNumEntries + length(numEntriesToInsert)
         if newNumEntries > rowInfo.allocSize
             if(getProfileType(matrix) == STATIC_PROFILE 
                     && newNumEntries > rowInfo.allocSize)
-                throw(InvalidArgumentException("number of new indices exceed "
+                throw(InvalidArgumentError("number of new indices exceed "
                         * "statically allocated graph structure"))
             end
             
