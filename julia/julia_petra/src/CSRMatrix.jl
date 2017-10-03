@@ -271,7 +271,7 @@ function globalAssemble(matrix::CSRMatrix)
     end
     
     numNonLocalRows = length(matrix.nonlocals)
-    nooneHasNonLocalRows = maxAll(comm, myNumNonLocalRows == 0)
+    nooneHasNonLocalRows = maxAll(comm, numNonLocalRows == 0)
     if nooneHasNonLocalRows
         #no process has nonlocal rows, so nothing to do
         return
