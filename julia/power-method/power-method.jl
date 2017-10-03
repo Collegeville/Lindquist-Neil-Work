@@ -1,7 +1,7 @@
 using julia_petra
 
 #program settings
-const useMPI = false
+const useMPI = true
 
 const commData = Float64
 const commGID = UInt64
@@ -39,7 +39,6 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
             @. resid.data = z.data - λ*q.data
             residual = norm2(resid)[1]
 
-            verbose && print("Iter = $iter, λ = $λ, residual of A*q-λ*q = $residual\n")
             if residual < tolerance
                 return (λ, true)
             end
@@ -52,7 +51,7 @@ macro log(values...)
     esc(:(verbose && println($(values...))))
 end
 
-function main(comm::Comm{GID, PID, LID}, arg1, numGlobalElements, verbose, Data::Type) where{GID, PID, LID}
+function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type) where{GID, PID, LID}
 
     const pid = myPid(comm)
     const nProc = numProc(comm)
@@ -141,16 +140,20 @@ const verbose = pid == 1
 
 @log comm
 
-if length(ARGS) != 2
-    #@log "Usage: $(ARGS[1]) number_of_equations"
-    @log "Exactly 2 arguments are required"
+if length(ARGS) != 1
+    @log "Usage: $(ARGS[1]) number_of_equations"
+#    @log "Exactly 2 arguments are required"
     exit(1)
 end
 
-numGlobalElements = parse(commLID, ARGS[2])
+numGlobalElements = parse(commLID, ARGS[1])
 if numGlobalElements < nProc
     @log "numGlobalBlocks = $numGlobalElements cannot be < number of processors = $nProc"
     exit(1)
 end
 
-main(comm, parse(commLID, ARGS[1]), numGlobalElements, verbose, commData)
+main(comm, numGlobalElements, verbose, commData)
+
+print("\n\n\nSecond pass\n\n\n")
+
+main(comm, numGlobalElements, verbose, commData)
