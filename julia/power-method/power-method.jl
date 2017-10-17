@@ -47,8 +47,8 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
     (λ, false)
 end
 
-macro log(values...)
-    esc(:(verbose && println($(values...))))
+function log(values...)
+    verbose && println(values...)
 end
 
 function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type) where{GID, PID, LID}
@@ -71,9 +71,9 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
 
     const A = CSRMatrix{Data}(map, numNz, STATIC_PROFILE)
 
-    values = Data[-1, -1]
-    indices = Array{GID, 1}(2)#TODO does this need to be GID?
-    two = Data(2)
+    const values = Data[-1, -1]
+    indices = Array{LID, 1}(2)#TODO does this need to be GID?
+    two = Data[Data(2)]
 
     for i = 1:numMyElements
         if myGlobalElements[i] == 1
@@ -85,26 +85,31 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
         end
 
         insertGlobalValues(A, myGlobalElements[i], indices, values)
-        insertGlobalValues(A, myGlobalElements[i], LID[myGlobalElements[i]], Data[two])
+        insertGlobalValues(A, myGlobalElements[i], LID[myGlobalElements[i]], two)
     end
 
-    fillComplete(A)
+    fillComplete(A, map, map)#use map for domain and range
 
     const niters = numGlobalElements*10
     const tolerance = 1.0e-2
 
     #compile all the nessacery methods before timing
-    powerMethod(A, niters, tolerance, verbose)
+    tic()
+    λ, success = powerMethod(A, niters, tolerance, verbose)
+    elapsedTime = toq()
+    
+    log("λ = $λ; is within tolerance? $success")
+    log("total time for first solve (plus compile) = $elapsedTime sec\n\n")
 
     tic()
     λ, success = powerMethod(A, niters, tolerance, verbose)
     #TODO look into storing FLOPS
-    elapsedTime = toc()
+    elapsedTime = toq()
 
 
-    @log "λ = $λ; is within tolerance? $success"
-    @log "\n\n total time for first solve = $elapsedTime sec\n\n"
-    @log "increasing magnitude of first diagonal term, solving again\n\n"
+    log("λ = $λ; is within tolerance? $success")
+    log("total time for first solve (pre-compiled) = $elapsedTime sec\n\n")
+    log("increasing magnitude of first diagonal term, solving again\n")
 
     if myGID(map, 1)
         rowInds, rowVals = getLocalRowView(A, 0)
@@ -118,12 +123,12 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
 
     tic()
     λ, success = powerMethod(A, niters, tolerance, verbose)
-    elapsedTime = toc()
+    elapsedTime = toq()
 
-    @log ""
+    log("")
 
-    @log "λ = $λ; is within tolerance? $success"
-    @log "\n\n total time for second solve = $elapsedTime sec\n\n"
+    log("λ = $λ; is within tolerance? $success")
+    log("\n\n total time for second solve = $elapsedTime sec\n\n")
 end
 
 
@@ -138,22 +143,17 @@ const pid = myPid(comm)
 const nProc = numProc(comm)
 const verbose = pid == 1
 
-@log comm
+log(comm)
 
 if length(ARGS) != 1
-    @log "Usage: $(ARGS[1]) number_of_equations"
-#    @log "Exactly 2 arguments are required"
+    log("Usage: 1 argument for the number_of_equations")
     exit(1)
 end
 
 numGlobalElements = parse(commLID, ARGS[1])
 if numGlobalElements < nProc
-    @log "numGlobalBlocks = $numGlobalElements cannot be < number of processors = $nProc"
+    log("numGlobalBlocks = $numGlobalElements cannot be < number of processors = $nProc")
     exit(1)
 end
-
-main(comm, numGlobalElements, verbose, commData)
-
-print("\n\n\nSecond pass\n\n\n")
 
 main(comm, numGlobalElements, verbose, commData)
