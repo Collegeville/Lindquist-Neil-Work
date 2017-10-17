@@ -204,10 +204,12 @@ end
 Reduces the content of the MultiVector across all processes.  Note that the MultiVector cannot be distributed globally.
 """
 function commReduce(mVect::MultiVector)
-    if distributedGlobal(mVect)
-        throw(InvalidArgumentError("Cannot reduce distributed MultiVector"))
-    end
+    #doesn't make sense to limit reducing across all processors to when its only on a single processor
+    #if distributedGlobal(mVect)
+    #    throw(InvalidArgumentError("Cannot reduce distributed MultiVector"))
+    #end
     
+    #TODO this seems off
     mVect.data = sumAll(comm(mVect), mVect.data)
 end
 
@@ -250,7 +252,7 @@ function checkSizes(source::MultiVector{Data, GID, PID, LID},
             Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
     (source.numVectors == target.numVectors 
         && source.globalLength == target.globalLength 
-        && source.localLength == target.localLength)
+        )#&& source.localLength == target.localLength)
 end
 
 

@@ -152,7 +152,6 @@ function doTransfer(source::SrcDistObject{GID, PID, LID},
     # only need to pack & send comm buffers if combine mode is not ZERO
     # ZERO combine mode indicates results are the same as if all zeros were recieved
     if cm != ZERO
-        
         exports = packAndPrepare(source, target, exportLIDs, distor)
         
         if ((reversed && distributedGlobal(target)) 

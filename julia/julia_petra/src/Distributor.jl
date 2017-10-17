@@ -16,7 +16,7 @@ createFromSends(dist::DistributorImpl,exportPIDs::AbstractArray{PID})
         ::Integer where PID <:Integer
     - sets up the Distributor object using a list of process IDs to which we
         export and the number of IDs being exported.  Returns the number of
-        IDs this processor will be reciving
+        IDs this processor will be receiving
 
 createFromRecvs(dist::DistributorImpl, remoteGIDs::AbstractArray{GID},
         remotePIDs::AbstractArray{PID})::Tuple{AbstractArray{GID}, AbstractArray{PID}}

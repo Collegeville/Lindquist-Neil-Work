@@ -567,6 +567,7 @@ function makeIndicesLocal(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
                 graph.localIndices1D = Array{LID, 1}(numEnt)
             end
             
+            
             localColumnMap = getLocalMap(colMap)
             
             numBad = convertColumnIndicesFromGlobalToLocal(
@@ -610,6 +611,7 @@ function convertColumnIndicesFromGlobalToLocal(localColumnIndices::AbstractArray
         globalColumnIndices::AbstractArray{GID, 1}, ptr::AbstractArray{LID, 1},
         localColumnMap::BlockMap{GID, PID, LID}, numRowEntries::AbstractArray{LID, 1}
         )::LID where {GID, PID, LID}
+    
     
     localNumRows = max(length(ptr)-1, 0)
     numBad = 0
@@ -839,6 +841,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
             end
         end
 
+        
         numRemoteColGIDs = length(remoteGIDSet)
         
         #line 214, abunch of explanation of serial short circuit
@@ -875,7 +878,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
         numDomainElts = numMyElements(domMap)
         if numLocalColGIDs == numDomainElts
             if linearMap(domMap) #I think isContiguous() <=> linearMap()
-                localColGIDs[1:numLocalColGIDs] = minMyGID(domMap)
+                localColGIDs[1:numLocalColGIDs] = range(minMyGID(domMap), 1, numLocalColGIDs)
             else
                 domElts = myGlobalElements(domMap)
                 localColGIDs[1:length(domElts)] = domElts
@@ -912,5 +915,6 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
             end
         end
     end
-    return(error, BlockMap(myColumns, comm(domMap)))
+    
+    return (error, BlockMap(myColumns, comm(domMap)))
 end

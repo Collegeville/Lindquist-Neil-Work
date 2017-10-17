@@ -40,14 +40,14 @@ function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
         info("$(myPid(comm(source))): Import ctor expert\n")
     end
     
-    remoteLIDs = julia_petra.remoteLIDs(importData)
+    const remoteLIDs = julia_petra.remoteLIDs(importData)
     
     if !userRemotePIDGID
         empty!(remoteGIDs)
         empty!(remoteLIDs)
     end
     
-    getIDsSource(data, remoteGIDs, !userRemotePIDGID)
+    getIDSource(data, remoteGIDs, !userRemotePIDGID)
     
     if length(remoteGIDs) > 0 && !isDistributed(source)
         throw(InvalidArgumentError("Target has remote LIDs but source is not distributed globally"))
@@ -104,14 +104,14 @@ end
 
 function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{AbstractArray{PID}}, plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
     const debug = get(plist, :debug, false)
-
+    
     if debug
         info("$(myPid(comm(source))): Import ctor\n")
     end
 
-    impor = Import{GID, PID, LID}(debug, ImportExportData(source, target))
+    const impor = Import{GID, PID, LID}(debug, ImportExportData(source, target))
 
-    remoteGIDs = setupSamePermuteRemote(impor)
+    const remoteGIDs = setupSamePermuteRemote(impor)
 
     if debug
         info("$(myPid(comm(source))): Import ctor: setupSamePermuteRemote done\n")
@@ -148,15 +148,15 @@ end
 
 
 function getIDSources(data, remoteGIDs, useRemotes=true)
-    source = sourceMap(data)
-    target = targetMap(data)
+    const source = sourceMap(data)
+    const target = targetMap(data)
     
-    sourceGIDs = myGlobalElements(source)
-    targetGIDs = myGlobalElements(target)
+    const sourceGIDs = myGlobalElements(source)
+    const targetGIDs = myGlobalElements(target)
     
-    numSrcGIDs = length(sourceGIDs)
-    numTgtGIDs = length(targetGIDs)
-    numGIDs = min(numSrcGIDs, numTgtGIDs)
+    const numSrcGIDs = length(sourceGIDs)
+    const numTgtGIDs = length(targetGIDs)
+    const numGIDs = min(numSrcGIDs, numTgtGIDs)
     
     numSameGIDs = 1
     while numSameGIDs <= numGIDs && sourceGIDs[numSameGIDs] == targetGIDs[numSameGIDs]
@@ -165,9 +165,9 @@ function getIDSources(data, remoteGIDs, useRemotes=true)
     numSameGIDs -= 1
     numSameIDs(data, numSameGIDs)
     
-    permuteToLIDs = julia_petra.permuteToLIDs(data)
-    permuteFromLIDs = julia_petra.permuteFromLIDs(data)
-    remoteLIDs = julia_petra.remoteLIDs(data)
+    const permuteToLIDs = julia_petra.permuteToLIDs(data)
+    const permuteFromLIDs = julia_petra.permuteFromLIDs(data)
+    const remoteLIDs = julia_petra.remoteLIDs(data)
     
     
     for tgtLID = (numSameGIDs+1):numTgtGIDs
@@ -176,11 +176,9 @@ function getIDSources(data, remoteGIDs, useRemotes=true)
         if srcLID != 0
             push!(permuteToLIDs, tgtLID)
             push!(permuteFromLIDs, srcLID)
-        else
-            if useRemotes
-                push!(remoteGIDs, curTargetGID)
-                push!(remoteLIDs, tgtLID)
-            end
+        elseif useRemotes
+            push!(remoteGIDs, curTargetGID)
+            push!(remoteLIDs, tgtLID)
         end
     end
 end
@@ -235,11 +233,11 @@ function setupExport(impor::Import{GID, PID, LID}, remoteGIDs::AbstractArray{GID
             #if all remotes are invalid, can delete them all
             empty!(remoteProcIDs)
             empty!(remoteGIDs)
-            empty!(remoteLIDs(data))
+            empty!(julia_petra.remoteLIDs(data))
         else
             numValidRemote = 1
             
-            remoteLIDs = remoteLIDs(data)
+            remoteLIDs = julia_petra.remoteLIDs(data)
             
             for r = 1:totalNumRemote
                 if remoteProcIds[r] != 0
@@ -275,8 +273,8 @@ function setupExport(impor::Import{GID, PID, LID}, remoteGIDs::AbstractArray{GID
     numExportIDs = length(exportGIDs)
     
     if numExportIDs > 0
-        resize!(exportLIDs(data), numExportIDs)
-        exportLIDs = exportLIDs(data)
+        exportLIDs = julia_petra.exportLIDs(data)
+        resize!(exportLIDs, numExportIDs)
         for k in 1:numExportIDs
             exportLIDs[k] = lid(source, exportGIDs[k])
         end
