@@ -128,7 +128,7 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
     log("")
 
     log("λ = $λ; is within tolerance? $success")
-    log("\n\n total time for second solve = $elapsedTime sec\n\n")
+    log("total time for second solve = $elapsedTime sec\n\n")
 end
 
 
