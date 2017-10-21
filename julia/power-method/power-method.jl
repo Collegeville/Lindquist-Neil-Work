@@ -28,7 +28,7 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
     randn!(z.data)
 
     valid = false
-
+    
     for iter = 1:niters
         normz = norm2(z)[1]
         q = scale(z, 1.0/normz)
@@ -52,7 +52,7 @@ function log(values...)
 end
 
 function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type) where{GID, PID, LID}
-
+    
     const pid = myPid(comm)
     const nProc = numProc(comm)
 
@@ -68,9 +68,9 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
             numNz[i] = 3
         end
     end
-
+    
     const A = CSRMatrix{Data}(map, numNz, STATIC_PROFILE)
-
+    
     const values = Data[-1, -1]
     indices = Array{LID, 1}(2)#TODO does this need to be GID?
     two = Data[Data(2)]
@@ -89,7 +89,7 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
     end
 
     fillComplete(A, map, map)#use map for domain and range
-
+    
     const niters = numGlobalElements*10
     const tolerance = 1.0e-2
 
