@@ -648,7 +648,7 @@ function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
     #skipping sort ghosts stuff
 
     numProcs = numProc(comm(matrix))
-
+    
     needGlobalAssemble = !assertNoNonlocalInserts && numProcs > 1
     if needGlobalAssemble
         globalAssemble(matrix)
@@ -657,7 +657,7 @@ function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
             throw(InvalidStateError("Cannot have nonlocal entries on a serial run.  An invalid entry is present."))
         end
     end
-
+    
     setDomainRangeMaps(myGraph, domainMap, rangeMap)
     if !hasColMap(myGraph)
         makeColMap(myGraph)
@@ -954,6 +954,15 @@ function apply!(Y::MultiVector{Data, GID, PID, LID},
         throw(InvalidStateError("Cannot call apply(...) until fillComplete(...)"))
     end
     
+    if alpha == ZERO
+        if beta == ZERO
+            fill!(Y, ZERO)
+        elseif beta != Data(1)
+            scale!(Y, beta)
+        end
+        return
+    end
+    
     if mode == NO_TRANS
         applyNonTranspose!(Y, operator, X, alpha, beta)
     else
@@ -964,21 +973,12 @@ end
 function applyNonTranspose!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, alpha::Data, beta::Data) where {Data, GID, PID, LID}
     const ZERO = Data(0)
     
-    if alpha == ZERO
-        if beta == ZERO
-            fill!(Y, ZERO)
-        elseif beta != Data(1)
-            scale!(Y, beta)
-        end
-        return
-    end
-    
     #These are nullable
     importer = getGraph(operator).importer
     exporter = getGraph(operator).exporter
     
     YIsOverwritten = (beta == ZERO)
-    YIsReplicated = distributedGlobal(Y) && numProc(comm(Y)) != 1
+    YIsReplicated = !distributedGlobal(Y) && numProc(comm(Y)) != 1
     
     #part of special case for replicated MV output
     if YIsReplicated && myPid(comm(Y)) != 1
@@ -995,8 +995,10 @@ function applyNonTranspose!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMa
         doImport(X, XColMap, get(importer), INSERT)
     end
     
+    
     YRowMap = getRowMapMultiVector(operator, Y)
     if !isnull(exporter)
+        (myPid(comm(Y))==1) && println("non-null exporter, calling localApply")
         localApply(YRowMap, operator, XColMap, NO_TRANS, alpha, ZERO)
         
         if YIsOverwritten
@@ -1007,7 +1009,7 @@ function applyNonTranspose!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMa
         
         doExport(YRowMap, Y, get(exporter), ADD)
     else
-        #don't do export row Map and range map are the same
+        #don't do export if row Map and range map are the same
         
         if XColMap === Y
             
@@ -1032,15 +1034,6 @@ end
 
 function applyTranspose!(Yin::MultiVector{Data, GID, PID, LID}, operator::CSRMatrix{Data, GID, PID, LID}, Xin::MultiVector{Data, GID, PID, LID}, mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
     const ZERO = Data(0)
-    
-    if alpha == ZERO
-        if beta == ZERO
-            fill!(Y, ZERO)
-        elseif beta != Data(1)
-            scale!(Y, beta)
-        end
-        return
-    end
     
     nVects = numVectors(Xin)
     importer = getGraph(operator).importer
@@ -1111,12 +1104,12 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
         mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
     
     if alpha == Data(0)
+        (myPid(comm(Y))==1) && println("alpha early-exit")
         return scale!(Y, beta)
     end
 
     const rawY = Y.data
     const rawX = X.data
-
 
     #TODO implement this better, can BLAS be used?
     if !isTransposed(mode)

@@ -204,12 +204,11 @@ end
 Reduces the content of the MultiVector across all processes.  Note that the MultiVector cannot be distributed globally.
 """
 function commReduce(mVect::MultiVector)
-    #doesn't make sense to limit reducing across all processors to when its only on a single processor
-    #if distributedGlobal(mVect)
-    #    throw(InvalidArgumentError("Cannot reduce distributed MultiVector"))
-    #end
+    #can only reduce locally replicated mutlivectors
+    if distributedGlobal(mVect)
+        throw(InvalidArgumentError("Cannot reduce distributed MultiVector"))
+    end
     
-    #TODO this seems off
     mVect.data = sumAll(comm(mVect), mVect.data)
 end
 

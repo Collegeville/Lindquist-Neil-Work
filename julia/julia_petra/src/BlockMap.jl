@@ -169,7 +169,6 @@ function BlockMap(myGlobalElements::AbstractArray{GID}, comm::Comm{GID, PID,LID}
     
     data.linearMap = Bool(minAll(data.comm, linear))
     
-    
     if numProc(comm) == 1
         data.numGlobalElements = data.numMyElements
         data.minAllGID = data.minMyGID

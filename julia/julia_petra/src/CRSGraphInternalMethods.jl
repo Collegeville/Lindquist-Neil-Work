@@ -916,5 +916,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
         end
     end
     
-    return (error, BlockMap(myColumns, comm(domMap)))
+    m = BlockMap(myColumns, comm(domMap))
+    
+    return (error, m)
 end
