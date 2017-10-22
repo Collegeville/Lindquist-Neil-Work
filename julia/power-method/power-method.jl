@@ -77,7 +77,7 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
 
     for i = 1:numMyElements
         if myGlobalElements[i] == 1
-            indices = LID[1]
+            indices = LID[2]
         elseif myGlobalElements[i] == numGlobalElements
             indices = LID[numGlobalElements-2]
         else
