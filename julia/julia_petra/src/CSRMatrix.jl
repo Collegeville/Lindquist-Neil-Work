@@ -211,21 +211,21 @@ end
 Returns a nullable object of the column map multivector
 """
 function getColumnMapMultiVector(mat::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, force = false) where {Data, GID, PID, LID}
-    if !hasColMap(mat)
+    if !hasColmap(mat)
         throw(InvalidStateError("Can only call getColumnMapMultiVector with a matrix that has a column map"))
     end
     if !isFillComplete(mat)
         throw(InvalidStateError("Can only call getColumnMapMultiVector if the matrix is fill active"))
     end
     
-    numVecs = numVectors(X)
+    numVecs = getNumVectors(X)
     importer = getGraph(mat).importer
-    colMap = getColMap(mat)
+    colMap = getColmap(mat)
     
     #if import object is trivial, don't need a seperate column map multivector
     if !isnull(importer) || force
-        if isnull(mat.importMV) || numVectors(get(mat.importMV)) != numVecs
-            mat.importMV = Nullable(MultiVector{Data, GID, PID, LID}(colMap, numVecs))
+        if isnull(mat.importMV) || getNumVectors(get(mat.importMV)) != numVecs
+            mat.importMV = Nullable(MultiVector(colMap, numVecs))
         else
             mat.importMV
         end
@@ -271,7 +271,7 @@ function globalAssemble(matrix::CSRMatrix)
     end
     
     numNonLocalRows = length(matrix.nonlocals)
-    nooneHasNonLocalRows = maxAll(comm, numNonLocalRows == 0)
+    nooneHasNonLocalRows = maxAll(comm, myNumNonLocalRows == 0)
     if nooneHasNonLocalRows
         #no process has nonlocal rows, so nothing to do
         return
@@ -629,12 +629,6 @@ function fillComplete(matrix::CSRMatrix, plist::Dict{Symbol})
 end
 
 function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
-        domainMap::BlockMap{GID, PID, LID}, rangeMap::BlockMap{GID, PID, LID};
-        plist...) where {Data, GID, PID, LID}
-    fillComplete(matrix, domainMap, rangeMap, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
-end
-    
-function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
         domainMap::BlockMap{GID, PID, LID}, rangeMap::BlockMap{GID, PID, LID},
         plist::Dict{Symbol}) where {Data, GID, PID, LID}
     if isFillComplete(matrix)
@@ -648,7 +642,7 @@ function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
     #skipping sort ghosts stuff
 
     numProcs = numProc(comm(matrix))
-    
+
     needGlobalAssemble = !assertNoNonlocalInserts && numProcs > 1
     if needGlobalAssemble
         globalAssemble(matrix)
@@ -657,11 +651,10 @@ function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
             throw(InvalidStateError("Cannot have nonlocal entries on a serial run.  An invalid entry is present."))
         end
     end
-    
+
     setDomainRangeMaps(myGraph, domainMap, rangeMap)
     if !hasColMap(myGraph)
         makeColMap(myGraph)
-        matrix.colMap = myGraph.colMap
     end
     
     makeIndicesLocal(myGraph)
@@ -954,15 +947,6 @@ function apply!(Y::MultiVector{Data, GID, PID, LID},
         throw(InvalidStateError("Cannot call apply(...) until fillComplete(...)"))
     end
     
-    if alpha == ZERO
-        if beta == ZERO
-            fill!(Y, ZERO)
-        elseif beta != Data(1)
-            scale!(Y, beta)
-        end
-        return
-    end
-    
     if mode == NO_TRANS
         applyNonTranspose!(Y, operator, X, alpha, beta)
     else
@@ -973,12 +957,21 @@ end
 function applyNonTranspose!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, alpha::Data, beta::Data) where {Data, GID, PID, LID}
     const ZERO = Data(0)
     
+    if alpha == ZERO
+        if beta == ZERO
+            fill!(Y, ZERO)
+        elseif beta != Data(1)
+            scale!(Y, beta)
+        end
+        return
+    end
+    
     #These are nullable
     importer = getGraph(operator).importer
     exporter = getGraph(operator).exporter
     
     YIsOverwritten = (beta == ZERO)
-    YIsReplicated = !distributedGlobal(Y) && numProc(comm(Y)) != 1
+    YIsReplicated = distributedGlobal(Y) && numPid(comm(Y)) != 0
     
     #part of special case for replicated MV output
     if YIsReplicated && myPid(comm(Y)) != 1
@@ -990,15 +983,13 @@ function applyNonTranspose!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMa
     else
         #need to import source multivector
         
-        XColMap = get(getColumnMapMultiVector(operator, X))
+        XColMap = getColumnMapMultiVector(operator, X)
         
         doImport(X, XColMap, get(importer), INSERT)
     end
     
-    
     YRowMap = getRowMapMultiVector(operator, Y)
     if !isnull(exporter)
-        (myPid(comm(Y))==1) && println("non-null exporter, calling localApply")
         localApply(YRowMap, operator, XColMap, NO_TRANS, alpha, ZERO)
         
         if YIsOverwritten
@@ -1009,7 +1000,7 @@ function applyNonTranspose!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMa
         
         doExport(YRowMap, Y, get(exporter), ADD)
     else
-        #don't do export if row Map and range map are the same
+        #don't do export row Map and range map are the same
         
         if XColMap === Y
             
@@ -1034,6 +1025,15 @@ end
 
 function applyTranspose!(Yin::MultiVector{Data, GID, PID, LID}, operator::CSRMatrix{Data, GID, PID, LID}, Xin::MultiVector{Data, GID, PID, LID}, mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
     const ZERO = Data(0)
+    
+    if alpha == ZERO
+        if beta == ZERO
+            fill!(Y, ZERO)
+        elseif beta != Data(1)
+            scale!(Y, beta)
+        end
+        return
+    end
     
     nVects = numVectors(Xin)
     importer = getGraph(operator).importer
@@ -1104,13 +1104,13 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
         mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
     
     if alpha == Data(0)
-        (myPid(comm(Y))==1) && println("alpha early-exit")
         return scale!(Y, beta)
     end
 
     const rawY = Y.data
     const rawX = X.data
 
+    
     #TODO implement this better, can BLAS be used?
     if !isTransposed(mode)
         #TODO look at best way to order the loops to avoid cache misses
@@ -1135,5 +1135,6 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
             end
         end
     end
+    
     Y
 end
