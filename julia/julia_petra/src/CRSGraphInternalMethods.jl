@@ -567,6 +567,7 @@ function makeIndicesLocal(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
                 graph.localIndices1D = Array{LID, 1}(numEnt)
             end
             
+            
             localColumnMap = getLocalMap(colMap)
             
             numBad = convertColumnIndicesFromGlobalToLocal(
@@ -610,6 +611,7 @@ function convertColumnIndicesFromGlobalToLocal(localColumnIndices::AbstractArray
         globalColumnIndices::AbstractArray{GID, 1}, ptr::AbstractArray{LID, 1},
         localColumnMap::BlockMap{GID, PID, LID}, numRowEntries::AbstractArray{LID, 1}
         )::LID where {GID, PID, LID}
+    
     
     localNumRows = max(length(ptr)-1, 0)
     numBad = 0
@@ -809,7 +811,6 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
             const localNumRows = getLocalNumRows(graph)
 
             numLocalColGIDs = 0
-            numRemoteColGIDs = 0
 
             gidIsLocal = zeros(Bool, localNumRows)
             remoteGIDSet = Set()
@@ -832,16 +833,17 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
                                 numLocalColGIDs += 1
                             end
                         else
-                            if !in(remoteGIDSet, gid)
-                                push!(remoteGIDSet, gid)
-                                numRemoteColGIDs += 1
-                            end
+                            #don't need containment checks, set already takes care of that
+                            push!(remoteGIDSet, gid)
                         end
                     end
                 end
             end
         end
 
+        
+        numRemoteColGIDs = length(remoteGIDSet)
+        
         #line 214, abunch of explanation of serial short circuit
         if numProc(comm(domMap)) == 1
             if numRemoteColGIDs != 0
@@ -853,7 +855,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
         end
         resize!(myColumns, numLocalColGIDs+numRemoteColGIDs)
         localColGIDs  = view(myColumns, 1:numLocalColGIDs)
-        remoteColGIDs = view(myColumns, numLocalColGIDs+1:numRemoteColGIDs)
+        remoteColGIDs = view(myColumns, numLocalColGIDs+1:numLocalColGIDs+numRemoteColGIDs)
 
         remoteColGIDs[:] = [el for el in remoteGIDSet]
 
@@ -876,7 +878,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
         numDomainElts = numMyElements(domMap)
         if numLocalColGIDs == numDomainElts
             if linearMap(domMap) #I think isContiguous() <=> linearMap()
-                localColGIDs[1:numLocalColGIDs] = minMyGIDs(domMap)
+                localColGIDs[1:numLocalColGIDs] = range(minMyGID(domMap), 1, numLocalColGIDs)
             else
                 domElts = myGlobalElements(domMap)
                 localColGIDs[1:length(domElts)] = domElts
@@ -913,5 +915,8 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
             end
         end
     end
-    return(error, BlockMap(myColumns, comm(domMap)))
+    
+    m = BlockMap(myColumns, comm(domMap))
+    
+    return (error, m)
 end

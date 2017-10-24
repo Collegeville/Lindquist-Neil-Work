@@ -50,7 +50,8 @@ function broadcastAll(comm::MPIComm, myvals::AbstractArray{T}, root::Integer)::A
 end
 
 function gatherAll(comm::MPIComm, myVals::AbstractArray{T})::Array{T} where T
-    MPI.Allgather(myVals, comm.mpiComm)
+    lengths = MPI.Allgather([convert(Cint, length(myVals))], comm.mpiComm)
+    MPI.Allgatherv(myVals, lengths, comm.mpiComm)
 end
 
 function sumAll(comm::MPIComm, partialsums::AbstractArray{T})::Array{T} where T

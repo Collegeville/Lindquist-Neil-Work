@@ -1,6 +1,10 @@
 using julia_petra
 using Base.Test
 
+const GID = UInt64
+const PID = UInt16
+const LID = UInt32
+
 #use distinct types
 const comm = MPIComm(UInt64, UInt16, UInt32)
 
@@ -32,6 +36,8 @@ try
             @testset "Data MPI Tests" begin
                 include("MultiVectorTests.jl")
                 multiVectorTests(comm)
+                
+                include("CSRMatrixMPITests.jl")
             end
 
         finally

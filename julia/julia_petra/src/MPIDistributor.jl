@@ -196,7 +196,6 @@ function computeRecvs(dist::MPIDistributor{GID, PID, LID}, myProc::PID, nProcs::
     status = MPI.Status()
     
     msgCount = zeros(Int, nProcs)
-    counts = ones(Int, nProcs)
     
     for i = 1:(dist.numSends + dist.selfMsg)
         msgCount[dist.procs_to[i]] += 1
@@ -209,8 +208,8 @@ function computeRecvs(dist::MPIDistributor{GID, PID, LID}, myProc::PID, nProcs::
     end
     dist.numRecvs = MPI.Scatter(counts, 1, 0, dist.comm.mpiComm)[1]
     
-    dist.lengths_from = zeros(Int, nProcs)
-    dist.procs_from = zeros(PID, nProcs)
+    dist.lengths_from = zeros(Int, dist.numRecvs)
+    dist.procs_from = zeros(PID, dist.numRecvs)
     
     #using NEW_COMM_PATTERN (see line 590)
     
@@ -259,15 +258,12 @@ function computeRecvs(dist::MPIDistributor{GID, PID, LID}, myProc::PID, nProcs::
         j += dist.lengths_from[i]
     end
     
-    barrier(dist.comm) #testing
     dist.totalRecvLength = 0
     for i = 1:dist.numRecvs
         dist.totalRecvLength += dist.lengths_from[i]
     end
     
     dist.numRecvs -= dist.selfMsg
-    
-    barrier(dist.comm)
     
     dist        
 end
@@ -277,13 +273,12 @@ function computeSends(dist::MPIDistributor{GID, PID, LID}, remoteGIDs::AbstractA
 
     tmpPlan = MPIDistributor(dist.comm)
     
-    procList = copy(remotePIDs)
     importObjs = Array{Tuple{GID, PID}}(numImports)
     for i = 1:numImports
         importObjs[i] = (remoteGIDs[i], myPid(dist.comm))#remotePIDs[i])
     end
     
-    numExports = createFromSends(tmpPlan, procList)
+    numExports = createFromSends(tmpPlan, copy(remotePIDs))
     
     exportIDs = Array{GID}(numExports)
     exportProcs = Array{PID}(numExports)
@@ -341,8 +336,8 @@ end
 #### Distributor interface ####
 
 function createFromSends(dist::MPIDistributor{GID, PID, LID}, exportPIDs::AbstractArray{PID})::Integer where GID <:Integer where PID <:Integer where LID <:Integer
-    pid = myPid(dist.comm)
-    nProcs = numProc(dist.comm)
+    const pid = myPid(dist.comm)
+    const nProcs = numProc(dist.comm)
     createSendStructure(dist, pid, nProcs, exportPIDs)
     computeRecvs(dist, pid, nProcs)
     if dist.numRecvs > 0
@@ -360,7 +355,6 @@ function createFromRecvs(dist::MPIDistributor{GID, PID}, remoteGIDs::AbstractArr
         throw(InvalidArgumentError("remote lists must be the same length"))
     end
     (exportGIDs, exportPIDs) = computeSends(dist, remoteGIDs, remotePIDs)
-    
     createFromSends(dist, exportPIDs)
     
     exportGIDs, exportPIDs

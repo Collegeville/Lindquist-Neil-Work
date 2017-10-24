@@ -2,7 +2,7 @@
 export Export 
 
 """
-Communication plan for data redistribution from a (possibly) multipl-owned to a uniquely owned distribution
+Communication plan for data redistribution from a (possibly) multiple-owned to a uniquely owned distribution
 """
 struct Export{GID <: Integer, PID <:Integer, LID <: Integer}
     debug::Bool
@@ -175,9 +175,9 @@ function setupRemote(expor::Export{GID, PID, LID}, exportGIDs::AbstractArray{GID
     remoteLIDs = julia_petra.remoteLIDs(data)
     
     resize!(remoteLIDs, numRemoteIDs)
-    
-    for (i, j) in zip(remoteGIDs, remoteLIDs)
-        remoteLIDs[j] = lid(target, remoteGIDs[i])
+
+    for i in 1:length(remoteGIDs)
+        remoteLIDs[i] = lid(target, remoteGIDs[i])
     end
     
     if expor.debug

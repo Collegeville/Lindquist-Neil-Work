@@ -127,7 +127,7 @@ end
 
 
 """
-    BlockMap(numGlobalElements, numMyElements, myGlobalElements, comm)
+    BlockMap(myGlobalElements, comm)
 
 Constructor for user-defined arbitrary distribution of elements
 """
@@ -169,13 +169,18 @@ function BlockMap(myGlobalElements::AbstractArray{GID}, comm::Comm{GID, PID,LID}
     
     data.linearMap = Bool(minAll(data.comm, linear))
     
-    
     if numProc(comm) == 1
         data.numGlobalElements = data.numMyElements
         data.minAllGID = data.minMyGID
         data.maxAllGID = data.maxMyGID
     else
-        data.numGlobalElements = sumAll(data.comm, data.numMyElements)
+        if data.linearMap
+            data.numGlobalElements = sumAll(data.comm, data.numMyElements)
+        else
+            #if 1+ GIDs shared between processors, need to total that correctly
+            allIDs = gatherAll(data.comm, myGlobalElements)
+            data.numGlobalElements = length(unique(allIDs))
+        end
         
         tmp_send = [
             -((data.numMyElements > 0
