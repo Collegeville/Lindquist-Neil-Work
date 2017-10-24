@@ -224,7 +224,7 @@ function getColumnMapMultiVector(mat::CSRMatrix{Data, GID, PID, LID}, X::MultiVe
     
     #if import object is trivial, don't need a seperate column map multivector
     if !isnull(importer) || force
-        if isnull(mat.importMV) || getNumVectors(get(mat.importMV)) != numVecs
+        if isnull(mat.importMV) || numVectors(get(mat.importMV)) != numVecs
             mat.importMV = Nullable(MultiVector{Data, GID, PID, LID}(colMap, numVecs))
         else
             mat.importMV
