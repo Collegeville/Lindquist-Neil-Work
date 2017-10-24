@@ -211,21 +211,21 @@ end
 Returns a nullable object of the column map multivector
 """
 function getColumnMapMultiVector(mat::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, force = false) where {Data, GID, PID, LID}
-    if !hasColmap(mat)
+    if !hasColMap(mat)
         throw(InvalidStateError("Can only call getColumnMapMultiVector with a matrix that has a column map"))
     end
     if !isFillComplete(mat)
         throw(InvalidStateError("Can only call getColumnMapMultiVector if the matrix is fill active"))
     end
     
-    numVecs = getNumVectors(X)
+    numVecs = numVectors(X)
     importer = getGraph(mat).importer
-    colMap = getColmap(mat)
+    colMap = getColMap(mat)
     
     #if import object is trivial, don't need a seperate column map multivector
     if !isnull(importer) || force
         if isnull(mat.importMV) || getNumVectors(get(mat.importMV)) != numVecs
-            mat.importMV = Nullable(MultiVector(colMap, numVecs))
+            mat.importMV = Nullable(MultiVector{Data, GID, PID, LID}(colMap, numVecs))
         else
             mat.importMV
         end
@@ -270,7 +270,7 @@ function globalAssemble(matrix::CSRMatrix)
         throw(InvalidStateError("Fill must be active to call this method"))
     end
     
-    numNonLocalRows = length(matrix.nonlocals)
+    myNumNonLocalRows = length(matrix.nonlocals)
     nooneHasNonLocalRows = maxAll(comm, myNumNonLocalRows == 0)
     if nooneHasNonLocalRows
         #no process has nonlocal rows, so nothing to do
@@ -629,6 +629,12 @@ function fillComplete(matrix::CSRMatrix, plist::Dict{Symbol})
 end
 
 function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
+        domainMap::BlockMap{GID, PID, LID}, rangeMap::BlockMap{GID, PID, LID};
+        plist...) where {Data, GID, PID, LID}
+    fillComplete(matrix, domainMap, rangeMap, Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
+end
+
+function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
         domainMap::BlockMap{GID, PID, LID}, rangeMap::BlockMap{GID, PID, LID},
         plist::Dict{Symbol}) where {Data, GID, PID, LID}
     if isFillComplete(matrix)
@@ -655,6 +661,7 @@ function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
     setDomainRangeMaps(myGraph, domainMap, rangeMap)
     if !hasColMap(myGraph)
         makeColMap(myGraph)
+        matrix.colMap = myGraph.colMap
     end
     
     makeIndicesLocal(myGraph)
@@ -971,7 +978,7 @@ function applyNonTranspose!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMa
     exporter = getGraph(operator).exporter
     
     YIsOverwritten = (beta == ZERO)
-    YIsReplicated = distributedGlobal(Y) && numPid(comm(Y)) != 0
+    YIsReplicated = !distributedGlobal(Y) && numProc(comm(Y)) != 0
     
     #part of special case for replicated MV output
     if YIsReplicated && myPid(comm(Y)) != 1
@@ -983,7 +990,7 @@ function applyNonTranspose!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMa
     else
         #need to import source multivector
         
-        XColMap = getColumnMapMultiVector(operator, X)
+        XColMap = get(getColumnMapMultiVector(operator, X))
         
         doImport(X, XColMap, get(importer), INSERT)
     end
