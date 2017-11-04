@@ -813,8 +813,8 @@ function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
 
     if rowInfo.localRow != 0 && rowInfo.numEntries > 0
         viewRange = 1:rowInfo.numEntries
-		indices::AbstractArray{Data, 1} = getLocalView(myGraph, rowInfo)[viewRange]
-        values::AbstractArray{LID, 1} = getView(matrix, rowInfo)[viewRange]
+		indices::AbstractArray{LID, 1} = getLocalView(myGraph, rowInfo)[viewRange]
+        values::AbstractArray{Data, 1} = getView(matrix, rowInfo)[viewRange]
     else
         indices = LID[]
         values = Data[]
