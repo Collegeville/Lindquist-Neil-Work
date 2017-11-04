@@ -465,7 +465,7 @@ function insertNonownedGlobalValues(matrix::CSRMatrix{Data, GID, PID, LID},
     append!(curRowInds, indices)
 end
 
-function getView(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID}) where {Data, GID, PID, LID}
+function getView(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID})::AbstractArray{Data, 1} where {Data, GID, PID, LID}
     if getProfileType(matrix) == STATIC_PROFILE && rowInfo.allocSize > 0
         range = rowInfo.offset1D:rowInfo.offset1D+rowInfo.allocSize-1
         view(matrix.localMatrix.values, range)
@@ -809,12 +809,12 @@ function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
                 * "getLocalalRowCopy(...) instead."))
     end
 
-    myGraph = matrix.myGraph
+    const myGraph = matrix.myGraph
 
     if rowInfo.localRow != 0 && rowInfo.numEntries > 0
         viewRange = 1:rowInfo.numEntries
-        indices = getLocalView(myGraph, rowInfo)[viewRange]
-        values = getView(matrix, rowInfo)[viewRange]
+		indices::AbstractArray{Data, 1} = getLocalView(myGraph, rowInfo)[viewRange]
+        values::AbstractArray{LID, 1} = getView(matrix, rowInfo)[viewRange]
     else
         indices = LID[]
         values = Data[]
@@ -950,8 +950,19 @@ function apply!(Y::MultiVector{Data, GID, PID, LID},
         operator::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID},
         mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
     
+    const ZERO = Data(0)
+    
     if isFillActive(operator)
         throw(InvalidStateError("Cannot call apply(...) until fillComplete(...)"))
+    end
+    
+	if alpha == ZERO
+        if beta == ZERO
+            fill!(Y, ZERO)
+        elseif beta != Data(1)
+            scale!(Y, beta)
+        end
+        return
     end
     
     if mode == NO_TRANS
@@ -963,15 +974,6 @@ end
 
 function applyNonTranspose!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID}, alpha::Data, beta::Data) where {Data, GID, PID, LID}
     const ZERO = Data(0)
-    
-    if alpha == ZERO
-        if beta == ZERO
-            fill!(Y, ZERO)
-        elseif beta != Data(1)
-            scale!(Y, beta)
-        end
-        return
-    end
     
     #These are nullable
     importer = getGraph(operator).importer
@@ -1032,15 +1034,6 @@ end
 
 function applyTranspose!(Yin::MultiVector{Data, GID, PID, LID}, operator::CSRMatrix{Data, GID, PID, LID}, Xin::MultiVector{Data, GID, PID, LID}, mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
     const ZERO = Data(0)
-    
-    if alpha == ZERO
-        if beta == ZERO
-            fill!(Y, ZERO)
-        elseif beta != Data(1)
-            scale!(Y, beta)
-        end
-        return
-    end
     
     nVects = numVectors(Xin)
     importer = getGraph(operator).importer
@@ -1109,10 +1102,6 @@ end
 function localApply(Y::MultiVector{Data, GID, PID, LID},
         A::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID},
         mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
-    
-    if alpha == Data(0)
-        return scale!(Y, beta)
-    end
 
     const rawY = Y.data
     const rawX = X.data
@@ -1123,8 +1112,12 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
         #TODO look at best way to order the loops to avoid cache misses
         for vect = LID(1):numVectors(Y)
             for row = LID(1):getLocalNumRows(A)
-                sum = Data(0)
-                for (ind, val) in zip(getLocalRowView(A, row)...)
+                sum::Data = Data(0)
+				#for (ind::LID, val::Data) in zip(getLocalRowView(A, row)...)
+				(indices, values) = getLocalRowView(A, row)
+                for i in LID(1):LID(length(indices))
+                	ind::LID = indices[i]
+                	val::Data = values[i]
                     sum += val*rawX[ind, vect]
                 end
                 sum = applyConjugation(mode, sum*alpha)
@@ -1136,7 +1129,11 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
         rawY[:, :] *= beta
         for vect = LID(1):numVectors(Y)
             for mRow in LID(1):getLocalNumRows(A)
-                for (ind, val) in zip(getLocalRowView(A, mRow)...)
+                #for (ind::LID, val::Data) in zip(getLocalRowView(A, mRow)...)
+                (indices, values) = getLocalRowView(A, mRow)
+                for i in LID(1):LID(length(indices))
+                	ind::LID = indices[i]
+                	val::Data = values[i]
                     rawY[ind, vect] += applyConjugation(mode, alpha*rawX[mRow, vect]*val)
                 end
             end

@@ -352,7 +352,7 @@ function getGlobalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}) wh
     end
 end
         
-function getLocalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}) where {GID <: Integer, PID, LID <: Integer}
+function getLocalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID})::AbstractArray{LID, 1} where {GID <: Integer, PID, LID <: Integer}
     if rowInfo.allocSize > 0
         if length(graph.localIndices1D) != 0
             range = rowInfo.offset1D : rowInfo.offset1D + rowInfo.allocSize-1
