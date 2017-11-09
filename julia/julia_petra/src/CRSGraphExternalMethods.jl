@@ -363,6 +363,21 @@ function getLocalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID})::Ab
     end
     return LID[]
 end
+                                    
+                                    
+function getLocalViewPtr(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID})::Tuple{Ptr{LID}, LID} where {GID <: Integer, PID, LID <: Integer}
+    if rowInfo.allocSize > 0
+        if length(graph.localIndices1D) != 0
+            #range = rowInfo.offset1D : rowInfo.offset1D + rowInfo.allocSize-1
+            #return view(graph.localIndices1D, range)
+            return (pointer(graph.localIndices1D, rowInfo.offset1D), rowInfo.allocSize)
+        elseif length(graph.localIndices2D[rowInfo.localRow]) == 0
+            baseArray = localIndices2D[rowInfo.localRow]
+            return (pointer(Ptr{LID}, baseArray), length(baseArray))
+        end
+    end
+    return (C_NULL, 0)
+end
 
 function getGlobalRowView(graph::CRSGraph{GID}, globalRow::GID)::AbstractArray{GID, 1} where {GID <: Integer}
     debug = @debug graph

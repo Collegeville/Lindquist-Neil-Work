@@ -476,6 +476,19 @@ function getView(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID}):
     end
 end
 
+function getViewPtr(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID})::Tuple{Ptr{Data}, LID} where {Data, GID, PID, LID}
+    if getProfileType(matrix) == STATIC_PROFILE && rowInfo.allocSize > 0
+        range = rowInfo.offset1D:rowInfo.offset1D+rowInfo.allocSize-1
+        #view(matrix.localMatrix.values, range)
+        (pointer(matrix.localMatrix.values, rowInfo.offset1D), rowInfo.allocSize)
+    elseif getProfileType(matrix) == DYNAMIC_PROFILE
+        baseArray = matrix.values2D[rowInfo.localRow]
+        (pointer(baseArray), length(baseArray))
+    else
+        (C_NULL, 0)
+    end
+end
+
 function getDiagCopyWithoutOffsets(rowMap, colMap, A::CSRMatrix{Data}) where {Data}
     errCount = 0
 
@@ -822,6 +835,41 @@ function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
     (indices, values)
 end
 
+function getLocalRowViewPtr(matrix::CSRMatrix{Data, GID, PID, LID},
+        localRow::Integer
+        )::Tuple{Ptr{LID}, Ptr{Data}, LID} where {
+        Data, GID, PID, LID}
+    rowInfo = getRowInfo(matrix.myGraph, LID(localRow))
+    getLocalRowViewPtr(matrix, rowInfo)
+end
+
+function getLocalRowViewPtr(matrix::CSRMatrix{Data, GID, PID, LID},
+        rowInfo::RowInfo{LID}
+        )::Tuple{Ptr{LID}, Ptr{Data}, LID}  where {
+        Data, GID, PID, LID}
+
+    if isGloballyIndexed(matrix)
+        throw(InvalidStateError("The matrix is globally indexed, so cannot return a "
+                * "view of the row with local column indices.  Use "
+                * "getLocalalRowCopy(...) instead."))
+    end
+
+    const myGraph = matrix.myGraph
+
+    if rowInfo.localRow != 0 && rowInfo.numEntries > 0
+        viewRange = 1:rowInfo.numEntries
+        (indices, _) = getLocalViewPtr(myGraph, rowInfo)
+        (values, _) = getViewPtr(matrix, rowInfo)
+        
+        (indices, values, rowInfo.numEntries)
+    else
+        indices = LID[]
+        values = Data[]
+        (C_NULL, C_NULL, 0)
+    end
+end
+
+
 
 function getLocalDiagCopy(matrix::CSRMatrix{Data, GID, PID, LID})::MultiVector{Data, GID, PID, LID} where {Data, GID, PID, LID}
     if !hasColMap(matrix)
@@ -1114,10 +1162,13 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
             for row = LID(1):getLocalNumRows(A)
                 sum::Data = Data(0)
 				#for (ind::LID, val::Data) in zip(getLocalRowView(A, row)...)
-				(indices, values) = getLocalRowView(A, row)
-                for i in LID(1):LID(length(indices))
-                	ind::LID = indices[i]
-                	val::Data = values[i]
+                #(baseInds, baseVals) = getLocalRowView(A, row)
+				(indicesPtr, valuesPtr, len) = getLocalRowViewPtr(A, row)
+                indices = unsafe_wrap(Array{LID, 1}, indicesPtr, len)
+                values = unsafe_wrap(Array{Data, 1}, valuesPtr, len)
+                for i in LID(1):LID(len)
+                	ind::LID = indices[i] #unsafe_load(indices, i)
+                	val::Data = values[i] #unsafe_load(values, i)
                     sum += val*rawX[ind, vect]
                 end
                 sum = applyConjugation(mode, sum*alpha)
@@ -1130,10 +1181,10 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
         for vect = LID(1):numVectors(Y)
             for mRow in LID(1):getLocalNumRows(A)
                 #for (ind::LID, val::Data) in zip(getLocalRowView(A, mRow)...)
-                (indices, values) = getLocalRowView(A, mRow)
-                for i in LID(1):LID(length(indices))
-                	ind::LID = indices[i]
-                	val::Data = values[i]
+                (indices, values, len) = getLocalRowViewPtr(A, mRow)
+                for i in LID(1):LID(len)
+                	ind::LID = unsafe_load(indices, i)
+                	val::Data = unsafe_load(values, i)
                     rawY[ind, vect] += applyConjugation(mode, alpha*rawX[mRow, vect]*val)
                 end
             end
