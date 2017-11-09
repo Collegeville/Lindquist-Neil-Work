@@ -1161,14 +1161,10 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
         for vect = LID(1):numVectors(Y)
             for row = LID(1):getLocalNumRows(A)
                 sum::Data = Data(0)
-				#for (ind::LID, val::Data) in zip(getLocalRowView(A, row)...)
-                #(baseInds, baseVals) = getLocalRowView(A, row)
-				(indicesPtr, valuesPtr, len) = getLocalRowViewPtr(A, row)
-                indices = unsafe_wrap(Array{LID, 1}, indicesPtr, len)
-                values = unsafe_wrap(Array{Data, 1}, valuesPtr, len)
+                (indices, values, len) = getLocalRowViewPtr(A, row)
                 for i in LID(1):LID(len)
-                	ind::LID = indices[i] #unsafe_load(indices, i)
-                	val::Data = values[i] #unsafe_load(values, i)
+                    ind::LID = unsafe_load(indices, i)
+                    val::Data = unsafe_load(values, i)
                     sum += val*rawX[ind, vect]
                 end
                 sum = applyConjugation(mode, sum*alpha)
@@ -1180,11 +1176,10 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
         rawY[:, :] *= beta
         for vect = LID(1):numVectors(Y)
             for mRow in LID(1):getLocalNumRows(A)
-                #for (ind::LID, val::Data) in zip(getLocalRowView(A, mRow)...)
                 (indices, values, len) = getLocalRowViewPtr(A, mRow)
                 for i in LID(1):LID(len)
-                	ind::LID = unsafe_load(indices, i)
-                	val::Data = unsafe_load(values, i)
+                    ind::LID = unsafe_load(indices, i)
+                    val::Data = unsafe_load(values, i)
                     rawY[ind, vect] += applyConjugation(mode, alpha*rawX[mRow, vect]*val)
                 end
             end
