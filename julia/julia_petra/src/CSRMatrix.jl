@@ -478,14 +478,12 @@ end
 
 function getViewPtr(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID})::Tuple{Ptr{Data}, LID} where {Data, GID, PID, LID}
     if getProfileType(matrix) == STATIC_PROFILE && rowInfo.allocSize > 0
-        range = rowInfo.offset1D:rowInfo.offset1D+rowInfo.allocSize-1
-        #view(matrix.localMatrix.values, range)
-        (pointer(matrix.localMatrix.values, rowInfo.offset1D), rowInfo.allocSize)
+        (Ptr{Data}(pointer(matrix.localMatrix.values, rowInfo.offset1D)), LID(rowInfo.allocSize))
     elseif getProfileType(matrix) == DYNAMIC_PROFILE
         baseArray = matrix.values2D[rowInfo.localRow]
-        (pointer(baseArray), length(baseArray))
+        (pointer(baseArray), LID(length(baseArray)))
     else
-        (C_NULL, 0)
+        (Ptr{Data}(C_NULL), LID(0))
     end
 end
 

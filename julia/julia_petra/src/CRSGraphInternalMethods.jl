@@ -157,25 +157,25 @@ function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} wher
         return RowInfo{LID}(graph, row, 0, 0, 1)
     end
     
-    offset1D = 1
-    allocSize = 0
+    offset1D = LID(1)
+    allocSize = LID(0)
     
     if getProfileType(graph) == STATIC_PROFILE
         if length(graph.rowOffsets) != 0
-            offset1D  = graph.rowOffsets[row]
-            allocSize = graph.rowOffsets[row+1] - graph.rowOffsets[row]
+            offset1D  = LID(graph.rowOffsets[row])
+            allocSize = LID(graph.rowOffsets[row+1] - graph.rowOffsets[row])
         end
         numEntries = (length(graph.numRowEntries) == 0 ?
-            allocSize : graph.numRowEntries[row])
+            allocSize : LID(graph.numRowEntries[row]))
     else #dynamic profile
         if isLocallyIndexed(graph) && length(graph.localIndices2D) == 0
-            allocSize = length(graph.localIndices2D[row])
+            allocSize = LID(length(graph.localIndices2D[row]))
             
         elseif isGloballyIndexed(graph) && length(graph.globalIndices2D) == 0
-            allocSize = length(graph.globalIndices2D[row])
+            allocSize = LID(length(graph.globalIndices2D[row]))
         end
         numEntries = (length(graph.numRowEntries) == 0 ?
-            0 : graph.numRowEntries[row])
+            LID(0) : LID(graph.numRowEntries[row]))
     end
     RowInfo{LID}(graph, row, allocSize, numEntries, offset1D)
 end
