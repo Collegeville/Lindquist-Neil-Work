@@ -212,36 +212,44 @@ function commReduce(mVect::MultiVector)
     mVect.data = sumAll(comm(mVect), mVect.data)
 end
 
-function norm2(mVect::MultiVector{Data})::AbstractArray{Data, 1} where Data
-    normImpl(mVect, Data(2))
-end
-
 """
 Handles the non-infinate norms
 """
-function normImpl(mVect::MultiVector{Data}, normType::Data)::AbstractArray{Data, 1} where Data
-    const numVects = numVectors(mVect)
-    const localVectLength = localLength(mVect)
-    norms = Array{Data, 1}(numVects)
-    for i = 1:numVects
-        sum = Data(0)
-        for j = 1:localVectLength
-            sum += Data(mVect.data[j, i]^normType)
+macro normImpl(mVect, Data, normType)
+    quote
+        const numVects = numVectors($(esc(mVect)))
+        const localVectLength = localLength($(esc(mVect)))
+        norms = Array{$(esc(Data)), 1}(numVects)
+        for i = 1:numVects
+            sum = $(esc(Data))(0)
+            for j = 1:localVectLength
+                $(if normType == 2
+                    quote
+                        val = $(esc(mVect)).data[j, i]
+                        sum += val*val
+                    end
+                else
+                    :(sum += $(esc(Data))($(esc(mVect)).data[j, i]^$normType))
+                end)
+            end
+            norms[i] = sum
         end
-        norms[i] = sum
-    end
 
-    norms = sumAll(comm(map(mVect)), norms)
+        norms = sumAll(comm(map($(esc(mVect)))), norms)
 
-    if normType == Data(2)
-        @. norms = sqrt(norms)
-    else
-        @. norms = norms^(1/normType)
+        $(if normType == 2
+            :(@. norms = sqrt(norms))
+        else
+            :(@. norms = norms^(1/normType))
+        end)
+        norms
     end
-    norms
 end
 
 
+function norm2(mVect::MultiVector{Data})::AbstractArray{Data, 1} where Data
+    @normImpl mVect Data 2
+end
 
 
 ## DistObject interface ##

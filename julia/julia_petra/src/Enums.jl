@@ -32,6 +32,7 @@ Checks whether the given TransposeMode is transposed
     mode != NO_TRANS
 end
 
+
 function applyConjugation(mode::TransposeMode, val::T)::T where T
     if mode == CONJ_TRANS
         conj(val)
@@ -40,6 +41,9 @@ function applyConjugation(mode::TransposeMode, val::T)::T where T
     end
 end
 
+function applyConjugation(mode::TransposeMode, val::T)::T where {T <: Real}
+    val
+end
 
 
 """

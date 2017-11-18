@@ -5,7 +5,7 @@ type BlockMapData{GID <: Integer, PID <:Integer, LID <: Integer}
     comm::Comm{GID, PID, LID}
     directory::Nullable{Directory}
     lid::Array{LID}
-    myGlobalElements::Array{GID}
+    myGlobalElements::Array{GID, 1}
 #    firstPointInElementList::Array{Integer}
 #    elementSizeList::Array{Integer}
 #    pointToElementList::Array{Integer}
