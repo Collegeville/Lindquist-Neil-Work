@@ -3,7 +3,7 @@
 function SerialMapTests(map::BlockMap{Int, Int, Int}, map2::BlockMap{Int, Int, Int}, diffMap::BlockMap{Int, Int, Int})
 #    quote
         mapCopy = BlockMap{Int, Int, Int}(map)
-        
+
         @test uniqueGIDs(map)
 
         for i = 1:5
@@ -133,3 +133,14 @@ map2 = BlockMap(5, 5, [1, 2, 3, 4, 5], false, 1, 5, commVal)
 diffMap = BlockMap(6, 6, [1, 2, 3, 4, 5, 6], false, 1, 6, commVal)
 #@SerialMapTests
 SerialMapTests(map, map2, diffMap)
+
+
+#stability tests
+for (GID, PID, LID) in Base.product(stableGIDs, stablePIDs, stableLIDs)
+        @test is_stable(check_method(gid, (BlockMap{GID, PID, LID}, LID)))
+        @test is_stable(check_method(lid, (BlockMap{GID, PID, LID}, GID)))
+        @test is_stable(check_method(myGID, (BlockMap{GID, PID, LID}, GID)))
+        @test is_stable(check_method(myLID, (BlockMap{GID, PID, LID}, LID)))
+        @test is_stable(check_method(numGlobalElements, (BlockMap{GID, PID, LID},)))
+        @test is_stable(check_method(numMyElements, (BlockMap{GID, PID, LID},)))
+end

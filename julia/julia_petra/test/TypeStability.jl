@@ -10,7 +10,6 @@
 function check_function(func, param_types; unstable_vars=Dict{Symbol, Type}(), unstable_return::Bool=false)
     result = Tuple{Any, StabilityReport}[]
     for params in param_types
-        println(which(func, params).file, which(func, params).line)
         push!(result, (params, check_method(func, params; unstable_vars=unstable_vars, unstable_return=unstable_return)))
     end
     result

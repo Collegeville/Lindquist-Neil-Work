@@ -1,6 +1,9 @@
 using julia_petra
 using Base.Test
 
+include("TypeStability.jl")
+include("TestUtil.jl")
+
 const GID = UInt64
 const PID = UInt16
 const LID = UInt32
@@ -25,10 +28,10 @@ try
                 include("MPICommTests.jl")
                 include("MPIBlockMapTests.jl")
                 include("MPIimport-export Tests.jl")
-                
+
                 include("LocalCommTests.jl")
                 runLocalCommTests(comm)
-                
+
                 include("BasicDirectoryTests.jl")
                 basicDirectoryTests(comm)
             end
@@ -36,7 +39,7 @@ try
             @testset "Data MPI Tests" begin
                 include("MultiVectorTests.jl")
                 multiVectorTests(comm)
-                
+
                 include("CSRMatrixMPITests.jl")
             end
 
