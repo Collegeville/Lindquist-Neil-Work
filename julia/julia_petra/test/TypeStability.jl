@@ -39,7 +39,8 @@ function check_method(func, param_types; unstable_vars=Dict{Symbol, Type}(), uns
         warn("mutliple methods for $func matching $param_types")
     end
 
-    stability_report = StabilityReport()
+    unstable_vars = Array{Tuple{Symbol, Type}, 1}(0)
+    unstable_ret = Nullable{Type}()
 
     for (src, rettyp) in code
         #check variables
@@ -52,7 +53,7 @@ function check_method(func, param_types; unstable_vars=Dict{Symbol, Type}(), uns
                     name = Symbol(slotnames[i])
                     typ = src.slottypes[i]
                     if (!isleaftype(typ) || typ == Core.Box) && !(typ <: get(unstable_vars, name, Int64))
-                        push!(stability_report.unstable_variables, (name, typ))
+                        push!(unstable_var, (name, typ))
                     end
 
                     #else likely optmized out
@@ -63,13 +64,13 @@ function check_method(func, param_types; unstable_vars=Dict{Symbol, Type}(), uns
         end
 
         if !unstable_return && (!isleaftype(rettyp) || rettyp == Core.Box)
-            push!(stability_report.unstableReturn, Nullable(rettyp))
+            unstable_ret = Nullable(rettyp)
         end
 
         #TODO check body
     end
 
-    return stability_report
+    return StabilityReport(unstable_vars, unstable_ret)
 end
 
 struct StabilityReport
