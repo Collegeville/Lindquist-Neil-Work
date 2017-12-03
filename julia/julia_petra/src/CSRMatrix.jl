@@ -478,7 +478,7 @@ end
 
 function getViewPtr(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID})::Tuple{Ptr{Data}, LID} where {Data, GID, PID, LID}
     if getProfileType(matrix) == STATIC_PROFILE && rowInfo.allocSize > 0
-        (Ptr{Data}(pointer(matrix.localMatrix.values, rowInfo.offset1D)), LID(rowInfo.allocSize))
+        ((pointer(matrix.localMatrix.values, rowInfo.offset1D))::Ptr{Data}, LID(rowInfo.allocSize))
     elseif getProfileType(matrix) == DYNAMIC_PROFILE
         baseArray = matrix.values2D[rowInfo.localRow]
         (pointer(baseArray), LID(length(baseArray)))
@@ -1025,11 +1025,14 @@ function applyNonTranspose!(Y::MultiVector{Data, GID, PID, LID}, operator::CSRMa
     importer = getGraph(operator).importer
     exporter = getGraph(operator).exporter
 
+    #assumed to be shared by all data structures
+    resultComm = comm(Y)
+
     YIsOverwritten = (beta == ZERO)
-    YIsReplicated = !distributedGlobal(Y) && numProc(comm(Y)) != 0
+    YIsReplicated = !distributedGlobal(Y) && numProc(resultComm) != 0
 
     #part of special case for replicated MV output
-    if YIsReplicated && myPid(comm(Y)) != 1
+    if YIsReplicated && myPid(resultComm) != 1
         beta = ZERO
     end
 
