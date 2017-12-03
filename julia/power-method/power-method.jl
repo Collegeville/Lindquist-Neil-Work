@@ -28,7 +28,9 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
     randn!(z.data)
 
     valid = false
-    
+
+    λ::Data
+
     for iter = 1:niters
         normz = norm2(z)[1]
         q = scale(z, 1.0/normz)
@@ -52,7 +54,7 @@ function log(values...)
 end
 
 function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type) where{GID, PID, LID}
-    
+
     const pid = myPid(comm)
     const nProc = numProc(comm)
 
@@ -68,9 +70,9 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
             numNz[i] = 3
         end
     end
-    
+
     const A = CSRMatrix{Data}(map, numNz, STATIC_PROFILE)
-    
+
     const values = Data[-1, -1]
     indices = Array{LID, 1}(2)#TODO does this need to be GID?
     two = Data[Data(2)]
@@ -89,7 +91,7 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
     end
 
     fillComplete(A, map, map)#use map for domain and range
-    
+
     const niters = numGlobalElements*10
     const tolerance = 1.0e-2
 
@@ -97,7 +99,7 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
     tic()
     λ, success = powerMethod(A, niters, tolerance, verbose)
     elapsedTime = toq()
-    
+
     log("λ = $λ; is within tolerance? $success")
     log("total time for first solve (plus compile) = $elapsedTime sec\n\n")
 
@@ -147,13 +149,11 @@ log(comm)
 
 if length(ARGS) != 1
     log("Usage: 1 argument for the number_of_equations")
-    exit(1)
+else
+    targetNumGlobalElements = parse(commLID, ARGS[1])
+    if targetNumGlobalElements < nProc
+        log("numGlobalBlocks = $targetNumGlobalElements cannot be < number of processors = $nProc")
+    else
+        main(comm, targetNumGlobalElements, verbose, commData)
+    end
 end
-
-numGlobalElements = parse(commLID, ARGS[1])
-if numGlobalElements < nProc
-    log("numGlobalBlocks = $numGlobalElements cannot be < number of processors = $nProc")
-    exit(1)
-end
-
-main(comm, numGlobalElements, verbose, commData)
