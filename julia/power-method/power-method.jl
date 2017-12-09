@@ -29,12 +29,16 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
 
     valid = false
 
-    λ::Data
+    const ONE = one(Data)
+    const ZERO = zero(Data)
 
     for iter = 1:niters
         normz = norm2(z)[1]
-        q = scale(z, 1.0/normz)
-        apply!(z, A, q, Data(1), Data(0))
+
+        q = Base.copy!(q, z)
+        scale!(q, ONE/normz)
+
+        apply!(z, A, q, ONE, ZERO)
         λ = dot(q, z)[1]
         if iter%100 != 0 || iter+1 == niters
             #TODO improve - currently works, but is a little bit of a hack around MultiVector's lack of math operators
@@ -104,7 +108,10 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
     log("total time for first solve (plus compile) = $elapsedTime sec\n\n")
 
     tic()
+    #Profile.clear_malloc_data()
+    #@time
     λ, success = powerMethod(A, niters, tolerance, verbose)
+    #exit(0)
     #TODO look into storing FLOPS
     elapsedTime = toq()
 
