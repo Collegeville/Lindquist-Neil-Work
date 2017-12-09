@@ -537,6 +537,8 @@ function sortAndMergeIndicesAndValues(matrix::CSRMatrix{Data, GID, PID, LID},
         if !merged
             totalNumDups += mergeRowIndicesAndValues(matrix, rowInfo)
         end
+
+        recycleRowInfo(rowInfo)
     end
 
     if !sorted
@@ -621,6 +623,8 @@ function insertGlobalValues(matrix::CSRMatrix{Data, GID, PID, LID}, globalRow::I
 
         insertIndicesAndValues(myGraph, rowInfo, indices, getView(matrix, rowInfo),
                 values, GLOBAL_INDICES)
+
+        recycleRowInfo(rowInfo)
     end
 end
 
@@ -735,7 +739,8 @@ function getGlobalRowCopy(matrix::CSRMatrix{Data, GID, PID, LID},
     rowInfo = getRowInfoFromGlobalRow(myGraph, GID(globalRow))
     viewRange = 1:rowInfo.numEntries
 
-    if rowInfo.localRow != 0
+
+    retVal = if rowInfo.localRow != 0
         if isLocallyIndexed(myGraph)
             colMap = getColMap(myGraph)
             curLocalIndices = getLocalView(myGraph, rowInfo)[viewRange]
@@ -749,6 +754,10 @@ function getGlobalRowCopy(matrix::CSRMatrix{Data, GID, PID, LID},
     else
         (GID[], Data[])
     end
+
+    recycleRowInfo(rowInfo)
+
+    retVal
 end
 
 
@@ -761,7 +770,7 @@ function getLocalRowCopy(matrix::CSRMatrix{Data, GID, PID, LID},
     rowInfo = getRowInfo(myGraph, LID(localRow))
     viewRange = 1:rowInfo.numEntries
 
-    if rowInfo.localRow != 0
+    retVal = if rowInfo.localRow != 0
         if isLocallyIndexed(myGraph)
             curLocalIndices = Array{LID}(getLocalView(myGraph, rowInfo)[viewRange])
         else
@@ -775,6 +784,10 @@ function getLocalRowCopy(matrix::CSRMatrix{Data, GID, PID, LID},
     else
         (LID[], Data[])
     end
+
+    recycleRowInfo(rowInfo)
+
+    retVal
 end
 
 
@@ -798,6 +811,7 @@ function getGlobalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
         indices = GID[]
         values = Data[]
     end
+    recycleRowInfo(rowInfo)
     (indices, values)
 end
 
@@ -806,7 +820,10 @@ function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
         )::Tuple{AbstractArray{LID, 1}, AbstractArray{Data, 1}} where {
         Data, GID, PID, LID}
     rowInfo = getRowInfo(matrix.myGraph, LID(localRow))
-    getLocalRowView(matrix, rowInfo)
+    retVal = getLocalRowView(matrix, rowInfo)
+    recycleRowInfo(rowInfo)
+
+    retVal
 end
 
 function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
@@ -838,7 +855,10 @@ function getLocalRowViewPtr(matrix::CSRMatrix{Data, GID, PID, LID},
         )::Tuple{Ptr{LID}, Ptr{Data}, LID} where {
         Data, GID, PID, LID}
     rowInfo = getRowInfo(matrix.myGraph, LID(localRow))
-    getLocalRowViewPtr(matrix, rowInfo)
+    retVal = getLocalRowViewPtr(matrix, rowInfo)
+    recycleRowInfo(rowInfo)
+
+    retVal
 end
 
 function getLocalRowViewPtr(matrix::CSRMatrix{Data, GID, PID, LID},
