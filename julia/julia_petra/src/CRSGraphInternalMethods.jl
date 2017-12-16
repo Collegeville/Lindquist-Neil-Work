@@ -15,7 +15,7 @@ const rowInfoSpare = Union{Void, RowInfo}[nothing]
 """
     Gets a `RowInfo` object with the given values, reusing an intance if able
 """
-function getRowInfo(graph::CRSGraph{<:Integer, <:Integer, LID}, localRow::LID,
+@inline function getRowInfo(graph::CRSGraph{<:Integer, <:Integer, LID}, localRow::LID,
         allocSize::LID, numEntries::LID, offset1D::LID)::RowInfo{LID} where {LID <: Integer}
     global rowInfoSpare
 
@@ -44,7 +44,7 @@ end
     Puts the `RowInfo` object back in the object pool.
     After calling this method remove all references to the object.
 """
-function recycleRowInfo(rowInfo::RowInfo{T}) where T
+@inline function recycleRowInfo(rowInfo::RowInfo{T}) where T
     @inbounds rowInfoSpare[1] = rowInfo
 end
 
