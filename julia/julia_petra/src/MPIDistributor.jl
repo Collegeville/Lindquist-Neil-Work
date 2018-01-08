@@ -300,7 +300,7 @@ end
 Creates a reverse distributor for the given MPIDistributor
 """
 function createReverseDistributor(dist::MPIDistributor{GID, PID, LID}
-        )::MPIDistributor{GID, PID, LID} where {GID <: Integer, PID <: Integer, LID <: Integer}
+        ) where {GID <: Integer, PID <: Integer, LID <: Integer}
     myProc = myPid(dist.comm)
 
     if isnull(dist.planReverse)
@@ -335,11 +335,9 @@ function createReverseDistributor(dist::MPIDistributor{GID, PID, LID}
 
         reverse.request = Array{MPI.Request}(reverse.numRecvs)
         reverse.status  = Array{MPI.Status}(reverse.numRecvs)
-
-        reverse
-    else
-        get(dist.planReverse)
     end
+
+    nothing
 end
 
 
@@ -520,12 +518,10 @@ function resolveReversePosts(dist::MPIDistributor{GID, PID, LID},
     end
 
     if isnull(dist.planReverse)
-        plan = createReverseDistributor(dist)
-    else
-        plan = get(dist.planReverse)
+        createReverseDistributor(dist)
     end
 
-    resolvePosts(plan, exportObjs)
+    resolvePosts(get(dist.planReverse), exportObjs)
 end
 
 
