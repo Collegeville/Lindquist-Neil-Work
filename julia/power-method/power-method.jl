@@ -25,9 +25,9 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
 
     #skipping flop counting
 
-    randn!(z.data)
+    λ::Data = 0
 
-    valid = false
+    randn!(z.data)
 
     const ONE = one(Data)
     const ZERO = zero(Data)
@@ -35,8 +35,8 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
     for iter = 1:niters
         normz = norm2(z)[1]
 
-        q = Base.copy!(q, z)
-        scale!(q, ONE/normz)
+        @. q.data = z.data/normz
+
 
         apply!(z, A, q, ONE, ZERO)
         λ = dot(q, z)[1]
@@ -78,8 +78,7 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
     const A = CSRMatrix{Data}(map, numNz, STATIC_PROFILE)
 
     const values = Data[-1, -1]
-    indices = Array{LID, 1}(2)#TODO does this need to be GID?
-    two = Data[Data(2)]
+    const two = Data[Data(2)]
 
     for i = 1:numMyElements
         if myGlobalElements[i] == 1

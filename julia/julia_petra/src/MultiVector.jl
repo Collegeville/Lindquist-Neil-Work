@@ -14,7 +14,7 @@ type MultiVector{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
     localLength::LID
     globalLength::GID
     numVectors::LID
-    
+
     map::BlockMap{GID, PID, LID}
 end
 
@@ -64,7 +64,7 @@ function Base.copy!(dest::MultiVector{Data, GID, PID, LID}, src::MultiVector{Dat
     dest.globalLength = src.globalLength
     dest.numVectors = src.numVectors
     dest.map = src.map
-    
+
     dest
 end
 
@@ -208,7 +208,7 @@ function commReduce(mVect::MultiVector)
     if distributedGlobal(mVect)
         throw(InvalidArgumentError("Cannot reduce distributed MultiVector"))
     end
-    
+
     mVect.data = sumAll(comm(mVect), mVect.data)
 end
 
@@ -240,7 +240,7 @@ macro normImpl(mVect, Data, normType)
         $(if normType == 2
             :(@. norms = sqrt(norms))
         else
-            :(@. norms = norms^(1/normType))
+            :(@. norms = norms^(1/$normType))
         end)
         norms
     end
@@ -257,8 +257,8 @@ end
 function checkSizes(source::MultiVector{Data, GID, PID, LID},
         target::MultiVector{Data, GID, PID, LID})::Bool where {
             Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
-    (source.numVectors == target.numVectors 
-        && source.globalLength == target.globalLength 
+    (source.numVectors == target.numVectors
+        && source.globalLength == target.globalLength
         )#&& source.localLength == target.localLength)
 end
 
