@@ -23,7 +23,7 @@ const rowInfoSpare = Union{Void, RowInfo}[nothing]
         #rowInfoSpare should always be size 1
         nextVal = rowInfoSpare[1]
         #ensure object pool haves right type
-        if typeof(nextVal) === RowInfo{LID}
+        if nextVal isa RowInfo{LID}
             rowInfoSpare[1] = nothing
 
             rowInfo::RowInfo{LID} = nextVal
