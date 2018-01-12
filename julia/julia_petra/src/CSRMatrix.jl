@@ -873,13 +873,13 @@ function getLocalRowViewPtr(matrix::CSRMatrix{Data, GID, PID, LID},
     end
 
     const myGraph = matrix.myGraph
+    const numEntries = rowInfo.numEntries
 
-    if rowInfo.localRow != 0 && rowInfo.numEntries > 0
-        viewRange = 1:rowInfo.numEntries
+    if rowInfo.localRow != 0 && numEntries > 0
         (indices, _) = getLocalViewPtr(myGraph, rowInfo)
         (values, _) = getViewPtr(matrix, rowInfo)
 
-        (indices, values, rowInfo.numEntries)
+        (indices, values, numEntries)
     else
         indices = LID[]
         values = Data[]
@@ -1186,11 +1186,11 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
                 for i in LID(1):LID(len)
                     ind::LID = unsafe_load(indices, i)
                     val::Data = unsafe_load(values, i)
-                    sum += val*rawX[ind, vect]
+                    @inbounds sum += val*rawX[ind, vect]
                 end
                 sum = applyConjugation(mode, sum*alpha)
-                rawY[row, vect] *= beta
-                rawY[row, vect] += sum
+                @inbounds rawY[row, vect] *= beta
+                @inbounds rawY[row, vect] += sum
             end
         end
     else
@@ -1201,7 +1201,7 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
                 for i in LID(1):LID(len)
                     ind::LID = unsafe_load(indices, i)
                     val::Data = unsafe_load(values, i)
-                    rawY[ind, vect] += applyConjugation(mode, alpha*rawX[mRow, vect]*val)
+                    @inbounds rawY[ind, vect] += applyConjugation(mode, alpha*rawX[mRow, vect]*val)
                 end
             end
         end
