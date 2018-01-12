@@ -1,11 +1,10 @@
 
-export Export 
+export Export
 
 """
 Communication plan for data redistribution from a (possibly) multiple-owned to a uniquely owned distribution
 """
 struct Export{GID <: Integer, PID <:Integer, LID <: Integer}
-    debug::Bool
     exportData::ImportExportData{GID, PID, LID}
 end
 
@@ -26,23 +25,22 @@ end
 function Export(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID},
         remotePIDs::Nullable{AbstractArray{PID}}, plist::Dict{Symbol}) where {
             GID <: Integer, PID <: Integer, LID <: Integer}
-    const debug = get(plist, :debug, false)
 
-    if debug
+    if @debug
         info("$(myPid(comm(source))): Export ctor\n")
     end
 
-    expor = Export(debug, ImportExportData(source, target))
+    expor = Export(ImportExportData(source, target))
 
     exportGIDs = setupSamePermuteExport(expor)
 
-    if debug
+    if @debug
         info("$(myPid(comm(source))): Export ctor: setupSamePermuteExport done\n")
     end
     if distributedGlobal(source)
         setupRemote(expor, exportGIDs)
     end
-    if debug
+    if @debug
         info("$(myPid(comm(source))): Export ctor: done\n")
     end
 
@@ -53,32 +51,32 @@ end
 ## internal construction methods ##
 
 function setupSamePermuteExport(expor::Export{GID, PID, LID})::AbstractArray{GID} where {GID <: Integer, PID <: Integer, LID <: Integer}
-    
+
     data = expor.exportData
-    
+
     source = sourceMap(expor)
     target = targetMap(expor)
-    
+
     sourceGIDs = myGlobalElements(source)
     targetGIDs = myGlobalElements(target)
-    
-    
+
+
     numSrcGIDs = length(sourceGIDs)
     numTgtGIDs = length(targetGIDs)
     numGIDs = min(numSrcGIDs, numTgtGIDs)
-    
+
     numSameGIDs = 1
     while numSameGIDs <= numGIDs && sourceGIDs[numSameGIDs] == targetGIDs[numSameGIDs]
         numSameGIDs += 1
     end
     numSameGIDs -= 1
     numSameIDs(data, numSameGIDs)
-    
+
     exportGIDs = Array{GID, 1}(0)
     permuteToLIDs = julia_petra.permuteToLIDs(data)
     permuteFromLIDs = julia_petra.permuteFromLIDs(data)
     exportLIDs = julia_petra.exportLIDs(data)
-    
+
     for srcLID = (numSameGIDs+1):numSrcGIDs
         const curSrcGID = sourceGIDs[srcLID]
         const tgtLID = lid(target, curSrcGID)
@@ -90,16 +88,16 @@ function setupSamePermuteExport(expor::Export{GID, PID, LID})::AbstractArray{GID
             push!(exportLIDs, srcLID)
         end
     end
-    
+
     if length(exportLIDs) != 0 && !distributedGlobal(source)
         isLocallyComplete(data, false)
         warn("Source has export LIDs but source not distributed globally.  " *
             "Exporting to a submap of the target map.")
     end
-    
+
     if distributedGlobal(source)
         #resize!(julia_petra.exportPIDs(data), length(exportGIDs))
-        
+
         (exportPIDs, exportLIDs) = remoteIDList(target, exportGIDs)
         julia_petra.exportPIDs(data, exportPIDs)
         missingGIDs = 0
@@ -108,14 +106,14 @@ function setupSamePermuteExport(expor::Export{GID, PID, LID})::AbstractArray{GID
                 missingGIDs += 1
             end
         end
-        
+
         if missingGIDs != 0
             warn("The source Map has GIDs not found in the target Map")
-            
+
             isLocallyComplete(data, false)
             numInvalidExports = missingGIDs
             totalNumExports = length(exportPIDs)
-            
+
             if numInvalidExports == totalNumExports
                 # all exports invalid, can delete all exports
                 resize!(exportGIDs, 0)
@@ -142,17 +140,17 @@ function setupSamePermuteExport(expor::Export{GID, PID, LID})::AbstractArray{GID
     end
     exportGIDs
 end
-    
+
 function setupRemote(expor::Export{GID, PID, LID}, exportGIDs::AbstractArray{GID, 1}) where {GID <: Integer, PID <: Integer, LID <: Integer}
-    
+
     data = expor.exportData
-    
+
     target = targetMap(data)
 
-    if expor.debug
+    if @debug
         info("$(myPid(comm(target))): setupRemote\n")
     end
-    
+
     exportPIDs = julia_petra.exportPIDs(data)
 
     order = sortperm(exportPIDs)
@@ -160,31 +158,31 @@ function setupRemote(expor::Export{GID, PID, LID}, exportGIDs::AbstractArray{GID
     permute!(exportLIDs(data), order)
     permute!(exportGIDs, order)
 
-    if expor.debug
+    if @debug
         info("$(myPid(comm(target))): setupRemote: Calling createFromSends\n")
     end
-    
+
     numRemoteIDs = createFromSends(distributor(data), exportPIDs)
-    
-    if expor.debug
+
+    if @debug
         info("$(myPid(comm(target))): setupRemote: Calling doPostsAndWaits\n")
     end
-    
+
     remoteGIDs = resolve(distributor(data), exportGIDs)
-    
+
     remoteLIDs = julia_petra.remoteLIDs(data)
-    
+
     resize!(remoteLIDs, numRemoteIDs)
 
     for i in 1:length(remoteGIDs)
         remoteLIDs[i] = lid(target, remoteGIDs[i])
     end
-    
-    if expor.debug
+
+    if @debug
         info("$(myPid(comm(target))): setupRemote: done\n")
     end
 end
-    
+
 ## Getters ##
 
 """

@@ -37,7 +37,7 @@ end
 
 Import data into this object using an Import object ("forward mode")
 """
-function doImport(source::SrcDistObject{GID, PID, LID}, 
+function doImport(source::SrcDistObject{GID, PID, LID},
         target::DistObject{GID, PID, LID}, importer::Import{GID, PID, LID},
         cm::CombineMode) where {GID <:Integer, PID <: Integer, LID <: Integer}
     doTransfer(source, target, cm, numSameIDs(importer), permuteToLIDs(importer),
@@ -109,15 +109,13 @@ function doTransfer(source::SrcDistObject{GID, PID, LID},
         permuteFromLIDs::AbstractArray{LID, 1}, remoteLIDs::AbstractArray{LID, 1},
         exportLIDs::AbstractArray{LID, 1}, distor::Distributor{GID, PID, LID},
         reversed::Bool) where {GID <: Integer, PID <: Integer, LID <: Integer}
-    
-    debug = false #DECISION add plist for debug setting? get debug from (im/ex)porter?
-    
-    if debug
+
+    if @debug
         if !sameAs(map(source), map(target))
             throw(InvalidArgumentError("Source and target maps don't match"))
         end
     end
-    
+
     if !checkSizes(source, target)
         throw(InvalidArgumentError("checkSize() indicates that the destination " *
                 "object is not a legal target for redistribution from the " *
@@ -125,36 +123,36 @@ function doTransfer(source::SrcDistObject{GID, PID, LID},
                 "the same dimensions.  For example, MultiVectors must have " *
                 "the same number of rows and columns."))
     end
-    
+
     readAlso = true #from TPetras rwo
     if cm == INSERT || cm == REPLACE
         numIDsToWrite = numSameIDs + length(permuteToLIDs) + length(remoteLIDs)
         if numIDsToWrite == numMyElements(map(target))
             # overwriting all local data in the destination, so write-only suffices
-            
+
             #TODO look at FIXME on line 503
             readAlso = false
         end
     end
-    
+
     #TODO look at FIXME on line 514
     createViews(source)
-    
+
     #tell target to create a view of its data
     #TODO look at FIXME on line 531
     createViewsNonConst(target, readAlso)
-    
-    
+
+
     if numSameIDs + length(permuteToLIDs) != 0
         copyAndPermute(source, target, numSameIDs, permuteToLIDs, permuteFromLIDs)
     end
-    
+
     # only need to pack & send comm buffers if combine mode is not ZERO
     # ZERO combine mode indicates results are the same as if all zeros were recieved
     if cm != ZERO
         exports = packAndPrepare(source, target, exportLIDs, distor)
-        
-        if ((reversed && distributedGlobal(target)) 
+
+        if ((reversed && distributedGlobal(target))
                 || (!reversed && distributedGlobal(source)))
             if reversed
                 #do exchange of remote data
@@ -162,11 +160,11 @@ function doTransfer(source::SrcDistObject{GID, PID, LID},
             else
                 imports = resolve(distor, exports)
             end
-            
+
             unpackAndCombine(target, remoteLIDs, imports, distor, cm)
         end
     end
-    
+
     releaseViews(source)
     releaseViews(target)
 end

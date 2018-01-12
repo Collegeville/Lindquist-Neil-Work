@@ -1,8 +1,13 @@
 #contains random utility macros
 
+globalDebug = false
+setGlobalDebug(val::Bool) = (globalDebug = val)
+
 """
-Expands into get(\$graph.plist, :debug, false)
+Returns the global debug value
+
+Has an optional ignored argument
 """
-macro debug(graph)
-    :($(esc(:(Base.get)))($(esc(graph)).plist, :debug, false))
+macro debug()
+    globalDebug
 end

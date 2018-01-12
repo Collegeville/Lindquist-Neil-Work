@@ -382,7 +382,7 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
 
    matrix.localMatrix.graph.entries = myGraph.localIndices1D
 
-    #most of the debug sections were taken out, since they're for debuging Petra itself, and julia doesn't have a compiler option to enable macros
+    #most of the debug sections were taken out, they could be re-added wrapped with `if @debug`
     if getProfileType(matrix) == DYNAMIC_PROFILE
         numRowEntries = myGraph.numRowEntries
 

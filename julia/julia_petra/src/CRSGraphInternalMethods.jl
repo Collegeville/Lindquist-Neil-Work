@@ -109,7 +109,7 @@ function computeGlobalConstants(graph::CRSGraph{GID, PID, LID}) where {
     #short circuit if already computed
     graph.haveGlobalConstants && return
 
-    if @debug graph
+    if @debug
         @assert !null(graph.colMap) "The graph must have a column map at this point"
     end
 
@@ -139,7 +139,7 @@ function computeLocalConstants(graph::CRSGraph{GID, PID, LID}) where {
     #short circuit if already computed
     graph.haveLocalConstants && return
 
-    if @debug graph
+    if @debug
         @assert !null(graph.colMap) "The graph must have a column map at this point"
     end
 
@@ -193,7 +193,7 @@ function getRowInfoFromGlobalRow(graph::CRSGraph{GID, PID, LID},
 end
 
 function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} where {GID, PID, LID <: Integer}
-    if @debug graph
+    if @debug
         @assert hasRowInfo(graph) "Graph does not have row info anymore.  Should have been caught earlier"
     end
 
@@ -327,7 +327,7 @@ end
 
 #TODO migrate this to testing
 function checkInternalState(graph::CRSGraph)
-    if @debug graph
+    if @debug
         const localNumRows = getLocalNumRows(graph)
 
         @assert(isFillActive(graph) != isFillComplete(graph),
@@ -636,7 +636,7 @@ function makeIndicesLocal(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
                     globalIndices = graph.globalIndices2D[localRow]
 
                     graph.localIndices2D[localRow] = [lid(colMap, gid) for gid in globalIndices]
-                    if @debug graph
+                    if @debug
                         @assert(minimum(graph.localIndices2D[localRow]) > 0,
                             "Globalal indices were not found in the column Map")
                     end
@@ -709,7 +709,7 @@ macro insertIndicesImpl(indicesType, innards)
             graph.nodeNumEntries += numNewIndices
             setLocallyModified(graph)
 
-            if @debug graph
+            if @debug
                 chkNewNumEntries = getNumEntriesInLocalRow(graph, myRow)
                 @assert(chkNewNumEntries == newNumEntries,
                     "Internal Logic error: chkNewNumEntries = $chkNewNumEntries "
@@ -810,7 +810,7 @@ function insertGlobalIndicesImpl(graph::CRSGraph{GID, PID, LID},
         graph.nodeNumEntries += numNewToInsert
         setLocallyModified(graph)
 
-        if @debug graph
+        if @debug
             newNumEntries = rowInfo.numEntries + numNewToInsert
             chkNewNumEntries = getNumEntiresInLocalRow(graph, myRow)
             @assert(chkNewNumEntries == newNumEntries,
@@ -909,7 +909,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
 
         remotePIDs = remoteIDList(domMap, remoteColGIDs)[1]
         if any(remotePIDs .== 0)
-            if @debug graph
+            if @debug
                 warn("Some column indices are not in the domain Map")
             end
             error = true
@@ -952,7 +952,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
             end
 
             if numLocalCount != numLocalColGIDs
-                if @debug graph
+                if @debug
                     warn("$(myPid(comm(graph))): numLocalCount = $numLocalCount "
                         * "!= numLocalColGIDs = $numLocalColGIDs.  "
                         * "This should not happen.")

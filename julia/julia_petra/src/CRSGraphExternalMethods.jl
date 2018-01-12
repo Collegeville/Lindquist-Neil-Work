@@ -55,7 +55,7 @@ isFillComplete(g::CRSGraph) = g.fillComplete
 function getGlobalRowCopy(graph::CRSGraph{GID}, globalRow::GID)::Array{GID, 1} where {GID <: Integer}
     Array{GID, 1}(getGlobalRowView(graph, globalRow))
 end
-        
+
 function getLocalRowCopy(graph::CRSGraph{GID, PID, LID}, localRow::LID)::Array{LID, 1} where {GID, PID, LID <: Integer}
     Array{LID, 1}(getLocalRowView(graph, localRow))
 end
@@ -96,17 +96,17 @@ function copyAndPermute(source::CRSGraph{GID, PID, LID},
             throw(InvalidArgumentError("permuteToLIDs and "
                     * "permuteFromLIDs must have the same size"))
         end
-        
+
         srcRowMap = getRowMap(source)
         tgtRowMap = getRowMap(target)
-        
+
         #copy part
         for myid = 1:numSameIDs
             myGID = gid(srcRowMap, myid)
             row = getGlobalRowView(source, myGID)
             insertGlobalIndices(target, myGID, row)
         end
-        
+
         #permute part
         for i = 1:length(permuteToLIDs)
             srcGID = gid(srcRowMap, permuteFromLIDs[i])
@@ -116,8 +116,8 @@ function copyAndPermute(source::CRSGraph{GID, PID, LID},
         end
     end
 end
-        
-            
+
+
 function copyAndPermuteNoViewMode(source::RowGraph{GID, PID, LID},
         target::CRSGraph{GID, PID, LID}, numSameIDs::LID,
         permuteToLIDs::AbstractArray{LID, 1}, permuteFromLIDs::AbstractArray{LID, 1}) where {
@@ -126,17 +126,17 @@ function copyAndPermuteNoViewMode(source::RowGraph{GID, PID, LID},
         throw(InvalidArgumentError("permuteToLIDs and "
                 * "permuteFromLIDs must have the same size"))
     end
-    
+
     srcRowMap = getRowMap(source)
     tgtRowMap = getRowMap(target)
-    
+
     #copy part
     for myid = 1:numSameIDs
         myGID = gid(srcRowMap, myid)
         rowCopy = getGlobalRowCopy(sourceRowGraph, myGID)
         insertGlobalIndices(target, myGID, rowCopy)
     end
-    
+
     #permute part
     for i = 1:length(permuteToLIDs)
         tgtGID = gid(tgtRowMap, permuteToLIDs[i])
@@ -145,8 +145,8 @@ function copyAndPermuteNoViewMode(source::RowGraph{GID, PID, LID},
         insertGlobalIndices(target, tgtGID, rowCopy)
     end
 end
-        
-    
+
+
 
 function packAndPrepare(source::RowGraph{GID, PID, LID},
         target::CRSGraph{GID, PID, LID}, exportLIDs::AbstractArray{LID, 1},
@@ -163,9 +163,9 @@ function unpackAndCombine(target::CRSGraph{GID, PID, LID},
     #should be caught else where
     @assert(isFillActive(target),
         "Import and Export operations require a fill active graph")
-    
+
     tgtMap = map(target)
-    
+
     for i = 1:length(importLIDs)
         row = imports[i]
         insertGlobalIndicesFiltered(target, gid(tgtMap, importLIDs[i]), row)
@@ -216,32 +216,31 @@ function insertLocalIndices(graph::CRSGraph{GID, PID, LID},
     if !hasRowInfo(graph)
         throw(InvalidStateError("Row information was deleted"))
     end
-    
-    debug = @debug graph
-    if debug
+
+    if @debug
         colMap = getColMap(graph)
         badColIndices = [ind for ind in indices if myLID(colMap, ind)]
-        
+
         if length(badColIndices) != 0
             throw(InvalidArgumentError(
                 "Attempting to insert entries in owned row $localRow, "
                 * "at the following column indices: $indices.\n"
-                                
+
                 * "Of those, the following indices are not in "
                 * "the column map on this process: $badColIndices.\n"
-        
+
                 * "Since the graph has a column map already, it is "
                 * "invalid to insert entries at those locations"))
         end
     end
-       
+
     insertLocalIndicesImpl(graph, localRow, indices)
-    
-    if debug
+
+    if @debug
         @assert isLocallyIndexed(graph) "Post condtion violated"
     end
-end    
-    
+end
+
 
 """
     insertGlobalIndices(::CRSGraph{GID, PID, LID}, localRow::Integer, [numEntries::Integer,] inds::AbstractArray{<: Integer, 1})
@@ -275,15 +274,15 @@ function insertGlobalIndices(graph::CRSGraph{GID, PID, LID}, globalRow::GID,
     if isFillComplete(graph)
         throw(InvalidStateError("Cannot call this method if the fill is not active"))
     end
-    
+
     myRow = lid(graph.rowMap, globalRow)
     if myRow != 0
-        if @debug graph
+        if @debug
             if hasColMap(graph)
                 colMap = get(graph.colMap)
 
                 #appearently jupyter can't render the generator if properly
-                badColInds = [index for index in indices 
+                badColInds = [index for index in indices
                                         if myGid(colMap, index)==0]
                 if length(badColInds) != 0
                     throw(InvalidArgumentError("$(myPid(comm(graph))): "
@@ -322,7 +321,7 @@ function insertGlobalIndicesFiltered(graph::CRSGraph{GID, PID, LID}, globalRow::
     if isFillComplete(graph)
         throw(InvalidStateError("Cannot insert into fill complete graph"))
     end
-    
+
     myRow = lid(graph.rowMap, globalRow)
     if myRow != 0
         #if column map present, use it to filter the entries
@@ -336,7 +335,7 @@ function insertGlobalIndicesFiltered(graph::CRSGraph{GID, PID, LID}, globalRow::
         append!(graph.nonlocals[globalRow], indices)
     end
 end
-                        
+
 function getGlobalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}) where {GID <: Integer, PID, LID <: Integer}
     if rowInfo.allocSize > 0
         if length(graph.globalIndices1D) != 0
@@ -351,7 +350,7 @@ function getGlobalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}) wh
         GID[]
     end
 end
-        
+
 function getLocalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID})::AbstractArray{LID, 1} where {GID <: Integer, PID, LID <: Integer}
     if rowInfo.allocSize > 0
         if length(graph.localIndices1D) != 0
@@ -363,8 +362,8 @@ function getLocalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID})::Ab
     end
     return LID[]
 end
-                                    
-                                    
+
+
 function getLocalViewPtr(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID})::Tuple{Ptr{LID}, LID} where {GID <: Integer, PID, LID <: Integer}
     if rowInfo.allocSize > 0
         if length(graph.localIndices1D) != 0
@@ -380,19 +379,18 @@ function getLocalViewPtr(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}):
 end
 
 function getGlobalRowView(graph::CRSGraph{GID}, globalRow::GID)::AbstractArray{GID, 1} where {GID <: Integer}
-    debug = @debug graph
     if isLocallyIndexed(graph)
         throw(InvalidArgumentError("The graph's indices are currently stored as local indices, so a view with global column indices cannot be returned.  Use getGlobalRowCopy(::CRSGraph) instead"))
     end
 
-    if debug
+    if @debug
         @assert hasRowInfo(graph) "Graph row information was deleted"
     end
     rowInfo = getRowInfoFromGlobalRow(graph, globalRow)
-    
+
     if rowInfo.localRow != 0 && rowInfo.numEntries > 0
         indices = view(getGlobalView(graph, rowInfo), 1:rowInfo.numEntries)
-        if debug
+        if @debug
             @assert(length(indices) == getNumEntriesInGlobalRow(graph, globalRow),
                 "length(indices) = $(length(indices)) "
                 * "!= getNumEntriesInGlobalRow(graph, $globalRow) "
@@ -403,9 +401,9 @@ function getGlobalRowView(graph::CRSGraph{GID}, globalRow::GID)::AbstractArray{G
         GID[]
     end
 end
-        
+
 function getLocalRowView(graph::CRSGraph{GID}, localRow::GID)::AbstractArray{GID, 1} where {GID}
-    if @debug graph
+    if @debug
         @assert hasRowInfo() "Graph row information was deleted"
     end
     rowInfo = getRowInfoFromLocalRowIndex(graph, localRow)
@@ -423,7 +421,7 @@ function getLocalRowView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}
     if rowInfo.localRow != 0 && rowInfo.numEntries > 0
         indices = view(getLocalView(graph, rowInfo), 1:rowInfo.numEntries)
 
-        if @debug graph
+        if @debug
             @assert(length(indices) == getNumEntriesInLocalRow(graph, localRow),
                 "length(indices) = $(length(indices)) "
                 * "!= getNumEntriesInLocalRow(graph, $localRow) "
@@ -442,7 +440,7 @@ function resumeFill(graph::CRSGraph, plist::Dict{Symbol})
         throw(InvalidStateError("Cannot resume fill of the CRSGraph, "
                 * "since the graph's row information was deleted."))
     end
-    
+
     clearGlobalConstants(graph)
     graph.plist = plist
     graph.lowerTriangle = false
@@ -450,8 +448,8 @@ function resumeFill(graph::CRSGraph, plist::Dict{Symbol})
     graph.indicesAreSorted = true
     graph.noRedundancies = true
     graph.fillComplete = false
-    
-    if get(plist, :debug, false)
+
+    if @debug
         @assert isFillActive(graph) && !isFillComplete(graph) "Post condition violated"
     end
 end
@@ -465,13 +463,13 @@ function fillComplete(graph::CRSGraph, plist::Dict{Symbol})
     else
         domMap = get(graph.domainMap)
     end
-    
+
     if isnull(graph.rangeMap)
         ranMap = graph.colMap
     else
         ranMap = get(graph.rangeMap)
     end
-    
+
     fillComplete(graph, ranMap, domMap, plist)
 end
 
@@ -485,11 +483,11 @@ function fillComplete(graph::CRSGraph{GID, PID, LID}, domainMap::BlockMap{GID, P
     if !isFillActive(graph) || isFillComplete(graph)
         throw(InvalidStateError("Graph fill state must be active to call fillComplete(...)"))
     end
-       
+
     const numProcs = numProc(comm(graph))
-    
+
     const assertNoNonlocalInserts = get(plist, :noNonlocalChanges, false)
-    
+
     const mayNeedGlobalAssemble = !assertNoNonlocalInserts && numProcs > 1
     if mayNeedGlobalAssemble
         globalAssemble(graph)
@@ -498,7 +496,7 @@ function fillComplete(graph::CRSGraph{GID, PID, LID}, domainMap::BlockMap{GID, P
             throw(InvalidStateError("Only one process, but nonlocal entries are present"))
         end
     end
-    
+
     setDomainRangeMaps(graph, domainMap, rangeMap)
 
     if !hasColMap(graph)
@@ -508,38 +506,37 @@ function fillComplete(graph::CRSGraph{GID, PID, LID}, domainMap::BlockMap{GID, P
     makeIndicesLocal(graph)
 
     sortAndMergeAllIndices(graph, isSorted(graph), isMerged(graph))
-    
+
     makeImportExport(graph)
     computeGlobalConstants(graph)
     fillLocalGraph(graph, plist)
     graph.fillComplete(true)
-    
-    if get(plist, :debug, false)
+
+    if @debug
         @assert !isFillActive(graph) && isFillComplete(graph) "post conditions violated"
     end
-    
+
     checkInternalState(graph)
 end
 
 function makeColMap(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
-    debug = @debug graph
     const localNumRows = getLocalNumEntries(graph)
-    
+
     #TODO look at FIXME on line 4898
-    
+
     error, colMap = __makeColMap(graph, graph.domainMap)
-                                        
-    if debug
+
+    if @debug
         comm = julia_petra.comm(graph)
         globalError = maxAll(comm, error)
-        
+
         if globalError
             error("makeColMap reports an error on at least one process")
         end
     end
-    
+
     graph.colMap = colMap
-    
+
     checkInternalState(graph)
 end
 
@@ -565,9 +562,9 @@ Sets the graph's data directly, using 1D storage
 function setAllIndices(graph::CRSGraph{GID, PID, LID},
         rowPointers::AbstractArray{LID, 1},columnIndices::Array{LID, 1}) where {
         GID, PID, LID <: Integer}
-    
+
     localNumRows = getLocalNumRows(graph)
-    
+
     if isnull(graph.colMap)
         throw(InvalidStateError("The graph must have a "
                 * "column map before calling setAllIndices"))
@@ -576,18 +573,18 @@ function setAllIndices(graph::CRSGraph{GID, PID, LID},
         throw(InvalidArgumentError("length(rowPointers) = $(length(rowPointers)) "
                 * "!= localNumRows+1 = $(localNumRows+1)"))
     end
-    
+
     localNumEntries = rowPointers[localNumRows+1]
-    
+
     graph.indicesType    = LOCAL_INDICES
     graph.pftype         = STATIC_PROFILE
     graph.localIndices1D = columnIndices
     graph.rowOffsets     = rowPointers
     graph.nodeNumEntries = localNumEntries
     graph.storageStatus  = STORAGE_1D_UNPACKED
-    
+
     graph.localGraph     = LocalCRSGraph(columnIndices, rowPointers)
-    
+
     checkInternalState(graph)
 end
 
@@ -599,7 +596,7 @@ Whether the graph's storage is optimized
 """
 function isStorageOptimized(graph::CRSGraph)
     const isOpt = length(graph.numRowEntries) == 0 && getLocalNumRows(graph) > 0
-    if isOpt && @debug graph
+    if isOpt && @debug
         @assert(getProfileType(graph) == STATIC_PROFILE,
             "Matrix claims optimized storage by profile type "
             * "is dynamic.  This shouldn't happend.")

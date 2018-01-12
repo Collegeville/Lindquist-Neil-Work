@@ -5,14 +5,13 @@ export Import
 Communication plan for data redistribution from a uniquely-owned to a (possibly) multiply-owned distribution.
 """
 struct Import{GID <: Integer, PID <:Integer, LID <: Integer}
-    debug::Bool
     importData::ImportExportData{GID, PID, LID}
-    
+
     #default constructor appeared to accept a pair of BlockMaps
-    function Import{GID, PID, LID}(debug::Bool,
+    function Import{GID, PID, LID}(
             importData::ImportExportData{GID, PID, LID}) where {
                 GID <: Integer, PID <: Integer, LID <: Integer}
-        new(debug, importData)
+        new(importData)
     end
 end
 
@@ -32,69 +31,68 @@ function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
         userExportLIDs::AbstractArray{LID}, userExportPIDs::AbstractArray{PID},
         useRemotePIDGID::Bool, plist::Dict{Symbol}
         ) where {GID <: Integer, PID <: Integer, LID <: Integer}
-    
+
     importData = ImportExportData(source, target)
-    const debug = get(plist, :debug, false)
-    
-    if debug
+
+    if @debug
         info("$(myPid(comm(source))): Import ctor expert\n")
     end
-    
+
     const remoteLIDs = julia_petra.remoteLIDs(importData)
-    
+
     if !userRemotePIDGID
         empty!(remoteGIDs)
         empty!(remoteLIDs)
     end
-    
+
     getIDSource(data, remoteGIDs, !userRemotePIDGID)
-    
+
     if length(remoteGIDs) > 0 && !isDistributed(source)
         throw(InvalidArgumentError("Target has remote LIDs but source is not distributed globally"))
     end
-        
+
     (remotePIDs, _) = remoteIDList(source, remoteGIDs)
-    
+
     remoteProcIDs = (useRemotePIDGID) ? userRemotePIDs : remotePIDs
-    
+
     if !(length(remoteProcIDs) == length(remoteGIDs) && length(remoteGIDs) == length(remoteLIDs))
         throw(InvalidArgumentError("Size miss match on remoteProcIDs, remoteGIDs and remoteLIDs"))
     end
-    
+
     # ensure remoteProcIDs[i], remoteGIDs[i] and remoteLIDs[i] refer to the same thing
     order = sortperm(remoteProcIDs)
     permute!(remoteProcIDs, order)
     permute!(remoteGIDs, order)
     permute!(remoteLIDs, order)
-    
+
     exportPIDs = Array{PID, 1}(length(userExportPIDs))
     exportLIDs = Array{PID, 1}(length(userExportPIDs))
-    
+
     #need the funcitons with these names, not the variables
     julia_petra.remoteLIDs(importData, remoteLIDs)
     julia_petra.exportPIDs(importData, exportPIDs)
     julia_petra.exportLIDs(importData, exportLIDs)
-    
+
     locallyComplete = true
     for i = 1:length(userExportPIDs)
         if userExportPIDs[i] == 0
             locallyComplete = false
         end
-        
+
         exportPIDs[i] = userExportPIDs[i]
         exportLIDs[i] = userExportLIDs[i]
     end
-    
+
     isLocallyComplete(importData, locallyComplete)
     #TODO create and upgrade to createFromSendsAndRecvs
     #createFromSendsAndRecvs(distributor(importData), exportPIDs, remoteProcIDs)
     createFromRecvs(distributor(importData), remoteGIDs, remotePIDs)
-    
-    Import(debug, importData)
+
+    Import(importData)
 end
 
 function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{AbstractArray{PID}}=Nullable{AbstractArray{PID}}(); plist...) where {GID <: Integer, PID <: Integer, LID <: Integer}
-    Import(source, target, remotePIDs, 
+    Import(source, target, remotePIDs,
         Dict(Array{Tuple{Symbol, Any}, 1}(plist)))
 end
 
@@ -103,23 +101,22 @@ function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
 end
 
 function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}, remotePIDs::Nullable{AbstractArray{PID}}, plist::Dict{Symbol}) where {GID <: Integer, PID <: Integer, LID <: Integer}
-    const debug = get(plist, :debug, false)
-    
-    if debug
+
+    if @debug
         info("$(myPid(comm(source))): Import ctor\n")
     end
 
-    const impor = Import{GID, PID, LID}(debug, ImportExportData(source, target))
+    const impor = Import{GID, PID, LID}(ImportExportData(source, target))
 
     const remoteGIDs = setupSamePermuteRemote(impor)
 
-    if debug
+    if @debug
         info("$(myPid(comm(source))): Import ctor: setupSamePermuteRemote done\n")
     end
     if distributedGlobal(source)
         setupExport(impor, remoteGIDs, remotePIDs)
     end
-    if debug
+    if @debug
         info("$(myPid(comm(source))): Import ctor: done\n")
     end
 
@@ -128,21 +125,21 @@ end
 
 ## internal construction methods ##
 
-function setupSamePermuteRemote(impor::Import{GID, PID, LID}) where {GID <: Integer, PID <: Integer, LID <: Integer} 
-    
+function setupSamePermuteRemote(impor::Import{GID, PID, LID}) where {GID <: Integer, PID <: Integer, LID <: Integer}
+
     data = impor.importData
-    
+
     remoteGIDs = Array{GID, 1}(0)
-    
+
     getIDSources(data, remoteGIDs)
-    
+
     if length(remoteLIDs(data)) != 0 && !distributedGlobal(sourceMap(impor))
         isLocallyComplete(data, false)
-        
+
         warn("Target has remote LIDs but source is not distributed globally.  " *
             "Importing a submap of the target map")
     end
-    
+
     remoteGIDs
 end
 
@@ -150,26 +147,26 @@ end
 function getIDSources(data, remoteGIDs, useRemotes=true)
     const source = sourceMap(data)
     const target = targetMap(data)
-    
+
     const sourceGIDs = myGlobalElements(source)
     const targetGIDs = myGlobalElements(target)
-    
+
     const numSrcGIDs = length(sourceGIDs)
     const numTgtGIDs = length(targetGIDs)
     const numGIDs = min(numSrcGIDs, numTgtGIDs)
-    
+
     numSameGIDs = 1
     while numSameGIDs <= numGIDs && sourceGIDs[numSameGIDs] == targetGIDs[numSameGIDs]
         numSameGIDs += 1
     end
     numSameGIDs -= 1
     numSameIDs(data, numSameGIDs)
-    
+
     const permuteToLIDs = julia_petra.permuteToLIDs(data)
     const permuteFromLIDs = julia_petra.permuteFromLIDs(data)
     const remoteLIDs = julia_petra.remoteLIDs(data)
-    
-    
+
+
     for tgtLID = (numSameGIDs+1):numTgtGIDs
         const curTargetGID = targetGIDs[tgtLID]
         const srcLID = lid(source, curTargetGID)
@@ -186,22 +183,22 @@ end
 function setupExport(impor::Import{GID, PID, LID}, remoteGIDs::AbstractArray{GID}, userRemotePIDs::Nullable{AbstractArray{PID}}) where {GID <: Integer, PID <: Integer, LID <: Integer}
     data = impor.importData
     const source = sourceMap(impor)
-    
+
     useRemotePIDs = !isnull(userRemotePIDs)
-    
+
     # Sanity Checks
     if useRemotePIDs && length(get(userRemotePIDs)) != length(remoteGIDs)
         throw(InvalidArgumentError("remotePIDs must either be null " *
                 "or match the size of remoteGIDs."))
     end
-    
-    
+
+
     missingGID = 0
-    
+
     if !useRemotePIDs
         newRemotePIDs = Array{PID, 1}(length(remoteGIDs))
-        if impor.debug
-            info("$(myPid(comm(source))): setupExport(Import): about to call " * 
+        if @debug
+            info("$(myPid(comm(source))): setupExport(Import): about to call " *
                 "getRemoteIndexList on sourceMap\n")
         end
         (remoteProcIDs, remoteLIDs) = remoteIDList(source, remoteGIDs)
@@ -213,19 +210,19 @@ function setupExport(impor::Import{GID, PID, LID}, remoteGIDs::AbstractArray{GID
     else
         remoteProcIDs = get(userRemotePIDs)
     end
-    
+
     #line 688
-    
+
     if missingGID != 0
         isLocallyComplete(data, false)
-        
+
         warn("Source map was un-able to figure out which process owns one " *
             "or more of the GIDs in the list of remote GIDs.  This probably " *
             "means that there is at least one GID owned by some process in " *
             "the target map which is not owned by any process in the source " *
             "Map.  (That is, the source and target maps do not contain the " *
             "same set of GIDs globally")
-        
+
         #ignore remote GIDs that aren't owned by any process in the source Map
         numInvalidRemote = missingGID
         totalNumRemote = length(remoteGIDs)
@@ -236,9 +233,9 @@ function setupExport(impor::Import{GID, PID, LID}, remoteGIDs::AbstractArray{GID
             empty!(julia_petra.remoteLIDs(data))
         else
             numValidRemote = 1
-            
+
             remoteLIDs = julia_petra.remoteLIDs(data)
-            
+
             for r = 1:totalNumRemote
                 if remoteProcIds[r] != 0
                     remoteProcIds[numValidRemote] = remoteProcIDs[r]
@@ -248,30 +245,30 @@ function setupExport(impor::Import{GID, PID, LID}, remoteGIDs::AbstractArray{GID
                 end
             end
             numValidRemote -= 1
-            
+
             if numValidRemote != totalNumRemote - numInvalidRemote
                 throw(InvalidStateError("numValidRemote = $numValidRemote " *
                         "!= totalNumRemote - numInvalidRemote " *
                         "= $(totalNumRemote - numInvalidRemote)"))
             end
-            
+
             resize!(remoteProcIDs, numValidRemote)
             resize!(remoteGIDs, numValidRemote)
             resize!(remoteLIDs, numValidRemote)
         end
     end
-    
+
     order = sortperm(remoteProcIDs)
     permute!(remoteProcIDs, order)
     permute!(remoteGIDs, order)
     permute!(remoteLIDs, order)
-    
+
     (exportGIDs, exportPIDs) = createFromRecvs(distributor(data), remoteGIDs, remoteProcIDs)
-    
+
     julia_petra.exportPIDs(data, exportPIDs)
-    
+
     numExportIDs = length(exportGIDs)
-    
+
     if numExportIDs > 0
         exportLIDs = julia_petra.exportLIDs(data)
         resize!(exportLIDs, numExportIDs)
@@ -279,8 +276,8 @@ function setupExport(impor::Import{GID, PID, LID}, remoteGIDs::AbstractArray{GID
             exportLIDs[k] = lid(source, exportGIDs[k])
         end
     end
-    
-    if impor.debug
+
+    if @debug
         info("$(myPid(comm(source))): setupExport: done\n")
     end
 end
