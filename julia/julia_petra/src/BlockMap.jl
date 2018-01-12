@@ -463,51 +463,24 @@ function remoteIDList(map::BlockMap{GID, PID, LID}, gidList::AbstractArray{GID}
     getDirectoryEntries(get(data.directory), map, gidList)
 end
 
-"Helper method for `lid` and `gid`"
-function safeCast(id, idCast, typ, retTyp)
-    #if retTyp is a concrete type
-    if method_exists(typemin, (retTyp,)) && method_exists(typemax, (retTyp,))
-        #if typ is subtype of retTyp, always cast
-        if method_exists(typemin, (typ,)) && typemin(typ) >= typemin(retTyp) && method_exists(typemax, (typ,)) && typemax(typ) <= typemax(retTyp)
-            :($idCast = $retTyp($id))
-        else #not always safe to cast to retTyp
-            quote
-                $idCast =
-                    #if id outside retTyp, convert to 0 (value for invalid)
-                    if $(typemin(retTyp)) > $id || $(typemax(retTyp)) < $id
-                        $retTyp(0)
-                    else#id valid for retTyp
-                        $retTyp($id)
-                    end
-            end
-        end
-    #if abstract type, just used original type and lose type stability
-    else
-        :($idCast = $id)
-    end
-end
 
 """
     lid(map::BlockMap{GID, PID, LID}, gid::Integer)::LID
 
 Return local ID of global ID, or 0 if not found on this processor
 """
-@generated function lid(map::BlockMap{GID, PID, LID}, gid::Integer) where GID <: Integer where PID <: Integer where LID <: Integer
-    quote
-        data = map.data
-        $(safeCast(:gid, :gidCast, gid, GID))
-        #gidCast = GID(gid)
-        if (gidCast < data.minMyGID) || (gidCast > data.maxMyGID)
-             LID(0)
-        elseif data.linearMap
-            LID(gidCast - data.minMyGID + 1)
-        elseif gidCast >= data.myGlobalElements[1] && gidCast <= data.lastContiguousGID
-            LID(gidCast - data.myGlobalElements[1] + 1)
-        elseif haskey(data.lidHash, gidCast)
-            data.lidHash[gidCast]
-        else
-            LID(0)
-        end
+function lid(map::BlockMap{GID, PID, LID}, gid::Integer) where GID <: Integer where PID <: Integer where LID <: Integer
+    data = map.data
+    if (gid < data.minMyGID) || (gid > data.maxMyGID)
+         LID(0)
+    elseif data.linearMap
+        LID(gid - data.minMyGID + 1)
+    elseif gid >= data.myGlobalElements[1] && gid <= data.lastContiguousGID
+        LID(gid - data.myGlobalElements[1] + 1)
+    elseif haskey(data.lidHash, GID(gid))
+        data.lidHash[gid]
+    else
+        LID(0)
     end
 end
 
@@ -516,17 +489,14 @@ end
 
 Return global ID of local ID, or 0 if not found on this processor
 """
-@generated function gid(map::BlockMap{GID, PID, LID}, lid::Integer) where GID <: Integer where PID <: Integer where LID <: Integer
-    quote
-        data = map.data
-        $(safeCast(:lid, :lidCast, lid, LID))
-        if (data.numMyElements == LID(0)) || (lidCast < data.minLID) || (lidCast > data.maxLID)
-            GID(0)
-        elseif data.linearMap
-            GID(lidCast + data.minMyGID - 1)
-        else
-            GID(data.myGlobalElements[lidCast])
-        end
+function gid(map::BlockMap{GID, PID, LID}, lid::Integer) where GID <: Integer where PID <: Integer where LID <: Integer
+    data = map.data
+    if (data.numMyElements == LID(0)) || (lid < data.minLID) || (lid > data.maxLID)
+        GID(0)
+    elseif data.linearMap
+        GID(lid + data.minMyGID - 1)
+    else
+        GID(data.myGlobalElements[lid])
     end
 end
 
