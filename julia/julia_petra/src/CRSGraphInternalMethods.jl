@@ -15,7 +15,7 @@ const rowInfoSpare = Union{Void, RowInfo}[nothing]
 """
     Gets a `RowInfo` object with the given values, reusing an intance if able
 """
-@inline function getRowInfo(graph::CRSGraph{<:Integer, <:Integer, LID}, localRow::LID,
+@inline function createRowInfo(graph::CRSGraph{<:Integer, <:Integer, LID}, localRow::LID,
         allocSize::LID, numEntries::LID, offset1D::LID)::RowInfo{LID} where {LID <: Integer}
     global rowInfoSpare
 
@@ -198,7 +198,7 @@ function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} wher
     end
 
     if !hasRowInfo(graph) || !myLID(graph.rowMap, row)
-        return getRowInfo(graph, row, 0, 0, 1)
+        return createRowInfo(graph, row, LID(0), LID(0), LID(1))
     end
 
     offset1D::LID = 1
@@ -221,7 +221,7 @@ function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} wher
         numEntries = (length(graph.numRowEntries) == 0 ?
             LID(0) : LID(graph.numRowEntries[row]))
     end
-    getRowInfo(graph, row, allocSize, numEntries, offset1D)
+    createRowInfo(graph, row, allocSize, numEntries, offset1D)
 end
 
 function getLocalView(rowInfo::RowInfo{LID})::AbstractArray{LID, 1} where LID <: Integer
