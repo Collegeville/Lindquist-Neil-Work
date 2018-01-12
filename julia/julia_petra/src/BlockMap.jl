@@ -21,7 +21,7 @@ A type for partitioning block element vectors and matrices
 """
 struct BlockMap{GID <: Integer, PID <:Integer, LID <: Integer}
     data::BlockMapData{GID, PID, LID}
-    
+
     function BlockMap{GID, PID, LID}(data::BlockMapData) where {GID <: Integer, PID <:Integer, LID <: Integer}
         new(data)
     end
@@ -38,36 +38,36 @@ function BlockMap(numGlobalElements::Integer, comm::Comm{GID, PID, LID}) where G
 end
 
 function BlockMap(numGlobalElements::GID, comm::Comm{GID, PID, LID}) where GID <: Integer where PID <: Integer where LID <: Integer
-    if numGlobalElements < 0 
+    if numGlobalElements < 0
         throw(InvalidArgumentError("NumGlobalElements = $(numGlobalElements).  Should be >= 0"))
     end
-    
+
     const data = BlockMapData(numGlobalElements, comm)
     const map = BlockMap{GID, PID, LID}(data)
-    
+
     const numProcVal = numProc(comm)
     data.linearMap = true
-    
+
     const myPIDVal = myPid(comm) - 1
-    
+
     data.numMyElements = floor(typeof(data.numGlobalElements),
         data.numGlobalElements/numProcVal)
     remainder = data.numGlobalElements % numProcVal
     startIndex = myPIDVal * (data.numMyElements+1)
-    
+
     if myPIDVal < remainder
         data.numMyElements += 1
     else
         startIndex -= (myPIDVal - remainder)
     end
-    
+
     data.minAllGID = 1
     data.maxAllGID = data.minAllGID + data.numGlobalElements - 1
     data.minMyGID = startIndex + 1
     data.maxMyGID = data.minMyGID + data.numMyElements - 1
     data.distributedGlobal = isDistributedGlobal(map, data.numGlobalElements,
         data.numMyElements)
-    
+
     EndOfConstructorOps(map)
     map
 end
@@ -82,25 +82,25 @@ function BlockMap(numGlobalElements::Integer, numMyElements::Integer, comm::Comm
 end
 
 function BlockMap(numGlobalElements::GID, numMyElements::LID, comm::Comm{GID, PID, LID}) where GID <: Integer where PID <: Integer where LID <: Integer
-    if numGlobalElements < -1 
+    if numGlobalElements < -1
         throw(InvalidArgumentError("NumGlobalElements = $(numGlobalElements).  Should be >= -1"))
     end
     if numMyElements < 0
         throw(InvalidArgumentError("NumMyElements = $(numMyElements). Should be >= 0"))
     end
-    
+
     const data = BlockMapData(numGlobalElements, comm)
     const map = BlockMap{GID, PID, LID}(data)
-    
+
     data.numMyElements = numMyElements
     data.linearMap = true
-    
+
     data.distributedGlobal = isDistributedGlobal(map, numGlobalElements, numMyElements)
-    
+
     #Local Map and uniprocessor case: Each processor gets a complete copy of all elements
     if !data.distributedGlobal || numProc(comm) == 1
         data.numGlobalElements = data.numMyElements
-        
+
         data.minAllGID = 1
         data.maxAllGID = data.minAllGID + data.numGlobalElements - 1
         data.minMyGID = 1
@@ -108,19 +108,19 @@ function BlockMap(numGlobalElements::GID, numMyElements::LID, comm::Comm{GID, PI
     else
         tmp_numMyElements = data.numMyElements
         data.numGlobalElements = sumAll(data.comm, tmp_numMyElements)
-        
+
         data.minAllGID = 1
         data.maxAllGID = data.minAllGID + data.numGlobalElements - 1
-        
+
         tmp_numMyElements = data.numMyElements
         data.maxMyGID = scanSum(data.comm, tmp_numMyElements)
-        
+
         startIndex = data.maxMyGID - data.numMyElements
         data.minMyGID = startIndex + 1
         data.maxMyGID = data.minMyGID + data.numMyElements - 1
     end
     checkValidNGE(map, numGlobalElements)
-    
+
     EndOfConstructorOps(map)
     map
 end
@@ -139,25 +139,25 @@ end
 function BlockMap(myGlobalElements::AbstractArray{GID}, comm::Comm{GID, PID,LID}
         ) where GID <: Integer where PID <: Integer where LID <: Integer
     numMyElements = LID(length(myGlobalElements))
-    
+
     const data = BlockMapData(GID(0), comm)
     const map = BlockMap{GID, PID, LID}(data)
-    
+
     data.numMyElements = numMyElements
-    
+
     linear = 1
     if numMyElements > 0
         data.myGlobalElements = Array{GID}(numMyElements)
-        
+
         data.myGlobalElements[1] = myGlobalElements[1]
         data.minMyGID = myGlobalElements[1]
         data.maxMyGID = myGlobalElements[1]
-        
+
         for i = 2:numMyElements
             data.myGlobalElements[i] = myGlobalElements[i]
             data.minMyGID = min(data.minMyGID, myGlobalElements[i])
             data.maxMyGID = max(data.maxMyGID, myGlobalElements[i])
-            
+
             if myGlobalElements[i] != myGlobalElements[i-1] + 1
                 linear = 0
             end
@@ -166,9 +166,9 @@ function BlockMap(myGlobalElements::AbstractArray{GID}, comm::Comm{GID, PID,LID}
         data.minMyGID = 1
         data.maxMyGID = 0
     end
-    
+
     data.linearMap = Bool(minAll(data.comm, linear))
-    
+
     if numProc(comm) == 1
         data.numGlobalElements = data.numMyElements
         data.minAllGID = data.minMyGID
@@ -181,23 +181,23 @@ function BlockMap(myGlobalElements::AbstractArray{GID}, comm::Comm{GID, PID,LID}
             allIDs = gatherAll(data.comm, myGlobalElements)
             data.numGlobalElements = length(unique(allIDs))
         end
-        
+
         tmp_send = [
             -((data.numMyElements > 0
                     || data.numGlobalElements == 0)?
                 data.minMyGID:Inf)
             , data.maxMyGID]
-        
+
         tmp_recv = maxAll(data.comm, tmp_send)
-        
+
         @assert typeof(tmp_recv[1]) <: Integer "Result type is $(typeof(tmp_recv[1])), should be subtype of Integer"
-            
+
         data.minAllGID = -tmp_recv[1]
         data.maxAllGID =  tmp_recv[2]
     end
-    
+
     data.distributedGlobal = isDistributedGlobal(map, data.numGlobalElements, numMyElements)
-    
+
     EndOfConstructorOps(map)
     map
 end
@@ -217,48 +217,48 @@ end
 function BlockMap(numGlobalElements::GID, numMyElements::LID,
         myGlobalElements::AbstractArray{GID}, userIsDistributedGlobal::Bool,
         userMinAllGID::GID, userMaxAllGID::GID, comm::Comm{GID, PID, LID}) where GID <: Integer where PID <: Integer where LID <: Integer
-    if numGlobalElements < -1 
+    if numGlobalElements < -1
         throw(InvalidArgumentError("NumGlobalElements = $(numGlobalElements).  Should be >= -1"))
     end
     if numMyElements < 0
         throw(InvalidArgumentError("NumMyElements = $(numMyElements). Should be >= 0"))
     end
-    if userMinAllGID < 1 
+    if userMinAllGID < 1
         throw(InvalidArgumentError("Minimum global element index = $(data.minAllGID).  Should be >= 1"))
     end
-    
+
     const data = BlockMapData(numGlobalElements, comm)
     const map = BlockMap{GID, PID, LID}(data)
-    
+
     data.numMyElements = numMyElements
-    
+
     linear = 1
     if numMyElements > 0
         data.myGlobalElements = Array{GID}(numMyElements)
-        
+
         data.myGlobalElements[1] = myGlobalElements[1]
         data.minMyGID = myGlobalElements[1]
         data.maxMyGID = myGlobalElements[1]
-        
+
         for i = 2:numMyElements
             data.myGlobalElements[i] = myGlobalElements[i]
             data.minMyGID = min(data.minMyGID, myGlobalElements[i])
             data.maxMyGID = max(data.maxMyGID, myGlobalElements[i])
-            
+
             if myGlobalElements[i] != myGlobalElements[i-1] + 1
                 linear = 0
             end
         end
-        
+
     else
         data.minMyGID = 1
         data.maxMyGID = 0
     end
-    
+
     data.linearMap = Bool(minAll(comm, linear))
-    
+
     data.distributedGlobal = userIsDistributedGlobal
-    
+
      if !data.distributedGlobal || numProc(comm) == 1
         data.numGlobalElements = data.numMyElements
         checkValidNGE(map, numGlobalElements)
@@ -271,7 +271,7 @@ function BlockMap(numGlobalElements::GID, numMyElements::LID,
             data.numGlobalElements = numGlobalElements
         end
         checkValidNGE(data.numGlobalELements)
-        
+
         data.minAllGID = userMinAllGID
         data.maxAllGID = userMaxAllGID
     end
@@ -285,7 +285,7 @@ end
 function isDistributedGlobal(map::BlockMap{GID, PID, LID}, numGlobalElements::GID,
         numMyElements::LID) where GID <: Integer where PID <: Integer where LID <: Integer
     data = map.data
-    if numProc(data.comm) > 1 
+    if numProc(data.comm) > 1
         localReplicated = numGlobalElements == numMyElements
         !Bool(minAll(data.comm, localReplicated))
     else
@@ -296,7 +296,7 @@ end
 function EndOfConstructorOps(map::BlockMap)
     map.data.minLID = 1
     map.data.maxLID = max(map.data.numMyElements, 1)
-    
+
     GlobalToLocalSetup(map);
 end
 
@@ -304,15 +304,15 @@ function GlobalToLocalSetup(map::BlockMap)
     data = map.data
     numMyElements = data.numMyElements
     myGlobalElements = data.myGlobalElements
-    
+
     if data.linearMap || numMyElements == 0
         return map
     end
     if length(data.numGlobalElements) == 0
         return map
     end
-    
-    
+
+
     val = myGlobalElements[1]
     i = 1
     for i = 1:numMyElements-1
@@ -321,19 +321,19 @@ function GlobalToLocalSetup(map::BlockMap)
         end
         val += 1
     end
-    
+
     data.lastContiguousGIDLoc = i
     if data.lastContiguousGIDLoc <= 1
         data.lastContiguousGID = myGlobalElements[1]
     else
         data.lastContiguousGID = myGlobalElements[data.lastContiguousGIDLoc]
     end
-    
+
     if i < numMyElements
         data.lidHash = empty!(data.lidHash)
-        
+
         sizehint!(data.lidHash, numMyElements - i + 2)
-        
+
         for i = i:numMyElements
             data.lidHash[myGlobalElements[i]] = i
         end
@@ -398,7 +398,7 @@ Return the minimum global ID owned by this processor
 function minMyGID(map::BlockMap{GID, PID, LID})::GID where GID <: Integer where PID <: Integer where LID <: Integer
     map.data.minMyGID
 end
-    
+
 """
     maxMyGID(map::BlockMap{GID, PID, LID})::GID
 
@@ -416,7 +416,7 @@ Creates a copy of the given map that doesn't support any inter-process actions
 function getLocalMap(map::BlockMap{GID, PID, LID})::BlockMap{GID, PID, LID} where {GID, PID, LID}
     oldData = map.data
     data = BlockMapData(oldData.numGlobalElements, LocalComm(oldData.comm))
-    
+
     data.directory = Nullable{Directory}()
     data.lid = copy(oldData.lid)
     data.myGlobalElements =  copy(oldData.myGlobalElements)
@@ -434,10 +434,10 @@ function getLocalMap(map::BlockMap{GID, PID, LID})::BlockMap{GID, PID, LID} wher
     data.lastContiguousGID = oldData.lastContiguousGID
     data.lastContiguousGIDLoc = oldData.lastContiguousGIDLoc
     data.lidHash = copy(oldData.lidHash)
-    
+
     BlockMap{GID, PID, LID}(data)
 end
-    
+
 ##local/global ID accessor methods##
 
 """
@@ -463,20 +463,28 @@ function remoteIDList(map::BlockMap{GID, PID, LID}, gidList::AbstractArray{GID}
     getDirectoryEntries(get(data.directory), map, gidList)
 end
 
-
+"Helper method for `lid` and `gid`"
 function safeCast(id, idCast, typ, retTyp)
-    #if concrete type
-    if method_exists(typemin, (typ,)) && method_exists(typemax, (typ,))
-        quote
-            if $(typemin(typ))>$id || $(typemax(typ)) < $id
-                return $retTyp(0)
+    #if retTyp is a concrete type
+    if method_exists(typemin, (retTyp,)) && method_exists(typemax, (retTyp,))
+        #if typ is subtype of retTyp, always cast
+        if method_exists(typemin, (typ,)) && typemin(typ) >= typemin(retTyp) && method_exists(typemax, (typ,)) && typemax(typ) <= typemax(retTyp)
+            :($idCast = $retTyp($id))
+        else #not always safe to cast to retTyp
+            quote
+                $idCast =
+                    #if id outside retTyp, convert to 0 (value for invalid)
+                    if $(typemin(retTyp)) > $id || $(typemax(retTyp)) < $id
+                        $retTyp(0)
+                    else#id valid for retTyp
+                        $retTyp($id)
+                    end
             end
-            $idCast = $typ($id)
         end
-    #if abstract type
+    #if abstract type, just used original type and lose type stability
     else
         :($idCast = $id)
-    end 
+    end
 end
 
 """
@@ -487,7 +495,7 @@ Return local ID of global ID, or 0 if not found on this processor
 @generated function lid(map::BlockMap{GID, PID, LID}, gid::Integer) where GID <: Integer where PID <: Integer where LID <: Integer
     quote
         data = map.data
-        $(safeCast(:gid, :gidCast, GID, LID))
+        $(safeCast(:gid, :gidCast, gid, GID))
         #gidCast = GID(gid)
         if (gidCast < data.minMyGID) || (gidCast > data.maxMyGID)
              LID(0)
@@ -508,10 +516,10 @@ end
 
 Return global ID of local ID, or 0 if not found on this processor
 """
-@generated function gid(map::BlockMap{GID, PID, LID}, lid::Integer) where GID <: Integer where PID <: Integer where LID <: Integer 
+@generated function gid(map::BlockMap{GID, PID, LID}, lid::Integer) where GID <: Integer where PID <: Integer where LID <: Integer
     quote
         data = map.data
-        $(safeCast(:lid, :lidCast, LID, GID))
+        $(safeCast(:lid, :lidCast, lid, LID))
         if (data.numMyElements == LID(0)) || (lidCast < data.minLID) || (lidCast > data.maxLID)
             GID(0)
         elseif data.linearMap
@@ -577,7 +585,7 @@ Return a list of global elements on this processor
 """
 function myGlobalElements(map::BlockMap{GID})::AbstractArray{GID} where GID <: Integer
     data = map.data
-    
+
     if length(data.myGlobalElements) == 0
         myGlobalElements = Array{Integer}(data.numMyElements)
         for i = 1:data.numMyElements
@@ -636,19 +644,19 @@ function sameAs(this::BlockMap{GID, PID, LID}, other::BlockMap{GID, PID, LID})::
     if tData == oData
         return true
     end
-    
+
     if ((tData.minAllGID != oData.minAllGID)
         || (tData.maxAllGID != oData.maxAllGID)
         || (tData.numGlobalElements != oData.numGlobalElements))
         return false
     end
-        
+
     mySameMap = 1
-    
+
     if tData.numMyElements != oData.numMyElements
         mySameMap = 0
     end
-    
+
     if tData.linearMap && oData.linearMap
         # For linear maps, just need to check whether lower bound is the same
         if tData.minMyGID != oData.minMyGID
@@ -662,7 +670,7 @@ function sameAs(this::BlockMap{GID, PID, LID}, other::BlockMap{GID, PID, LID})::
             end
         end
     end
-    
+
     Bool(minAll(tData.comm, mySameMap))
 end
 
@@ -694,7 +702,7 @@ function myGlobalElementIDs(map::BlockMap{GID})::AbstractArray{GID} where GID <:
     else
         myGlobalElements = copy(data.myGlobalElements)
     end
-    
+
     myGlobalElements
 end
 
@@ -717,13 +725,13 @@ function determineIsOneToOne(map::BlockMap)::Bool
             data.directory = Nullable(createDirectory(data.comm, map))
         end
        gidsAllUniquelyOwned(get(data.directory))
-    end 
+    end
 end
-                                                    
+
 """
     comm(map::BlockMap{GID, PID, LID})::Comm{GID, PID, LID}
 
-Return the Comm for the map                                                    
+Return the Comm for the map
 """
 function comm(map::BlockMap{GID, PID, LID})::Comm{GID, PID, LID} where GID <: Integer where PID <: Integer where LID <: Integer
     map.data.comm
