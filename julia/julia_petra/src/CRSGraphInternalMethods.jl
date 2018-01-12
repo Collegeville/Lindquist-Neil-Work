@@ -198,11 +198,11 @@ function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} wher
     end
 
     if !hasRowInfo(graph) || !myLID(graph.rowMap, row)
-        return RowInfo{LID}(graph, row, 0, 0, 1)
+        return getRowInfo(graph, row, 0, 0, 1)
     end
 
-    offset1D = LID(1)
-    allocSize = LID(0)
+    offset1D::LID = 1
+    allocSize::LID = 0
 
     if getProfileType(graph) == STATIC_PROFILE
         if length(graph.rowOffsets) != 0
