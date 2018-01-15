@@ -192,7 +192,7 @@ function getRowInfoFromGlobalRow(graph::CRSGraph{GID, PID, LID},
     getRowInfo(graph, lid(graph.rowMap, row))
 end
 
-function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} where {GID, PID, LID <: Integer}
+@inline function getRowInfo(graph::CRSGraph{GID, PID, LID}, row::LID)::RowInfo{LID} where {GID, PID, LID <: Integer}
     if @debug
         @assert hasRowInfo(graph) "Graph does not have row info anymore.  Should have been caught earlier"
     end

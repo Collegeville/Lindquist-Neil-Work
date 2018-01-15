@@ -368,7 +368,7 @@ end
 Return true if the LID passed in belongs to the calling processor in this
 map, otherwise returns false.
 """
-function myLID(map::BlockMap, lidVal::Integer)
+@inline function myLID(map::BlockMap, lidVal::Integer)
     gid(map, lidVal) != 0
 end
 
@@ -469,7 +469,7 @@ end
 
 Return local ID of global ID, or 0 if not found on this processor
 """
-function lid(map::BlockMap{GID, PID, LID}, gid::Integer) where GID <: Integer where PID <: Integer where LID <: Integer
+@inline function lid(map::BlockMap{GID, PID, LID}, gid::Integer) where GID <: Integer where PID <: Integer where LID <: Integer
     data = map.data
     if (gid < data.minMyGID) || (gid > data.maxMyGID)
          LID(0)
@@ -489,7 +489,7 @@ end
 
 Return global ID of local ID, or 0 if not found on this processor
 """
-function gid(map::BlockMap{GID, PID, LID}, lid::Integer) where GID <: Integer where PID <: Integer where LID <: Integer
+@inline function gid(map::BlockMap{GID, PID, LID}, lid::Integer) where GID <: Integer where PID <: Integer where LID <: Integer
     data = map.data
     if (data.numMyElements == LID(0)) || (lid < data.minLID) || (lid > data.maxLID)
         GID(0)

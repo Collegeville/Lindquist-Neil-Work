@@ -850,7 +850,7 @@ function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
     (indices, values)
 end
 
-function getLocalRowViewPtr(matrix::CSRMatrix{Data, GID, PID, LID},
+@inline function getLocalRowViewPtr(matrix::CSRMatrix{Data, GID, PID, LID},
         localRow::Integer
         )::Tuple{Ptr{LID}, Ptr{Data}, LID} where {
         Data, GID, PID, LID}
@@ -861,7 +861,7 @@ function getLocalRowViewPtr(matrix::CSRMatrix{Data, GID, PID, LID},
     retVal
 end
 
-function getLocalRowViewPtr(matrix::CSRMatrix{Data, GID, PID, LID},
+@inline function getLocalRowViewPtr(matrix::CSRMatrix{Data, GID, PID, LID},
         rowInfo::RowInfo{LID}
         )::Tuple{Ptr{LID}, Ptr{Data}, LID}  where {
         Data, GID, PID, LID}
