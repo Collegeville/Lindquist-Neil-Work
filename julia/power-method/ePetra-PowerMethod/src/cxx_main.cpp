@@ -104,12 +104,12 @@ int main(int argc, char *argv[])
   long long NumGlobalElements = std::atoi(argv[1]);
 
   if (NumGlobalElements < NumProc)
-      {
+  {
      if (verbose)
        std::cout << "numGlobalBlocks = " << NumGlobalElements
 	    << " cannot be < number of processors = " << NumProc << std::endl;
      std::exit(1);
-      }
+   }
 
   // Construct a Map that puts approximately the same number of
   // equations on each processor.
@@ -157,19 +157,19 @@ int main(int argc, char *argv[])
     {
     if (MyGlobalElements[i]==0)
       {
-	Indices[0] = 1;
-	NumEntries = 1;
+    Indices[0] = 1;
+    NumEntries = 1;
       }
     else if (MyGlobalElements[i] == NumGlobalElements-1)
       {
-	Indices[0] = NumGlobalElements-2;
-	NumEntries = 1;
+    Indices[0] = NumGlobalElements-2;
+    NumEntries = 1;
       }
     else
       {
-	Indices[0] = MyGlobalElements[i]-1;
-	Indices[1] = MyGlobalElements[i]+1;
-	NumEntries = 2;
+    Indices[0] = MyGlobalElements[i]-1;
+    Indices[1] = MyGlobalElements[i]+1;
+    NumEntries = 2;
       }
      ierr = A.InsertGlobalValues(MyGlobalElements[i], NumEntries, &Values[0], &Indices[0]);
      assert(ierr==0);
@@ -191,22 +191,28 @@ int main(int argc, char *argv[])
   double tolerance = 1.0e-2;
 
   // Iterate
-  Epetra_Flops counter;
-  A.SetFlopCounter(counter);
   Epetra_Time timer(Comm);
   ierr += power_method(A, lambda, niters, tolerance, verbose);
   double elapsed_time = timer.ElapsedTime();
-//  double total_flops =counter.Flops();
-//  double MFLOPs = total_flops/elapsed_time/1000000.0;
 
   if (verbose)
-//    std::cout << "\n\nTotal MFLOPs for first solve = " << MFLOPs << std::endl<< std::endl;
-    std::cout << "\n\nTotal Time for first solve = " << elapsed_time << std::endl<< std::endl;
+    std::cout << "\n\nTotal Time for first (warm up) solve = " << elapsed_time << std::endl<< std::endl;
+
+
+  // Iterate (again)
+  lambda = 0.0;
+  timer.ResetStartTime();
+  ierr += power_method(A, lambda, niters, tolerance, verbose);
+  elapsed_time = timer.ElapsedTime();
+
+  if (verbose)
+    std::cout << "\n\nTotal time for first (warmed) solve = " << elapsed_time << std::endl<< std::endl;
+
 
   // Increase diagonal dominance
   if (verbose)
     std::cout << "\nIncreasing magnitude of first diagonal term, solving again\n\n"
-		    << std::endl;
+              << std::endl;
 
   if (A.MyGlobalRow(0)) {
     int numvals = A.NumGlobalEntries(0);
@@ -221,14 +227,10 @@ int main(int argc, char *argv[])
   // Iterate (again)
   lambda = 0.0;
   timer.ResetStartTime();
-  counter.ResetFlops();
   ierr += power_method(A, lambda, niters, tolerance, verbose);
   elapsed_time = timer.ElapsedTime();
-//  total_flops = counter.Flops();
-//  MFLOPs = total_flops/elapsed_time/1000000.0;
 
   if (verbose)
-//    std::cout << "\n\nTotal MFLOPs for second solve = " << MFLOPs << std::endl<< std::endl;
     std::cout << "\n\nTotal time for second solve = " << elapsed_time << std::endl<< std::endl;
 
 
@@ -243,18 +245,11 @@ return ierr ;
 }
 
 int power_method(Epetra_CrsMatrix& A, double &lambda, int niters,
-		 double tolerance, bool verbose) {
+        double tolerance, bool verbose) {
 
   Epetra_Vector q(A.RowMap());
   Epetra_Vector z(A.RowMap());
   Epetra_Vector resid(A.RowMap());
-
-  Epetra_Flops * counter = A.GetFlopCounter();
-  if (counter!=0) {
-    q.SetFlopCounter(A);
-    z.SetFlopCounter(A);
-    resid.SetFlopCounter(A);
-  }
 
   // Fill z with random Numbers
   z.Random();
@@ -271,16 +266,13 @@ int power_method(Epetra_CrsMatrix& A, double &lambda, int niters,
       A.Multiply(false, q, z); // Compute z = A*q
       q.Dot(z, &lambda); // Approximate maximum eigenvalue
       if (iter%100==0 || iter+1==niters)
-	{
-	  resid.Update(1.0, z, -lambda, q, 0.0); // Compute A*q - lambda*q
-	  resid.Norm2(&residual);
-	  if (verbose) std::cout << "Iter = " << iter << "  Lambda = " << lambda
-			    << "  Residual of A*q - lambda*q = "
-			    << residual << std::endl;
-	}
+    {
+      resid.Update(1.0, z, -lambda, q, 0.0); // Compute A*q - lambda*q
+      resid.Norm2(&residual);
+    }
       if (residual < tolerance) {
-	ierr = 0;
-	break;
+    ierr = 0;
+    break;
       }
     }
   return(ierr);
