@@ -146,7 +146,7 @@ function createSendStructure(dist::MPIDistributor{GID, PID, LID}, pid::PID,
         starts[1] = 1
 
         if nactive > 0
-            dist.indices_to = Array{Integer}(nactive)
+            dist.indices_to = Array{GID, 1}(nactive)
         end
 
 
@@ -167,9 +167,9 @@ function createSendStructure(dist::MPIDistributor{GID, PID, LID}, pid::PID,
 
 
         if dist.numSends > 0
-            dist.lengths_to = Array{Integer}(dist.numSends)
+            dist.lengths_to = Array{GID}(dist.numSends)
             dist.procs_to = Array{PID}(dist.numSends)
-            dist.starts_to = Array{Integer}(dist.numSends)
+            dist.starts_to = Array{GID}(dist.numSends)
         end
 
         j::GID = 1

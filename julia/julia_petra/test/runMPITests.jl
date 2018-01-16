@@ -1,3 +1,6 @@
+#have debug enabled while running tests
+globalDebug = true
+
 using julia_petra
 using Base.Test
 

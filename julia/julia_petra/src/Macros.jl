@@ -6,5 +6,9 @@ Returns the global debug value
 Has an optional ignored argument
 """
 macro debug()
-    Main.globalDebug
+    if isdefined(Main, :globalDebug)
+        Main.globalDebug::Bool
+    else
+        false
+    end
 end

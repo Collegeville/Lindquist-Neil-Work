@@ -110,12 +110,6 @@ function doTransfer(source::SrcDistObject{GID, PID, LID},
         exportLIDs::AbstractArray{LID, 1}, distor::Distributor{GID, PID, LID},
         reversed::Bool) where {GID <: Integer, PID <: Integer, LID <: Integer}
 
-    if @debug
-        if !sameAs(map(source), map(target))
-            throw(InvalidArgumentError("Source and target maps don't match"))
-        end
-    end
-
     if !checkSizes(source, target)
         throw(InvalidArgumentError("checkSize() indicates that the destination " *
                 "object is not a legal target for redistribution from the " *
