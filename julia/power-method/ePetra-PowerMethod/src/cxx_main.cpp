@@ -260,20 +260,20 @@ int power_method(Epetra_CrsMatrix& A, double &lambda, int niters,
   int ierr = 1;
 
   for (int iter = 0; iter < niters; iter++)
-    {
-      z.Norm2(&normz); // Compute 2-norm of z
-      q.Scale(1.0/normz, z);
-      A.Multiply(false, q, z); // Compute z = A*q
-      q.Dot(z, &lambda); // Approximate maximum eigenvalue
-      if (iter%100==0 || iter+1==niters)
+  {
+    z.Norm2(&normz); // Compute 2-norm of z
+    q.Scale(1.0/normz, z);
+    A.Multiply(false, q, z); // Compute z = A*q
+    q.Dot(z, &lambda); // Approximate maximum eigenvalue
+    if (iter%100==0 || iter+1==niters)
     {
       resid.Update(1.0, z, -lambda, q, 0.0); // Compute A*q - lambda*q
       resid.Norm2(&residual);
     }
-      if (residual < tolerance) {
-    ierr = 0;
-    break;
-      }
+    if (residual < tolerance) {
+      ierr = 0;
+      break;
     }
+  }
   return(ierr);
 }
