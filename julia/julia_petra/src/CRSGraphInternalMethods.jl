@@ -379,9 +379,9 @@ function checkInternalState(graph::CRSGraph)
             "Graph claims to have global constants, but also says 0 global entries")
 
         @assert(!graph.haveGlobalConstants
-            || (graph.globalNumEntries > graph.nodeNumEntries
-                && graph.globalNumDiags > graph.nodeNumDiags
-                && graph.globalMaxNumRowEntries > graph.nodeMaxNumRowEntries),
+            || (graph.globalNumEntries >= graph.nodeNumEntries
+                && graph.globalNumDiags >= graph.nodeNumDiags
+                && graph.globalMaxNumRowEntries >= graph.nodeMaxNumRowEntries),
             "Graph claims to have global constants, but some of the local "
             * "constants are greater than their corresponding global constants")
 

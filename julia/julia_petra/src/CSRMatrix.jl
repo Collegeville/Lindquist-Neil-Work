@@ -558,7 +558,7 @@ function mergeRowIndicesAndValues(matrix::CSRMatrix{Data, GID, PID, LID},
 
     if rowInfo.numEntries != 0
         newend = 1
-        for cur in 1:rowInfo.numEntries
+        for cur in 2:rowInfo.numEntries
             if indsView[newend]::LID != indsView[cur]::LID
                 #new entry, save it
                 newend += 1
@@ -575,7 +575,7 @@ function mergeRowIndicesAndValues(matrix::CSRMatrix{Data, GID, PID, LID},
 
     graph.numRowEntries[rowInfo.localRow] = newend
 
-    newend
+    rowInfo.numEntries - newend
 end
 
 
