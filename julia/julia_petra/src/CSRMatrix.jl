@@ -559,14 +559,14 @@ function mergeRowIndicesAndValues(matrix::CSRMatrix{Data, GID, PID, LID},
     if rowInfo.numEntries != 0
         newend = 1
         for cur in 1:rowInfo.numEntries
-            if indsView[newend] != indsView[cur]
+            if indsView[newend]::LID != indsView[cur]::LID
                 #new entry, save it
                 newend += 1
-                indsView[newend] = indsView[cur]
-                valsView[newend] = valsView[cur]
+                indsView[newend] = indsView[cur]::LID
+                valsView[newend] = valsView[cur]::Data
             else
                 #old entry, merge it
-                valsView[newend] += valsView[cur]
+                valsView[newend] += valsView[cur]::Data
             end
         end
     else
@@ -841,8 +841,8 @@ function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
 
     if rowInfo.localRow != 0 && rowInfo.numEntries > 0
         viewRange = 1:rowInfo.numEntries
-		indices::AbstractArray{LID, 1} = getLocalView(myGraph, rowInfo)[viewRange]
-        values::AbstractArray{Data, 1} = getView(matrix, rowInfo)[viewRange]
+		indices::AbstractArray{LID, 1} = view(getLocalView(myGraph, rowInfo), viewRange)
+        values::AbstractArray{Data, 1} = view(getView(matrix, rowInfo), viewRange)
     else
         indices = LID[]
         values = Data[]

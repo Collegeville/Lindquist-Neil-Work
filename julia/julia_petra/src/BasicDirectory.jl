@@ -7,29 +7,29 @@ basic implmentations
 """
 type BasicDirectory{GID <: Integer, PID <:Integer, LID <: Integer} <: Directory{GID, PID, LID}
     map::BlockMap{GID, PID, LID}
-    
+
     directoryMap::Nullable{BlockMap}
-    
-    procList::Array{PID}
-    procListLists::Array{Array{PID}}
-    
+
+    procList::Vector{PID}
+    procListLists::Vector{Vector{PID}}
+
     entryOnMultipleProcs::Bool
-    
-    localIndexList::Array{LID}
-    allMinGIDs::Array{GID}
-    
+
+    localIndexList::Vector{LID}
+    allMinGIDs::Vector{GID}
+
     function BasicDirectory{GID, PID, LID}(map::BlockMap{GID, PID, LID}) where {GID, PID, LID}
-        
+
         if !(distributedGlobal(map))
             new(map, Nullable{BlockMap}(), [], [], numProc(comm(map))!=1, [], [])
         elseif linearMap(map)
             commObj = comm(map)
-            
+
             allMinGIDs = gatherAll(commObj, minMyGID(map))
             allMinGIDs = vcat(allMinGIDs, [1+maxAllGID(map)])
-            
-            entryOnMultipleProcs = unique(allMinGIDs) != allMinGIDs
-            
+
+            entryOnMultipleProcs = length(Set(allMinGIDs)) != length(allMinGIDs)
+
             new(map, Nullable{BlockMap}(), [], [], entryOnMultipleProcs, [], allMinGIDs)
         else
             generateContent(
@@ -111,7 +111,7 @@ function generateContent(dir::BasicDirectory{GID, PID, LID}, map::BlockMap{GID, 
 
         dir.localIndexList[currLID] = importElements[i][3]
     end
-    
+
     globalVal = maxAll(commObj, numProcLists)
     dir.entryOnMultipleProcs = globalval > 0 ? true : false;
 
@@ -119,18 +119,18 @@ function generateContent(dir::BasicDirectory{GID, PID, LID}, map::BlockMap{GID, 
 end
 
 
-function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::BlockMap{GID, PID, LID}, globalEntries::AbstractArray{GID},
-        high_rank_sharing_procs::Bool)::Tuple{Array{PID}, Array{LID}} where GID <: Integer where PID <: Integer where LID <: Integer
+function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::BlockMap{GID, PID, LID}, globalEntries::AbstractVector{GID},
+        high_rank_sharing_procs::Bool)::Tuple{Vector{PID}, Vector{LID}} where GID <: Integer where PID <: Integer where LID <: Integer
     numEntries = length(globalEntries)
-    procs = Array{PID}(numEntries)
-    localEntries = Array{LID}(numEntries)
-    
+    procs = Vector{PID}(numEntries)
+    localEntries = Vector{LID}(numEntries)
+
     if !distributedGlobal(map)
         myPIDVal = myPid(comm(map))
-        
+
         for i = 1:numEntries
             lidVal = lid(map, globalEntries[i])
-            
+
             if lidVal == 0
                 procs[i] = 0
                 warn("GID $(globalEntries[i]) is not part of this map")
@@ -142,19 +142,19 @@ function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::Bloc
     elseif linearMap(map)
         minAllGIDVal = minAllGID(map)
         maxAllGIDVal = maxAllGID(map)
-        
+
         numProcVal = numProc(comm(map))
-        
+
         n_over_p = numGlobalElements(map)/numProcVal
-        
+
         allMinGIDs_list = copy(directory.allMinGIDs)
         order = sortperm(allMinGIDs_list)
         permute!(allMinGIDs_list, order)
-        
+
         for i = 1:numEntries
             lid  = 0
             proc = 0
-            
+
             gid = globalEntries[i]
             if gid < minAllGIDVal || gid > maxAllGIDVal
                 throw(InvalidArgumentError("GID=$gid out of valid range [$minAllGIDVal, $maxAllGIDVal]"))
@@ -163,7 +163,7 @@ function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::Bloc
             proc1 = min(GID(fld(gid, max(n_over_p, 1)) + 2), numProcVal)
             proc1 = 1
             found = false
-            
+
             while proc1 >= 1 && proc1 <= numProcVal
                 if allMinGIDs_list[proc1] <= gid
                     if (gid < allMinGIDs_list[proc1+1])
@@ -180,15 +180,15 @@ function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::Bloc
                 proc = order[proc1]
                 lid = gid - allMinGIDs_list[proc1] + 1
             end
-            
+
             procs[i] = proc
             localEntries[i] = lid
         end
     else #general case
         distributor = createDistributor(comm(map))
-        
+
         dirProcs = remoteIDList(map, numEntries, globalEntries)
-        
+
         numMissing = 0
         for i = 1:numEntries
             if dirProcs[i] == 0
@@ -197,16 +197,16 @@ function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::Bloc
                 numMissing += 1
             end
         end
-        
+
         (sendGIDs, sendPIDs) = createFromRecvs(distrbutor, globalEntries, dirProcs)
         numSends = length(sendGIDs)
-        
+
         if numSends > 0
             exports = Array{Tuple{GID, PID, LID}}(numSends)
             for i = 1:numSends
                 currGID = sendGIDs[i]
                 exports[i][1] = currGID
-                
+
                 currLID = lid(map, currGID)
                 @assert currLID > 0 #internal error
                 if !high_rank_sharing_procs
@@ -227,13 +227,13 @@ function getDirectoryEntries(directory::BasicDirectory{GID, PID, LID}, map::Bloc
                 exports[i][3] = directory.localIndexList[currLID]
             end
         end
-        
+
         numRecv = numEntries - numMissing
         imports = resolve(distributor, exports)
-        
+
         offsets = sortperm(globalEntries)
         sortedGE = globalEntries[offsets]
-        
+
         for i = 1:numRecv
             currLID = imports[i][1]
             j = searchsortedfirst(sortedGE, currLID)

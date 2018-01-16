@@ -21,16 +21,15 @@ getLocalNumEntries(graph::CRSGraph) = graph.nodeNumEntries
 
 function getNumEntriesInGlobalRow(graph::CRSGraph{GID}, globalRow::Integer)::Integer where {GID <: Integer}
     localRow = lid(graph.rowMap, GID(globalRow))
-    if hasRowInfo(graph) && localRow != 0
-        getRowInfo(graph, localRow).numEntries
-    else
-        -1
-    end
+    getNumEntriesInLocalRow(graph, localRow)
 end
 
 function getNumEntriesInLocalRow(graph::CRSGraph{GID, PID, LID}, localRow::Integer)::Integer where {GID, PID, LID <: Integer}
     if hasRowInfo(graph) && myLID(graph.rowMap, LID(localRow))
-        getRowInfo(graph, LID(localRow)).numEntries
+        info = getRowInfo(graph, LID(localRow))
+        retVal = info.numEntries
+        recycleRowInfo(info)
+        retVal
     else
         -1
     end
@@ -351,6 +350,18 @@ function getGlobalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}) wh
     end
 end
 
+@inline function getGlobalViewPtr(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID})::Tuple{Ptr{GID}, LID} where {GID <: Integer, PID, LID <: Integer}
+    if rowInfo.allocSize > 0
+        if length(graph.globalIndices1D) != 0
+            return (pointer(graph.globalIndices1D, rowInfo.offset1D), rowInfo.allocSize)
+        elseif length(graph.globalIndices2D[rowInfo.localRow]) == 0
+            baseArray = globalIndices2D[rowInfo.localRow]
+            return (pointer(baseArray), GID(length(baseArray)))
+        end
+    end
+    return (C_NULL, 0)
+end
+
 function getLocalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID})::AbstractArray{LID, 1} where {GID <: Integer, PID, LID <: Integer}
     if rowInfo.allocSize > 0
         if length(graph.localIndices1D) != 0
@@ -367,8 +378,6 @@ end
 @inline function getLocalViewPtr(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID})::Tuple{Ptr{LID}, LID} where {GID <: Integer, PID, LID <: Integer}
     if rowInfo.allocSize > 0
         if length(graph.localIndices1D) != 0
-            #range = rowInfo.offset1D : rowInfo.offset1D + rowInfo.allocSize-1
-            #return view(graph.localIndices1D, range)
             return (pointer(graph.localIndices1D, rowInfo.offset1D), rowInfo.allocSize)
         elseif length(graph.localIndices2D[rowInfo.localRow]) == 0
             baseArray::Array{LID, 1} = localIndices2D[rowInfo.localRow]
@@ -396,10 +405,31 @@ function getGlobalRowView(graph::CRSGraph{GID}, globalRow::GID)::AbstractArray{G
                 * "!= getNumEntriesInGlobalRow(graph, $globalRow) "
                 * "= $(getNumEntriesInGlobalRow(graph, globalRow))")
         end
-        indices
+        retVal = indices
     else
-        GID[]
+        retVal = GID[]
     end
+    recycleRowInfo(rowInfo)
+    retVal
+end
+
+function getGlobalRowViewPtr(graph::CRSGraph{GID, PID, LID}, globalRow::GID)::Tuple{Ptr{GID}, LID} where {GID <: Integer, PID <: Integer, LID <: Integer}
+    if isLocallyIndexed(graph)
+        throw(InvalidArgumentError("The graph's indices are currently stored as local indices, so a view with global column indices cannot be returned.  Use getGlobalRowCopy(::CRSGraph) instead"))
+    end
+
+    if @debug
+        @assert hasRowInfo(graph) "Graph row information was deleted"
+    end
+    rowInfo = getRowInfoFromGlobalRow(graph, globalRow)
+
+    if rowInfo.localRow != 0 && rowInfo.numEntries > 0
+        retVal = (getGlobalViewPtr(graph, rowInfo)[1], rowInfo.numEntries)
+    else
+        retVal = (C_NULL, 0)
+    end
+    recycleRowInfo(rowInfo)
+    retVal
 end
 
 function getLocalRowView(graph::CRSGraph{GID}, localRow::GID)::AbstractArray{GID, 1} where {GID}
@@ -408,7 +438,9 @@ function getLocalRowView(graph::CRSGraph{GID}, localRow::GID)::AbstractArray{GID
     end
     rowInfo = getRowInfoFromLocalRowIndex(graph, localRow)
 
-    getLocalRowView(graph, rowInfo)
+    retVal = getLocalRowView(graph, rowInfo)
+    recycleRowInfo(rowInfo)
+    retVal
 end
 
 function getLocalRowView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}
@@ -531,7 +563,7 @@ function makeColMap(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
         globalError = maxAll(comm, error)
 
         if globalError
-            error("makeColMap reports an error on at least one process")
+            Base.error("makeColMap reports an error on at least one process")
         end
     end
 

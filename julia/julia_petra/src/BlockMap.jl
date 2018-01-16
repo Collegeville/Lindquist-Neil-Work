@@ -147,7 +147,7 @@ function BlockMap(myGlobalElements::AbstractArray{GID}, comm::Comm{GID, PID,LID}
 
     linear = 1
     if numMyElements > 0
-        data.myGlobalElements = Array{GID}(numMyElements)
+        data.myGlobalElements = Array{GID, 1}(numMyElements)
 
         data.myGlobalElements[1] = myGlobalElements[1]
         data.minMyGID = myGlobalElements[1]
@@ -179,7 +179,7 @@ function BlockMap(myGlobalElements::AbstractArray{GID}, comm::Comm{GID, PID,LID}
         else
             #if 1+ GIDs shared between processors, need to total that correctly
             allIDs = gatherAll(data.comm, myGlobalElements)
-            data.numGlobalElements = length(unique(allIDs))
+            data.numGlobalElements = length(Set(allIDs))
         end
 
         tmp_send = [
@@ -557,8 +557,8 @@ function myGlobalElements(map::BlockMap{GID})::AbstractArray{GID} where GID <: I
     data = map.data
 
     if length(data.myGlobalElements) == 0
-        myGlobalElements = Array{Integer}(data.numMyElements)
-        for i = 1:data.numMyElements
+        myGlobalElements = Vector{GID}(data.numMyElements)
+        @inbounds for i = GID(1):GID(data.numMyElements)
             myGlobalElements[i] = data.minMyGID + i - 1
         end
         data.myGlobalElements = myGlobalElements

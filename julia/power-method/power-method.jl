@@ -98,6 +98,8 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
     const niters = numGlobalElements*10
     const tolerance = 1.0e-2
 
+    return
+
     #compile all the nessacery methods before timing
     tic()
     λ, success = powerMethod(A, niters, tolerance, verbose)
@@ -160,6 +162,10 @@ else
     if targetNumGlobalElements < nProc
         log("numGlobalBlocks = $targetNumGlobalElements cannot be < number of processors = $nProc")
     else
+        log("warming up")
+        main(comm, targetNumGlobalElements, verbose, commData)
+        log("main show")
+        Profile.clear_malloc_data()
         main(comm, targetNumGlobalElements, verbose, commData)
     end
 end

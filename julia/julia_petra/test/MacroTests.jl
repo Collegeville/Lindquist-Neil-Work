@@ -1,4 +1,4 @@
 
 
-@test :(Base.get(graph.plist, :debug, false)) == @macroexpand julia_petra.@debug graph
-@test :(Base.get(obj.plist, :debug, false))   == @macroexpand julia_petra.@debug obj
+#test with debug mode enabled
+@test true == @macroexpand julia_petra.@debug

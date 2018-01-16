@@ -36,6 +36,7 @@ const rowInfoSpare = Union{Void, RowInfo}[nothing]
         end
     end
 
+    (@debug) && (myPid(comm(graph)) == 1) && println("can't reuse $(@inbounds rowInfoSpare[1])")
     #couldn't reuse, create new instance
     return RowInfo{LID}(graph, localRow, allocSize, numEntries, offset1D)
 end
@@ -69,26 +70,30 @@ function insertIndicesAndValues(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo
 end
 
 function insertIndices(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}, newInds::Union{AbstractArray{GID, 1}, AbstractArray{LID, 1}}, lg::IndexType) where {GID, PID, LID}
-    numNewInds = 0
+    numNewInds = LID(length(newInds))
     if lg == GLOBAL_INDICES
-        newGInds = AbstractArray{GID, 1}(newInds)
-        numNewInds = length(newGInds)
         if isGloballyIndexed(graph)
-            gIndView = getGlobalView(graph, rowInfo)
-            gIndView[range(rowInfo.numEntries+1, 1, length(newGInds))] = newGInds[:]
+            numEntries = rowInfo.numEntries
+            (gIndPtr, gIndLen) = getGlobalViewPtr(graph, rowInfo)
+            @assert gIndLen >= numNewInds+numEntries
+            for i in 1:numNewInds
+                unsafe_store!(gIndPtr, GID(newInds[i]), numEntries+i)
+            end
         else
             lIndView = getLocalView(graph, rowInfo)
             colMap = graph.colMap
 
-            dest = range(rowInfo.numEntries, 1, length(newGInds))
-            lIndView[dest] = [lid(colMap, gid) for gid in newGInds]
+            dest = range(rowInfo.numEntries, 1, numNewInds)
+            lIndView[dest] = [lid(colMap, GID(id)) for id in newInds]
         end
     elseif lg == LOCAL_INDICES
-        newLInds = AbstractArray{LID, 1}(newInds)
-        numNewInds = length(newLInds)
         if isLocallyIndexed(graph)
-            lIndView = getLocalView(graph, rowInfo)
-            lIndView[range(rowInfo.numEntries, 1, length(newLInds))] = newLInds[:]
+            numEntries = rowInfo.numEntries
+            (lIndPtr, lIndLen) = getLocalViewPtr(graph, rowInfo)
+            @assert gIndLen >= numNewInds+numEntries
+            for i in 1:numNewInds
+                unsafe_store!(lIndPtr, LID(newInds[i]), numEntries+i)
+            end
         else
             @assert(false,"lg=LOCAL_INDICES, isGloballyIndexed(g) not implemented, "
             * "because it doesn't make sense")
@@ -110,7 +115,7 @@ function computeGlobalConstants(graph::CRSGraph{GID, PID, LID}) where {
     graph.haveGlobalConstants && return
 
     if @debug
-        @assert !null(graph.colMap) "The graph must have a column map at this point"
+        @assert !isnull(graph.colMap) "The graph must have a column map at this point"
     end
 
     computeLocalConstants(graph)
@@ -140,7 +145,7 @@ function computeLocalConstants(graph::CRSGraph{GID, PID, LID}) where {
     graph.haveLocalConstants && return
 
     if @debug
-        @assert !null(graph.colMap) "The graph must have a column map at this point"
+        @assert !isnull(graph.colMap) "The graph must have a column map at this point"
     end
 
     #if graph.haveLocalConstants == false  #short circuited above
@@ -161,14 +166,18 @@ function computeLocalConstants(graph::CRSGraph{GID, PID, LID}) where {
             const rowLID = lid(colMap, globalRow)
 
             const rowInfo = getRowInfo(graph, localRow)
-            rowView = getLocalView(rowInfo)
+            (rowPtr, rowLen) = getLocalViewPtr(graph, rowInfo)
 
-            if rowLID in rowView #appears to be broken IDK how or why
-                graph.nodeNumDiags += 1
+
+            for i in 1:rowLen
+                if unsafe_load(rowPtr) == rowLID
+                    graph.nodeNumDiags += 1
+                    break
+                end
             end
 
-            const smallestCol = rowView[1]
-            const largestCol  = rowView[end]
+            const smallestCol::LID = unsafe_load(rowPtr, 1)
+            const largestCol::LID  = unsafe_load(rowPtr, rowLen)
             if smallestCol < localRow
                 graph.upperTriangle = false
             end
@@ -716,6 +725,7 @@ macro insertIndicesImpl(indicesType, innards)
                     * "!= newNumEntries = $newNumEntries")
             end
             recycleRowInfo(rowInfo)
+            nothing
     end)
 end
 
@@ -830,139 +840,138 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
     error = false
 
     if isnull(wrappedDomMap)
-        colMap = Nullable{BlockMap{GID, PID, LID}}()
-    else
-        myColumns = GID[]
-        domMap = get(wrappedDomMap)
+        return  Nullable{BlockMap{GID, PID, LID}}()
+    end
+    myColumns = GID[]
+    domMap = get(wrappedDomMap)
 
-        if isLocallyIndexed(graph)
-            wrappedColMap = graph.colMap
+    if isLocallyIndexed(graph)
+        wrappedColMap = graph.colMap
 
-            if isnull(wrappedColMap)
-                warn("$(myPid(comm(graph))): The graph is locally indexed, but does not have a column map")
+        if isnull(wrappedColMap)
+            warn("$(myPid(comm(graph))): The graph is locally indexed, but does not have a column map")
 
-                error = true
-            else
-                colMap = get(wrappedColMap)
-                if linearMap(colMap) #i think isContiguous(map) <=> linearMap(map)?
-                    numCurGIDs = numMyElements(colMap)
-                    myFirstGlobalIndex = minMyGIDs(colMap)
-
-                    myColumns = collect(range(myFirstGlobalIndex, 1, numCurGIDs))
-                else
-                    myColumns = copy(myGlobalElements(colMap))
-                end
-            end
-        else #if graph.isGloballyIndexed
-            const localNumRows = getLocalNumRows(graph)
-
-            numLocalColGIDs = 0
-
-            gidIsLocal = zeros(Bool, localNumRows)
-            remoteGIDSet = Set()
-
-            #if rowMap != null
-            const rowMap = graph.rowMap
-
-            for localRow = 1:localNumRows
-                globalRow = gid(rowMap, localRow)
-                rowGIDs = getGlobalRowView(graph, globalRow)
-
-                numEnt = length(rowGIDs)
-                if numEnt != 0
-                    for k = 1:numEnt
-                        gid = rowGIDs[k]
-                        lid = julia_petra.lid(domMap, gid)
-                        if lid != 0
-                            if !gidIsLocal[lid]
-                                gidIsLocal[lid] = true
-                                numLocalColGIDs += 1
-                            end
-                        else
-                            #don't need containment checks, set already takes care of that
-                            push!(remoteGIDSet, gid)
-                        end
-                    end
-                end
-            end
-        end
-
-
-        numRemoteColGIDs = length(remoteGIDSet)
-
-        #line 214, abunch of explanation of serial short circuit
-        if numProc(comm(domMap)) == 1
-            if numRemoteColGIDs != 0
-                error = true
-            end
-            if numLocalColGIDs == localNumRows
-                return (error, domMap)
-            end
-        end
-        resize!(myColumns, numLocalColGIDs+numRemoteColGIDs)
-        localColGIDs  = view(myColumns, 1:numLocalColGIDs)
-        remoteColGIDs = view(myColumns, numLocalColGIDs+1:numLocalColGIDs+numRemoteColGIDs)
-
-        remoteColGIDs[:] = [el for el in remoteGIDSet]
-
-        remotePIDs = Array{PID, 1}(numRemoteColGIDs)
-
-        remotePIDs = remoteIDList(domMap, remoteColGIDs)[1]
-        if any(remotePIDs .== 0)
-            if @debug
-                warn("Some column indices are not in the domain Map")
-            end
             error = true
-        end
-
-        order = sortperm(remotePIDs)
-        permute!(remotePIDs, order)
-        permute!(remoteColGIDs, order)
-
-        #line 333
-
-        numDomainElts = numMyElements(domMap)
-        if numLocalColGIDs == numDomainElts
-            if linearMap(domMap) #I think isContiguous() <=> linearMap()
-                localColGIDs[1:numLocalColGIDs] = range(minMyGID(domMap), 1, numLocalColGIDs)
-            else
-                domElts = myGlobalElements(domMap)
-                localColGIDs[1:length(domElts)] = domElts
-            end
         else
-            numLocalCount = 1
-            if linearMap(domMap) #I think isContiguous() <=> linearMap()
-                curColMapGID = minMyGID(domMap)
-                for i = 1:numDomainElts
-                    if gidIsLocal[i]
-                        localColGIDs[numLocalCount] = curColMapGID
-                        numLocalCount += 1
-                    end
-                    curColMapGID += 1
-                end
-            else
-                domainElts = myGlobalElement(domMap)
-                for i = 1:numDomainElts
-                    if gidIsLocal[i]
-                        localColGIDs[numLocalCount] = domainElts[i]
-                        numLocalCount += 1
-                    end
-                    curColMapGID += 1
-                end
-            end
+            colMap = get(wrappedColMap)
+            if linearMap(colMap) #i think isContiguous(map) <=> linearMap(map)?
+                numCurGIDs = numMyElements(colMap)
+                myFirstGlobalIndex = minMyGIDs(colMap)
 
-            if numLocalCount != numLocalColGIDs
-                if @debug
-                    warn("$(myPid(comm(graph))): numLocalCount = $numLocalCount "
-                        * "!= numLocalColGIDs = $numLocalColGIDs.  "
-                        * "This should not happen.")
+                myColumns = collect(range(myFirstGlobalIndex, 1, numCurGIDs))
+            else
+                myColumns = copy(myGlobalElements(colMap))
+            end
+        end
+        return (error, BlockMap(myColumns, comm(domMap)))
+    end
+
+    #else if graph.isGloballyIndexed
+    const localNumRows = getLocalNumRows(graph)
+
+    numLocalColGIDs = 0
+
+    gidIsLocal = zeros(Bool, localNumRows)
+    remoteGIDSet = Set()
+
+    #if rowMap != null
+    const rowMap = graph.rowMap
+
+    for localRow = 1:localNumRows
+        globalRow = gid(rowMap, localRow)
+        (rowGIDPtr, numEnt) = getGlobalRowViewPtr(graph, globalRow)
+
+        if numEnt != 0
+            for k = 1:numEnt
+                gid::GID = unsafe_load(rowGIDPtr, k)
+                lid::LID = julia_petra.lid(domMap, gid)
+                if lid != 0
+                    @inbounds if !gidIsLocal[lid]
+                        gidIsLocal[lid] = true
+                        numLocalColGIDs += 1
+                    end
+                else
+                    #don't need containment checks, set already takes care of that
+                    push!(remoteGIDSet, gid)
                 end
-                error = true
             end
         end
     end
 
-    m = BlockMap(myColumns, comm(domMap))
 
-    return (error, m)
+
+    numRemoteColGIDs = length(remoteGIDSet)
+
+    #line 214, abunch of explanation of serial short circuit
+    if numProc(comm(domMap)) == 1
+        if numRemoteColGIDs != 0
+            error = true
+        end
+        if numLocalColGIDs == localNumRows
+            return (error, domMap)
+        end
+    end
+    resize!(myColumns, numLocalColGIDs+numRemoteColGIDs)
+    localColGIDs  = view(myColumns, 1:numLocalColGIDs)
+    remoteColGIDs = view(myColumns, numLocalColGIDs+1:numLocalColGIDs+numRemoteColGIDs)
+
+    remoteColGIDs[:] = [el for el in remoteGIDSet]
+
+    remotePIDs = Array{PID, 1}(numRemoteColGIDs)
+
+    remotePIDs = remoteIDList(domMap, remoteColGIDs)[1]
+    if any(remotePIDs .== 0)
+        if @debug
+            warn("Some column indices are not in the domain Map")
+        end
+        error = true
+    end
+
+    order = sortperm(remotePIDs)
+    permute!(remotePIDs, order)
+    permute!(remoteColGIDs, order)
+
+    #line 333
+
+    numDomainElts = numMyElements(domMap)
+    if numLocalColGIDs == numDomainElts
+        if linearMap(domMap) #I think isContiguous() <=> linearMap()
+            localColGIDs[1:numLocalColGIDs] = range(minMyGID(domMap), 1, numLocalColGIDs)
+        else
+            domElts = myGlobalElements(domMap)
+            localColGIDs[1:length(domElts)] = domElts
+        end
+    else
+        numLocalCount = 0
+        if linearMap(domMap) #I think isContiguous() <=> linearMap()
+            curColMapGID = minMyGID(domMap)
+            for i = 1:numDomainElts
+                if gidIsLocal[i]
+                    numLocalCount += 1
+                    localColGIDs[numLocalCount] = curColMapGID
+                end
+                curColMapGID += 1
+            end
+        else
+            domainElts = myGlobalElement(domMap)
+            for i = 1:numDomainElts
+                if gidIsLocal[i]
+                    numLocalCount += 1
+                    localColGIDs[numLocalCount] = domainElts[i]
+                end
+                curColMapGID += 1
+            end
+        end
+
+        if numLocalCount != numLocalColGIDs
+            if @debug
+                warn("$(myPid(comm(graph))): numLocalCount = $numLocalCount "
+                    * "!= numLocalColGIDs = $numLocalColGIDs.  "
+                    * "This should not happen.")
+            end
+            error = true
+        end
+    end
+
+    return (error, BlockMap(myColumns, comm(domMap)))
 end

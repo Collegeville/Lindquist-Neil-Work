@@ -4,12 +4,12 @@ Contains the data for a BlockMap
 type BlockMapData{GID <: Integer, PID <:Integer, LID <: Integer}
     comm::Comm{GID, PID, LID}
     directory::Nullable{Directory}
-    lid::Array{LID}
-    myGlobalElements::Array{GID, 1}
+    lid::Vector{LID}
+    myGlobalElements::Vector{GID}
 #    firstPointInElementList::Array{Integer}
 #    elementSizeList::Array{Integer}
 #    pointToElementList::Array{Integer}
-    
+
     numGlobalElements::GID
     numMyElements::LID
 #    elementSize::Integer
@@ -25,7 +25,7 @@ type BlockMapData{GID <: Integer, PID <:Integer, LID <: Integer}
     maxLID::LID
 #    numGlobalPoints::Integer
 #    numMyPoints::Integer
-    
+
 #    constantElementSize::Bool
     linearMap::Bool
     distributedGlobal::Bool
@@ -42,7 +42,7 @@ function BlockMapData(numGlobalElements::GID, comm::Comm{GID, PID, LID}) where G
         Nullable{Directory}(),
         LID[],
         GID[],
-        
+
         numGlobalElements,
         LID(0),
         GID(0),
@@ -51,7 +51,7 @@ function BlockMapData(numGlobalElements::GID, comm::Comm{GID, PID, LID}) where G
         GID(0),
         LID(0),
         LID(0),
-        
+
         false,
         false,
         false,

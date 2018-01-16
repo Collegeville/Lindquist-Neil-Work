@@ -6,14 +6,13 @@ serialComm = SerialComm{Int32, Bool, Int16}()
 srcMap = BlockMap(n, n, serialComm)
 desMap = BlockMap(n, n, serialComm)
 
-function basicTest(impor, debugSetting=false)
+function basicTest(impor)
     if isa(impor, Import)
         data = impor.importData
     else
         # basic exports are about the same anyways
         data = impor.exportData
     end
-    @test debugSetting == impor.debug
     @test srcMap == data.source
     @test desMap == data.target
     @test n == data.numSameIDs
@@ -35,44 +34,28 @@ expor = Array{Export, 1}(1)
 debugregex = Regex("^(?:.*INFO: .*$(myPid(serialComm)): .+\n){2,}.*\$")
 
 # basic import
-@test_nowarn impor[1] = Import(srcMap, desMap)
+@test_warn debugregex impor[1] = Import(srcMap, desMap)
 basicTest(impor[1])
-@test_warn debugregex impor[1] = Import(srcMap, desMap, debug=true)
-#impor[1] = Import(srcMap, desMap, debug=true)
-basicTest(impor[1], true)
-@test_nowarn impor[1] = Import(srcMap, desMap, Nullable{AbstractArray{Bool}}())
+
+@test_warn debugregex impor[1] = Import(srcMap, desMap, Nullable{AbstractArray{Bool}}())
 basicTest(impor[1])
-@test_warn debugregex impor[1] = Import(srcMap, desMap, Nullable{AbstractArray{Bool}}(), debug=true)
-basicTest(impor[1], true)
 
 
 # import using Dicts
-@test_nowarn impor[1] = Import(srcMap, desMap, Dict{Symbol, Any}())
+@test_warn debugregex impor[1] = Import(srcMap, desMap, Dict{Symbol, Any}())
 basicTest(impor[1])
-@test_warn debugregex impor[1] = Import(srcMap, desMap, Dict([(:debug, true)]))
-basicTest(impor[1], true)
-@test_nowarn impor[1] = Import(srcMap, desMap, Nullable{AbstractArray{Bool}}(), Dict{Symbol, Any}())
+@test_warn debugregex impor[1] = Import(srcMap, desMap, Nullable{AbstractArray{Bool}}(), Dict{Symbol, Any}())
 basicTest(impor[1])
-@test_warn debugregex impor[1] = Import(srcMap, desMap, Nullable{AbstractArray{Bool}}(), Dict([(:debug, true)])) 
-basicTest(impor[1], true)
 
 
 # basic export
-@test_nowarn expor[1] = Export(srcMap, desMap)
+@test_warn debugregex expor[1] = Export(srcMap, desMap)
 basicTest(expor[1])
-@test_warn debugregex expor[1] = Export(srcMap, desMap, debug=true)
-basicTest(expor[1], true)
-@test_nowarn expor[1] = Export(srcMap, desMap, Nullable{AbstractArray{Bool}}())
+@test_warn debugregex expor[1] = Export(srcMap, desMap, Nullable{AbstractArray{Bool}}())
 basicTest(expor[1])
-@test_warn debugregex expor[1] = Export(srcMap, desMap, Nullable{AbstractArray{Bool}}(), debug=true)
-basicTest(expor[1], true)
 
 #export using Dicts
-@test_nowarn expor[1] = Export(srcMap, desMap, Dict{Symbol, Any}())
+@test_warn debugregex expor[1] = Export(srcMap, desMap, Dict{Symbol, Any}())
 basicTest(expor[1])
-@test_warn debugregex expor[1] = Export(srcMap, desMap, Dict([(:debug, true)]))
-basicTest(expor[1], true)
-@test_nowarn expor[1] = Export(srcMap, desMap, Nullable{AbstractArray{Bool}}(), Dict{Symbol, Any}())
+@test_warn debugregex expor[1] = Export(srcMap, desMap, Nullable{AbstractArray{Bool}}(), Dict{Symbol, Any}())
 basicTest(expor[1])
-@test_warn debugregex expor[1] = Export(srcMap, desMap, Nullable{AbstractArray{Bool}}(), Dict([(:debug, true)]))
-basicTest(expor[1], true)
