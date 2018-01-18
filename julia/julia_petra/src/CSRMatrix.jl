@@ -471,7 +471,7 @@ end
 
 function getView(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID})::AbstractArray{Data, 1} where {Data, GID, PID, LID}
     if getProfileType(matrix) == STATIC_PROFILE && rowInfo.allocSize > 0
-        range = rowInfo.offset1D:rowInfo.offset1D+rowInfo.allocSize-1
+        range = rowInfo.offset1D:rowInfo.offset1D+rowInfo.allocSize-LID(1)
         view(matrix.localMatrix.values, range)
     elseif getProfileType(matrix) == DYNAMIC_PROFILE
         matrix.values2D[rowInfo.localRow]

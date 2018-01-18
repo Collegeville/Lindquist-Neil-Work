@@ -2,7 +2,7 @@ export LocalCSRMatrix, numRows, numCols, getRowView
 
 struct LocalCSRMatrix{Data, IndexType <: Integer}
     graph::LocalCRSGraph{IndexType, IndexType}
-    values::AbstractArray{Data, 1}
+    values::Union{Vector{Data}, SubArray{Data, 1, Vector{Data}, Tuple{UnitRange{IndexType}}, true}}
 
     numCols::IndexType
 end
