@@ -474,9 +474,10 @@ function getView(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID}):
         range = rowInfo.offset1D:rowInfo.offset1D+rowInfo.allocSize-LID(1)
         view(matrix.localMatrix.values, range)
     elseif getProfileType(matrix) == DYNAMIC_PROFILE
-        matrix.values2D[rowInfo.localRow]
+        baseArray = matrix.values2D[rowInfo.localRow]
+        view(baseArray, LID(1):LID(length(baseArray)))
     else
-        Data[]
+        view(matrix.localMatrix.values, LID(1):LID(0))
     end
 end
 
@@ -848,12 +849,12 @@ function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
     const myGraph = matrix.myGraph
 
     if rowInfo.localRow != 0 && rowInfo.numEntries > 0
-        viewRange = 1:rowInfo.numEntries
-		indices::AbstractArray{LID, 1} = view(getLocalView(myGraph, rowInfo), viewRange)
-        values::AbstractArray{Data, 1} = view(getView(matrix, rowInfo), viewRange)
+        viewRange = LID(1):rowInfo.numEntries
+		indices = view(getLocalView(myGraph, rowInfo), viewRange)
+        values = view(getView(matrix, rowInfo), viewRange)
     else
-        indices = LID[]
-        values = Data[]
+        indices = view(LID[], LID(1):LID(0))
+        values = view(Data[], LID(1):LID(0))
     end
     (indices, values)
 end
