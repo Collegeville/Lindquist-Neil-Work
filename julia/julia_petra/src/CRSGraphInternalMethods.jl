@@ -47,6 +47,7 @@ end
 """
 @inline function recycleRowInfo(rowInfo::RowInfo{T}) where T
     @inbounds rowInfoSpare[1] = rowInfo
+    nothing
 end
 
 
@@ -54,12 +55,12 @@ end
 getLocalGraph(graph::CRSGraph) = graph.localGraph
 
 
-function updateGlobalAllocAndValues(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}, newAllocSize::Integer, rowValues::AbstractArray{Data, 1})::RowInfo{LID} where {Data, GID, PID, LID}
+function updateGlobalAllocAndValues(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}, newAllocSize::Integer, rowValues::AbstractArray{Data, 1}) where {Data, GID, PID, LID}
 
     resize!(graph.globalIndices2D[rowInfo.localRow], newAllocSize)
     resize!(rowVals, newAllocSize)
 
-    getRowInfo(graph, rowInfo.localRow)
+    nothing
 end
 
 function insertIndicesAndValues(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}, newInds::Union{AbstractArray{GID, 1}, AbstractArray{LID, 1}}, oldRowVals::AbstractArray{Data, 1}, newRowVals::AbstractArray{Data, 1}, lg::IndexType) where {Data, GID, PID, LID}
@@ -718,13 +719,13 @@ macro insertIndicesImpl(indicesType, innards)
             graph.nodeNumEntries += numNewIndices
             setLocallyModified(graph)
 
+            recycleRowInfo(rowInfo)
             if @debug
                 chkNewNumEntries = getNumEntriesInLocalRow(graph, myRow)
                 @assert(chkNewNumEntries == newNumEntries,
                     "Internal Logic error: chkNewNumEntries = $chkNewNumEntries "
                     * "!= newNumEntries = $newNumEntries")
             end
-            recycleRowInfo(rowInfo)
             nothing
     end)
 end
@@ -842,7 +843,6 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
     if isnull(wrappedDomMap)
         return  Nullable{BlockMap{GID, PID, LID}}()
     end
-    myColumns = GID[]
     domMap = get(wrappedDomMap)
 
     if isLocallyIndexed(graph)
@@ -852,6 +852,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
             warn("$(myPid(comm(graph))): The graph is locally indexed, but does not have a column map")
 
             error = true
+            myColumns = GID[]
         else
             colMap = get(wrappedColMap)
             if linearMap(colMap) #i think isContiguous(map) <=> linearMap(map)?
@@ -871,7 +872,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
 
     numLocalColGIDs = 0
 
-    gidIsLocal = zeros(Bool, localNumRows)
+    gidIsLocal = falses(localNumRows)
     remoteGIDSet = Set()
 
     #if rowMap != null
@@ -911,7 +912,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
             return (error, domMap)
         end
     end
-    resize!(myColumns, numLocalColGIDs+numRemoteColGIDs)
+    myColumns = Vector{GID}(numLocalColGIDs+numRemoteColGIDs)
     localColGIDs  = view(myColumns, 1:numLocalColGIDs)
     remoteColGIDs = view(myColumns, numLocalColGIDs+1:numLocalColGIDs+numRemoteColGIDs)
 

@@ -18,7 +18,7 @@ end
 
 """
     LocalCSRMatrix(nRows::Integer, nCols::Integer, vals::AbstractArray{Data, 1}, rows::AbstractArray{IndexType, 1}, cols::AbstractArray{IndexType, 1}}
-  
+
 Creates the specified LocalCSRMatrix
 """
 function LocalCSRMatrix(nRows::Integer, nCols::Integer,
@@ -33,7 +33,7 @@ end
 
 """
     LocalCSRMatrix(numCols::IndexType, values::AbstractArray{Data, 1}, localGraph::LocalCRSGraph{IndexType, IndexType}) where {IndexType, Data <: Number}
-  
+
 Creates the specified LocalCSRMatrix
 """
 function LocalCSRMatrix(numCols::IndexType, values::AbstractArray{Data, 1},
@@ -41,7 +41,7 @@ function LocalCSRMatrix(numCols::IndexType, values::AbstractArray{Data, 1},
     if numCols < 0
         throw(InvalidArgumentError("Cannot have a negative number of rows"))
     end
-    
+
     LocalCSRMatrix(localGraph, values, numCols)
 end
 
@@ -69,13 +69,10 @@ function getRowView(matrix::LocalCSRMatrix{Data, IndexType},
         row::Integer)::SparseRowView{Data, IndexType} where {Data, IndexType}
     start = matrix.graph.rowMap[row]
     count = matrix.graph.rowMap[row+1] - start
-    
+
     if count == 0
         SparseRowView(Data[], IndexType[])
     else
         SparseRowView(matrix.values, matrix.graph.entries, count, start)
     end
 end
-
-
-

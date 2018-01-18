@@ -390,7 +390,9 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
         localTotalNumEntries = computeOffsets(ptrs, numRowEntries)
 
         inds = Array{LID, 1}(localTotalNumEntries)
-        vals = Array{Data, 1}(localTotalNumEntries)
+        #work around type instability required by localMatrix.values
+        vals_concrete = Array{Data, 1}(localTotalNumEntries)
+        vals = vals_concrete
 
         localIndices2D = myGraph.localIndices2D
         for row = 1:localNumRows
@@ -398,7 +400,7 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
             dest = range(ptrs[row], 1, numEnt)
 
             inds[dest] = localIndices2D[row][:]
-            vals[dest] = matrix.values2D[row][:]
+            vals_concrete[dest] = matrix.values2D[row][:]
         end
     elseif getProfileType(matrix) == STATIC_PROFILE
         curRowOffsets = myGraph.rowOffsets
@@ -413,7 +415,9 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
             localTotalNumEntries = computeOffsets(ptrs, numRowEnt)
 
             inds = Array{LID, 1}(localTotalNumEntries)
-            vals = Array{Data, 1}(localTotalNumEntries)
+            #work around type instability required by localMatrix.values
+            vals_concrete = Array{Data, 1}(localTotalNumEntries)
+            vals = vals_concrete
 
             #line 1234
             for row in 1:localNumRows
@@ -421,10 +425,10 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
                 dstPos = ptrs[row]
                 dstEnd = ptrs[row+1]-1
                 dst = dstPos:dstEnd
-                src = range(srcPos, 1, dstEnd-dstPos+1)
+                src = srcPos:srcPos+dstEnd-dstPos
 
                 inds[dst] = myGraph.localIndices1D[src]
-                vals[dst] = localMatrix.values[src]
+                vals_concrete[dst] = localMatrix.values[src]
             end
         else
             #dont have to pack, just set pointers
@@ -617,8 +621,11 @@ function insertGlobalValues(matrix::CSRMatrix{Data, GID, PID, LID}, globalRow::I
                         * "statically allocated graph structure"))
             end
 
-            rowInfo = updateGlobalAllocAndValues(myGraph, rowInfo, newNumEntries,
+            updateGlobalAllocAndValues(myGraph, rowInfo, newNumEntries,
                             matrix.values2D[localRow])
+
+            recycleRowInfo(rowInfo)
+            rowInfo = getRowInfo(myGraph, localRow);
         end
 
         insertIndicesAndValues(myGraph, rowInfo, indices, getView(matrix, rowInfo),
@@ -626,6 +633,7 @@ function insertGlobalValues(matrix::CSRMatrix{Data, GID, PID, LID}, globalRow::I
 
         recycleRowInfo(rowInfo)
     end
+    nothing
 end
 
 

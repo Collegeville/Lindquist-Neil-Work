@@ -355,11 +355,11 @@ end
         if length(graph.globalIndices1D) != 0
             return (pointer(graph.globalIndices1D, rowInfo.offset1D), rowInfo.allocSize)
         elseif length(graph.globalIndices2D[rowInfo.localRow]) == 0
-            baseArray = globalIndices2D[rowInfo.localRow]
+            baseArray = graph.globalIndices2D[rowInfo.localRow]::Vector{GID}
             return (pointer(baseArray), GID(length(baseArray)))
         end
     end
-    return (C_NULL, 0)
+    return (Ptr{GID}(C_NULL), 0)
 end
 
 function getLocalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID})::AbstractArray{LID, 1} where {GID <: Integer, PID, LID <: Integer}
@@ -368,7 +368,7 @@ function getLocalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID})::Ab
             range = rowInfo.offset1D : rowInfo.offset1D + rowInfo.allocSize-1
             return view(graph.localIndices1D, range)
         elseif length(graph.localIndices2D[rowInfo.localRow]) == 0
-            return localIndices2D[rowInfo.localRow]
+            return graph.localIndices2D[rowInfo.localRow]
         end
     end
     return LID[]
@@ -398,14 +398,7 @@ function getGlobalRowView(graph::CRSGraph{GID}, globalRow::GID)::AbstractArray{G
     rowInfo = getRowInfoFromGlobalRow(graph, globalRow)
 
     if rowInfo.localRow != 0 && rowInfo.numEntries > 0
-        indices = view(getGlobalView(graph, rowInfo), 1:rowInfo.numEntries)
-        if @debug
-            @assert(length(indices) == getNumEntriesInGlobalRow(graph, globalRow),
-                "length(indices) = $(length(indices)) "
-                * "!= getNumEntriesInGlobalRow(graph, $globalRow) "
-                * "= $(getNumEntriesInGlobalRow(graph, globalRow))")
-        end
-        retVal = indices
+        retVal = view(getGlobalView(graph, rowInfo), 1:rowInfo.numEntries)
     else
         retVal = GID[]
     end
@@ -426,7 +419,7 @@ function getGlobalRowViewPtr(graph::CRSGraph{GID, PID, LID}, globalRow::GID)::Tu
     if rowInfo.localRow != 0 && rowInfo.numEntries > 0
         retVal = (getGlobalViewPtr(graph, rowInfo)[1], rowInfo.numEntries)
     else
-        retVal = (C_NULL, 0)
+        retVal = (Ptr{GID}(C_NULL), LID(0))
     end
     recycleRowInfo(rowInfo)
     retVal

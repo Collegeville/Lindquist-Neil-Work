@@ -419,7 +419,9 @@ function getLocalMap(map::BlockMap{GID, PID, LID})::BlockMap{GID, PID, LID} wher
 
     data.directory = Nullable{Directory}()
     data.lid = copy(oldData.lid)
-    data.myGlobalElements =  copy(oldData.myGlobalElements)
+    #maps shouldn't be modified anyways, may as well share array
+    #data.myGlobalElements =  copy(oldData.myGlobalElements)
+    data.myGlobalElements = oldData.myGlobalElements
     data.numMyElements = oldData.numMyElements
     data.minAllGID = oldData.minAllGID
     data.maxAllGID = oldData.maxAllGID
