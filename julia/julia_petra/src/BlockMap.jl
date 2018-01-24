@@ -174,17 +174,8 @@ function BlockMap(myGlobalElements::AbstractArray{GID}, comm::Comm{GID, PID,LID}
         data.minAllGID = data.minMyGID
         data.maxAllGID = data.maxMyGID
     else
-        if data.linearMap
-            data.numGlobalElements = sumAll(data.comm, data.numMyElements)
-        else
-            #if 1+ GIDs shared between processors, need to total that correctly
-            allIDs = gatherAll(data.comm, myGlobalElements)
-            data.numGlobalElements = length(Set(allIDs))
-        end
-
         tmp_send = [
-            -((data.numMyElements > 0
-                    || data.numGlobalElements == 0)?
+            -((data.numMyElements > 0)?
                 data.minMyGID:Inf)
             , data.maxMyGID]
 
@@ -194,6 +185,26 @@ function BlockMap(myGlobalElements::AbstractArray{GID}, comm::Comm{GID, PID,LID}
 
         data.minAllGID = -tmp_recv[1]
         data.maxAllGID =  tmp_recv[2]
+
+        if data.linearMap
+            data.numGlobalElements = sumAll(data.comm, data.numMyElements)
+        else
+            #if 1+ GIDs shared between processors, need to total that correctly
+            allIDs = gatherAll(data.comm, myGlobalElements)
+
+            indexModifier = 1 - data.minAllGID
+            maxGID = data.maxAllGID
+
+            count = 0
+            arr = BitArray(maxGID + indexModifier)
+            for id in allIDs
+                if !arr[GID(id + indexModifier)]
+                    arr[GID(id + indexModifier)] = true
+                    count += 1
+                end
+            end
+            data.numGlobalElements = count
+        end
     end
 
     data.distributedGlobal = isDistributedGlobal(map, data.numGlobalElements, numMyElements)
