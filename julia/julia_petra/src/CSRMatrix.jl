@@ -482,7 +482,7 @@ function getView(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID}):
         baseArray = matrix.values2D[rowInfo.localRow]
         view(baseArray, LID(1):LID(length(baseArray)))
     else
-        view(matrix.localMatrix.values, LID(1):LID(0))
+        Data[]
     end
 end
 
@@ -858,8 +858,8 @@ function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
 		indices = view(getLocalView(myGraph, rowInfo), viewRange)
         values = view(getView(matrix, rowInfo), viewRange)
     else
-        indices = view(LID[], LID(1):LID(0))
-        values = view(Data[], LID(1):LID(0))
+        indices = LID[]
+        values = Data[]
     end
     (indices, values)
 end

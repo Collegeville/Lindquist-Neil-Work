@@ -372,7 +372,7 @@ function getLocalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}) whe
             return view(baseArray, LID(1):LID(length(baseArray)))
         end
     end
-    return view(graph.localIndices1D, LID(1):LID(0))
+    return LID
 end
 
 
