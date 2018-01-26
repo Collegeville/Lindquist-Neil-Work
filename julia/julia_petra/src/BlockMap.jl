@@ -196,7 +196,7 @@ function BlockMap(myGlobalElements::AbstractArray{GID}, comm::Comm{GID, PID,LID}
             maxGID = data.maxAllGID
 
             count = 0
-            arr = BitArray(maxGID + indexModifier)
+            arr = falses(maxGID + indexModifier)
             for id in allIDs
                 if !arr[GID(id + indexModifier)]
                     arr[GID(id + indexModifier)] = true
