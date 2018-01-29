@@ -230,8 +230,10 @@ int main(int argc, char *argv[])
   ierr += power_method(A, lambda, niters, tolerance, verbose);
   elapsed_time = timer.ElapsedTime();
 
-  if (verbose)
+  if (verbose){
     std::cout << "\n\nTotal time for second solve = " << elapsed_time << std::endl<< std::endl;
+    std::cout << "\nErrors: " << ierr <<std::endl; 
+  }
 
 
   // Release all objects
