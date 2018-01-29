@@ -195,8 +195,10 @@ int main(int argc, char *argv[])
   ierr += power_method(A, lambda, niters, tolerance, verbose);
   double elapsed_time = timer.ElapsedTime();
 
-  if (verbose)
-    std::cout << "\n\nTotal Time for first (warm up) solve = " << elapsed_time << std::endl<< std::endl;
+  if (verbose){
+    std::cout << "lambda = " << lambda << std::endl;
+    std::cout << "Total Time for first (warm up) solve = " << elapsed_time << std::endl<< std::endl;
+  }
 
 
   // Iterate (again)
@@ -205,9 +207,10 @@ int main(int argc, char *argv[])
   ierr += power_method(A, lambda, niters, tolerance, verbose);
   elapsed_time = timer.ElapsedTime();
 
-  if (verbose)
-    std::cout << "\n\nTotal time for first (warmed) solve = " << elapsed_time << std::endl<< std::endl;
-
+  if (verbose){
+    std::cout << "lambda = " << lambda << std::endl;
+    std::cout << "Total time for first (warmed) solve = " << elapsed_time << std::endl<< std::endl;
+  }
 
   // Increase diagonal dominance
   if (verbose)
@@ -231,8 +234,9 @@ int main(int argc, char *argv[])
   elapsed_time = timer.ElapsedTime();
 
   if (verbose){
-    std::cout << "\n\nTotal time for second solve = " << elapsed_time << std::endl<< std::endl;
-    std::cout << "\nErrors: " << ierr <<std::endl; 
+    std::cout << "lambda = " << lambda << std::endl;
+    std::cout << "Total time for second solve = " << elapsed_time << std::endl<< std::endl;
+    std::cout << "\nErrors: " << ierr << std::endl << std::endl; 
   }
 
 
