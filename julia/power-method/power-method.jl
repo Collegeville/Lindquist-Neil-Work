@@ -120,9 +120,9 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
     log("increasing magnitude of first diagonal term, solving again\n")
 
     if myGID(map, 1)
-        rowInds, rowVals = getLocalRowView(A, 0)
-        for i = 1:getNumEntriesInGlobalRow(A, 0)
-            if rowInds[i] == 0
+        rowInds, rowVals = getLocalRowView(A, 1)
+        for i = 1:getNumEntriesInGlobalRow(A, 1)
+            if rowInds[i] == 1
                 #using a view, so values update the original
                 rowVals[i] *= 10
             end
