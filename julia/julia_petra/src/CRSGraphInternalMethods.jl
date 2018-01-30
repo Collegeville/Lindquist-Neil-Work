@@ -214,7 +214,7 @@ end
     offset1D::LID = 1
     allocSize::LID = 0
 
-    if getProfileType(graph) == STATIC_PROFILE
+    @inbounds if getProfileType(graph) == STATIC_PROFILE
         if length(graph.rowOffsets) != 0
             offset1D  = LID(graph.rowOffsets[row])
             allocSize = LID(graph.rowOffsets[row+1] - graph.rowOffsets[row])

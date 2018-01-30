@@ -622,7 +622,7 @@ Whether the graph's storage is optimized
 """
 function isStorageOptimized(graph::CRSGraph)
     const isOpt = length(graph.numRowEntries) == 0 && getLocalNumRows(graph) > 0
-    if isOpt && @debug
+    if (@debug) && isOpt
         @assert(getProfileType(graph) == STATIC_PROFILE,
             "Matrix claims optimized storage by profile type "
             * "is dynamic.  This shouldn't happend.")

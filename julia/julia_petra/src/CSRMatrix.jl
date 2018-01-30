@@ -487,8 +487,9 @@ function getView(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID}):
 end
 
 @inline function getViewPtr(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID})::Tuple{Ptr{Data}, LID} where {Data, GID, PID, LID}
-    if getProfileType(matrix) == STATIC_PROFILE && rowInfo.allocSize > 0
-        (pointer(matrix.localMatrix.values::Array{Data, 1}, rowInfo.offset1D), rowInfo.allocSize)
+    allocSize = rowInfo.allocSize
+    if getProfileType(matrix) == STATIC_PROFILE && allocSize > 0
+        (pointer(matrix.localMatrix.values::Array{Data, 1}, rowInfo.offset1D), allocSize)
     elseif getProfileType(matrix) == DYNAMIC_PROFILE
         baseArray = matrix.values2D[rowInfo.localRow]
         (pointer(baseArray), LID(length(baseArray)))
@@ -895,8 +896,6 @@ end
 
         (indices, values, numEntries)
     else
-        indices = LID[]
-        values = Data[]
         (C_NULL, C_NULL, 0)
     end
 end
@@ -1193,8 +1192,10 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
     #TODO implement this better, can BLAS be used?
     if !isTransposed(mode)
         #TODO look at best way to order the loops to avoid cache misses
+        # I think this is the better order, since MultiVector is column oriented
+        numRows = getLocalNumRows(A)
         for vect = LID(1):numVectors(Y)
-            for row = LID(1):getLocalNumRows(A)
+            for row = LID(1):numRows
                 sum::Data = Data(0)
                 (indices, values, len) = getLocalRowViewPtr(A, row)
                 for i in LID(1):LID(len)
@@ -1209,8 +1210,9 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
         end
     else
         rawY[:, :] *= beta
+        numRows = getLocalNumRows(A)
         for vect = LID(1):numVectors(Y)
-            for mRow in LID(1):getLocalNumRows(A)
+            for mRow in LID(1):numRows
                 (indices, values, len) = getLocalRowViewPtr(A, mRow)
                 for i in LID(1):LID(len)
                     ind::LID = unsafe_load(indices, i)
