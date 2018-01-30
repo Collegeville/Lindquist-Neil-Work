@@ -486,7 +486,7 @@ function getView(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID}):
     end
 end
 
-@inline function getViewPtr(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID})::Tuple{Ptr{Data}, LID} where {Data, GID, PID, LID}
+Base.@propagate_inbounds @inline function getViewPtr(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID})::Tuple{Ptr{Data}, LID} where {Data, GID, PID, LID}
     allocSize = rowInfo.allocSize
     if getProfileType(matrix) == STATIC_PROFILE && allocSize > 0
         (pointer(matrix.localMatrix.values::Array{Data, 1}, rowInfo.offset1D), allocSize)
@@ -865,7 +865,7 @@ function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
     (indices, values)
 end
 
-@inline function getLocalRowViewPtr(matrix::CSRMatrix{Data, GID, PID, LID},
+Base.@propagate_inbounds @inline function getLocalRowViewPtr(matrix::CSRMatrix{Data, GID, PID, LID},
         localRow::Integer
         )::Tuple{Ptr{LID}, Ptr{Data}, LID} where {
         Data, GID, PID, LID}
@@ -876,7 +876,7 @@ end
     retVal
 end
 
-@inline function getLocalRowViewPtr(matrix::CSRMatrix{Data, GID, PID, LID},
+Base.@propagate_inbounds @inline function getLocalRowViewPtr(matrix::CSRMatrix{Data, GID, PID, LID},
         rowInfo::RowInfo{LID}
         )::Tuple{Ptr{LID}, Ptr{Data}, LID}  where {
         Data, GID, PID, LID}
@@ -890,7 +890,10 @@ end
     const myGraph = matrix.myGraph
     const numEntries = rowInfo.numEntries
 
-    if rowInfo.localRow != 0 && numEntries > 0
+    nonLocalRow = true
+    @boundscheck nonLocalRow = rowInfo.localRow != 0
+
+    if nonLocalRow && numEntries > 0
         (indices, _) = getLocalViewPtr(myGraph, rowInfo)
         (values, _) = getViewPtr(matrix, rowInfo)
 
@@ -1197,7 +1200,7 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
         for vect = LID(1):numVectors(Y)
             for row = LID(1):numRows
                 sum::Data = Data(0)
-                (indices, values, len) = getLocalRowViewPtr(A, row)
+                @inbounds (indices, values, len) = getLocalRowViewPtr(A, row)
                 for i in LID(1):LID(len)
                     ind::LID = unsafe_load(indices, i)
                     val::Data = unsafe_load(values, i)
@@ -1213,7 +1216,7 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
         numRows = getLocalNumRows(A)
         for vect = LID(1):numVectors(Y)
             for mRow in LID(1):numRows
-                (indices, values, len) = getLocalRowViewPtr(A, mRow)
+                @inbounds (indices, values, len) = getLocalRowViewPtr(A, mRow)
                 for i in LID(1):LID(len)
                     ind::LID = unsafe_load(indices, i)
                     val::Data = unsafe_load(values, i)

@@ -197,7 +197,7 @@ end
 hasRowInfo(graph::CRSGraph) = (getProfileType(graph) != STATIC_PROFILE
                                 || length(graph.rowOffsets) != 0)
 
-function getRowInfoFromGlobalRow(graph::CRSGraph{GID, PID, LID},
+Base.@propagate_inbounds function getRowInfoFromGlobalRow(graph::CRSGraph{GID, PID, LID},
         row::Integer)::RowInfo{LID} where {GID, PID, LID <: Integer}
     getRowInfo(graph, lid(graph.rowMap, row))
 end
@@ -207,7 +207,9 @@ end
         @assert hasRowInfo(graph) "Graph does not have row info anymore.  Should have been caught earlier"
     end
 
-    if !hasRowInfo(graph) || !myLID(graph.rowMap, row)
+    emptyRowInfo = !hasRowInfo(graph)
+    @boundscheck emptyRowInfo = emptyRowInfo || !myLID(graph.rowMap, row)
+    if emptyRowInfo
         return createRowInfo(graph, row, LID(0), LID(0), LID(1))
     end
 

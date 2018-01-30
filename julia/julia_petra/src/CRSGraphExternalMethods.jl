@@ -376,7 +376,7 @@ function getLocalView(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID}) whe
 end
 
 
-@inline function getLocalViewPtr(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID})::Tuple{Ptr{LID}, LID} where {GID <: Integer, PID, LID <: Integer}
+Base.@propagate_inbounds @inline function getLocalViewPtr(graph::CRSGraph{GID, PID, LID}, rowInfo::RowInfo{LID})::Tuple{Ptr{LID}, LID} where {GID <: Integer, PID, LID <: Integer}
     if rowInfo.allocSize > 0
         if length(graph.localIndices1D) != 0
             return (pointer(graph.localIndices1D, rowInfo.offset1D), rowInfo.allocSize)
@@ -407,7 +407,7 @@ function getGlobalRowView(graph::CRSGraph{GID}, globalRow::GID)::AbstractArray{G
     retVal
 end
 
-function getGlobalRowViewPtr(graph::CRSGraph{GID, PID, LID}, globalRow::GID)::Tuple{Ptr{GID}, LID} where {GID <: Integer, PID <: Integer, LID <: Integer}
+Base.@propagate_inbounds function getGlobalRowViewPtr(graph::CRSGraph{GID, PID, LID}, globalRow::GID)::Tuple{Ptr{GID}, LID} where {GID <: Integer, PID <: Integer, LID <: Integer}
     if isLocallyIndexed(graph)
         throw(InvalidArgumentError("The graph's indices are currently stored as local indices, so a view with global column indices cannot be returned.  Use getGlobalRowCopy(::CRSGraph) instead"))
     end
@@ -417,7 +417,10 @@ function getGlobalRowViewPtr(graph::CRSGraph{GID, PID, LID}, globalRow::GID)::Tu
     end
     rowInfo = getRowInfoFromGlobalRow(graph, globalRow)
 
-    if rowInfo.localRow != 0 && rowInfo.numEntries > 0
+    isLocalRow = true
+    @boundscheck isLocalRow = rowInfo.localRow != 0
+
+    if isLocalRow && rowInfo.numEntries > 0
         retVal = (getGlobalViewPtr(graph, rowInfo)[1], rowInfo.numEntries)
     else
         retVal = (Ptr{GID}(C_NULL), LID(0))
