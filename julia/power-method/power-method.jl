@@ -40,7 +40,7 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
 
         apply!(z, A, q, ONE, ZERO)
         λ = dot(q, z)[1]
-        if iter%100 != 0 || iter+1 == niters
+        if iter%100 == 0 || iter+1 == niters
             #TODO improve - currently works, but is a little bit of a hack around MultiVector's lack of math operators
             @. resid.data = z.data - λ*q.data
             residual = norm2(resid)[1]
