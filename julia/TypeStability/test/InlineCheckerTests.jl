@@ -106,6 +106,19 @@ end
     end
     @check h
 
+    @test_nowarn begin
+        @stable_function([(UInt8, Float64), (UInt16, Float32)], Dict(:return => Number),
+        function hb(x, y)
+            if x > 1
+                1
+            else
+                1.0
+            end
+        end)
+        @copy hb
+    end
+    @check hb
+
     @test_warn [r".*h1.*", r".*h2.*", (result)->!contains(result, "h3"), r".*not stable.*", r".*eturn.*"] begin
         @stable_function [(UInt8, Float64), (UInt16, Float32)] begin
             function h1(x, y)
@@ -140,8 +153,7 @@ end
 
     @test_nowarn @stable_function [(Float64,)] foo
     @test_warn [r".*not stable.*", r".*eturn.*"] @stable_function [(Int,)] foo
-
-
+    @test_nowarn @stable_function [(Int,)] Dict(:return => Number) foo
 
     @enable_inline_checks false
     @test_nowarn @stable_function [(Int,)] foo

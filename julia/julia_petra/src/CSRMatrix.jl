@@ -1192,7 +1192,8 @@ TypeStability.@stable_function [(MultiVector{D, G, P, L}, CSRMatrix{D, G, P, L},
                         [UInt64, Int64, UInt32], #GID
                         [UInt8, Int8, UInt32], #PID
                         [UInt32, Int32]) #LID
-] begin
+# createRowInfo has a nessaccery Union variable
+] RegexDict((r"^nextVal@_\d+$", Union{Void, julia_petra.RowInfo})) begin
 function localApply(Y::MultiVector{Data, GID, PID, LID},
         A::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID},
         mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}

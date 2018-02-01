@@ -5,4 +5,5 @@ using Base.Test
 
     include("StabilityAnalysisTests.jl")
     include("InlineCheckerTests.jl")
+    include("Utils.jl")
 end

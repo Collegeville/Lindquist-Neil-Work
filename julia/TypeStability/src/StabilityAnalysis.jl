@@ -3,38 +3,38 @@ export check_function, check_method
 export StabilityReport, is_stable
 
 """
-    check_function(func, signatures; unstable_vars=Dict(), unstable_return::Type)
+    check_function(func, signatures, acceptable_instability=Dict())
 
 Check that the function is stable under each of the given signatures.
 
 Return an array of method signature-`StabilityReport` pairs from
 [`check_method`](@ref).
 """
-function check_function(func, signatures; unstable_vars=Dict{Symbol, Type}(),
-        unstable_return::Type=Bool)
+function check_function(func, signatures, acceptable_instability=Dict{Symbol, Type}())
     result = Tuple{Any, StabilityReport}[]
     for params in signatures
-        push!(result, (params, check_method(func, params; unstable_vars=unstable_vars, unstable_return=unstable_return)))
+        push!(result, (params, check_method(func, params, acceptable_instability)))
     end
     result
 end
 
 """
-    check_method(func, signature; unstable_vars=Dict(), unstable_return::Type)
+    check_method(func, signature, acceptable_instability=Dict())
 
 Create a `StabilityReport` object describing the type stability of the method.
 
 Compute non-concrete types of variables and return value, returning them in
 a [`StabilityReport`](@ref) Object
 
-#Arguments
--`unstable_vars=Dict()`: A mapping of variables that are allowed be non-concrete
-types.  `get` is called with the mapping, the variable's symbol and `Bool` to
-get the variable's allowed type.
+`acceptable_instability`, if present, is a mapping of variables that are
+allowed be non-concrete types.  `get` is called with the mapping, the
+variable's symbol and `Bool` to get the variable's allowed type.  Additionally,
+the return value is checked using `:return` as the symbol.
+
 -`unstable_return::Type`: A supertype of allowed, non-concrete return types.
 """
 #Based off julia's code_warntype
-function check_method(func, signature; unstable_vars=Dict{Symbol, Type}(), unstable_return::Type=Bool)
+function check_method(func, signature, acceptable_instability=Dict{Symbol, Type}())
     function slots_used(ci, slotnames)
         used = falses(length(slotnames))
         scan_exprs!(used, ci.code)
@@ -49,6 +49,11 @@ function check_method(func, signature; unstable_vars=Dict{Symbol, Type}(), unsta
                 scan_exprs!(used, ex.args)
             end
         end
+    end
+
+    function isstable(typ, name)
+        (isleaftype(typ) && typ != Core.Box) ||
+                (typ <: get(acceptable_instability, name, Bool))
     end
 
     #loop over possible methods for the given argument types
@@ -72,7 +77,7 @@ function check_method(func, signature; unstable_vars=Dict{Symbol, Type}(), unsta
                 if used_slotids[i]
                     name = Symbol(slotnames[i])
                     typ = src.slottypes[i]
-                    if (!isleaftype(typ) || typ == Core.Box) && !(typ <: get(unstable_vars, name, Bool))
+                    if !isstable(typ, name)
                         push!(unstable_vars_list, (name, typ))
                     end
 
@@ -83,45 +88,38 @@ function check_method(func, signature; unstable_vars=Dict{Symbol, Type}(), unsta
             warn("Can't access slot types of CodeInfo")
         end
 
-        if (!isleaftype(rettyp) || rettyp == Core.Box) && !(rettyp <: unstable_return)
-            unstable_ret = Nullable(rettyp)
+        if !isstable(rettyp, :return)
+            push!(unstable_vars_list, (:return, rettyp))
         end
 
         #TODO check body
     end
 
-    return StabilityReport(unstable_vars_list, unstable_ret)
+    return StabilityReport(unstable_vars_list)
 end
 
 """
     StabilityReport()
-    StabilityReport(unstable_variables::Vector{Tuple{Symbol, Type}}, unstable_return::Nullable{Type})
+    StabilityReport(unstable_variables::Vector{Tuple{Symbol, Type}})
 
 Holds information about the stability of a method.
 
-If `unstable_vars` and `unstable_return` are present, sets the respective
-fields.  Otherwise, creates an empty list and null value respectively.
+If `unstable_vars` is present, set the fields.  Otherwise, creates an empty set.
 
 See [`is_stable`](@ref)
 """
 struct StabilityReport
     "A list of unstable variables and their values"
-    unstable_variables::Array{Tuple{Symbol, Type}, 1}
-    "The return type, if not concrete.  Otherwise `Nullable()`"
-    unstable_return::Nullable{<:Type}
+    unstable_variables::Dict{Symbol, Type}
+
+    StabilityReport(v::Dict{Symbol, Type}) = new(v)
 end
 
-StabilityReport() = StabilityReport(Array{Tuple{Symbol, Type}, 1}(0), Nullable{Type}())
-StabilityReport(vars::Vector{Tuple{Symbol, Type}}) = StabilityReport(vars, Nullable{Type}())
-StabilityReport(ret::Nullable{<:Type}) = StabilityReport(Vector{Tuple{Symbol, Type}}(0), ret)
+StabilityReport() = StabilityReport(Dict{Symbol, Type}())
+StabilityReport(vars) = StabilityReport(Dict{Symbol, Type}(vars))
 
 function Base.:(==)(x::StabilityReport, y::StabilityReport)
-    (x.unstable_variables == y.unstable_variables
-        && if isnull(x.unstable_return)
-            isnull(y.unstable_return)
-        else
-            !isnull(y.unstable_return) && get(x.unstable_return) == get(y.unstable_return)
-        end)
+    x.unstable_variables == y.unstable_variables
 end
 
 """
@@ -130,5 +128,6 @@ end
 
 Check if the given [`StabilityReport`](@ref)s don't have any unstable types.
 """
-is_stable(report::StabilityReport)::Bool = length(report.unstable_variables) == 0 && isnull(report.unstable_return)
+is_stable(report::StabilityReport)::Bool = length(report.unstable_variables) == 0
 is_stable(reports::AbstractArray{StabilityReport})::Bool = all(@. is_stable(reports))
+is_stable(reports::Set{StabilityReport})::Bool = all(@. is_stable(reports))
