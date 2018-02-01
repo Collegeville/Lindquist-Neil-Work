@@ -1,3 +1,5 @@
+using TypeStability
+
 module julia_petra
 
 # Internal Utilities

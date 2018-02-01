@@ -1,6 +1,8 @@
 export CSRMatrix, insertGlobalValues
 #TODO export other CSRMatrix-specific symbols
 
+using TypeStability
+
 mutable struct CSRMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer} <: DistRowMatrix{Data, GID, PID, LID}
     rowMap::BlockMap{GID, PID, LID}
     colMap::Nullable{BlockMap{GID, PID, LID}}
@@ -1183,7 +1185,14 @@ function applyTranspose!(Yin::MultiVector{Data, GID, PID, LID}, operator::CSRMat
     Yin
 end
 
-
+TypeStability.@stable_function [(MultiVector{D, G, P, L}, CSRMatrix{D, G, P, L},
+                        MultiVector{D, G, P, L}, TransposeMode, D, D)
+                    for (D, G, P, L) in Base.Iterators.product(
+                        [Float64, Complex64], #Data
+                        [UInt64, Int64, UInt32], #GID
+                        [UInt8, Int8, UInt32], #PID
+                        [UInt32, Int32]) #LID
+] begin
 function localApply(Y::MultiVector{Data, GID, PID, LID},
         A::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID},
         mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
@@ -1227,4 +1236,5 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
     end
 
     Y
+end
 end

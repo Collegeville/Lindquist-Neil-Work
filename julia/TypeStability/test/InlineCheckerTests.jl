@@ -72,20 +72,20 @@ end
     @check g
 
     @test_nowarn begin
-        @stable_function [(Float64,)] begin
+        @stable_function [(Complex{Float64},)] begin
             function g1(x)
-                if x > 0
+                if x == 0
                     x
                 else
-                    0.0
+                    0.0im
                 end
             end
 
-            function g2(x)
-                if x > 0
+            function g2(x::Complex{T}) where T
+                if x == 0
                     x
                 else
-                    2.5
+                    Complex{T}(2.5)
                 end
             end
         end

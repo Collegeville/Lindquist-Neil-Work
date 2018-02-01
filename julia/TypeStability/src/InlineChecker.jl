@@ -49,9 +49,17 @@ macro stable_function(arg_lists, func::Expr)
         if func.head == :function
             func_names = [func.args[1].args[1]]
         elseif func.head == :block
-            func_names = unique([expr.args[1].args[1]
-                                    for expr in func.args
-                                    if expr.head == :function])
+            func_names = Symbol[]
+            for expr in func.args
+                if expr.head == :function
+                    if expr.args[1].head == :where
+                        push!(func_names, expr.args[1].args[1].args[1])
+                    else
+                        push!(func_names, expr.args[1].args[1])
+                    end
+                end
+            end
+            func_names = unique(func_names)
             if length(func_names) == 0
                 error("Cannot find function name in $func")
             end

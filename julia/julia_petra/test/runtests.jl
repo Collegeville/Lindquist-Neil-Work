@@ -1,6 +1,10 @@
 #have debug enabled while running tests
 globalDebug = true
 
+using TypeStability
+#check stability while running tests
+enable_inline_stability_checks(true)
+
 using julia_petra
 using Base.Test
 
