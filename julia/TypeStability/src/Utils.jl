@@ -42,6 +42,7 @@ function Base.get(dict::RegexDict, key::String, default)
             return entryVal
         end
     end
+    println("Returning $default")
     return default
 end
 

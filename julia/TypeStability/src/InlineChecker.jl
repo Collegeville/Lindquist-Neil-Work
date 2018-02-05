@@ -73,12 +73,18 @@ Internal method to parse the last argument of @stable_function
 """
 function parsebody(func::Expr)
     if func.head == :function
-        func_names = [func.args[1].args[1]]
+        if func.args[1] isa Symbol
+            func_names = [func.args[1]]
+        else
+            func_names = [func.args[1].args[1]]
+        end
     elseif func.head == :block
         func_names = Symbol[]
         for expr in func.args
             if expr.head == :function
-                if expr.args[1].head == :where
+                if expr.args[1] isa Symbol
+                    push!(func_names, expr.args[1])
+                elseif expr.args[1].head == :where
                     push!(func_names, expr.args[1].args[1].args[1])
                 else
                     push!(func_names, expr.args[1].args[1])

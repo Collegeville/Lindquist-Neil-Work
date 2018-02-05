@@ -381,7 +381,7 @@ Base.@propagate_inbounds @inline function getLocalViewPtr(graph::CRSGraph{GID, P
         if length(graph.localIndices1D) != 0
             return (pointer(graph.localIndices1D, rowInfo.offset1D), rowInfo.allocSize)
         elseif length(graph.localIndices2D[rowInfo.localRow]) == 0
-            baseArray::Array{LID, 1} = localIndices2D[rowInfo.localRow]
+            baseArray::Array{LID, 1} = graph.localIndices2D[rowInfo.localRow]
             return (pointer(baseArray), LID(length(baseArray)))
         end
     end

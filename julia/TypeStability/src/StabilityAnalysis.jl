@@ -51,9 +51,11 @@ function check_method(func, signature, acceptable_instability=Dict{Symbol, Type}
         end
     end
 
-    function isstable(typ, name)
+    function var_is_stable(typ, name)
         (isleaftype(typ) && typ != Core.Box) ||
+            begin
                 (typ <: get(acceptable_instability, name, Bool))
+            end
     end
 
     #loop over possible methods for the given argument types
@@ -77,7 +79,7 @@ function check_method(func, signature, acceptable_instability=Dict{Symbol, Type}
                 if used_slotids[i]
                     name = Symbol(slotnames[i])
                     typ = src.slottypes[i]
-                    if !isstable(typ, name)
+                    if !var_is_stable(typ, name)
                         push!(unstable_vars_list, (name, typ))
                     end
 
@@ -88,7 +90,7 @@ function check_method(func, signature, acceptable_instability=Dict{Symbol, Type}
             warn("Can't access slot types of CodeInfo")
         end
 
-        if !isstable(rettyp, :return)
+        if !var_is_stable(rettyp, :return)
             push!(unstable_vars_list, (:return, rettyp))
         end
 

@@ -488,18 +488,6 @@ function getView(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID}):
     end
 end
 
-Base.@propagate_inbounds @inline function getViewPtr(matrix::CSRMatrix{Data, GID, PID, LID}, rowInfo::RowInfo{LID})::Tuple{Ptr{Data}, LID} where {Data, GID, PID, LID}
-    allocSize = rowInfo.allocSize
-    if getProfileType(matrix) == STATIC_PROFILE && allocSize > 0
-        (pointer(matrix.localMatrix.values::Array{Data, 1}, rowInfo.offset1D), allocSize)
-    elseif getProfileType(matrix) == DYNAMIC_PROFILE
-        baseArray = matrix.values2D[rowInfo.localRow]
-        (pointer(baseArray), LID(length(baseArray)))
-    else
-        (Ptr{Data}(C_NULL), LID(0))
-    end
-end
-
 function getDiagCopyWithoutOffsets(rowMap, colMap, A::CSRMatrix{Data}) where {Data}
     errCount = 0
 
@@ -867,42 +855,54 @@ function getLocalRowView(matrix::CSRMatrix{Data, GID, PID, LID},
     (indices, values)
 end
 
-Base.@propagate_inbounds @inline function getLocalRowViewPtr(matrix::CSRMatrix{Data, GID, PID, LID},
-        localRow::Integer
-        )::Tuple{Ptr{LID}, Ptr{Data}, LID} where {
-        Data, GID, PID, LID}
-    rowInfo = getRowInfo(matrix.myGraph, LID(localRow))
-    retVal = getLocalRowViewPtr(matrix, rowInfo)
-    recycleRowInfo(rowInfo)
 
-    retVal
+TypeStability.@stable_function [(CSRMatrix{D, G, P, L}, L)
+                    for (D, G, P, L) in Base.Iterators.product(
+                        [Float64, Complex64], #Data
+                        [UInt64, Int64, UInt32], #GID
+                        [UInt8, Int8, UInt32], #PID
+                        [UInt32, Int32]) #LID
+] RegexDict((r"rowValues", Any)) begin
+
+function getLocalRowViewPtr end
+
+Base.@propagate_inbounds @inline function getLocalRowViewPtr(
+        matrix::CSRMatrix{Data, GID, PID, LID}, localRow::LID
+        )::Tuple{Ptr{LID}, Ptr{Data}, LID} where {Data, GID, PID, LID}
+    row = LID(localRow)
+    const graph = matrix.myGraph
+
+    if getProfileType(graph) == STATIC_PROFILE
+        if (@debug) && !hasRowInfo(graph)
+            error("Row Info was deleted, but is still needed")
+        end
+        offset1D = graph.rowOffsets[row]
+        numEntries = (length(graph.numRowEntries) == 0 ?
+                    graph.rowOffsets[row+1] - offset1D
+                    : graph.numRowEntries[row])
+        if numEntries > 0
+            indicesPtr = pointer(graph.localIndices1D, offset1D)
+            rowValues = matrix.localMatrix.values
+            if rowValues isa SubArray{Data, 1, Vector{Data}, Tuple{UnitRange{LID}}, true}
+                valuesPtr = pointer(rowValues.parent, offset1D + rowValues.indexes[1].start)
+            elseif rowValues isa Vector{Data}
+                #else should be Vector, but assert anyways
+                valuesPtr = pointer(rowValues, offset1D)
+            else
+                error("localMatrix.values is of unsupported type $(typeof(rowValues)).")
+            end
+
+            return (indicesPtr, valuesPtr, numEntries)
+        else
+            return (C_NULL, C_NULL, 0)
+        end
+    else #dynamic profile
+        indices = graph.localIndices2D[row]
+        values = matrix.values2D[row]
+
+        return (pointer(indices, 0), pointer(values, 0), length(indices))
+    end
 end
-
-Base.@propagate_inbounds @inline function getLocalRowViewPtr(matrix::CSRMatrix{Data, GID, PID, LID},
-        rowInfo::RowInfo{LID}
-        )::Tuple{Ptr{LID}, Ptr{Data}, LID}  where {
-        Data, GID, PID, LID}
-
-    if isGloballyIndexed(matrix)
-        throw(InvalidStateError("The matrix is globally indexed, so cannot return a "
-                * "view of the row with local column indices.  Use "
-                * "getLocalalRowCopy(...) instead."))
-    end
-
-    const myGraph = matrix.myGraph
-    const numEntries = rowInfo.numEntries
-
-    nonLocalRow = true
-    @boundscheck nonLocalRow = rowInfo.localRow != 0
-
-    if nonLocalRow && numEntries > 0
-        (indices, _) = getLocalViewPtr(myGraph, rowInfo)
-        (values, _) = getViewPtr(matrix, rowInfo)
-
-        (indices, values, numEntries)
-    else
-        (C_NULL, C_NULL, 0)
-    end
 end
 
 
@@ -1193,7 +1193,7 @@ TypeStability.@stable_function [(MultiVector{D, G, P, L}, CSRMatrix{D, G, P, L},
                         [UInt8, Int8, UInt32], #PID
                         [UInt32, Int32]) #LID
 # createRowInfo has a nessaccery Union variable
-] RegexDict((r"^nextVal@_\d+$", Union{Void, julia_petra.RowInfo})) begin
+] RegexDict((r"rowValues", Any)) begin
 function localApply(Y::MultiVector{Data, GID, PID, LID},
         A::CSRMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID},
         mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
