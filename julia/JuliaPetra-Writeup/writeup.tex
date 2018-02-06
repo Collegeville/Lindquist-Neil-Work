@@ -1,0 +1,61 @@
+\documentclass{article}
+
+\title{Implementation of Petra in Julia}
+\author{Neil Lindquist}
+
+\begin{document}
+	
+\maketitle
+	
+%TODO Title it "Introduction" instead?
+\section{Julia}
+
+Julia is a programing language first publicly released in 2012 \cite{WhyWeCreatedJulia}.
+The design goals of Julia are to avoid needing multiple programing languages, by having
+the advantages of other, major programing languages.
+
+\begin{quote}
+We want a language that’s open source, with a liberal license. We want the speed of C with the dynamism of Ruby. We want a language that’s homoiconic, with true macros like Lisp, but with obvious, familiar mathematical notation like Matlab. We want something as usable for general programming as Python, as easy for statistics as R, as natural for string processing as Perl, as powerful for linear algebra as Matlab, as good at gluing programs together as the shell. Something that is dirt simple to learn, yet keeps the most serious hackers happy. We want it interactive and we want it compiled.
+\cite{WhyWeCreatedJulia}
+\end{quote}
+
+%TODO talk a bit about success/failure of the goals
+
+%TODO talk about Julia and the LLVM backend
+
+\section{Implementing JuliaPetra}
+
+\section{Implementing the Power Method}
+
+\section{Optimizing Julia}
+
+%TODO I probably should add some citations to this section
+Ultimately, optimizing JuliaPetra to the speed of C was done through method inlining.
+Both manually telling the compiler to always inline certain methods and ensuring the
+compiler could determine the types of values, allowing operations to be inlined, and
+thus compiled down to machine code, instead of dispatching at runtime.
+Ensuring that the code was type stable, meaning that the compiler could determine the
+types of all values, was the main improvement.
+
+Type stability is important for high performance Julia code.
+As a dynamic programing language, Julia has to accommodate any sort of custom
+datatype for any function or operator.
+However, if the Julia compiler can determine the type of a value, it can inlin small functions.
+This allows, for example, the addition of two 64 bit integers to be compiled down
+to LLVM's \(add\) instruction, then down to the machine's add instruction.
+If Julia can't determine the specific type of a value at compile time, then it
+falls back to runtime dispatch of method calls.
+
+%TODO talk some about type stability in JuliaPetra
+
+%TODO talk about lack of tooling for Julia
+
+%TODO mention inlining as an secondary optimization
+
+
+\section{Final Results}
+	
+	
+\bibliographystyle{acm}
+\bibliography{bibliography}
+\end{document}
