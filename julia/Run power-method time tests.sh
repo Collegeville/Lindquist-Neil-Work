@@ -2,8 +2,14 @@
 
 #this file must be run from the julia directory of the Lindquist-Neil-Work repository
 
-EQs=4000
-numProcs=4
+#allow EQs and numProcs to be passed as arguments
+if [ "$#" -eq 2 ]; then
+  EQs=$1
+  numProcs=$2
+else
+  EQs=16000000
+  numProcs=16
+fi
 
 #echo Git Branch:
 #git branch | grep \*
@@ -27,7 +33,7 @@ echo
 echo ePetra Power Method
 mpirun -np $numProcs power-method/ePetra-PowerMethod/petra_power_method_LL $EQs
 
-read -p "Press enter to continue"
+#read -p "Press enter to continue"
 
 
 #flag for using tcp
