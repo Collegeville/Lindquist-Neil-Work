@@ -1,5 +1,3 @@
-using julia_petra
-
 
 ### test Serial Comm ###
 

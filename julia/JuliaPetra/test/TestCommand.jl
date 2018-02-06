@@ -3,12 +3,12 @@ function testJuliaPetra(flags...; coverage=false)
 #               errs::Vector{AbstractString},
 #               nopkgs::Vector{AbstractString},
 #               notests::Vector{AbstractString}; coverage::Bool=false)
-    
+
     formattedFlags = ["--$flag" for flag in flags]
     combinedFlags = join(formattedFlags, "\n")
-    
-    test_path = abspath(Pkg.dir(), "julia_petra", "test", "runtests.jl")
-    info("Testing julia_petra")
+
+    test_path = abspath(Pkg.dir(), "JuliaPetra", "test", "runtests.jl")
+    info("Testing JuliaPetra")
     Base.cd(dirname(test_path)) do
         try
             cmd = ```
@@ -22,9 +22,9 @@ function testJuliaPetra(flags...; coverage=false)
             $formattedFlags
             ```
             run(cmd)
-            info("julia_petra tests passed")
+            info("JuliaPetra tests passed")
         catch err
-             Base.Pkg.Entry.warnbanner(err, label="[ ERROR: julia_petra ]")
+             Base.Pkg.Entry.warnbanner(err, label="[ ERROR: JuliaPetra ]")
         end
     end
 end

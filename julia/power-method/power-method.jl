@@ -1,4 +1,4 @@
-using julia_petra
+using JuliaPetra
 
 #program settings
 const useMPI = true
@@ -64,8 +64,8 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
 
     map = BlockMap(numGlobalElements, comm)
 
-    numMyElements = julia_petra.numMyElements(map)
-    myGlobalElements = julia_petra.myGlobalElements(map)
+    numMyElements = JuliaPetra.numMyElements(map)
+    myGlobalElements = JuliaPetra.myGlobalElements(map)
     numNz = Array{GID, 1}(numMyElements)
     for i = 1:numMyElements
         if myGlobalElements[i] == 1 || myGlobalElements[i] == numGlobalElements
@@ -97,6 +97,8 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
 
     const niters = numGlobalElements*10
     const tolerance = 1.0e-2
+
+    log("starting tests")
 
     #compile all the nessacery methods before timing
     tic()

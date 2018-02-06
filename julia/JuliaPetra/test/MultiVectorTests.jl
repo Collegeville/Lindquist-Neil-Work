@@ -14,7 +14,7 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
     @test n == localLength(vect)
     @test nProcs*n == globalLength(vect)
     @test 3 == numVectors(vect)
-    @test curMap == julia_petra.map(vect)
+    @test curMap == JuliaPetra.map(vect)
     @test zeros(Float64, (n, 3)) == vect.data
 
     # test basic construction without setting data to zeros
@@ -22,7 +22,7 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
     @test n == localLength(vect)
     @test nProcs*n == globalLength(vect)
     @test 3 == numVectors(vect)
-    @test curMap == julia_petra.map(vect)
+    @test curMap == JuliaPetra.map(vect)
 
     # test wrapper constructor
     arr = Array{Float64, 2}(n, 3)
@@ -30,7 +30,7 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
     @test n == localLength(vect)
     @test nProcs*n == globalLength(vect)
     @test 3 == numVectors(vect)
-    @test curMap == julia_petra.map(vect)
+    @test curMap == JuliaPetra.map(vect)
     @test arr === vect.data
 
     # test copy
@@ -38,7 +38,7 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
     @test n == localLength(vect)
     @test nProcs*n == globalLength(vect)
     @test 3 == numVectors(vect)
-    @test curMap == julia_petra.map(vect)
+    @test curMap == JuliaPetra.map(vect)
     @test vect.data == vect2.data
     @test vect.data !== vect2.data #ensure same contents, but different address
 
@@ -47,10 +47,10 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
     @test localLength(vect) == localLength(vect2)
     @test globalLength(vect) == globalLength(vect2)
     @test numVectors(vect) == numVectors(vect2)
-    @test julia_petra.map(vect) == julia_petra.map(vect2)
+    @test JuliaPetra.map(vect) == JuliaPetra.map(vect2)
     @test vect.data == vect2.data
     @test vect.data !== vect2.data
-    
+
 
     # test scale and scale!
     vect = MultiVector(curMap, ones(Float64, n, 3))
@@ -63,13 +63,13 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
     @test pid*5*ones(Float64, (n, 3)) == vect2.data
 
     increase = pid*nProcs
-    
+
     vect = MultiVector(curMap, ones(Float64, n, 3))
     @test vect == scale!(vect, increase+[2.0, 3.0, 4.0])
     @test hcat( (increase+2)*ones(Float64, n),
-                (increase+3)*ones(Float64, n), 
+                (increase+3)*ones(Float64, n),
                 (increase+4)*ones(Float64, n))  == vect.data
-    
+
     for i = 1:3
         act = i+1+repeat(Float64[increase], inner=n)
         @test act == getVectorView(vect, i)
@@ -80,7 +80,7 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
     vect2 = scale(vect, pid*nProcs+[2.0, 3.0, 4.0])
     @test vect !== vect2
     @test hcat( (pid*nProcs+2)*ones(Float64, n),
-                (pid*nProcs+3)*ones(Float64, n), 
+                (pid*nProcs+3)*ones(Float64, n),
                 (pid*nProcs+4)*ones(Float64, n))  == vect2.data
 
     #test dot
@@ -90,14 +90,14 @@ function multiVectorTests(comm::Comm{UInt64, UInt16, UInt32})
     #test fill!
     fill!(vect, 8)
     @test 8*ones(Float64, (n, 3)) == vect.data
-    
-    
+
+
     #test reduce
     arr = (10^pid)*ones(Float64, n, 3)
     vect = MultiVector(BlockMap(n, n, comm), arr)
     commReduce(vect)
     @test sum(10^i for i in 1:nProcs)*ones(Float64, n, 3) == vect.data
-    
+
 
     #test norm2
     arr = ones(Float64, n, 3)

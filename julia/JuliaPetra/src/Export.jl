@@ -73,9 +73,9 @@ function setupSamePermuteExport(expor::Export{GID, PID, LID})::AbstractArray{GID
     numSameIDs(data, numSameGIDs)
 
     exportGIDs = Array{GID, 1}(0)
-    permuteToLIDs = julia_petra.permuteToLIDs(data)
-    permuteFromLIDs = julia_petra.permuteFromLIDs(data)
-    exportLIDs = julia_petra.exportLIDs(data)
+    permuteToLIDs = JuliaPetra.permuteToLIDs(data)
+    permuteFromLIDs = JuliaPetra.permuteFromLIDs(data)
+    exportLIDs = JuliaPetra.exportLIDs(data)
 
     for srcLID = (numSameGIDs+1):numSrcGIDs
         const curSrcGID = sourceGIDs[srcLID]
@@ -96,10 +96,10 @@ function setupSamePermuteExport(expor::Export{GID, PID, LID})::AbstractArray{GID
     end
 
     if distributedGlobal(source)
-        #resize!(julia_petra.exportPIDs(data), length(exportGIDs))
+        #resize!(JuliaPetra.exportPIDs(data), length(exportGIDs))
 
         (exportPIDs, exportLIDs) = remoteIDList(target, exportGIDs)
-        julia_petra.exportPIDs(data, exportPIDs)
+        JuliaPetra.exportPIDs(data, exportPIDs)
         missingGIDs = 0
         for i = 1:length(exportPIDs)
             if exportPIDs[i] == 0
@@ -151,7 +151,7 @@ function setupRemote(expor::Export{GID, PID, LID}, exportGIDs::AbstractArray{GID
         info("$(myPid(comm(target))): setupRemote\n")
     end
 
-    exportPIDs = julia_petra.exportPIDs(data)
+    exportPIDs = JuliaPetra.exportPIDs(data)
 
     order = sortperm(exportPIDs)
     permute!(exportPIDs, order)
@@ -170,7 +170,7 @@ function setupRemote(expor::Export{GID, PID, LID}, exportGIDs::AbstractArray{GID
 
     remoteGIDs = resolve(distributor(data), exportGIDs)
 
-    remoteLIDs = julia_petra.remoteLIDs(data)
+    remoteLIDs = JuliaPetra.remoteLIDs(data)
 
     resize!(remoteLIDs, numRemoteIDs)
 

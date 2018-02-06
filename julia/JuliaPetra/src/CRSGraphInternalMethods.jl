@@ -544,7 +544,7 @@ end
 function globalAssemble(graph::CRSGraph)
     @assert isFillActive(graph) "Fill must be active before calling globalAssemble(graph)"
 
-    comm = julia_petra.comm(graph)
+    comm = JuliaPetra.comm(graph)
     myNumNonlocalRows = length(graph.nonlocals)
 
     maxNonlocalRows = maxAll(comm, myNumNonlocalRows)
@@ -887,7 +887,7 @@ function __makeColMap(graph::CRSGraph{GID, PID, LID}, wrappedDomMap::Nullable{Bl
         if numEnt != 0
             for k = 1:numEnt
                 gid::GID = unsafe_load(rowGIDPtr, k)
-                lid::LID = julia_petra.lid(domMap, gid)
+                lid::LID = JuliaPetra.lid(domMap, gid)
                 if lid != 0
                     @inbounds if !gidIsLocal[lid]
                         gidIsLocal[lid] = true

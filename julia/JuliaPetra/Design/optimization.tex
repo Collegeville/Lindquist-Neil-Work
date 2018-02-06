@@ -42,7 +42,7 @@ The main issues with pointers is duplication between the fast, internal method a
 
 \section{Function Inlining}
 When profiling, a significant amount of time was spend in ``line 0'' of various files.
-I was able to realized that this was method call and dispatch overhead.
+I realized that this was method call and dispatch overhead.
 I was able to eliminate much of that time by aggressively inlining functions that are called within the matrix-vector multiplication loop.
 This speed up likely does come at the cost of increased code size, depending on how many different function's reference the inlined methods
 %TODO provide hard evidence of improvement

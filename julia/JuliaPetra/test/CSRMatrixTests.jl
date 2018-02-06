@@ -48,9 +48,9 @@ insertGlobalValues(mat, 2, LID[1, 3, 4], Data[2.5, 6.21, 77])
 @test 3 == getNumEntriesInGlobalRow(mat, 2)
 @test 3 == getLocalNumEntries(mat)
 @test 0 == getLocalNumDiags(mat)
-rowInfo = julia_petra.getRowInfo(mat.myGraph, LID(2))
+rowInfo = JuliaPetra.getRowInfo(mat.myGraph, LID(2))
 @test 3 == rowInfo.numEntries
-julia_petra.recycleRowInfo(rowInfo)
+JuliaPetra.recycleRowInfo(rowInfo)
 #skipped many of the global methods because those require re-generating and may not be up to date
 
 row = getGlobalRowCopy(mat, 2)

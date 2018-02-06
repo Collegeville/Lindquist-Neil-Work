@@ -1,7 +1,7 @@
 
 #these tests take way too long to be included in the normal unit tests
 
-using julia_petra
+using JuliaPetra
 include("TypeStability.jl")
 include("TestUtil.jl")
 

@@ -267,7 +267,7 @@ computeGlobalConstants(matrix::CSRMatrix) = nothing
 clearGlobalConstants(matrix::CSRMatrix) = nothing
 
 function globalAssemble(matrix::CSRMatrix)
-    comm = julia_petra.comm(matrix)
+    comm = JuliaPetra.comm(matrix)
     if !isFillActive(matrix)
         throw(InvalidStateError("Fill must be active to call this method"))
     end

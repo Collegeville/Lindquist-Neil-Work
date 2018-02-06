@@ -4,10 +4,10 @@
 \author{Neil Lindquist}
 
 \begin{document}
-	
+
 \section{General Design}
 Most of the design follows either EPetra or TPetra fairly closely.  The Comm, BlockMap, Distributor and Directory are all based off EPetra, since TPetra has many references to Kokkos and other packages that are not, currently, being implemented in Julia.
-The data structures, such as SrcDistObject, RowMatrix, Operator, Multivector are all based off TPetra, since TPetra has templating, as opposed to EPetra's hard coded types.
+The data structures, such as SrcDistObject, RowMatrix, Operator, Multivector are all based off TPetra, since TPetra has templating, as opposed to EPetra's fixed data types.
 There are some, minor deviations from the original -Petras.
 	One such example is the documentation for DistObject methods being written in the context of multiple dispatch, where the method can belong to both argument types (source and destination).  
 	Another, common, example is the addition of \(!\)'s to the names of destructive functions to follow Julia's conventions.

@@ -5,7 +5,7 @@ using TypeStability
 #check stability while running tests
 enable_inline_stability_checks(true)
 
-using julia_petra
+using JuliaPetra
 using Base.Test
 
 @. ARGS = lowercase(ARGS)

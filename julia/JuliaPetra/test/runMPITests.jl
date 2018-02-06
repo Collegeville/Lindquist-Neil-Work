@@ -1,7 +1,7 @@
 #have debug enabled while running tests
 globalDebug = true
 
-using julia_petra
+using JuliaPetra
 using Base.Test
 
 include("TypeStability.jl")

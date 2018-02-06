@@ -556,7 +556,7 @@ function makeColMap(graph::CRSGraph{GID, PID, LID}) where {GID, PID, LID}
     error, colMap = __makeColMap(graph, graph.domainMap)
 
     if @debug
-        comm = julia_petra.comm(graph)
+        comm = JuliaPetra.comm(graph)
         globalError = maxAll(comm, error)
 
         if globalError

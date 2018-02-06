@@ -1,6 +1,6 @@
 using TypeStability
 
-module julia_petra
+module JuliaPetra
 
 # Internal Utilities
 include("Enums.jl")

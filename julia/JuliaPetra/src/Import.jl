@@ -38,7 +38,7 @@ function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
         info("$(myPid(comm(source))): Import ctor expert\n")
     end
 
-    const remoteLIDs = julia_petra.remoteLIDs(importData)
+    const remoteLIDs = JuliaPetra.remoteLIDs(importData)
 
     if !userRemotePIDGID
         empty!(remoteGIDs)
@@ -69,9 +69,9 @@ function Import(source::BlockMap{GID, PID, LID}, target::BlockMap{GID, PID, LID}
     exportLIDs = Array{PID, 1}(length(userExportPIDs))
 
     #need the funcitons with these names, not the variables
-    julia_petra.remoteLIDs(importData, remoteLIDs)
-    julia_petra.exportPIDs(importData, exportPIDs)
-    julia_petra.exportLIDs(importData, exportLIDs)
+    JuliaPetra.remoteLIDs(importData, remoteLIDs)
+    JuliaPetra.exportPIDs(importData, exportPIDs)
+    JuliaPetra.exportLIDs(importData, exportLIDs)
 
     locallyComplete = true
     for i = 1:length(userExportPIDs)
@@ -162,9 +162,9 @@ function getIDSources(data, remoteGIDs, useRemotes=true)
     numSameGIDs -= 1
     numSameIDs(data, numSameGIDs)
 
-    const permuteToLIDs = julia_petra.permuteToLIDs(data)
-    const permuteFromLIDs = julia_petra.permuteFromLIDs(data)
-    const remoteLIDs = julia_petra.remoteLIDs(data)
+    const permuteToLIDs = JuliaPetra.permuteToLIDs(data)
+    const permuteFromLIDs = JuliaPetra.permuteFromLIDs(data)
+    const remoteLIDs = JuliaPetra.remoteLIDs(data)
 
 
     for tgtLID = (numSameGIDs+1):numTgtGIDs
@@ -230,11 +230,11 @@ function setupExport(impor::Import{GID, PID, LID}, remoteGIDs::AbstractArray{GID
             #if all remotes are invalid, can delete them all
             empty!(remoteProcIDs)
             empty!(remoteGIDs)
-            empty!(julia_petra.remoteLIDs(data))
+            empty!(JuliaPetra.remoteLIDs(data))
         else
             numValidRemote = 1
 
-            remoteLIDs = julia_petra.remoteLIDs(data)
+            remoteLIDs = JuliaPetra.remoteLIDs(data)
 
             for r = 1:totalNumRemote
                 if remoteProcIds[r] != 0
@@ -265,12 +265,12 @@ function setupExport(impor::Import{GID, PID, LID}, remoteGIDs::AbstractArray{GID
 
     (exportGIDs, exportPIDs) = createFromRecvs(distributor(data), remoteGIDs, remoteProcIDs)
 
-    julia_petra.exportPIDs(data, exportPIDs)
+    JuliaPetra.exportPIDs(data, exportPIDs)
 
     numExportIDs = length(exportGIDs)
 
     if numExportIDs > 0
-        exportLIDs = julia_petra.exportLIDs(data)
+        exportLIDs = JuliaPetra.exportLIDs(data)
         resize!(exportLIDs, numExportIDs)
         for k in 1:numExportIDs
             exportLIDs[k] = lid(source, exportGIDs[k])
