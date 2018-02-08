@@ -85,8 +85,8 @@ function main(numGlobalElements)
     #REVIEW this feels really low-level, is there a higher level way that has access to global indices?
     @sync for p in procs(A)
         @async remotecall_fetch(p, A) do A
-            if (1 in A.indexes[1]) && (1 in A.indexes[2])
-                localpart(A)[1, 1] *= 10
+            if (1 in localindexes(A)[1]) && (1 in localindexes(A)[2])
+                DistributedArrays.localpart(A)[1, 1] *= 10
             end
           nothing
       end
