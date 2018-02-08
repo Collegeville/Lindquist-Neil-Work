@@ -23,6 +23,12 @@ echo Using $numProcs processors
 
 echo
 echo
+echo DistributedArrays Power Method:
+~/bin/julia --color=yes -p $numProcs -O3 power-method/DA-power-method.jl $EQs
+
+
+echo
+echo
 echo JuliaPetra Power Method:
 mpirun -np $numProcs ~/bin/julia --color=yes -O3 power-method/power-method.jl $EQs
 #mpirun -np $numProcs ~/bin/julia  --track-allocation=user --color=yes julia/power-method/power-method.jl $EQs
