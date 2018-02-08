@@ -10,9 +10,9 @@ function powerMethod(A::DArray{Data, 2}, niters::Integer,
         tolerance::Data)::Tuple{Data, Bool} where Data
     vectDims = (size(A, 1),)
     vectDist = (length(procs(A)),)
-    q = dzeros(vectDims, procs(A), vectDist)
-    z = drand(vectDims, procs(A), vectDist)
-    resid = dzeros(vectDims, procs(A), vectDist)
+    q = dzeros(Data, vectDims, procs(A), vectDist)::DArray{Data, 1, Array{Data, 1}}
+    z = drand(Data, vectDims, procs(A), vectDist)::DArray{Data, 1, Array{Data, 1}}
+    resid = dzeros(Data, vectDims, procs(A), vectDist)::DArray{Data, 1, Array{Data, 1}}
 
 
     #skipping flop counting
@@ -20,7 +20,7 @@ function powerMethod(A::DArray{Data, 2}, niters::Integer,
     λ::Data = 0
 
     for iter = 1:niters
-        normz = norm(z, 2)
+        normz::Data = norm(z, 2)
 
         #map!(z->z/normz, q, z)
         z, q = q, z
@@ -34,7 +34,7 @@ function powerMethod(A::DArray{Data, 2}, niters::Integer,
             copy!(resid, z)
             Base.axpy!(-λ, q, resid)
 
-            residual = norm(resid, 2)
+            residual::Data = norm(resid, 2)
 
             if residual < tolerance
                 return (λ, true)
