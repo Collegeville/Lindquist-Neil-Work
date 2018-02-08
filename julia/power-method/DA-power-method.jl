@@ -23,14 +23,8 @@ function powerMethod(A::DArray{Data, 2}, niters::Integer,
         normz = norm(z, 2)
 
         #map!(z->z/normz, q, z)
-        @sync for p in procs(q)
-            @async remotecall_fetch(p, normz) do normz
-                let localQ = DistributedArrays.localpart(q), localZ = z[localindexes(q)...]
-                    @. localQ = localZ/normz
-                end
-                nothing
-            end
-        end
+        z, q = q, z
+        scale!(q, 1/normz)
 
         A_mul_B!(Data(1), A, q, Data(0), z)
         λ = dot(q, z)
