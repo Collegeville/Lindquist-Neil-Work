@@ -21,7 +21,16 @@ function powerMethod(A::DArray{Data, 2}, niters::Integer,
 
     for iter = 1:niters
         normz = norm(z, 2)
-        map!(z->z/normz, q, z)
+
+        #map!(z->z/normz, q, z)
+        @sync for p in procs(q)
+            @async remotecall_fetch(p, normz) do normz
+                let localQ = DistributedArrays.localpart(q), localZ = z[localindexes(q)...]
+                    @. localQ = localZ/normz
+                end
+                nothing
+            end
+        end
 
         A_mul_B!(Data(1), A, q, Data(0), z)
         λ = dot(q, z)
@@ -71,7 +80,7 @@ function main(numGlobalElements)
     #@time
     λ, success = powerMethod(A, niters, tolerance)
     #exit(0)
-    #TODO look into storing1 FLOPS
+    #TODO look into storing FLOPS
     elapsedTime = toq()
 
 
