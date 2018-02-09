@@ -49,11 +49,28 @@ function main(numGlobalElements)
     Data = Float64
 
     A = DArray((numGlobalElements, numGlobalElements), workers(), [length(workers()), 1]) do I
-        coords = [[i, j, Data(i==j?2:-1)] for i in I[1], j in I[2] if abs(i-j) <= 1]
-        cols = [i-I[1].start+1 for (i,j,v) in coords]
-        rows = [j-I[2].start+1 for (i,j,v) in coords]
-        vals = [v for (i,j,v) in coords]
-        sparse(cols, rows, vals, length(I[1]), length(I[2]))
+        rowIndices = I[1]
+        colIndices = I[2]
+
+        if rowIndices.start == 1
+            lColIndices = (rowIndices.start:rowIndices.stop-1)
+            lRowIndices = 2:length(rowIndices)
+        else
+            lColIndices = rowIndices-1
+            lRowIndices = 1:length(lColIndices)
+        end
+
+        if rowIndices.stop == colIndices.stop
+            rColIndices = (rowIndices.start+1:rowIndices.stop)
+        else
+            rColIndices = rowIndices+1
+        end
+        rRowIndices = 1:length(rColIndices)
+
+        rows = vcat(1:length(rowIndices), lRowIndices, rRowIndices)
+        cols = vcat(rowIndices, lColIndices, rColIndices)
+        vals = vcat(fill(Data(2), length(rowIndices)), fill(Data(-1), length(lRowIndices)+length(rRowIndices)))
+        sparse(rows, cols, vals, length(rowIndices), length(colIndices))
     end
 
     const niters = numGlobalElements*10
