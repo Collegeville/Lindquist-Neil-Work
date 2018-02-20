@@ -1,7 +1,7 @@
 
 #Power method implementation using DistributedArrays.jl
 
-using DistributedArrays
+@everywhere using DistributedArrays
 
 """
 Returns a tuple of the computed λ and if the λ is within tolerance
@@ -10,9 +10,9 @@ function powerMethod(A::DArray{Data, 2}, niters::Integer,
         tolerance::Data)::Tuple{Data, Bool} where Data
     vectDims = (size(A, 1),)
     vectDist = (length(procs(A)),)
-    q = dzeros(Data, vectDims, procs(A), vectDist)::DArray{Data, 1, Array{Data, 1}}
     z = drand(Data, vectDims, procs(A), vectDist)::DArray{Data, 1, Array{Data, 1}}
-    resid = dzeros(Data, vectDims, procs(A), vectDist)::DArray{Data, 1, Array{Data, 1}}
+    q = dfill(zero(Data), vectDims, procs(A), vectDist)::DArray{Data, 1, Array{Data, 1}}
+    resid = dfill(zero(Data), vectDims, procs(A), vectDist)::DArray{Data, 1, Array{Data, 1}}
 
 
     #skipping flop counting
