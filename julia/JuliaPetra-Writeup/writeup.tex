@@ -1,61 +1,123 @@
-\documentclass{article}
+ \documentclass{article}
 
 \title{Implementation of Petra in Julia}
 \author{Neil Lindquist}
 
+\newcommand{\juliaSnippet}[1]{\texttt{\detokenize{#1}}}
+
 \begin{document}
-	
+
 \maketitle
-	
-%TODO Title it "Introduction" instead?
-\section{Julia}
+
+\section{Introduction}
 
 Julia is a programing language first publicly released in 2012 \cite{WhyWeCreatedJulia}.
-The design goals of Julia are to avoid needing multiple programing languages, by having
-the advantages of other, major programing languages.
+Julia is designed so that it
+``has the performance of a statically compiled
+language while providing interactive dynamic behavior and productivity like Python, LISP or
+Ruby'' \cite{JuliaDesignPaper}.
+%TODO look into referencing use in HPC
 
-\begin{quote}
-We want a language that’s open source, with a liberal license. We want the speed of C with the dynamism of Ruby. We want a language that’s homoiconic, with true macros like Lisp, but with obvious, familiar mathematical notation like Matlab. We want something as usable for general programming as Python, as easy for statistics as R, as natural for string processing as Perl, as powerful for linear algebra as Matlab, as good at gluing programs together as the shell. Something that is dirt simple to learn, yet keeps the most serious hackers happy. We want it interactive and we want it compiled.
-\cite{WhyWeCreatedJulia}
-\end{quote}
+%TODO summary of Petra object model
+The Petra Object Model is the design used in Trilinos for objects commonly used in solver algorithms.
+\cite{OverviewOfTrilinos}
+Petra libraries provide parallel, distributed matrices, vectors and graphs for other packages to use.
 
-%TODO talk a bit about success/failure of the goals
+\section{Design of JuliaPetra}
 
-%TODO talk about Julia and the LLVM backend
-
-\section{Implementing JuliaPetra}
-
-\section{Implementing the Power Method}
-
-\section{Optimizing Julia}
-
-%TODO I probably should add some citations to this section
-Ultimately, optimizing JuliaPetra to the speed of C was done through method inlining.
-Both manually telling the compiler to always inline certain methods and ensuring the
-compiler could determine the types of values, allowing operations to be inlined, and
-thus compiled down to machine code, instead of dispatching at runtime.
-Ensuring that the code was type stable, meaning that the compiler could determine the
-types of all values, was the main improvement.
-
-Type stability is important for high performance Julia code.
-As a dynamic programing language, Julia has to accommodate any sort of custom
-datatype for any function or operator.
-However, if the Julia compiler can determine the type of a value, it can inlin small functions.
-This allows, for example, the addition of two 64 bit integers to be compiled down
-to LLVM's \(add\) instruction, then down to the machine's add instruction.
-If Julia can't determine the specific type of a value at compile time, then it
-falls back to runtime dispatch of method calls.
-
-%TODO talk some about type stability in JuliaPetra
-
-%TODO talk about lack of tooling for Julia
-
-%TODO mention inlining as an secondary optimization
+%TODO general design notes
+The design of JuliaPetra follows closely with that of ePetra and tPetra.
 
 
-\section{Final Results}
-	
-	
+%TODO talk about what is and isn't ideomatic Julia
+The JuliaPetra is not really idiomatic Julia code.
+	%TODO Data Structures don't mesh with Julia Arrays
+		%TODO look at fixing that
+The data structures used by JuliaPetra don't currently interact with Julia Arrays.
+They inherit from \juliaSnippet{DistObject} as objects that
+	%TODO MPI is different from Julia's built in comm model
+
+
+%TODO talk about how Operator is duck typed
+
+\section{Optimizing JuliaPetra}
+%REVIEW Is this best on its own? Or is it better as a subsection of the previous?
+
+Type Stability was one of the most important factors in improving the speed of JuliaPetra.
+A function is Type Stability if the type inferencer is able to deduce that a variable will only
+hold objects of a specific, concrete type.
+%REVIEW figure out if I need a cite on the definition of Type Stability
+When the type inferencer is able to infer a variable's type well enough that only a single
+method matches for a particular function call, that method call may be inlined. \cite{JuliaDesignPaper}
+This removes method dispatch and call overhead at run time.
+%TODO might need a citation
+%TODO mention that even if inlining doesn't happen the method instance is saved to skip dispatch?
+%TODO comment about Julia compiling mutliple versions of a method for different types
+
+Given the importance of Type Stability for high performance Julia code, it is important it be able
+to determine if a critical section of code is type stable.
+However, the only tool Julia provides for checking type stability is the \juliaSnippet{code_warntype}
+function and the related \juliaSnippet{@code_warntype} macro.  This function takes a function and list
+of types, then outputs a version of the function for arguments of the given types after some optimizations
+have occurred with non-concrete types marked in red.
+%REVIEW clean up the previous sentence
+This requires manually checking a function for each combination of argument types that should be optimized.
+Furthermore, there are not any tools provided by the Julia community to make checking type stability easier.
+So, to check a function automatically and for multiple function signatures at a time, I had to write some
+utilities to do the checking.
+%TODO call it out as the "TypeStability.jl package"?  Should look into publishing it publicly
+
+
+In the matrix vector multiplication loop, there is a lot of use for getting a view of a chunk of an array.
+However, creating an actual array view object requires allocating to the heap, and thus garbage collection.
+The work around used in JuliaPetra at various internal locations is to use the \juliaSnippet{Ptr} API.
+The \juliaSnippet{Ptr} API is designed for interacting with C++, however it allows creating a \juliaSnippet{Ptr} to location in
+an array and dereferencing elements in that array.
+As bits types, \juliaSnippet{Ptr} objects and integers are able to be stack allocated.
+Additionally, \juliaSnippet{Tuple} objects are optimized so that they can be stack allocated.
+Thus, by representing a view of an array as a \juliaSnippet{(Ptr, Integer)} tuple, the view
+can be stack allocated, meaning it does not need to be garbage collected.
+This improves the speed of the matrix vector multiplication loop.
+%TODO figure out what should be cited from where in this paragraph
+
+
+%TODO talk about need for agressive inlining
+Another optimization was use of the \juliaSnippet{@inline} macro, which indicates to the
+compiler that the annotated function should be inlined.
+This is useful for marking internal functions that are only used a few times, to make sure
+that the compiler inlines them, even if it would otherwise not.
+%REVIEW does this really need to be a paragraph?  It's kind of a basic thing, force critical functions to be inlined
+%TODO check if @inline still even makes a difference
+
+
+%TODO get data to support optimizations
+
+\section{Comparing with ePetra}
+
+%TODO figure out comparison of readability of code
+
+
+%TODO mention timings?  comment on julia's startup time?
+
+
+\section{Comparing with DistributedArrays.jl}
+
+%TODO compare - I made alot of notes in the outline
+
+\section{Results}
+
+%TODO show timing data
+
+
+%TODO discuss methodology used to get data
+
+
+\section{Conclusion}
+
+%TODO say JP runs as fast as the C++ version
+%TODO mention how not ideomatic Julia, but ideomatic version was real slow
+
+
 \bibliographystyle{acm}
 \bibliography{bibliography}
 \end{document}
