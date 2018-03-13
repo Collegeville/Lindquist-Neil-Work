@@ -1,6 +1,8 @@
 \documentclass[acmsmall]{acmart}
 \bibliographystyle{ACM-Reference-Format}
 
+\usepackage{array}
+
 \title{Implementation of Petra in Julia}
 \author{Neil Lindquist}
 
@@ -42,9 +44,8 @@ In particular, the communication APIs, such as \juliaSnippet{Comm} and \juliaSni
 are based off ePetra and the data structures, such as \juliaSnippet{MultiVector} and
 \juliaSnippet{RowMatrix} are based off tPetra.
 
-
 %TODO talk about what is and isn't ideomatic Julia
-JuliaPetra is somewhat idiomatic Julia code, however, there are some areas that are closer to
+JuliaPetra is somewhat idiomatic Julia code, however there are some areas that are closer to
 idiomatic C/C++ code.
 One less than idiomatic area has to do with the fact that JuliaPetra is built using the MPI
 single-program-multiple-data model, where the same program is run on multiple processes
@@ -147,12 +148,67 @@ the execution time of JuliaPetra.
 
 \section{Results}
 
+
 %TODO show timing data
+\begin{tabular}{|c c|r|r|r|r|}
+	\hline
+		\multicolumn{2}{|c|}{Equations Per Process}
+		& \multicolumn{1}{ m{9em}|}{DistributedArrays.jl without caching}
+		& \multicolumn{1}{ m{9em}|}{DistributedArrays.jl with caching}
+		& JuliaPetra
+		& ePetra \\
+	\hline
+		\multicolumn{6}{|l|}{4 Processors}\\
+	\hline
+		100,000			&Average & ??? & ??? & ??? & ??? \\
+		equations		&Minimum & ??? & ??? & ??? & ??? \\
+						&Maximum & ??? & ??? & ??? & ??? \\
+	\hline
+		1,000,000		&Average & ??? & ??? & ??? & ??? \\
+		equations		&Minimum & ??? & ??? & ??? & ??? \\
+						&Maximum & ??? & ??? & ??? & ??? \\
+	\hline
+		10,000,000		&Average & ??? & ??? & ??? & ??? \\
+		equations		&Minimum & ??? & ??? & ??? & ??? \\
+						&Maximum & ??? & ??? & ??? & ??? \\
+	\hline
+		\multicolumn{6}{|l|}{16 Processors}\\
+	\hline
+		100,000			&Average & ??? & ??? & ??? & ??? \\
+		equations		&Minimum & ??? & ??? & ??? & ??? \\
+						&Maximum & ??? & ??? & ??? & ??? \\
+	\hline
+		1,000,000		&Average & ??? & ??? & ??? & ??? \\
+		equations		&Minimum & ??? & ??? & ??? & ??? \\
+						&Maximum & ??? & ??? & ??? & ??? \\
+	\hline
+		10,000,000		&Average & ??? & ??? & ??? & ??? \\
+		equations		&Minimum & ??? & ??? & ??? & ??? \\
+						&Maximum & ??? & ??? & ??? & ??? \\
+	\hline
+			\multicolumn{6}{|l|}{20 Processors}\\
+	\hline
+		100,000			&Average & ??? & ??? & ??? & ??? \\
+		equations		&Minimum & ??? & ??? & ??? & ??? \\
+						&Maximum & ??? & ??? & ??? & ??? \\
+	\hline
+		1,000,000		&Average & ??? & ??? & ??? & ??? \\
+		equations		&Minimum & ??? & ??? & ??? & ??? \\
+						&Maximum & ??? & ??? & ??? & ??? \\
+	\hline
+		10,000,000		&Average & ??? & ??? & ??? & ??? \\
+		equations		&Minimum & ??? & ??? & ??? & ??? \\
+						&Maximum & ??? & ??? & ??? & ??? \\
+	\hline
+\end{tabular}
+
 
 %TODO discuss methodology used to get data
 The timing results were obtained by running the various power method implementaitons
 with various sized problems and varying numbers of processors.
 Each combination of problem size and number of processors was run five times.
+Each Julia implementation was run before making any timings to ensure all code is
+compiled.
 Tests were ran with Julia v0.6.0 and Trilinos 12.10.1.
 %TODO add OS & such
 %TODO anything else that should be described?
