@@ -16,23 +16,35 @@ Julia is designed so that it
 ``has the performance of a statically compiled
 language while providing interactive dynamic behavior and productivity like Python, LISP or
 Ruby'' \cite{JuliaDesignPaper}.
-%TODO look into referencing use in HPC
+%TODO look into referencing use in HPC (celeste/petaflop club?)
 
-%TODO summary of Petra object model
+%REVIEW go into more detail?
 The Petra Object Model is the design used in Trilinos for objects commonly used in solver algorithms.
 \cite{OverviewOfTrilinos}
 Petra libraries provide parallel, distributed matrices, vectors and graphs for other packages to use.
+
+%TODO fill out paragraph
+JuliaPetra is an implementation of the Petra Object model in Julia.
+A similar project exists in the Trilinos.jl project, which is a Julia wrapper for select parts of
+the Trilinos C++ library \cite{Trilinos.jlGithub}.
+JuliaPetra is different in that it is build entirely in Julia, with the exception of the
+native libraries used by MPI.jl.
+%TODO mention 
+
+%TODO talk about goal of paper/JuliaPetra
 
 \section{Design of JuliaPetra}
 
 %TODO general design notes
 The design of JuliaPetra follows closely with that of ePetra and tPetra.
+In particular, the communication APIs, such as \juliaSnippet{Comm} and \juliaSnippet{BlockMap}
+are based off ePetra and the data structures, such as \juliaSnippet{MultiVector} and
+\juliaSnippet{RowMatrix} are based off tPetra.
 
 
 %TODO talk about what is and isn't ideomatic Julia
 JuliaPetra is somewhat idiomatic Julia code, however, there are some areas that are closer to
-idiomatic C/C++ code
-	%TODO MPI is different from Julia's built in comm model
+idiomatic C/C++ code.
 One less than idiomatic area has to do with the fact that JuliaPetra is built using the MPI
 single-program-multiple-process model where the same program is run on multiple processes
 that communicate with each other.
@@ -42,7 +54,13 @@ asynchronously evaluates long running functions on other processes.  \cite{Julia
 %TODO talk a bit about the differences in program logic?
 %TODO mention that each process iterates over only the local part, not the entirety
 
-%TODO talk about how Operator is duck typed
+JuliaPetra's type hierarchy is built on top of Julia's AbstractArray type.  This allows
+interaction between JuliaPetra and existing Julia code.
+Since Julia doesn't support multiple inheritance, %TODO cite?
+other interfaces are implemented without a type.
+These interfaces include ePetra's Operator, SrcDistObject and DistObject.
+So, any methods that use one of those types accepts any object and assumes
+the methods required for the interface are present.
 
 \section{Optimizing JuliaPetra}
 %REVIEW Is this best on its own? Or is it better as a subsection of the previous?
@@ -54,29 +72,28 @@ hold objects of a specific, concrete type.
 When the type inferencer is able to infer a variable's type well enough that only a single
 method matches for a particular function call, that method call may be inlined. \cite{JuliaDesignPaper}
 This removes method dispatch and call overhead at run time.
+Additionally, even if the method is not inlined for other reasons, the specific method that should
+be called is known already so it doesn't need to be found at run time.
 %TODO might need a citation
-%TODO mention that even if inlining doesn't happen the method instance is saved to skip dispatch?
 %TODO comment about Julia compiling mutliple versions of a method for different types
 
 Given the importance of Type Stability for high performance Julia code, it is important it be able
 to determine if a critical section of code is type stable.
 However, the only tool Julia provides for checking type stability is the \juliaSnippet{code_warntype}
 function and the related \juliaSnippet{@code_warntype} macro.  This function takes a function and list
-of types, then outputs a version of the function for arguments of the given types after some optimizations
-have occurred with non-concrete types marked in red.
-%REVIEW clean up the previous sentence
+of types and outputs a version of the function for arguments of the given types after some optimizations
+have occurred and marks non-concrete types, likely indicators of type unstable code, in red.
 This requires manually checking a function for each combination of argument types that should be optimized.
 Furthermore, there are not any tools provided by the Julia community to make checking type stability easier.
-So, to check a function automatically and for multiple function signatures at a time, I had to write some
-utilities to do the checking.
+So, to ensure important functions were type stable for important sets of arguments,
+extra utilities needed to be written to check the type stability automatically.
 %TODO call it out as the "TypeStability.jl package"?  Should look into publishing it publicly
-
 
 In the matrix vector multiplication loop, there is a lot of use for getting a view of a chunk of an array.
 However, creating an actual array view object requires allocating to the heap, and thus garbage collection.
 The work around used in JuliaPetra at various internal locations is to use the \juliaSnippet{Ptr} API.
-The \juliaSnippet{Ptr} API is designed for interacting with C++, however it allows creating a \juliaSnippet{Ptr} to location in
-an array and dereferencing elements in that array.
+The \juliaSnippet{Ptr} API is designed for interacting with C libraries, however it allows creating
+a \juliaSnippet{Ptr} that points to location an array and dereferencing elements in that array.
 As bits types, \juliaSnippet{Ptr} objects and integers are able to be stack allocated.
 Additionally, \juliaSnippet{Tuple} objects are optimized so that they can be stack allocated.
 Thus, by representing a view of an array as a \juliaSnippet{(Ptr, Integer)} tuple, the view
@@ -84,12 +101,11 @@ can be stack allocated, meaning it does not need to be garbage collected.
 This improves the speed of the matrix vector multiplication loop.
 %TODO figure out what should be cited from where in this paragraph
 
-
 %TODO talk about need for agressive inlining
 Another optimization was use of the \juliaSnippet{@inline} macro, which indicates to the
 compiler that the annotated function should be inlined.
-This is useful for marking internal functions that are only used a few times, to make sure
-that the compiler inlines them, even if it would otherwise not.
+This ensures that functions that are used in performance critical functions do not have
+method call overhead.
 %REVIEW does this really need to be a paragraph?  It's kind of a basic thing, force critical functions to be inlined
 %TODO check if @inline still even makes a difference
 
@@ -98,11 +114,18 @@ that the compiler inlines them, even if it would otherwise not.
 
 \section{Comparing with ePetra}
 
-%TODO figure out comparison of readability of code
+JuliaPetra is fairly similar to ePetra, as ePetra was used as the template for implementing JuliaPetra.
 
-
-%TODO mention timings?  comment on julia's startup time?
-
+The JuliaPetra and ePetra implementations of the power method are similar, due to the similarities
+in the APIs and the simplicity of the algorithm.
+JuliaPetra was able to achieve the same performance as ePetra on large instances of the power method.
+%TODO "cite" results section
+%TODO comment on julia's startup time?
+	%need hard numbers then
+Since Julia uses just in time compiling, it has extra start up costs compared to the ePetra version.
+For example, the first call to \juliaSnippet{powerMethod} in a Julia process takes around 2 seconds longer
+than subsequent calls.
+%REVIEW check that 2 seconds is accurate.  "cite" results section?
 
 \section{Comparing with DistributedArrays.jl}
 
@@ -110,25 +133,43 @@ DistributedArrays.jl is a similar library designed to support distributed arrays
 \cite{DAGithub}
 %TODO talk about general design
 DistributedArrays.jl is designed for Julia's built in parallel model, so operations that apply to
-each element are distributed to each process from the master process.
+each element are distributed to each process from the master process.  DistributedArrays.jl offers a number of advantages over JuliaPetra, however, it is not able to
+match the speed of JuliaPetra.
 
-DistributedArrays.jl uses an instance of \juliaSnippet{AbstractArray} for a process's local storage,
-this allows automatic support for different array structures.
+One area where DistributedArrays.jl has an advantage over Julia is that it follows standard
+practice for ideomatic Julia code more than JuliaPetra.
+For example, it is built around the default Julia parallelization model and APIs.
+It's APIs are all designed as function calls that should be made from a main process that
+then delegates part of the work to the other processes. %TODO remove?
+%TODO comment how DA fits a little better with Array APIS
+%TODO comment about higher level API
+Another advantage is that DistributedArrays.jl uses an instance of \juliaSnippet{AbstractArray}
+for a process's local storage, this allows automatic support for different array structures.
 
-%TODO compare - I made alot of notes in the outline
+However, DistributedArrays.jl was not able to match the speed of JuliaPetra.
+%TODO cite/reference results section
+%TODO mention approximate difference in speed
 
 \section{Results}
 
 %TODO show timing data
 
-
 %TODO discuss methodology used to get data
+The timing results were obtained by running the powerMethod with various sized problems and varying
+numbers of processors.  Each combination of problem size and number of processors was run five times.
+Tests were ran with Julia v0.6.0 and Trilinos 12.10.1.
+%TODO add OS & such
+%TODO anything else that should be described?
 
 
 \section{Conclusion}
 
-%TODO say JP runs as fast as the C++ version
-%TODO mention how not totally ideomatic Julia, but ideomatic version was slower
+JuliaPetra is an implementation of the Petra object model in the Julia programming language.
+JuliaPetra is able to perform at the same speeds as ePetra.
+There are aspects of JuliaPetra that are not ideomatic Julia code, however, JuliaPetra has much
+better performance than the more ideomatic DistributedArrays.jl.
+
+%This shows that...?
 
 
 \bibliographystyle{acm}
