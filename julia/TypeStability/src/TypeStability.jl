@@ -1,3 +1,6 @@
+
+__precompile__()
+
 module TypeStability
 
 include("StabilityAnalysis.jl")
