@@ -1,4 +1,5 @@
- \documentclass{article}
+\documentclass[acmsmall]{acmart}
+\bibliographystyle{ACM-Reference-Format}
 
 \title{Implementation of Petra in Julia}
 \author{Neil Lindquist}
@@ -155,8 +156,9 @@ However, DistributedArrays.jl was not able to match the speed of JuliaPetra.
 %TODO show timing data
 
 %TODO discuss methodology used to get data
-The timing results were obtained by running the powerMethod with various sized problems and varying
-numbers of processors.  Each combination of problem size and number of processors was run five times.
+The timing results were obtained by running the various power method implementaitons
+with various sized problems and varying numbers of processors.
+Each combination of problem size and number of processors was run five times.
 Tests were ran with Julia v0.6.0 and Trilinos 12.10.1.
 %TODO add OS & such
 %TODO anything else that should be described?
@@ -171,7 +173,5 @@ better performance than the more ideomatic DistributedArrays.jl.
 
 %This shows that...?
 
-
-\bibliographystyle{acm}
 \bibliography{bibliography}
 \end{document}
