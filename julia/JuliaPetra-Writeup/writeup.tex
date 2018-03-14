@@ -18,25 +18,25 @@ Julia is designed so that it
 language while providing interactive dynamic behavior and productivity like Python, LISP or
 Ruby'' \cite{JuliaDesignPaper}.
 %TODO look into referencing use in HPC (celeste/petaflop club?)
+	%Can't find any formal papers, https://juliacomputing.com/case-studies/celeste.html is the closest
 
 %REVIEW go into more detail?
 The Petra Object Model is the design used in Trilinos for objects commonly used in solver algorithms.
 \cite{OverviewOfTrilinos}
 Petra libraries provide parallel, distributed matrices, vectors and graphs for other packages to use.
 
-%TODO fill out paragraph
 JuliaPetra is an implementation of the Petra Object model in Julia.
 A similar project exists in the Trilinos.jl project, which is a Julia wrapper for select parts of
 the Trilinos C++ library \cite{Trilinos.jlGithub}.
 JuliaPetra is different in that it is build entirely in Julia, with the exception of the
 native libraries used by MPI.jl.
-%TODO mention 
 
 %TODO talk about goal of paper/JuliaPetra
 
-\section{Design of JuliaPetra}
+\section{Implementation of JuliaPetra}
 
-%TODO general design notes
+\subsection{Design of JuliaPetra}
+
 The design of JuliaPetra follows closely with that of ePetra and tPetra.
 In particular, the communication APIs, such as \juliaSnippet{Comm} and \juliaSnippet{BlockMap}
 are based off ePetra and the data structures, such as \juliaSnippet{MultiVector} and
@@ -47,7 +47,7 @@ are based off ePetra and the data structures, such as \juliaSnippet{MultiVector}
 JuliaPetra is somewhat idiomatic Julia code, however, there are some areas that are closer to
 idiomatic C/C++ code.
 One less than idiomatic area has to do with the fact that JuliaPetra is built using the MPI
-single-program-multiple-process model where the same program is run on multiple processes
+single-program-multiple-data model, where the same program is run on multiple processes
 that communicate with each other.
 %TODO figure out citations
 The parallel model that comes built-in to Julia, on the other hand, has a main process that
@@ -55,7 +55,7 @@ asynchronously evaluates long running functions on other processes.  \cite{Julia
 %TODO talk a bit about the differences in program logic?
 %TODO mention that each process iterates over only the local part, not the entirety
 
-JuliaPetra's type hierarchy is built on top of Julia's AbstractArray type.  This allows
+JuliaPetra's type hierarchy is built on top of Julia's AbstractArray type.  This improves
 interaction between JuliaPetra and existing Julia code.
 Since Julia doesn't support multiple inheritance, %TODO cite?
 other interfaces are implemented without a type.
@@ -63,8 +63,7 @@ These interfaces include ePetra's Operator, SrcDistObject and DistObject.
 So, any methods that use one of those types accepts any object and assumes
 the methods required for the interface are present.
 
-\section{Optimizing JuliaPetra}
-%REVIEW Is this best on its own? Or is it better as a subsection of the previous?
+\subsection{Optimizing JuliaPetra}
 
 Type Stability was one of the most important factors in improving the speed of JuliaPetra.
 A function is Type Stability if the type inferencer is able to deduce that a variable will only
@@ -75,8 +74,8 @@ method matches for a particular function call, that method call may be inlined. 
 This removes method dispatch and call overhead at run time.
 Additionally, even if the method is not inlined for other reasons, the specific method that should
 be called is known already so it doesn't need to be found at run time.
-%TODO might need a citation
-%TODO comment about Julia compiling mutliple versions of a method for different types
+This process is able to work well for any set of arguments, since each function is compiled
+separately for every set of concrete types for which it is applied.  \cite{JuliaFreshApproach}
 
 Given the importance of Type Stability for high performance Julia code, it is important it be able
 to determine if a critical section of code is type stable.
@@ -102,25 +101,25 @@ can be stack allocated, meaning it does not need to be garbage collected.
 This improves the speed of the matrix vector multiplication loop.
 %TODO figure out what should be cited from where in this paragraph
 
-%TODO talk about need for agressive inlining
 Another optimization was use of the \juliaSnippet{@inline} macro, which indicates to the
 compiler that the annotated function should be inlined.
 This ensures that functions that are used in performance critical functions do not have
 method call overhead.
-%REVIEW does this really need to be a paragraph?  It's kind of a basic thing, force critical functions to be inlined
-%TODO check if @inline still even makes a difference
+%REVIEW does this really need to be a paragraph?  It seems like kind of a basic thing, force critical functions to be inlined
 
 
 %TODO get timing data to support optimizations
 
-\section{Comparing with ePetra}
+\section{Comparisons with Other Distributed Libraries}
+
+\subsection{Comparing with ePetra}
 
 JuliaPetra is fairly similar to ePetra, as ePetra was used as the template for implementing JuliaPetra.
 
 The JuliaPetra and ePetra implementations of the power method are similar, due to the similarities
 in the APIs and the simplicity of the algorithm.
-JuliaPetra was able to achieve the same performance as ePetra on large instances of the power method.
-%TODO "cite" results section
+JuliaPetra was able to achieve the same performance as ePetra on large instances of the power method,
+as can be seen in the Results section.
 %TODO comment on julia's startup time?
 	%need hard numbers then
 Since Julia uses just in time compiling, it has extra start up costs compared to the ePetra version.
@@ -128,13 +127,14 @@ For example, the first call to \juliaSnippet{powerMethod} in a Julia process tak
 than subsequent calls.
 %REVIEW check that 2 seconds is accurate.  "cite" results section?
 
-\section{Comparing with DistributedArrays.jl}
+\subsection{Comparing with DistributedArrays.jl}
 
 DistributedArrays.jl is a similar library designed to support distributed arrays in parallel environments.
 \cite{DAGithub}
 %TODO talk about general design
 DistributedArrays.jl is designed for Julia's built in parallel model, so operations that apply to
-each element are distributed to each process from the master process.  DistributedArrays.jl offers a number of advantages over JuliaPetra, however, it is not able to
+each element are distributed to each process from the master process.
+DistributedArrays.jl offers a number of advantages over JuliaPetra, however, it is not able to
 match the speed of JuliaPetra.
 
 One area where DistributedArrays.jl has an advantage over Julia is that it follows standard
@@ -143,15 +143,15 @@ For example, it is built around the default Julia parallelization model and APIs
 It's APIs are all designed as function calls that should be made from a main process that
 then delegates part of the work to the other processes. %TODO remove?
 %TODO comment how DA fits a little better with Array APIS
-%TODO comment about higher level API
+	%does it majorly?
 Another advantage is that DistributedArrays.jl uses an instance of \juliaSnippet{AbstractArray}
 for a process's local storage, this allows automatic support for different array structures.
 
 However, DistributedArrays.jl was not able to match the speed of JuliaPetra.
-%TODO cite/reference results section
 %TODO mention approximate difference in speed
 
 \section{Results}
+\label{section:Results}
 
 %TODO show timing data
 
