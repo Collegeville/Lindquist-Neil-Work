@@ -65,8 +65,8 @@ the methods required for the interface are present.
 
 \subsection{Optimizing JuliaPetra}
 
-Type Stability was one of the most important factors in improving the speed of JuliaPetra.
-A function is Type Stability if the type inferencer is able to deduce that a variable will only
+Type stability was one of the most important factors in improving the speed of JuliaPetra.
+A function is type stable if the type inferencer is able to deduce that a variable will only
 hold objects of a specific, concrete type.
 %REVIEW figure out if I need a cite on the definition of Type Stability
 When the type inferencer is able to infer a variable's type well enough that only a single
@@ -107,9 +107,6 @@ This ensures that functions that are used in performance critical functions do n
 method call overhead.
 %REVIEW does this really need to be a paragraph?  It seems like kind of a basic thing, force critical functions to be inlined
 
-
-%TODO get timing data to support optimizations
-
 \section{Comparisons with Other Distributed Libraries}
 
 \subsection{Comparing with ePetra}
@@ -120,12 +117,9 @@ The JuliaPetra and ePetra implementations of the power method are similar, due t
 in the APIs and the simplicity of the algorithm.
 JuliaPetra was able to achieve the same performance as ePetra on large instances of the power method,
 as can be seen in the Results section.
-%TODO comment on julia's startup time?
-	%need hard numbers then
-Since Julia uses just in time compiling, it has extra start up costs compared to the ePetra version.
-For example, the first call to \juliaSnippet{powerMethod} in a Julia process takes around 2 seconds longer
-than subsequent calls.
-%REVIEW check that 2 seconds is accurate.  "cite" results section?
+Since Julia uses just in time compiling exclusively, it has extra start up costs compared to
+the ePetra version. However, since each specialized method needs to be compiled only once,
+this is a fixed cost.
 
 \subsection{Comparing with DistributedArrays.jl}
 
@@ -148,10 +142,10 @@ Another advantage is that DistributedArrays.jl uses an instance of \juliaSnippet
 for a process's local storage, this allows automatic support for different array structures.
 
 However, DistributedArrays.jl was not able to match the speed of JuliaPetra.
-%TODO mention approximate difference in speed
+It was able to get within twice the time of JuliaPetra, but was never able to get within 1.5 times
+the execution time of JuliaPetra.
 
 \section{Results}
-\label{section:Results}
 
 %TODO show timing data
 
