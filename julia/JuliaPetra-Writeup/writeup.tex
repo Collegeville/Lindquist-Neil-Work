@@ -19,138 +19,142 @@
 
 \section{Introduction}
 
+%REVIEW include description of Julia?
 Julia is a programing language first publicly released in 2012 \cite{WhyWeCreatedJulia}.
 Julia is designed so that it
 ``has the performance of a statically compiled
 language while providing interactive dynamic behavior and productivity like Python, LISP or
 Ruby'' \cite{JuliaDesignPaper}.
-%TODO look into referencing use in HPC (celeste/petaflop club?)
-	%Can't find any formal papers, https://juliacomputing.com/case-studies/celeste.html is the closest
 
-%REVIEW go into more detail?
+%TODO go into more detail?
 The Petra Object Model is the design used in Trilinos for objects commonly used in solver algorithms.
 \cite{OverviewOfTrilinos}
 Petra libraries provide parallel, distributed matrices, vectors and graphs for other packages to use.
+The Petra object model has previously been implemented in a very stable subset of C++,
+in a newer, more advanced subset of C++ and in Java.
+%REVIEW should this list of previous implemenetations be a thing
 
-JuliaPetra is an implementation of the Petra Object model in Julia.
-A similar project exists in the Trilinos.jl project, which is a Julia wrapper for select parts of
-the Trilinos C++ library \cite{Trilinos.jlGithub}.
-JuliaPetra is different in that it is build entirely in Julia, with the exception of the
-native libraries used by MPI.jl.
-
-%TODO talk about goal of paper/JuliaPetra
-
-\section{Design of JuliaPetra}
+JuliaPetra is an implementation of the Petra object model in Julia.
+The design of JuliaPetra follows closely with that of the C++ implementations of the
+Petra object model, Epetra and Tpetra.
+In particular, the communication APIs, such as \juliaSnippet{Comm} and \juliaSnippet{BlockMap}
+are based directly off Epetra and the data structures, such as \juliaSnippet{MultiVector} and
+\juliaSnippet{RowMatrix} are based directly off Tpetra.
+Additionally, like Epetra and Tpetra, JuliaPetra uses MPI and Single-Program-Multiple-Data as it's parallel model.
 
 \begin{figure}[h]
-	
+	%name, type, location
+	\newcommand{\typeNode} [3]{\node[#2] (#1) [#3] {\juliaSnippet{#1}};}
+	\newcommand{\explicitInheritance}[2]{\draw[->] (#1.south) -- (#2.north);}
+	\newcommand{\implicitInheritance}[2]{\draw[dashed,->] (#1.south) -- (#2.north);}
+	\begin{tikzpicture}[
+		ImplicitInterface/.style={rectangle, draw=black, dashed, minimum size=5mm},
+		ExplicitInterface/.style={rectangle, draw=black, minimum size=5mm},
+		ConcreteType/.style={rectangle, draw=black, very thick, minimum size=5mm}
+		]
+		
+		\typeNode{SrcDistObject}{ImplicitInterface}{}
+		
+		\typeNode{DistObject}{ImplicitInterface}{below=.75cm of SrcDistObject}
+		\implicitInheritance{SrcDistObject}{DistObject}
+		
+		\typeNode{Operator}{ImplicitInterface}{left=of DistObject}
+		
+		\typeNode{AbstractArray}{ExplicitInterface}{left=of Operator}
+		
+		\typeNode{MultiVector}{ConcreteType}{below=of AbstractArray}
+		\implicitInheritance{DistObject}{MultiVector}
+		\explicitInheritance{AbstractArray}{MultiVector}
+		
+		\typeNode{RowMatrix}{ExplicitInterface}{below=of Operator}
+		\implicitInheritance{DistObject}{RowMatrix}
+		\implicitInheritance{Operator}{RowMatrix}
+		\explicitInheritance{AbstractArray}{RowMatrix}
+		
+		\typeNode{RowGraph}{ExplicitInterface}{below=of DistObject}
+		\implicitInheritance{DistObject}{RowGraph}
+		
+		\typeNode{CSRMatrix}{ConcreteType}{below=.75cm of RowMatrix}
+		\explicitInheritance{RowMatrix}{CSRMatrix}
+		
+		\typeNode{CSRGraph}{ConcreteType}{below=.75cm of RowGraph}
+		\explicitInheritance{RowGraph}{CSRGraph}
+		
+		
+		\typeNode{Import}{ConcreteType}{left=of SrcDistObject}
+		
+		\typeNode{Export}{ConcreteType}{left=of Import}
+		
+		
+		\typeNode{Comm}{ExplicitInterface}{left=of CSRMatrix}
+		
+		\typeNode{SerialComm}{ConcreteType}{below right=of Comm}
+		\explicitInheritance{Comm}{SerialComm}
+		
+		\typeNode{MPIComm}{ConcreteType}{left=.25cm of SerialComm}
+		\explicitInheritance{Comm}{MPIComm}
+		
+		\typeNode{LocalComm}{ConcreteType}{right=.25cm of SerialComm}
+		\explicitInheritance{Comm}{LocalComm}
+		
+		
+		\typeNode{Directory}{ExplicitInterface}{left=of AbstractArray}
+		
+		\typeNode{BasicDirectory}{ConcreteType}{below=of Directory}
+		\explicitInheritance{Directory}{BasicDirectory}
+		
+		\typeNode{BlockMap}{ConcreteType}{left=of Export}
+		
+		
+		\typeNode{Distributor}{ExplicitInterface}{left=.75cm of Comm}
+		
+		\typeNode{SerialDistributor}{ConcreteType}{below=of Distributor}
+		\explicitInheritance{Distributor}{SerialDistributor}
+		
+		\typeNode{MPIDistributor}{ConcreteType}{left=.25cm of SerialDistributor}
+		\explicitInheritance{Distributor}{MPIDistributor}
+		
+		\node[ImplicitInterface] (ImplicitKey) [below=of MPIDistributor] {Implicit Type};
+		\node[ExplicitInterface] (ExplicitKey) [right=of ImplicitKey] {Explicit, Abstract Type};
+		\node[ConcreteType]      (ConcreteKey) [right=of ExplicitKey] {Concrete Type};
 
-%name, type, location
-\newcommand{\typeNode} [3]{\node[#2] (#1) [#3] {\juliaSnippet{#1}};}
-\newcommand{\explicitInheritance}[2]{\draw[->] (#1.south) -- (#2.north);}
-\newcommand{\implicitInheritance}[2]{\draw[dashed,->] (#1.south) -- (#2.north);}
-\begin{tikzpicture}[
-ImplicitInterface/.style={rectangle, draw=black, dashed, minimum size=5mm},
-ExplicitInterface/.style={rectangle, draw=black, minimum size=5mm},
-ConcreteType/.style={rectangle, draw=black, very thick, minimum size=5mm}
-]
-
-\typeNode{SrcDistObject}{ImplicitInterface}{}
-
-\typeNode{DistObject}{ImplicitInterface}{below=of SrcDistObject}
-\implicitInheritance{SrcDistObject}{DistObject}
-
-\typeNode{Operator}{ImplicitInterface}{left=of DistObject}
-
-\typeNode{AbstractArray}{ExplicitInterface}{left=of Operator}
-
-\typeNode{MultiVector}{ConcreteType}{below=of AbstractArray}
-\implicitInheritance{DistObject}{MultiVector}
-\explicitInheritance{AbstractArray}{MultiVector}
-
-\typeNode{RowMatrix}{ExplicitInterface}{below=of Operator}
-\implicitInheritance{DistObject}{RowMatrix}
-\implicitInheritance{Operator}{RowMatrix}
-\explicitInheritance{AbstractArray}{RowMatrix}
-
-\typeNode{RowGraph}{ExplicitInterface}{below=of DistObject}
-\implicitInheritance{DistObject}{RowGraph}
-
-\typeNode{CSRMatrix}{ConcreteType}{below=of RowMatrix}
-\explicitInheritance{RowMatrix}{CSRMatrix}
-
-\typeNode{CSRGraph}{ConcreteType}{below=of RowGraph}
-\explicitInheritance{RowGraph}{CSRGraph}
-
-
-\typeNode{Import}{ConcreteType}{left=of SrcDistObject}
-
-\typeNode{Export}{ConcreteType}{left=of Import}
-
-
-\typeNode{Comm}{ExplicitInterface}{left=of CSRMatrix}
-
-\typeNode{SerialComm}{ConcreteType}{below right=of Comm}
-\explicitInheritance{Comm}{SerialComm}
-
-\typeNode{MPIComm}{ConcreteType}{left=.25cm of SerialComm}
-\explicitInheritance{Comm}{MPIComm}
-
-\typeNode{LocalComm}{ConcreteType}{right=.25cm of SerialComm}
-\explicitInheritance{Comm}{LocalComm}
-
-
-\typeNode{Directory}{ExplicitInterface}{left=of AbstractArray}
-
-\typeNode{BasicDirectory}{ConcreteType}{below=of Directory}
-\explicitInheritance{Directory}{BasicDirectory}
-
-\typeNode{BlockMap}{ConcreteType}{left=of Export}
-
-
-\typeNode{Distributor}{ExplicitInterface}{left=.75cm of Comm}
-
-\typeNode{SerialDistributor}{ConcreteType}{below=of Distributor}
-\explicitInheritance{Distributor}{SerialDistributor}
-
-\typeNode{MPIDistributor}{ConcreteType}{left=.25cm of SerialDistributor}
-\explicitInheritance{Distributor}{MPIDistributor}
-
-
-\end{tikzpicture}
-\caption{Type hierarchy}
-\label{fig:type-hierarchy}
+	\end{tikzpicture}
+	\caption{Type hierarchy.}
+	\label{fig:type-hierarchy}
 \end{figure}
 
-The design of JuliaPetra follows closely with that of ePetra and tPetra.
-In particular, the communication APIs, such as \juliaSnippet{Comm} and \juliaSnippet{BlockMap}
-are based off ePetra and the data structures, such as \juliaSnippet{MultiVector} and
-\juliaSnippet{RowMatrix} are based off tPetra.
-Additionally, like ePetra and tPetra, JuliaPetra uses Single-Program-Multiple-Data as it's parallel model.
-
-JuliaPetra's type hierarchy is built on top of Julia's AbstractArray type.
+JuliaPetra's type hierarchy is built on top of Julia's \juliaSnippet{AbstractArray} type.
 This improves interaction between JuliaPetra and existing Julia code.
 Since Julia doesn't support multiple inheritance, %TODO cite?
 other interfaces are implemented without an explicit type.
-These interfaces include ePetra's Operator, SrcDistObject and DistObject.
+These interfaces include \juliaSnippet{Operator}, \juliaSnippet{SrcDistObject} and \juliaSnippet{DistObject}.
 So, any methods that use one of those types accepts any object and assumes the methods required for the interface are present.
-See Figure~\ref{fig:type-hierarchy} for the full type hierarchy.
+Figure~\ref{fig:type-hierarchy} contains the full type hierarchy.
+
+Since JuliaPetra follows the design of Epetra and Tpetra, the library provides the ability to do similar
+computations as the existing Petra implementations.
+For example, JuliaPetra supports \juliaSnippet{MultiVector} operations such as dot product and norms.
+Additionally, sparse matrix - vector products can be computed.
 
 \section{Comparisons with Other Distributed Libraries}
 
-\subsection{Comparing with ePetra}
+\subsection{Comparing with Epetra}
 
-JuliaPetra is fairly similar to ePetra, as ePetra was used as the template for implementing JuliaPetra.
+The APIs for JuliaPetra are fairly similar to those for Epetra,
+as Epetra was used as the template for implementing JuliaPetra.
+There are some differences between the two.
+For example, JuliaPetra takes advantage of higher level structures, such as thrown exceptions and
+the \juliaSnippet{AbstractArray} support, where able.
+The similarities between JuliaPetra and Epetra can be seen in how similar the respective implementations
+of the power method are.
 
-The JuliaPetra and ePetra implementations of the power method are similar, due to the similarities
-in the APIs and the simplicity of the algorithm.
-JuliaPetra was able to achieve the same performance as ePetra on large instances of the power method,
+JuliaPetra was able to achieve the same performance as Epetra on large instances of the power method,
 as can be seen in the Results section.
 Since Julia uses just in time compiling exclusively, it has extra start up costs compared to
-the ePetra version. However, since each specialized method needs to be compiled only once,
+the Epetra version. However, since each specialized method needs to be compiled only once,
 this is a fixed cost.
 Additionally, JuliaPetra uses runtime dispatch in a few locations, especially related to
-\juliaSnippet{Comm} objects.  This will also add overhead compared to the ePetra version.
+\juliaSnippet{Comm} objects.  This will also add overhead compared to the Epetra version.
 
 \subsection{Comparing with DistributedArrays.jl}
 
@@ -184,9 +188,9 @@ the execution time of JuliaPetra.
 	\hline
 		\multicolumn{2}{|c|}{Equations Per Process}
 		& JuliaPetra
-		& ePetra
+		& Epetra
 		& \multicolumn{1}{m{1.8cm}||}{Distributed\-Arrays.jl}
-		& \multicolumn{1}{m{1.75cm}|}{JuliaPetra / ePetra}
+		& \multicolumn{1}{m{1.75cm}|}{JuliaPetra / Epetra}
 		& \multicolumn{1}{m{1.8cm}|}{JuliaPetra / Distributed\-Arrays.jl} \\
 	\hline
 		\multicolumn{7}{|l|}{4 Processors}\\
@@ -252,9 +256,9 @@ with 20 Intel\textregistered Xeon\textregistered cpu's.
 \section{Conclusion}
 
 JuliaPetra is an implementation of the Petra object model in the Julia programming language.
-JuliaPetra is able to perform at the same speeds as ePetra.
-There are aspects of JuliaPetra that are not ideomatic Julia code, however, JuliaPetra has much
-better performance than the more ideomatic DistributedArrays.jl.
+This provides a set of basic, distributed linear algebra objects for building solvers in Julia.
+JuliaPetra is able to perform at the same speeds as Epetra and so, allows implementation of
+solver code in Julia with the distributed linear algebra support of the Petra object model.
 
 %This shows that...?
 
