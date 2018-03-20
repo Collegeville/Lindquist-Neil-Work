@@ -191,9 +191,9 @@ the execution time of JuliaPetra.
 	\hline
 		\multicolumn{7}{|l|}{4 Processors}\\
 	\hline
-		100,000			&Average & 1.96272 & 0.28090 & 2.35763 & 1.46846 & 0.14312 \\
-		equations		&Minimum & 1.79600 & 0.25652 & 2.00752 & 1.39540 & 0.14283 \\
-						&Maximum & 2.40793 & 0.29765 & 2.91800 & 1.48619 & 0.12361 \\
+		100,000			&Average & 0.27690 & 0.19294 & 1.86626 & 1.43515 & 0.14837 \\
+		equations		&Minimum & 0.26948 & 0.18933 & 1.59244 & 1.42335 & 0.16922 \\
+						&Maximum & 0.28782 & 0.19614 & 2.15375 & 1.46745 & 0.13364 \\
 	\hline
 		1,000,000		&Average & 3.07809 & 2.38844 & 14.7880 & 1.28875 & 0.20815 \\
 		equations		&Minimum & 2.98883 & 2.35483 & 13.2876 & 1.26923 & 0.22493 \\
@@ -219,9 +219,9 @@ the execution time of JuliaPetra.
 	\hline
 			\multicolumn{7}{|l|}{20 Processors}\\
 	\hline
-		100,000			&Average & 9.19004 & 9.18862 & 23.9124 & 1.00015 & 0.38432 \\
-		equations		&Minimum & 9.17049 & 9.17975 & 22.9229 & 0.99899 & 0.40006 \\
-						&Maximum & 9.21211 & 9.19973 & 25.0095 & 1.00135 & 0.36834 \\
+		100,000			&Average & 0.73843 & 0.70837 & 3.14911 & 1.04244 & 0.23449 \\
+		equations		&Minimum & 0.73621 & 0.69428 & 2.90237 & 1.06039 & 0.25366 \\
+						&Maximum & 0.73967 & 0.71449 & 3.64133 & 1.03524 & 0.20313 \\
 	\hline
 		1,000,000		&Average & 9.19411 & 9.18584 & 23.2980 & 1.00090 & 0.39463 \\
 		equations		&Minimum & 9.14960 & 9.16630 & 22.7740 & 0.99814 & 0.40177 \\
@@ -238,7 +238,7 @@ the execution time of JuliaPetra.
 \end{figure}
 
 The timing results can be seen in Figure~\ref{fig:timing-results}.
-The timing results were obtained by running the various power method implementaitons
+The timing results were obtained by running the various power method implementations
 with various sized problems and varying numbers of processors.
 Each combination of problem size and number of processors was run five times.
 Each Julia implementation was run before making any timings to ensure all code was
