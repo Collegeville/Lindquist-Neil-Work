@@ -2,6 +2,8 @@
 \bibliographystyle{ACM-Reference-Format}
 
 \usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{positioning} 
 
 \title{Implementation of Petra in Julia}
 \author{Neil Lindquist}
@@ -38,78 +40,101 @@ native libraries used by MPI.jl.
 
 %TODO talk about goal of paper/JuliaPetra
 
-\section{Implementation of JuliaPetra}
+\section{Design of JuliaPetra}
 
-\subsection{Design of JuliaPetra}
+\begin{figure}[h]
+	
+
+%name, type, location
+\newcommand{\typeNode} [3]{\node[#2] (#1) [#3] {\juliaSnippet{#1}};}
+\newcommand{\explicitInheritance}[2]{\draw[->] (#1.south) -- (#2.north);}
+\newcommand{\implicitInheritance}[2]{\draw[dashed,->] (#1.south) -- (#2.north);}
+\begin{tikzpicture}[
+ImplicitInterface/.style={rectangle, draw=black, dashed, minimum size=5mm},
+ExplicitInterface/.style={rectangle, draw=black, minimum size=5mm},
+ConcreteType/.style={rectangle, draw=black, very thick, minimum size=5mm}
+]
+
+\typeNode{SrcDistObject}{ImplicitInterface}{}
+
+\typeNode{DistObject}{ImplicitInterface}{below=of SrcDistObject}
+\implicitInheritance{SrcDistObject}{DistObject}
+
+\typeNode{Operator}{ImplicitInterface}{left=of DistObject}
+
+\typeNode{AbstractArray}{ExplicitInterface}{left=of Operator}
+
+\typeNode{MultiVector}{ConcreteType}{below=of AbstractArray}
+\implicitInheritance{DistObject}{MultiVector}
+\explicitInheritance{AbstractArray}{MultiVector}
+
+\typeNode{RowMatrix}{ExplicitInterface}{below=of Operator}
+\implicitInheritance{DistObject}{RowMatrix}
+\implicitInheritance{Operator}{RowMatrix}
+\explicitInheritance{AbstractArray}{RowMatrix}
+
+\typeNode{RowGraph}{ExplicitInterface}{below=of DistObject}
+\implicitInheritance{DistObject}{RowGraph}
+
+\typeNode{CSRMatrix}{ConcreteType}{below=of RowMatrix}
+\explicitInheritance{RowMatrix}{CSRMatrix}
+
+\typeNode{CSRGraph}{ConcreteType}{below=of RowGraph}
+\explicitInheritance{RowGraph}{CSRGraph}
+
+
+\typeNode{Import}{ConcreteType}{left=of SrcDistObject}
+
+\typeNode{Export}{ConcreteType}{left=of Import}
+
+
+\typeNode{Comm}{ExplicitInterface}{left=of CSRMatrix}
+
+\typeNode{SerialComm}{ConcreteType}{below right=of Comm}
+\explicitInheritance{Comm}{SerialComm}
+
+\typeNode{MPIComm}{ConcreteType}{left=.25cm of SerialComm}
+\explicitInheritance{Comm}{MPIComm}
+
+\typeNode{LocalComm}{ConcreteType}{right=.25cm of SerialComm}
+\explicitInheritance{Comm}{LocalComm}
+
+
+\typeNode{Directory}{ExplicitInterface}{left=of AbstractArray}
+
+\typeNode{BasicDirectory}{ConcreteType}{below=of Directory}
+\explicitInheritance{Directory}{BasicDirectory}
+
+\typeNode{BlockMap}{ConcreteType}{left=of Export}
+
+
+\typeNode{Distributor}{ExplicitInterface}{left=.75cm of Comm}
+
+\typeNode{SerialDistributor}{ConcreteType}{below=of Distributor}
+\explicitInheritance{Distributor}{SerialDistributor}
+
+\typeNode{MPIDistributor}{ConcreteType}{left=.25cm of SerialDistributor}
+\explicitInheritance{Distributor}{MPIDistributor}
+
+
+\end{tikzpicture}
+\caption{Type hierarchy}
+\label{fig:type-hierarchy}
+\end{figure}
 
 The design of JuliaPetra follows closely with that of ePetra and tPetra.
 In particular, the communication APIs, such as \juliaSnippet{Comm} and \juliaSnippet{BlockMap}
 are based off ePetra and the data structures, such as \juliaSnippet{MultiVector} and
 \juliaSnippet{RowMatrix} are based off tPetra.
+Additionally, like ePetra and tPetra, JuliaPetra uses Single-Program-Multiple-Data as it's parallel model.
 
-%TODO talk about what is and isn't ideomatic Julia
-JuliaPetra is somewhat idiomatic Julia code, however there are some areas that are closer to
-idiomatic C/C++ code.
-One less than idiomatic area has to do with the fact that JuliaPetra is built using the MPI
-single-program-multiple-data model, where the same program is run on multiple processes
-that communicate with each other.
-%TODO figure out citations
-The parallel model that comes built-in to Julia, on the other hand, has a main process that
-asynchronously evaluates long running functions on other processes.  \cite{JuliaFreshApproach}
-%TODO talk a bit about the differences in program logic?
-%TODO mention that each process iterates over only the local part, not the entirety
-
-JuliaPetra's type hierarchy is built on top of Julia's AbstractArray type.  This improves
-interaction between JuliaPetra and existing Julia code.
+JuliaPetra's type hierarchy is built on top of Julia's AbstractArray type.
+This improves interaction between JuliaPetra and existing Julia code.
 Since Julia doesn't support multiple inheritance, %TODO cite?
-other interfaces are implemented without a type.
+other interfaces are implemented without an explicit type.
 These interfaces include ePetra's Operator, SrcDistObject and DistObject.
-So, any methods that use one of those types accepts any object and assumes
-the methods required for the interface are present.
-
-\subsection{Optimizing JuliaPetra}
-
-Type stability was one of the most important factors in improving the speed of JuliaPetra.
-A function is type stable if the type inferencer is able to deduce that a variable will only
-hold objects of a specific, concrete type.
-%REVIEW figure out if I need a cite on the definition of Type Stability
-When the type inferencer is able to infer a variable's type well enough that only a single
-method matches for a particular function call, that method call may be inlined. \cite{JuliaDesignPaper}
-This removes method dispatch and call overhead at run time.
-Additionally, even if the method is not inlined for other reasons, the specific method that should
-be called is known already so it doesn't need to be found at run time.
-This process is able to work well for any set of arguments, since each function is compiled
-separately for every set of concrete types for which it is applied.  \cite{JuliaFreshApproach}
-
-Given the importance of Type Stability for high performance Julia code, it is important it be able
-to determine if a critical section of code is type stable.
-However, the only tool Julia provides for checking type stability is the \juliaSnippet{code_warntype}
-function and the related \juliaSnippet{@code_warntype} macro.  This function takes a function and list
-of types and outputs a version of the function for arguments of the given types after some optimizations
-have occurred and marks non-concrete types, likely indicators of type unstable code, in red.
-This requires manually checking a function for each combination of argument types that should be optimized.
-Furthermore, there are not any tools provided by the Julia community to make checking type stability easier.
-So, to ensure important functions were type stable for important sets of arguments,
-extra utilities needed to be written to check the type stability automatically.
-%TODO call it out as the "TypeStability.jl package"?  Should look into publishing it publicly
-
-In the matrix vector multiplication loop, there is a lot of use for getting a view of a chunk of an array.
-However, creating an actual array view object requires allocating to the heap, and thus garbage collection.
-The work around used in JuliaPetra at various internal locations is to use the \juliaSnippet{Ptr} API.
-The \juliaSnippet{Ptr} API is designed for interacting with C libraries, however it allows creating
-a \juliaSnippet{Ptr} that points to location an array and dereferencing elements in that array.
-As bits types, \juliaSnippet{Ptr} objects and integers are able to be stack allocated.
-Additionally, \juliaSnippet{Tuple} objects are optimized so that they can be stack allocated.
-Thus, by representing a view of an array as a \juliaSnippet{(Ptr, Integer)} tuple, the view
-can be stack allocated, meaning it does not need to be garbage collected.
-This improves the speed of the matrix vector multiplication loop.
-%TODO figure out what should be cited from where in this paragraph
-
-Another optimization was use of the \juliaSnippet{@inline} macro, which indicates to the
-compiler that the annotated function should be inlined.
-This ensures that functions that are used in performance critical functions do not have
-method call overhead.
-%REVIEW does this really need to be a paragraph?  It seems like kind of a basic thing, force critical functions to be inlined
+So, any methods that use one of those types accepts any object and assumes the methods required for the interface are present.
+See Figure~\ref{fig:type-hierarchy} for the full type hierarchy.
 
 \section{Comparisons with Other Distributed Libraries}
 
@@ -124,6 +149,8 @@ as can be seen in the Results section.
 Since Julia uses just in time compiling exclusively, it has extra start up costs compared to
 the ePetra version. However, since each specialized method needs to be compiled only once,
 this is a fixed cost.
+Additionally, JuliaPetra uses runtime dispatch in a few locations, especially related to
+\juliaSnippet{Comm} objects.  This will also add overhead compared to the ePetra version.
 
 \subsection{Comparing with DistributedArrays.jl}
 
