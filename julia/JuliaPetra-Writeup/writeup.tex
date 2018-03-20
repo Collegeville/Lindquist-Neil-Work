@@ -8,6 +8,9 @@
 
 \newcommand{\juliaSnippet}[1]{\texttt{\detokenize{#1}}}
 
+\let\oldtextregister\textregistered
+\renewcommand{\textregistered}{\textsuperscript{\tiny\oldtextregister}}
+
 \begin{document}
 
 \maketitle
@@ -148,70 +151,74 @@ the execution time of JuliaPetra.
 
 \section{Results}
 
-
-%TODO show timing data
-\begin{tabular}{|c c|r|r|r|r|}
+%TODO figure out the best way to lay this out
+\begin{figure}[h]
+\begin{tabular}{|c c|r|r|r||r|r|}
 	\hline
 		\multicolumn{2}{|c|}{Equations Per Process}
-		& \multicolumn{1}{ m{9em}|}{DistributedArrays.jl without caching}
-		& \multicolumn{1}{ m{9em}|}{DistributedArrays.jl with caching}
 		& JuliaPetra
-		& ePetra \\
+		& ePetra
+		& \multicolumn{1}{m{1.8cm}||}{Distributed\-Arrays.jl}
+		& \multicolumn{1}{m{1.75cm}|}{JuliaPetra / ePetra}
+		& \multicolumn{1}{m{1.8cm}|}{JuliaPetra / Distributed\-Arrays.jl} \\
 	\hline
-		\multicolumn{6}{|l|}{4 Processors}\\
+		\multicolumn{7}{|l|}{4 Processors}\\
 	\hline
-		100,000			&Average & 26.0456891890 & 21.5343383718 & 7.4636681064 & 7.396978\\
-		equations		&Minimum & 25.923896246  & 20.088410673  & 7.360983453  & 7.32456 \\
-						&Maximum & 26.218521874  & 22.865531125  & 7.595983703  & 7.48964 \\
+		100,000			&Average & 1.96272 & 0.28090 & 2.35763 & 1.46846 & 0.14312 \\
+		equations		&Minimum & 1.79600 & 0.25652 & 2.00752 & 1.39540 & 0.14283 \\
+						&Maximum & 2.40793 & 0.29765 & 2.91800 & 1.48619 & 0.12361 \\
 	\hline
-		1,000,000		&Average & ??? & ??? & ??? & ??? \\
-		equations		&Minimum & ??? & ??? & ??? & ??? \\
-						&Maximum & ??? & ??? & ??? & ??? \\
+		1,000,000		&Average & 3.07809 & 2.38844 & 14.7880 & 1.28875 & 0.20815 \\
+		equations		&Minimum & 2.98883 & 2.35483 & 13.2876 & 1.26923 & 0.22493 \\
+						&Maximum & 3.15854 & 2.44491 & 18.4698 & 1.29188 & 0.17101 \\
 	\hline
-		10,000,000		&Average & ??? & ??? & ??? & ??? \\
-		equations		&Minimum & ??? & ??? & ??? & ??? \\
-						&Maximum & ??? & ??? & ??? & ??? \\
+		10,000,000		&Average & 33.0215 & 24.6116 & 108.760 & 1.34171 & 0.30362 \\
+		equations		&Minimum & 31.5646 & 24.4134 & 107.118 & 1.29292 & 0.29467 \\
+						&Maximum & 35.1871 & 24.7888 & 109.561 & 1.41947 & 0.32116 \\
 	\hline
-		\multicolumn{6}{|l|}{16 Processors}\\
+		\multicolumn{7}{|l|}{16 Processors}\\
 	\hline
-		100,000			&Average & ??? & ??? & ??? & ??? \\
-		equations		&Minimum & ??? & ??? & ??? & ??? \\
-						&Maximum & ??? & ??? & ??? & ??? \\
+		100,000			&Average & 0.58371 & 0.51138 & 3.23072 & 1.15766 & 0.18068 \\
+		equations		&Minimum & 0.54744 & 0.49328 & 2.99947 & 1.10979 & 0.18251 \\
+						&Maximum & 0.60776 & 0.51907 & 3.47056 & 1.17086 & 0.17512 \\
 	\hline
-		1,000,000		&Average & ??? & ??? & ??? & ??? \\
-		equations		&Minimum & ??? & ??? & ??? & ??? \\
-						&Maximum & ??? & ??? & ??? & ??? \\
+		1,000,000		&Average & 7.46367 & 7.39699 & 21.5343 & 1.00901 & 0.34659 \\
+		equations		&Minimum & 7.36098 & 7.32456 & 20.0884 & 1.00497 & 0.36643 \\
+						&Maximum & 7.59598 & 7.48964 & 22.8655 & 1.01420 & 0.33220 \\
 	\hline
-		10,000,000		&Average & ??? & ??? & ??? & ??? \\
-		equations		&Minimum & ??? & ??? & ??? & ??? \\
-						&Maximum & ??? & ??? & ??? & ??? \\
+		10,000,000		&Average & 74.6001 & 73.6360 & 151.184 & 1.01310 & 0.49344 \\
+		equations		&Minimum & 73.7350 & 73.4646 & 150.411 & 1.00368 & 0.49022 \\
+						&Maximum & 74.9087 & 73.8342 & 152.033 & 1.01455 & 0.49271 \\
 	\hline
-			\multicolumn{6}{|l|}{20 Processors}\\
+			\multicolumn{7}{|l|}{20 Processors}\\
 	\hline
-		100,000			&Average & ??? & ??? & ??? & ??? \\
-		equations		&Minimum & ??? & ??? & ??? & ??? \\
-						&Maximum & ??? & ??? & ??? & ??? \\
+		100,000			&Average & 9.19004 & 9.18862 & 23.9124 & 1.00015 & 0.38432 \\
+		equations		&Minimum & 9.17049 & 9.17975 & 22.9229 & 0.99899 & 0.40006 \\
+						&Maximum & 9.21211 & 9.19973 & 25.0095 & 1.00135 & 0.36834 \\
 	\hline
-		1,000,000		&Average & ??? & ??? & ??? & ??? \\
-		equations		&Minimum & ??? & ??? & ??? & ??? \\
-						&Maximum & ??? & ??? & ??? & ??? \\
+		1,000,000		&Average & 9.19411 & 9.18584 & 23.2980 & 1.00090 & 0.39463 \\
+		equations		&Minimum & 9.14960 & 9.16630 & 22.7740 & 0.99814 & 0.40177 \\
+						&Maximum & 9.22002 & 9.21510 & 24.6296 & 1.00053 & 0.37435 \\
 	\hline
-		10,000,000		&Average & ??? & ??? & ??? & ??? \\
-		equations		&Minimum & ??? & ??? & ??? & ??? \\
-						&Maximum & ??? & ??? & ??? & ??? \\
+		10,000,000		&Average & 92.0613 & 91.6512 & 174.402 & 1.00447 & 0.52786 \\
+		equations		&Minimum & 91.5029 & 91.2491 & 173.480 & 1.00278 & 0.52746 \\
+						&Maximum & 92.5630 & 91.7905 & 175.096 & 1.00842 & 0.52864 \\
 	\hline
 \end{tabular}
-All times are in seconds.
 
+\caption{Timing results in seconds.}
+\label{fig:timing-results}
+\end{figure}
 
-%TODO discuss methodology used to get data
+The timing results can be seen in Figure~\ref{fig:timing-results}.
 The timing results were obtained by running the various power method implementaitons
 with various sized problems and varying numbers of processors.
 Each combination of problem size and number of processors was run five times.
-Each Julia implementation was run before making any timings to ensure all code is
-compiled.
-Tests were ran with Julia v0.6.0 and Trilinos 12.10.1.
-%TODO add OS & such
+Each Julia implementation was run before making any timings to ensure all code was
+compiled before the timing started.
+Tests were run with Julia v0.6.0 and Trilinos 12.10.1.
+Tests were run on a Red Hat Enterprise Linux Workstation, version 7.3,
+with 20 Intel\textregistered Xeon\textregistered cpu's.
 %TODO anything else that should be described?
 
 
