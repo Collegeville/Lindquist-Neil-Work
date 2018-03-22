@@ -6,12 +6,14 @@
 \usetikzlibrary{positioning} 
 
 \title{JuliaPetra: An Implementation of the Petra Object Model in Julia}
+
 \author{Neil Lindquist}
+\email{neillindquist5@gmail.com}
+
+\acmJournal{TOMS}
+
 
 \newcommand{\juliaSnippet}[1]{\texttt{\detokenize{#1}}}
-
-\let\oldtextregister\textregistered
-\renewcommand{\textregistered}{\textsuperscript{\tiny\oldtextregister}}
 
 \begin{document}
 
@@ -45,6 +47,9 @@ at Lawrence Berkeley National Laboratory.
 JuliaPetra is an implementation of the Petra object model in Julia.
 This provides Petra's distributed linear algebra objects for use in Julia implementations
 of distributed solver algorithms.
+JuliaPetra provides the ability to do basic linear algebra computations
+such as dot products, vector norms and sparse matrix - vector multiplications.
+%REVIEW should it go into more detail of possible compuations?
 
 \section{Design of JuliaPetra}
 
@@ -174,12 +179,6 @@ These interfaces include \juliaSnippet{Operator}, \juliaSnippet{SrcDistObject} a
 So, any methods that use one of those types accepts any object and assumes the methods required for the interface are present.
 Figure~\ref{fig:type-hierarchy} contains the full type hierarchy.
 
-Since JuliaPetra follows the design of Epetra and Tpetra, the library provides the ability to do similar
-computations as the existing Petra implementations.
-For example, JuliaPetra supports \juliaSnippet{MultiVector} operations such as dot product and norms.
-Additionally, sparse matrix - vector products can be computed.
-%REVIEW should it go into more detail of possible compuations
-
 \section{Comparisons with Other Distributed Libraries}
 
 \subsection{Comparing with Epetra}
@@ -304,7 +303,7 @@ The Julia tests were run with Julia v0.6.0 precompiled binary for Linux
 with the \juliaSnippet{-O3} flag enabled at run time.
 The Epetra tests were compiled with GCC 4.8.5, the \juliaSnippet{-O3} flag and Trilinos 12.10.1.
 Tests were run on a Red Hat Enterprise Linux Workstation, version 7.3,
-with 20 Intel\textregistered Xeon\textregistered CPUs.
+with 20 Intel Xeon CPUs.
 %TODO anything else that should be described?
 
 
