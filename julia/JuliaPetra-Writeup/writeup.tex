@@ -5,7 +5,7 @@
 \usepackage{tikz}
 \usetikzlibrary{positioning} 
 
-\title{Implementation of Petra in Julia}
+\title{JuliaPetra: An Implementation of the Petra Object Model in Julia}
 \author{Neil Lindquist}
 
 \newcommand{\juliaSnippet}[1]{\texttt{\detokenize{#1}}}
@@ -17,26 +17,36 @@
 
 \maketitle
 
+%TODO improve use of transitions between sentences
+%TODO improve inter-paragraph and inter-sectional transitioning
+
 \section{Introduction}
 
+%REVIEW should there be a intro paragraph before the petra object model?
+
 %TODO go into more detail?
+	%I'm not sure what detail to discuss
+	%This paragraph seems to short currently
 The Petra Object Model is the design used in Trilinos for objects commonly used in solver algorithms.
 \cite{OverviewOfTrilinos}
 Petra libraries provide parallel, distributed matrices, vectors and graphs for other packages to use.
-The Petra object model has previously been implemented in a very stable subset of C++,
-in a newer, more advanced subset of C++ and in Java.
-%REVIEW should this list of previous implemenetations be a thing?
+The Petra object model has previously been implemented in both C++ and Java.
+%REVIEW should this list of previous implemenetations be in the paper?
 
-%TODO does the design need to be its own section?
+Julia is a programing language that uses just in time compiling and strong type inferencing
+to obtain the speed of a statically compiled programing language with the productivity of an
+interpreted programing language. \cite{JuliaFreshApproach}
+By providing speed comparable to that of Fortran or C, Julia is a candidate for doing large scale,
+high performance computations.
+The Celeste project is an example of such computations, using 8,192 cores of the Cori Supercomputer
+at Lawrence Berkeley National Laboratory.
+%REVIEW does Celeste need to be cited seperately?  Its mentioned in JuliaFreshApproach
 
 JuliaPetra is an implementation of the Petra object model in Julia.
-This would provide Petra's distributed linear algebra objects for use in Julia solvers.
-The design of JuliaPetra follows closely with that of the C++ implementations of the
-Petra object model, Epetra and Tpetra.
-In particular, the communication APIs, such as \juliaSnippet{Comm} and \juliaSnippet{BlockMap}
-are based directly off Epetra and the data structures, such as \juliaSnippet{MultiVector} and
-\juliaSnippet{RowMatrix} are based directly off Tpetra.
-Additionally, like Epetra and Tpetra, JuliaPetra uses MPI and Single-Program-Multiple-Data as it's parallel model.
+This provides Petra's distributed linear algebra objects for use in Julia implementations
+of distributed solver algorithms.
+
+\section{Design of JuliaPetra}
 
 \begin{figure}
 	%name, type, location
@@ -121,7 +131,14 @@ Additionally, like Epetra and Tpetra, JuliaPetra uses MPI and Single-Program-Mul
 	\label{fig:type-hierarchy}
 \end{figure}
 
-The bottom level of abstraction handles the details of how the problem is distributed.
+The design of JuliaPetra follows closely with that of the C++ implementations of the
+Petra object model, Epetra and Tpetra.
+In particular, the communication APIs, such as \juliaSnippet{Comm} and \juliaSnippet{BlockMap}
+are based directly off Epetra and the data structures, such as \juliaSnippet{MultiVector} and
+\juliaSnippet{RowMatrix} are based directly off Tpetra.
+Additionally, like Epetra and Tpetra, JuliaPetra uses MPI and Single-Program-Multiple-Data as it's parallel model.
+
+The bottom level of abstraction handles the details of how the problem is distributed across processes.
 The \juliaSnippet{Comm} and \juliaSnippet{Distributor} types provides an interface to support
 different communication methods.
 All multiprocess communication is done through \juliaSnippet{Comm} objects, so new communication
@@ -133,24 +150,25 @@ types handle the next layer of abstraction.
 the problem around the set of processes.
 The \juliaSnippet{SrcDistObject} and \juliaSnippet{DistObject} interfaces provide the necessary
 methods for handling the actual redistribution of the data in the various data structures.
+This communication layer provides an abstraction on which the data structures can build.
 
-The linear algebra objects are built on top of the abstractions provided by the communication
-layer.
+The linear algebra objects are built on top of the abstractions provided by the communication layer.
 JuliaPetra has three main linear algebra types.
 The first type is the concrete type \juliaSnippet{MultiVector} which holds one or more dense vectors.
 The second type is the abstract interface \juliaSnippet{RowMatrix} representing matrices accessed by rows.
 The third type is the abstract interface \juliaSnippet{RowGraph} represented graphs accessed by rows.
-Row graphs are used to represent the sparsity pattern of row matrices.
+Vectors and row matrices are used to store their respective linear algebra data types.
+Row graphs are mainly used to represent the sparsity pattern of row matrices.
 Both \juliaSnippet{RowGraph} and \juliaSnippet{RowMatrix} have concrete implementations based on
 compressed sparse row, \juliaSnippet{CSRGraph} and \juliaSnippet{CSRMatrix} respectively.
-Julia's \juliaSnippet{AbstractArray} is subtyped by both the \juliaSnippet{MultiVector} and \juliaSnippet{RowMatrix} types.
-This allows existing Julia code to interact with data in JuliaPetra objects.
-The \juliaSnippet{Operator} interface provides an interface for types that provide an
+Julia's \juliaSnippet{AbstractArray} is subtyped by both the \juliaSnippet{MultiVector}
+and \juliaSnippet{RowMatrix} types to allow existing Julia code to interact with data in JuliaPetra objects.
+The \juliaSnippet{Operator} interface can be implemented by types that provide an
 \(y = \alpha A x + \beta y\) operation, such as matrices.
 \juliaSnippet{RowMatrix} is the only implementation of \juliaSnippet{Operator} in JuliaPetra.
 
-The type hierarchy is limited by the fact that Julia doesn't support multiple inheritance.%TODO cite?
-Interacting with existing code as a 2 dimensional array requires being a subtype of \juliaSnippet{AbstractArray}.
+The type hierarchy is limited by the fact that Julia doesn't support multiple inheritance.  %TODO cite?
+Interacting with existing code as a 2-dimensional array requires being a subtype of \juliaSnippet{AbstractArray}.
 This results in other interfaces not being explicit types, but simply contracts promised in the documentation.
 These interfaces include \juliaSnippet{Operator}, \juliaSnippet{SrcDistObject} and \juliaSnippet{DistObject}.
 So, any methods that use one of those types accepts any object and assumes the methods required for the interface are present.
@@ -160,16 +178,19 @@ Since JuliaPetra follows the design of Epetra and Tpetra, the library provides t
 computations as the existing Petra implementations.
 For example, JuliaPetra supports \juliaSnippet{MultiVector} operations such as dot product and norms.
 Additionally, sparse matrix - vector products can be computed.
+%REVIEW should it go into more detail of possible compuations
 
 \section{Comparisons with Other Distributed Libraries}
 
 \subsection{Comparing with Epetra}
 
+Epetra is the base implementation of the Petra object model.
+Epetra is implemented in a stable subset of C++. \cite{OverviewOfTrilinos}
 The APIs for JuliaPetra are fairly similar to those for Epetra,
 as Epetra was used as the template for implementing JuliaPetra.
 There are some differences between the two.
-For example, JuliaPetra takes advantage of higher level structures, such as thrown exceptions and
-the \juliaSnippet{AbstractArray} support, where able.
+For example, JuliaPetra takes advantage of higher level structures where able,
+such as method and type templating and thrown exceptions.
 The similarities between JuliaPetra and Epetra can be seen in how similar the respective implementations
 of the power method are.
 
@@ -178,29 +199,28 @@ as can be seen in the Results section.
 Since Julia uses just in time compiling exclusively, it has extra start up costs compared to
 the Epetra version. However, since each specialized method needs to be compiled only once,
 this is a fixed cost.
-Additionally, JuliaPetra uses runtime dispatch in a few locations, especially related to
-\juliaSnippet{Comm} objects.  This will also add overhead compared to the Epetra version.
+Additionally, JuliaPetra uses runtime dispatch in a few locations, such as with
+\juliaSnippet{Comm} objects, which adds additional overhead compared to Epetra.
 
 \subsection{Comparing with DistributedArrays.jl}
 
-DistributedArrays.jl is a similar library designed to support distributed arrays in parallel environments.
-\cite{DAGithub}
-DistributedArrays.jl is designed for Julia's built in parallel model, so each worker processes has a
-local chunk of the problem. \cite{JuliaFreshApproach}
-When an operation is called on the master process's object, it distributes the task to the respective
-processes, then combines the local results into the final result.
+DistributedArrays.jl is a similar library to JuliaPetra that is designed to support
+distributed arrays in parallel environments. \cite{DAGithub}
+DistributedArrays.jl is designed for Julia's built in parallel model, where the program logic is
+contained in a master process that allocates work to the worker processes for expensive operations.
+\cite{JuliaFreshApproach}
 DistributedArrays.jl offers a number of advantages over JuliaPetra, however, it is not able to
 match the speed of JuliaPetra.
 
-One area where DistributedArrays.jl has an advantage over Julia is that it follows standard
-practice for ideomatic Julia code more than JuliaPetra.
-For example, it is built around the default Julia parallelization APIs and model.
+DistributedArrays.jl has an advantages over JuliaPetra related to being designed to mesh well
+with other Julia code.
+For example, it is built around the default Julia parallelization APIs and model as well as using
+Julia \juliaSnippet{AbstractArray}s for local storage.
 Another advantage is that DistributedArrays.jl uses an instance of \juliaSnippet{AbstractArray}
 for a process's local storage, this allows automatic support for different array structures.
-However, DistributedArrays.jl will not work if a single-program-multiple-data parallel model is required.
 
 However, DistributedArrays.jl was not able to match the speed of JuliaPetra.
-It was able to get within twice the time of JuliaPetra for the largest problems ran,
+It was able to get within twice the execution time of JuliaPetra for the largest problems,
 but was never able to get within 1.5 times the execution time of JuliaPetra.
 
 \section{Results}
@@ -259,17 +279,30 @@ but was never able to get within 1.5 times the execution time of JuliaPetra.
 	\hline
 \end{tabular}
 
-\caption{Timing results in seconds.}
+\caption{Timing results of various power method implementations.  All times are in seconds.}
 \label{fig:timing-results}
 \end{figure}
 
 The timing results can be seen in Figure~\ref{fig:timing-results}.
+The timings were obtained from implementations of the power method for finding the largest eigenvalue
+of a symmetric tridiagonal matrix with the diagonal containing 2's and the off diagonals containing -1's.
+%TODO is there a name for this matrix?
+\cite{PowerMethod}
+This tests the performance of dot product, L2-norm and sparse matrix-vector multiplication functionalities.
+As can be seen in the results table, JuliaPetra is very close to the performance
+of Epetra for large problem sizes.
+Additionally, JuliaPetra is able to significantly outperform DistributedArrays.jl, performing in less than
+half the time of DistributedArrays.jl for all but the largest problems.
+
 The timings were obtained by running each power method implementations
 with various sized problems and varying numbers of processors.
-Each combination of implementation, problem size and number of processors was run five times.
-The Julia implementations was run once before collecting the timings, to ensure all code was
+Each combination of implementation, problem size and number of processors was run five times
+and the average, minimum and maximum are presented.
+The Julia implementations were run once before collecting the timings, to ensure all code was
 compiled before the timing started.
-Tests were run with Julia v0.6.0 and Trilinos 12.10.1.
+The Julia tests were run with Julia v0.6.0 precompiled binary for Linux
+with the \juliaSnippet{-O3} flag enabled at run time.
+The Epetra tests were compiled with GCC 4.8.5, the \juliaSnippet{-O3} flag and Trilinos 12.10.1.
 Tests were run on a Red Hat Enterprise Linux Workstation, version 7.3,
 with 20 Intel\textregistered Xeon\textregistered CPUs.
 %TODO anything else that should be described?
@@ -279,10 +312,8 @@ with 20 Intel\textregistered Xeon\textregistered CPUs.
 
 JuliaPetra is an implementation of the Petra object model in the Julia programming language.
 This provides a set of basic, distributed linear algebra objects for building solvers in Julia.
-JuliaPetra is able to perform at the same speeds as Epetra and so, allows implementation of
-solver code in Julia with the distributed linear algebra support of the Petra object model.
-
-%This shows that...?
+JuliaPetra is able to perform at the same speeds as Epetra,
+allowing Julia to compete with C++ for these types of high performance computations.
 
 \bibliography{bibliography}
 \end{document}
