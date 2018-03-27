@@ -65,7 +65,7 @@ and second, comparisons with two similar libraries, Epetra and DistributedArrays
 
 The design of JuliaPetra follows closely with that of the C++ implementations of the
 Petra object model, Epetra and Tpetra.
-Like Epetra and Tpetra, JuliaPetra uses MPI and Single-Program-Multiple-Data as it's parallel model.
+Like Epetra and Tpetra, JuliaPetra uses MPI and Single-Program-Multiple-Data as its base parallel model.
 The API is split into two main layers of abstraction, the communication layer and the data structures layer.
 
 The first level of abstraction handles the communication details and how the problem is
@@ -75,30 +75,27 @@ different communication methods.
 All interprocess communication is done through \juliaSnippet{Comm} and \juliaSnippet{Distributor} objects.
 So, new communication systems can be implemented without affected the objects built on top of it.
 The \juliaSnippet{BlockMap}, \juliaSnippet{Directory}, \juliaSnippet{Import} and \juliaSnippet{Export}
-types manage the distribution of the problem.
-\juliaSnippet{BlockMap} and \juliaSnippet{Directory} handle where the various parts of the problem are located.
-\juliaSnippet{Import} and \juliaSnippet{Export} manage the logic behind redistributing
+types handle the distribution of the problem across the processors.
+\juliaSnippet{BlockMap} and \juliaSnippet{Directory} manage which processor the various parts of
+the problem are located.
+\juliaSnippet{Import} and \juliaSnippet{Export} contain the logic behind redistributing
 the problem among the processes.
 \juliaSnippet{SrcDistObject} and \juliaSnippet{DistObject} provide an interface between
 the redistributing logic and the data structures themselves.
 The communication layer provides an abstraction on which the data structures can build.
 
 The linear algebra objects are built on top of the abstractions provided by the communication layer.
-JuliaPetra has three main linear algebra types.
+JuliaPetra has two main linear algebra types.
 The first type is the concrete type \juliaSnippet{MultiVector} which holds one or more dense vectors.
-The second type is the abstract interface \juliaSnippet{RowMatrix} representing matrices accessed by rows.
-Vectors and row matrices are used to store their respective linear algebra data types.
-The last type is the abstract interface \juliaSnippet{RowGraph} representing graphs accessed by rows.
-Row graphs are mainly used to represent the sparsity pattern of row matrices.
+The second type is the \juliaSnippet{Operator} interface which is implemented by types that provide an
+\(y = \alpha A x + \beta y\) operation, where \(A\) is the operator.
+Matrices are one possible \juliaSnippet{Operator}, as implemented in the abstract type \juliaSnippet{RowMatrix},
+which stores sparse matrices accessed by rows.
+\juliaSnippet{RowGraph} is an additionally type used to represent the sparsity pattern of a \juliaSnippet{RowMatrix}.
 Both \juliaSnippet{RowGraph} and \juliaSnippet{RowMatrix} have concrete implementations based on
 compressed sparse row format, \juliaSnippet{CSRGraph} and \juliaSnippet{CSRMatrix} respectively.
 Julia's \juliaSnippet{AbstractArray} is subtyped by both the \juliaSnippet{MultiVector}
 and \juliaSnippet{RowMatrix} types to allow existing Julia code to interact with data in JuliaPetra objects.
-Additionally \juliaSnippet{Operator} interface can be implemented by types that provide an
-\(y = \alpha A x + \beta y\) operation, where \(A\) is the operator, such as matrices.
-\juliaSnippet{RowMatrix} applying matrix-vector multiplications is the only implementation
-of \juliaSnippet{Operator} in JuliaPetra.
-
 
 \begin{figure}
 	%name, type, location
@@ -188,9 +185,10 @@ The type hierarchy in JuliaPetra is limited by the fact that types in Julia are 
 Interacting with existing code as a 2-dimensional array requires being a subtype of \juliaSnippet{AbstractArray}.
 So, the other interfaces for the data structures are not explicit types,
 but simply contracts promised in the documentation.
-These interfaces include \juliaSnippet{Operator}, \juliaSnippet{SrcDistObject} and \juliaSnippet{DistObject}.
-So, any methods that use one of those types accepts any object and assumes the methods required for the
-interface are present.
+These implicit interfaces include \juliaSnippet{Operator}, \juliaSnippet{SrcDistObject}
+and \juliaSnippet{DistObject}.
+So, any methods that use one of those types accepts an object of any type and specifies that the necessary
+methods are implemented in the documentation.
 Figure~\ref{fig:type-hierarchy} shows the full type hierarchy.
 
 \section{Comparisons with Other Distributed Libraries}
@@ -210,9 +208,9 @@ such as type templating and thrown exceptions.
 
 JuliaPetra is able to achieve the same performance as Epetra on large instances of the power method,
 as shown in Table~\ref{tab:timing-results}.
-Since Julia uses just in time compiling exclusively, it has extra start up costs compared to
+Since Julia uses just in time compiling, the JuliaPetra power method has extra start up costs compared to
 the Epetra version. However, since each specialized method needs to be compiled only once,
-this is a fixed cost.
+this is a fixed cost during the first evaluation.
 Additionally, JuliaPetra uses runtime dispatch in a few locations, such as with
 \juliaSnippet{Comm} objects, which adds additional overhead compared to Epetra.
 
@@ -240,7 +238,7 @@ JuliaPetra is able to run within half of the execution time of DistributedArrays
 The difference in time is caused by JuliaPetra needing less inter-process communication.
 %TODO is there other sources of improvement?
 
-\section{Results}
+\section{Timing Results}
 
 \begin{table}
 \begin{tabular}{|c c|r|r|r||r|r|}
