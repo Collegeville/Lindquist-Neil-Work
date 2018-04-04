@@ -21,7 +21,7 @@ echo
 echo Evaluating $EQs equations
 echo Using $numProcs processors
 
-(cd ~/cs_research/DistributedArrays.jl/ && git checkout sparse-matrix) > /dev/null
+(cd ~/cs_research/DistributedArrays.jl/ && git checkout timings-sparse-matrix) > /dev/null
 
 echo
 echo
@@ -38,14 +38,14 @@ julia --color=yes -p $numProcs -O3 power-method/DA-power-method.jl $EQs
 echo
 echo
 echo JuliaPetra Power Method:
-mpirun -np $numProcs julia --color=yes -O3 power-method/power-method.jl $EQs
+mpirun --mca pml ob1 --mca btl tcp,self -np $numProcs julia --color=yes -O3 power-method/power-method.jl $EQs
 #mpirun -np $numProcs ~/bin/julia  --track-allocation=user --color=yes julia/power-method/power-method.jl $EQs
 
 
 echo
 echo
 echo ePetra Power Method
-mpirun -np $numProcs power-method/ePetra-PowerMethod/petra_power_method_LL $EQs
+mpirun --mca pml ob1 --mca btl tcp,self -np $numProcs power-method/ePetra-PowerMethod/petra_power_method_LL $EQs
 
 #read -p "Press enter to continue"
 
