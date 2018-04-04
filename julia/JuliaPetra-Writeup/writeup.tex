@@ -3,7 +3,7 @@
 
 \usepackage{array}
 \usepackage{tikz}
-\usetikzlibrary{positioning} 
+\usetikzlibrary{positioning}
 
 \title{JuliaPetra: An Implementation of the Petra Object Model in Julia}
 
@@ -13,7 +13,7 @@
 \acmJournal{TOMS}
 
 
-\newcommand{\juliaSnippet}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\snippet}[1]{\texttt{\detokenize{#1}}}
 
 \begin{document}
 
@@ -55,18 +55,15 @@ The data structures in JuliaPetra focus on vectors and sparse matrices, in both 
 distributed, parallel environments.
 The library is written in Julia, a high level programming language with comparable performance to C or Fortran.
 JuliaPetra performs as fast as Epetra, an equivalent C++ library, and faster than DistributedArrays.jl, a Julia
-library for distributed computations.
+library for distributed computations on arrays.
 \end{abstract}
 
 \maketitle
 
-%TODO improve use of transitions between sentences
-%TODO improve inter-paragraph and inter-sectional transitioning
-
 \section{Introduction}
 
 JuliaPetra is an implementation of the Petra object model in Julia.
-The Petra object model is the design used in Trilinos for objects commonly used in linear solver algorithms.
+The Petra object model is the design used in Trilinos for objects commonly used by linear solver algorithms.
 \cite{OverviewOfTrilinos}
 Petra libraries provide parallel, distributed matrices, vectors and graphs for other packages to use.
 By providing a set of interfaces for basic linear algebra structures, Petra libraries provide a way
@@ -86,10 +83,10 @@ The Celeste project is an example of large scale computations in Julia,
 using 8,192 cores of the Cori Supercomputer
 at Lawrence Berkeley National Laboratory. \cite{JuliaFreshApproach}
 
+%REVIEW this is a strange paragraph.
 Like other implementations of the Petra object model,
 JuliaPetra provides the ability to do basic linear algebra computations.
 These computations include dot products, vector norms and sparse matrix - vector multiplications.
-%REVIEW should it go into more detail of possible compuations?
 This document provides, first, an overview of the types and interfaces of JuliaPetra,
 and second, comparisons with two similar libraries, Epetra and DistributedArrays.jl.
 
@@ -102,36 +99,36 @@ The API is split into two main layers of abstraction, the communication layer an
 
 The first level of abstraction handles the communication details and how the problem is
 distributed across processes.
-The \juliaSnippet{Comm} and \juliaSnippet{Distributor} types provide a low level interface to support
+The \snippet{Comm} and \snippet{Distributor} types provide a low level interface to support
 different communication methods.
-All interprocess communication is done through \juliaSnippet{Comm} and \juliaSnippet{Distributor} objects.
-So, new communication systems can be implemented without affected the objects built on top of it.
-The \juliaSnippet{BlockMap}, \juliaSnippet{Directory}, \juliaSnippet{Import} and \juliaSnippet{Export}
+Because all interprocess communication is done through these objects,
+new communication systems can be implemented without affected the objects built on top of the communication layer.
+The \snippet{BlockMap}, \snippet{Directory}, \snippet{Import} and \snippet{Export}
 types handle the distribution of the problem across the processors.
-\juliaSnippet{BlockMap} and \juliaSnippet{Directory} manage which processor the various parts of
+\snippet{BlockMap} and \snippet{Directory} manage which processor the various parts of
 the problem are located.
-\juliaSnippet{Import} and \juliaSnippet{Export} contain the logic behind redistributing
+\snippet{Import} and \snippet{Export} contain the logic behind redistributing
 the problem among the processes.
-\juliaSnippet{SrcDistObject} and \juliaSnippet{DistObject} provide an interface between
+The \snippet{SrcDistObject} and \snippet{DistObject} interfaces provide a connection between
 the redistributing logic and the data structures themselves.
-The communication layer provides an abstraction on which the data structures can build.
+The communication layer provides an abstraction on which the distributed data structures can build.
 
 The linear algebra objects are built on top of the abstractions provided by the communication layer.
 JuliaPetra has two main linear algebra types.
-The first type is the concrete type \juliaSnippet{MultiVector} which holds one or more dense vectors.
-The second type is the \juliaSnippet{Operator} interface which is implemented by types that provide an
-\(y = \alpha A x + \beta y\) operation, where \(A\) is the operator.
-Matrices are one possible \juliaSnippet{Operator}, as implemented in the abstract type \juliaSnippet{RowMatrix},
-which stores sparse matrices accessed by rows.
-\juliaSnippet{RowGraph} is an additionally type used to represent the sparsity pattern of a \juliaSnippet{RowMatrix}.
-Both \juliaSnippet{RowGraph} and \juliaSnippet{RowMatrix} have concrete implementations based on
-compressed sparse row format, \juliaSnippet{CSRGraph} and \juliaSnippet{CSRMatrix} respectively.
-Julia's \juliaSnippet{AbstractArray} is subtyped by both the \juliaSnippet{MultiVector}
-and \juliaSnippet{RowMatrix} types to allow existing Julia code to interact with data in JuliaPetra objects.
+The first type is the concrete type \snippet{MultiVector} which holds one or more dense vectors.
+The second type is the \snippet{Operator} interface which is implemented by types that provide a
+\(y \gets \alpha A(x) + \beta y\) operation, where \(x\) and \(y\) are vectors and \(A\) is the operator.
+The abstract type \snippet{RowMatrix}, which stores sparse matrices accessed by rows,
+supports this interface by multiplying the matrix on the left of \(x\).
+\snippet{RowGraph} is an additionally type used to represent the sparsity pattern of a \snippet{RowMatrix}.
+Both \snippet{RowMatrix} and \snippet{RowGraph} have concrete implementations based on
+compressed sparse row format, \snippet{CSRMatrix} and \snippet{CSRGraph} respectively.
+Julia's \snippet{AbstractArray} is subtyped by both the \snippet{MultiVector}
+and \snippet{RowMatrix} types to allow existing Julia code to interact with data in JuliaPetra objects.
 
 \begin{figure}
 	%name, type, location
-	\newcommand{\typeNode} [3]{\node[#2] (#1) [#3] {\juliaSnippet{#1}};}
+	\newcommand{\typeNode} [3]{\node[#2] (#1) [#3] {\snippet{#1}};}
 	\newcommand{\explicitInheritance}[2]{\draw[->] (#1.south) -- (#2);}
 	\newcommand{\implicitInheritance}[2]{\draw[dashed,->] (#1.south) -- (#2);}
 	\begin{tikzpicture}[
@@ -139,74 +136,74 @@ and \juliaSnippet{RowMatrix} types to allow existing Julia code to interact with
 	ExplicitInterface/.style={rectangle, draw=black, minimum size=5mm},
 	ConcreteType/.style={rectangle, draw=black, very thick, minimum size=5mm}
 	]
-	
+
 	\typeNode{Comm}{ExplicitInterface}{}
-	
+
 	\typeNode{MPIComm}{ConcreteType}{below=.75cm of Comm}
 	\explicitInheritance{Comm}{MPIComm.north}
-	
+
 	\typeNode{SerialComm}{ConcreteType}{right=.25cm of MPIComm}
 	\explicitInheritance{Comm}{SerialComm.north}
-	
+
 	\typeNode{LocalComm}{ConcreteType}{left=.25cm of MPIComm}
 	\explicitInheritance{Comm}{LocalComm.north}
-	
+
 	\typeNode{Distributor}{ExplicitInterface}{left=5.1cm of Comm}
-	
+
 	\typeNode{SerialDistributor}{ConcreteType}{below right=.75cm and -1cm of Distributor}
 	\explicitInheritance{Distributor}{SerialDistributor.north}
-	
+
 	\typeNode{MPIDistributor}{ConcreteType}{left=.25cm of SerialDistributor}
 	\explicitInheritance{Distributor}{MPIDistributor.north}
-	
-	
-	
+
+
+
 	\typeNode{Directory}{ExplicitInterface}{below right=.75cm and -1.25cm of MPIDistributor}
-	
+
 	\typeNode{BasicDirectory}{ConcreteType}{below=.75cm of Directory}
 	\explicitInheritance{Directory}{BasicDirectory.north}
-	
+
 	\typeNode{BlockMap}{ConcreteType}{right=of Directory}
-	
+
 	\typeNode{Import}{ConcreteType}{right=of BlockMap}
-	
+
 	\typeNode{Export}{ConcreteType}{right=of Import}
-	
-	
-	
+
+
+
 	\typeNode{SrcDistObject}{ImplicitInterface}{below left=.75cm and -.9cm of Export}
-	
+
 	\typeNode{DistObject}{ImplicitInterface}{below=.75cm of SrcDistObject}
 	\implicitInheritance{SrcDistObject}{DistObject.north}
-	
+
 	\typeNode{Operator}{ImplicitInterface}{left=of DistObject}
-	
+
 	\typeNode{AbstractArray}{ExplicitInterface}{left=of Operator}
-	
+
 	\typeNode{MultiVector}{ConcreteType}{below=of AbstractArray}
 	\implicitInheritance{DistObject}{MultiVector.north east}
 	\explicitInheritance{AbstractArray}{MultiVector.north}
-	
+
 	\typeNode{RowMatrix}{ExplicitInterface}{below=of Operator}
 	\implicitInheritance{DistObject}{RowMatrix.north east}
 	\implicitInheritance{Operator}{RowMatrix.north}
 	\explicitInheritance{AbstractArray}{RowMatrix.north west}
-	
+
 	\typeNode{RowGraph}{ExplicitInterface}{below=of DistObject}
 	\implicitInheritance{DistObject}{RowGraph.north}
-	
+
 	\typeNode{CSRMatrix}{ConcreteType}{below=.75cm of RowMatrix}
 	\explicitInheritance{RowMatrix}{CSRMatrix.north}
-	
+
 	\typeNode{CSRGraph}{ConcreteType}{below=.75cm of RowGraph}
 	\explicitInheritance{RowGraph}{CSRGraph.north}
-	
-	
-	
+
+
+
 	\node[ExplicitInterface] (ExplicitKey) [below=of CSRMatrix] {Abstract Type};
 	\node[ImplicitInterface] (ImplicitKey) [left=of ExplicitKey] {Implicit Type};
 	\node[ConcreteType]      (ConcreteKey) [right=of ExplicitKey] {Concrete Type};
-	
+
 	\end{tikzpicture}
 	\caption{Type hierarchy.}
 	\label{fig:type-hierarchy}
@@ -214,18 +211,18 @@ and \juliaSnippet{RowMatrix} types to allow existing Julia code to interact with
 
 
 The type hierarchy in JuliaPetra is limited by the fact that types in Julia are restricted to a single supertype.
-Interacting with existing code as a 2-dimensional array requires being a subtype of \juliaSnippet{AbstractArray}.
+Interacting with existing code as a 2-dimensional array requires being a subtype of \snippet{AbstractArray}.
 So, the other interfaces for the data structures are not explicit types,
 but simply contracts promised in the documentation.
-These implicit interfaces include \juliaSnippet{Operator}, \juliaSnippet{SrcDistObject}
-and \juliaSnippet{DistObject}.
+These implicit interfaces include \snippet{Operator}, \snippet{SrcDistObject}
+and \snippet{DistObject}.
 So, any methods that use one of those types accepts an object of any type and specifies that the necessary
 methods are implemented in the documentation.
 Figure~\ref{fig:type-hierarchy} shows the full type hierarchy.
 
 \section{Comparisons with Other Distributed Libraries}
 
-\subsection{Comparing with Epetra}
+\subsection{Comparison with Epetra}
 
 Epetra is the base implementation of the Petra object model,
 written in a stable subset of C++. \cite{OverviewOfTrilinos}
@@ -244,9 +241,9 @@ Since Julia uses just in time compiling, the JuliaPetra power method has extra s
 the Epetra version. However, since each specialized method needs to be compiled only once,
 this is a fixed cost during the first evaluation.
 Additionally, JuliaPetra uses runtime dispatch in a few locations, such as with
-\juliaSnippet{Comm} objects, which adds additional overhead compared to Epetra.
+\snippet{Comm} objects, which adds additional overhead compared to Epetra.
 
-\subsection{Comparing with DistributedArrays.jl}
+\subsection{Comparison with DistributedArrays.jl}
 
 DistributedArrays.jl is a similar library to JuliaPetra that is designed to support
 distributed arrays in parallel environments. \cite{DAGithub}
@@ -259,16 +256,16 @@ match the speed of JuliaPetra.
 DistributedArrays.jl has advantages over JuliaPetra because it is better designed to function with
 existing Julia code.
 For example, it is built around the default Julia parallelization APIs and model as well as using
-Julia \juliaSnippet{AbstractArray}s for local storage.
-Another advantage is that DistributedArrays.jl uses an instance of \juliaSnippet{AbstractArray}
+Julia \snippet{AbstractArray}s for local storage.
+Another advantage is that DistributedArrays.jl uses an instance of \snippet{AbstractArray}
 for a process's local storage, this allows automatic support for different array structures.
 Finally, by keeping the program logic on the master process, DistributedArrays.jl can be used to
 do distributed computations while using Julia's read-eval-print loop.
 
 However, DistributedArrays.jl is not able to match the speed of JuliaPetra.
 JuliaPetra is able to run within half of the execution time of DistributedArrays.jl.
-The difference in time is caused by JuliaPetra needing less inter-process communication.
-%TODO is there other sources of improvement?
+This difference in time is caused by JuliaPetra's less frequent and more efficient inter-process communication,
+since it is built on MPI's low level interface as opposed to Julia's high level, function based interface.
 
 \section{Timing Results}
 
@@ -340,14 +337,14 @@ The timings come from implementations of the power method for finding the larges
 This tests the performance of dot product, L2-norm and sparse matrix-vector multiplication functionalities.
 The matrices used were various sizes of symmetric tridiagonal matrices with the diagonal containing 2's
 and the off diagonals containing -1's distributed over different numbers of processors.
-%TODO is there a name for this matrix?
 Each combination of implementation, problem size and number of processors was run five times
 and the average, minimum and maximum are presented.
 The Julia implementations were run once before collecting the timings, to ensure all code was
 compiled before the timing started.
+MPI used TCP for communication.
 The Julia tests were run with Julia v0.6.0 precompiled binary for Linux
-with the \juliaSnippet{-O3} flag enabled at run time.
-The Epetra tests were compiled with GCC 4.8.5, the \juliaSnippet{-O3} flag and Trilinos 12.10.1.
+with the \snippet{-O3} flag enabled at run time.
+The Epetra tests were compiled with GCC 4.8.5, the \snippet{-O3} flag and Trilinos 12.10.1.
 Tests were run on a Red Hat Enterprise Linux Workstation, version 7.3,
 with 20 Intel Xeon CPUs.
 %TODO anything else that should be described?
@@ -359,6 +356,9 @@ JuliaPetra is an implementation of the Petra object model in the Julia programmi
 So, it provides an interface for distributed solver algorithms to interact and build on each other.
 Additionally, by performing at the same speeds as Epetra,
 it allows Julia to compete with C++ for these types of high performance computations.
+
+%REVIEW are there other things that should be discussed in the conclusion
+%It feels pretty short
 
 \bibliography{bibliography}
 \end{document}
