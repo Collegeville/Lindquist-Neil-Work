@@ -335,8 +335,8 @@ half the time of DistributedArrays.jl for all but the largest problems.
 The timings come from implementations of the power method for finding the largest eigenvalue of a matrix.
 \cite{PowerMethod}
 This tests the performance of dot product, L2-norm and sparse matrix-vector multiplication functionalities.
-The matrices used were various sizes of symmetric tridiagonal matrices with the diagonal containing 2's
-and the off diagonals containing -1's distributed over different numbers of processors.
+The matrices used were various sizes of symmetric tridiagonal matrices, with the diagonal containing 2's
+and the off diagonals containing -1's, that were distributed over different numbers of processors.
 Each combination of implementation, problem size and number of processors was run five times
 and the average, minimum and maximum are presented.
 The Julia implementations were run once before collecting the timings, to ensure all code was
@@ -358,7 +358,7 @@ Additionally, by performing at the same speeds as Epetra,
 it allows Julia to compete with C++ for these types of high performance computations.
 
 %REVIEW are there other things that should be discussed in the conclusion
-%It feels pretty short
+	%It feels pretty short
 
 \bibliography{bibliography}
 \end{document}
