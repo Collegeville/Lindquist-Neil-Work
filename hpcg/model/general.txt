@@ -2,8 +2,8 @@ problem details
 	numberOfCoarseLevels = 4
 	numberOfPresmootherSteps = 1
 	numberOfPostsmootherSteps = 1
-	
-	
+
+
 	nnz ≈ n * 26.52
 	nnz_1 ≈ n_1 * 26.05
 	nnz_2 ≈ n_2 * 25.15
@@ -12,7 +12,12 @@ problem details
 	nnz_1 ≈ .1227 * nnz
 	nnz_2 ≈ .01480 * nnz
 	nnz_3 ≈ .00173 * nnz
-	
+
+	n ≈ nnz * .037707
+	n_1 ≈ nnz * .004710
+	n_2 ≈ nnz_2 * .0005885
+	n_3 ≈ nnz_3 * .0000736
+
 compiler specs
 	sizeof(int) = 4
 	sizeof(long) = 8
@@ -25,11 +30,11 @@ compiler specs
 	sizeof(double) = 8
 
 
-Xeon E5-2420 specs	
+Xeon E5-2420 specs
 	L1 cache access 4 clocks best-case latency, 2x16 bytes bandwidth
 	L2 cache access 11 clocks best-case latency, 1x32 bytes bandwidth
 	L3 cache access 26-31 clocks (depending on product), 1x32 bytes bandwidth
 	256-bit/cycle ring bus interconnect between cores, graphics, cache and System Agent Domain
-	
+
 	processor speed 1.9 GHz
 	max memory bandwidth 32GB/s (~16.8 bytes/cycle)

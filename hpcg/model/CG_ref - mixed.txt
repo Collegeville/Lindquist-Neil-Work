@@ -17,14 +17,14 @@ byte loading operations
 		#else
 			1x call ComputeWAXPBY_ref<double, double, float>
 		#endif
-	
+
 		1x call ComputeWAXPBY_ref<float, float, float>
 		1x call ComputeWAXPBY_ref<double, float, double>
 		1x call ComputeSPMV_ref<float>
 		1x call ComputeDotProduct_ref<float, float>(!x dot x)
 		1x call ComputeDotProduct_ref<double, double)(x dot x)
-	
-	
+
+
 bytes loaded (excluding counters and accumulators, assuming all pointers are the same size)
 	4*sizeof(void*) + sizeof(local_int_t)
 	+ bytesLoaded(ComputeSPMV_ref<float>)
@@ -44,51 +44,49 @@ bytes loaded (excluding counters and accumulators, assuming all pointers are the
 		+ bytesLoaded(ComputeSPMV_ref<float>)
 		+ bytesLoaded(ComputeDotProduct_ref<float, float>(!x dot x)
 		+ bytesLoaded(ComputeDotProduct_ref<double, double>(x dot x))
-		
-		
+
+
 	calculated for actual setup (sizeof(void*) -> 8 bytes, sizeof(local_int_t) -> sizeof(int) -> 4 bytes)
-		92 + 32*n + 12*nnz
+		76 + 32*n + 12*nnz
 		+ iter
 			*(164 + 92*n + 12*nnz
 			+ (preconditioned
-				?(456
-					+ 180*n_0 + 60*nnz_0
-					+ 196*n_1 + 60*nnz_1
-					+ 196*n_2 + 60*nnz_2
-					+ 72*n_3 + 24*nnz_3)
-				:0))
-				
-		#if preconditioned
-			92 + 32*n + 12*nnz
-			+ iter
-				*(620 + 272*n + 72*nnz
-				+ 196*n_1 + 60*nnz_1
-				+ 196*n_2 + 60*nnz_2
-				+ 72*n_3 + 24*nnz_3)
-				
-			≈92 + 8756/663*nnz
-			+ iter
-				*(620 + 54536/663*nnz
-				+ 35180/521*nnz_1
-				+ 34100/503*nnz_2
-				+ 1242/47*nnz_3)
-				
-			≈92 + 8756/663*nnz
-			+ iter*(620 + 91.59062*nnz)
-			
-			≈8756/663*nnz
-			+ iter*91.59062*nnz
-			
-			≈iter*91.59062*nnz
+				?{
+					well cached:
+						316 + 252*n + 268*(n_1 + n_2) + 104*n_3
+							+ 68*(nnz + nnz_1 + nnz_2) + 24*nnz_3
+					poorly cached:
+						32*(nnz_0+nnz_1+nnz_2) + 16*nnz_3
+				}:0)
+
+		#if preconditioned:
+			={
+				well cached:
+					76 + 32*n + 12*nnz
+					+ iter
+						*(480 + 344*n + 80*nnz
+							+ 268*(n_1 + n_2) + 104*n_3
+							+ 68*(nnz_1 + nnz_2) + 24*nnz_3
+				poorly cached:
+					iter*32*(nnz + nnz_1 + nnz_2) + 8*nnz_3
+			}≈{
+				well cached:
+					iter*nnz*103.7903804
+				poorly cached:
+					iter*nnz*36.42768
+			}≈ iter*nnz*{
+				well cached: 103.7903804
+				poorly cached: 36.42768
+			}
 		#else
-			92 + 32*n + 12*nnz
-			+ iter*(164 + 92*n + 12*nnz)
-			
-			≈92 + 8756/663*nnz
+			76 + 32*n + 12*nnz
+			+ iter
+				*(164 + 92*n + 12*nnz)
+
+			≈76 + 8756/663*nnz
 			+ iter*(164 + 10256/663*nnz)
-			
+
 			≈8756/663*nnz + iter*10256/663*nnz
 
-			≈iter*10256/663*nnz
-		#endif
-			
+			≈iter*nnz*15.46907994
+		#end if

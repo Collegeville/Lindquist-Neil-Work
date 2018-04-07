@@ -1,17 +1,23 @@
 templated: <datatype>
 
 bytes loaded (excluding counters and accumulators, assuming all pointers are the same size)
-	3*sizeof(void*) + sizeof(local_int_t)
-	+ nrow*(4*sizeof(void*) + 2*sizeof(int) + 4*sizeof(float) + 2*sizeof(<datatype>))
-	+ nnz*(2*sizeof(local_int_t) + 4*sizeof(float))
+	well cached:
+		sizeof(local_int_t)
+		+ nrow*(6*sizeof(void*) + 2*sizeof(int) + 4*sizeof(float) + 2*sizeof(<datatype>))
+		+ nnz*(2*sizeof(local_int_t) + 2*sizeof(float))
+	poorly cached:
+		nnz*2*sizeof(float)
 
 	calculated for actual setup (sizeof(void*) -> 8 bytes, sizeof(local_int_t) -> sizeof(int) -> 4 bytes)
-		28 + 24*nnz
-		+ nrow*(56 + 2*sizeof(<datatype>))
+		well cached:
+			28 + 16*nnz
+			+ nrow*(56 + 2*sizeof(<datatype>))
+		poorly cached:
+			8*nnz
 
 		for <float>
-			28 + 64*nrow + 24*nnz
+			(28 + 64*nrow + 16*nnz) well cached + 8*nnz poorly cached
 
 		for <double>
-			28 + 72*nrow + 24*nnz
+			(28 + 72*nrow + 16*nnz) well cached + 8*nnz poorly cached
 			

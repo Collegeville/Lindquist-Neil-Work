@@ -16,7 +16,7 @@ operations
 	2x store <datatype> to local
 	1x store int to counter
 	1x store int
-	6x store double 
+	6x store double
 	6x store <datatype> to local
 	loop until convergance:
 		1x compare counter, const
@@ -41,139 +41,171 @@ operations
 		#else
 			1x call ComputeWAXPBY_ref
 		#endif
-		
-		
+
+
 bytes loaded (excluding counters and locals, assuming all pointers are the same size, assuming all vectors are the same length: n)
 	2*bytesLoaded(CopyVector) + bytesLoaded(ComputeSPMV_ref) + bytesLoaded(ComputeWAXPBY_ref)
-	+ bytesLoaded(ComputeDotProduct_ref<x dot x>) 
+	+ bytesLoaded(ComputeDotProduct_ref<x dot x>)
 	+ iterationCount*(2*bytesLoaded(ComputeDotProduct_ref<x dot y>)
 		+ bytesLoaded(ComputeDotProduct_ref<x dot x>)
 		+ bytesLoaded(ComputeSPMV_ref) + 2*bytesLoaded(ComputeWAXPBY_ref)
 		+ (preconditioned?bytesLoaded(ComputeMG_ref):bytesLoaded(ComputeWAXPBY_ref)))
 	+ (iterationCount - 1)*bytesLoaded(ComputeWAXPBY_ref)
-	
+
 	= 2*bytesLoaded(CopyVector) + bytesLoaded(ComputeSPMV_ref)
-	+ bytesLoaded(ComputeDotProduct_ref<x dot x>) 
+	+ bytesLoaded(ComputeDotProduct_ref<x dot x>)
 	+ iterationCount*(2*bytesLoaded(ComputeDotProduct_ref<x dot y>)
 		+ bytesLoaded(ComputeDotProduct_ref<x dot x>)
 		+ bytesLoaded(ComputeSPMV_ref) + 3*bytesLoaded(ComputeWAXPBY_ref)
 		+ (preconditioned?bytesLoaded(ComputeMG_ref):bytesLoaded(ComputeWAXPBY_ref)))
-		
+
 	calculated for actual setup (sizeof(void*) -> 8 bytes, sizeof(local_int_t) -> sizeof(int) -> 4 bytes)
 		2*bytesLoaded(CopyVector) + bytesLoaded(ComputeSPMV_ref)
-		+ bytesLoaded(ComputeDotProduct_ref<x dot x>) 
+		+ bytesLoaded(ComputeDotProduct_ref<x dot x>)
 		+ iterationCount*(2*bytesLoaded(ComputeDotProduct_ref<x dot y>)
 			+ bytesLoaded(ComputeDotProduct_ref<x dot x>)
 			+ bytesLoaded(ComputeSPMV_ref) + 3*bytesLoaded(ComputeWAXPBY_ref)
 			+ (preconditioned?bytesLoaded(ComputeMG_ref):bytesLoaded(ComputeWAXPBY_ref)))
-			
+
 		= 2*(20 + n*sizeof(<datatype>)) + 20 + 20 * n + nnz * (4+2*sizeof(<datatype>))
 		+ 16 + n*sizeof(<datatype>)
 		+ iterationCount*(2*(16 + 2*n*sizeof(<datatype>)) + 16 + n*sizeof(<datatype>)
 			+ 20 + 20 * n + nnz * (4+2*sizeof(<datatype>))
 			+ 3*(24 + 2*n*sizeof(<datatype>))
-			+ (preconditioned(480
-					+ n_0*(130 + 16*sizeof(<datatype>))
-					+ n_1*(130 + 16*sizeof(<datatype>))
-					+ n_2*(130 + 16*sizeof(<datatype>))
-					+ n_3*(56 + 6*sizeof(<datatype>))
-					+ nnz_0*(20 + 10*sizeof(<datatype>))
-					+ nnz_1*(20 + 10*sizeof(<datatype>))
-					+ nnz_2*(20 + 10*sizeof(<datatype>))
-					+ nnz_3*(8 + 4*sizeof(<datatype>)))
+			+ (preconditioned?{
+					well cached:
+						340
+						+ n*(140 + 16*sizeof(<datatype>))
+						+ n_1*(140 + 16*sizeof(<datatype>))
+						+ n_2*(140 + 16*sizeof(<datatype>))
+						+ n_3*(56 + 6*sizeof(<datatype>))
+						+ nnz*(20 + 6*sizeof(<datatype>))
+						+ nnz_1*(20 + 6*sizeof(<datatype>))
+						+ nnz_2*(20 + 6*sizeof(<datatype>))
+						+ nnz_3*(8 + 2*sizeof(<datatype>))
+
+					poorly cached:
+						  nnz*4*sizeof(<datatype>)
+						+ nnz_1*4*sizeof(<datatype>)
+						+ nnz_2*4*sizeof(<datatype>)
+						+ nnz_3*2*sizeof(<datatype>)}
 				:(24 + 2*n*sizeof(<datatype>))))
-				
-				
+
+
 		= 76 + 3*n*sizeof(<datatype>) + 20*n + nnz*(4+2*sizeof(<datatype>))
 		+ iterationCount
 			*(164 + n*(20 + 13*sizeof(<datatype>))
 			+ nnz*(4+2*sizeof(<datatype>))
-			+ (preconditioned
-				?(456
-					+ n_0*(130 + 14*sizeof(<datatype>))
-					+ n_1*(130 + 16*sizeof(<datatype>))
-					+ n_2*(130 + 16*sizeof(<datatype>))
-					+ n_3*(56 + 6*sizeof(<datatype>))
-					+ nnz_0*(20 + 10*sizeof(<datatype>))
-					+ nnz_1*(20 + 10*sizeof(<datatype>))
-					+ nnz_2*(20 + 10*sizeof(<datatype>))
-					+ nnz_3*(8 + 4*sizeof(<datatype>)))
+			+ (preconditioned?{
+					well cached:
+						316
+						+ n*(140 + 14*sizeof(<datatype>))
+						+ n_1*(140 + 16*sizeof(<datatype>))
+						+ n_2*(140 + 16*sizeof(<datatype>))
+						+ n_3*(56 + 6*sizeof(<datatype>))
+						+ nnz*(20 + 6*sizeof(<datatype>))
+						+ nnz_1*(20 + 6*sizeof(<datatype>))
+						+ nnz_2*(20 + 6*sizeof(<datatype>))
+						+ nnz_3*(8 + 2*sizeof(<datatype>))
+					poorly cached:
+						  nnz*4*sizeof(<datatype>)
+						+ nnz_1*4*sizeof(<datatype>)
+						+ nnz_2*4*sizeof(<datatype>)
+						+ nnz_3*2*sizeof(<datatype>)}
 				:0))
-				
-		#if preconditioned
-			76 + n*(20 + 3*sizeof(<datatype>)) + nnz*(4+2*sizeof(<datatype>))
-			+ iterationCount
-				*(620
-				+ n_0*(150 + 27*sizeof(<datatype>))
-				+ n_1*(130 + 16*sizeof(<datatype>))
-				+ n_2*(130 + 16*sizeof(<datatype>))
-				+ n_3*(56 + 6*sizeof(<datatype>))
-				+ nnz_0*(24 + 12*sizeof(<datatype>))
-				+ nnz_1*(20 + 10*sizeof(<datatype>))
-				+ nnz_2*(20 + 10*sizeof(<datatype>))
-				+ nnz_3*(8 + 4*sizeof(<datatype>)))
-		#else
-			= 76 + n*(20 + 3*sizeof(<datatype>)) + nnz*(4+2*sizeof(<datatype>))
-			+ iterationCount
-				*(164 + n*(20 + 13*sizeof(<datatype>))
-				+ nnz*(4+2*sizeof(<datatype>)))
-		#endif
-		
-		
+
+		={
+			preconditioned:
+				{
+					well cached:
+						76 + 3*n*sizeof(<datatype>) + 20*n + nnz*(4+2*sizeof(<datatype>))
+						+ iterationCount
+							*(480 + n*(160 + 27*sizeof(<datatype>))
+							+ n_1*(140 + 16*sizeof(<datatype>))
+							+ n_2*(140 + 16*sizeof(<datatype>))
+							+ n_3*(56 + 6*sizeof(<datatype>))
+							+ nnz*(24 + 8*sizeof(<datatype>))
+							+ nnz_1*(20 + 6*sizeof(<datatype>))
+							+ nnz_2*(20 + 6*sizeof(<datatype>))
+							+ nnz_3*(8 + 2*sizeof(<datatype>)))
+					poorly cached:
+						iterationCount
+							*(nnz*4*sizeof(<datatype>)
+								+ nnz_1*4*sizeof(<datatype>)
+								+ nnz_2*4*sizeof(<datatype>)
+								+ nnz_3*2*sizeof(<datatype>))
+				}
+			not preconditioned:
+				= 76 + n*(20 + 3*sizeof(<datatype>)) + nnz*(4+2*sizeof(<datatype>))
+				+ iterationCount
+					*(164 + n*(20 + 13*sizeof(<datatype>))
+					+ nnz*(4+2*sizeof(<datatype>)))
+		}
+
+
 		with 32-bit float
 			#if preconditioned
-			76 + 32*n + 12*nnz
-			+ iterationCount
-				*(620
-				+ n_0*258 + nnz_0*72
-				+ n_1*194 + nnz_1*60
-				+ n_2*194 + nnz_2*60
-				+ n_3*80 + nnz_3*24)
-				
-			≈76 + 8756/663*nnz
-			+ iterationCount
-				*(620
-				+ nnz_0*54186/663
-				+ nnz_1*35140/521
-				+ nnz_2*34060/503
-				+ nnz_3*1288/47)
-				
-			≈iterationCount*nnz*91.054
-		#else
-			= 76 + 32*n + 12*nnz
-			+ iterationCount*(164 + 72n + 12*nnz)
-			
-			≈iterationCount*9756/663*nnz
-			≈iterationCount*nnz*14.715
-		#endif
-	
+				{
+					well cached:
+						76 + 32*n + nnz*12
+						+ iterationCount
+							*(480 + n*168 + n_1*204 + n_2*204 + n_3*80
+								+ nnz*56 + nnz_1*44 + nnz_2*44 + nnz_3*16)
+					poorly cached:
+						iterationCount*(nnz*16 + nnz_1*16 + nnz_2*16 + nnz_3*8)
+				}
+
+				≈{
+					well cached:
+						13.2066365*nnz
+						+ iterationCount*nnz*69.49924
+					poorly cached:
+						iterationCount*nnz*18.21384
+				}
+
+				≈iterationCount*nnz*{
+					well cached: 69.49924
+					poorly cached: 18.21384
+				}
+			#else
+				= 76 + 32*n + 12*nnz
+				+ iterationCount*(164 + 72n + 12*nnz)
+
+				≈iterationCount*nnz*14.715
+			#endif
+
 		with 64-bit float
 			#if preconditioned
-				76 + n*44 + nnz*20
-				+ iterationCount
-					*(620
-					+ n_0*366
-					+ n_1*258
-					+ n_2*258
-					+ n_3*104
-					+ nnz_0*120
-					+ nnz_1*100
-					+ nnz_2*100
-					+ nnz_3*40)
-					
-				≈ iterationCount*nnz*148.995
+				{
+					well cached:
+						76 + n*44 + nnz*20
+						+ iterationCount
+							*(480 + n*376
+							+ n_1*284
+							+ n_2*284
+							+ n_3*104
+							+ nnz*88
+							+ nnz_1*68
+							+ nnz_2*68
+							+ nnz_3*24)
+					poorly cached:
+						iterationCount*(nnz*32 + nnz_1*32 + nnz_2*32 + nnz_3*16)
+				}≈iterationCount*nnz*{
+					well cached: 113.0817804
+					poorly cached: 36.42768
+				}
+
 			#else
 				= 76 + n*44 + nnz*20
 				+ iterationCount*(164 + n*124 + nnz*20)
-				
-				≈ iterationCount*nnz*16360/663
+
 				≈ iterationCount*nnz*24.676
 			#endif
-	
-	
+
+
 		#if preconditioned
-			theoretical  - ~38.89% decrease
+			theoretical  - ~38.54% decrease in well cached bytes loaded
+							50.00% decrease in poorly cached bytes loaded
 		#else
-			theorietical - ~40.37% decrease
+			theoretical  - ~40.37% decrease
 		#endif
-	

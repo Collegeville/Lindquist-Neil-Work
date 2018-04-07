@@ -1,5 +1,5 @@
-#the key commands used to calculate the average nnz for different levels if
-#coarseness as well as the average nnz_n/nnz_0
+#the key commands used to calculate the average nnz for different levels of
+#coarseness, as well as the average nnz_n/nnz_0
 
 import os
 import glob

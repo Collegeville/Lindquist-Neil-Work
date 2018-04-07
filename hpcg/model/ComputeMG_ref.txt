@@ -21,104 +21,109 @@ operations
 			1x load int from accumulator
 			1x store int to accumulator
 	#end if
-	
-	
+
+
 bytes loaded (excluding counters and accumulators, assuming all pointers are the same size, A_n is the nth coarsifid version of the matrix)
-	
+
 	2*sizeof(int)
 	+ bytesLoaded(ComputeSPMV_ref(A_0))
 	+ bytesLoaded(ComputeRestriction_ref(A_0))
 	+ bytesLoaded(ComputeProlongation_ref(A_0))
 	+ (numberOfPresmootherSteps+numberOfPostsmootherSteps)*bytesLoaded(ComputeSYMGS_ref(A_0))
-	
+
 	+ 2*sizeof(int)
 	+ bytesLoaded(ComputeSPMV_ref(A_1))
 	+ bytesLoaded(ComputeRestriction_ref(A_1))
 	+ bytesLoaded(ComputeProlongation_ref(A_1))
 	+ (numberOfPresmootherSteps+numberOfPostsmootherSteps)*bytesLoaded(ComputeSYMGS_ref(A_1))
-	
+
 	+ 2*sizeof(int)
 	+ bytesLoaded(ComputeSPMV_ref(A_2))
 	+ bytesLoaded(ComputeRestriction_ref(A_2))
 	+ bytesLoaded(ComputeProlongation_ref(A_2))
 	+ (numberOfPresmootherSteps+numberOfPostsmootherSteps)*bytesLoaded(ComputeSYMGS_ref(A_2))
-	
+
 	+ 2*sizeof(int)
 	+ bytesLoaded(ComputeSYMGS_ref(A_3))
-	
-	
-	= 8*sizeof(int) + 30*sizeof(void*) + 10*sizeof(local_int_t)
-	
-	+ n_0*(2*sizeof(void*) + sizeof(int) + 2*sizeof(local_int_t) + 4*sizeof(<datatype>))
-	+ n_1*(2*sizeof(void*) + sizeof(int) + 2*sizeof(local_int_t) + 4*sizeof(<datatype>))
-	+ n_2*(2*sizeof(void*) + sizeof(int) + 2*sizeof(local_int_t) + 4*sizeof(<datatype>))
-	+ n_3*(6*sizeof(void*) + 2*sizeof(int) + 6*sizeof(<datatype>))
-	
-	+ nnz_0*(sizeof(local_int_t)+2*sizeof(<datatype>))
-	+ nnz_1*(sizeof(local_int_t)+2*sizeof(<datatype>))
-	+ nnz_2*(sizeof(local_int_t)+2*sizeof(<datatype>))
-	+ nnz_3*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
-	
-	+ (numberOfPresmootherSteps+numberOfPostsmootherSteps)
-		*(9*sizeof(void*) + 3*sizeof(local_int_t)
-		+ n_0*(6*sizeof(void*) + 2*sizeof(int) + 6*sizeof(<datatype>))
-		+ nnz_0*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
-		+ n_1*(6*sizeof(void*) + 2*sizeof(int) + 6*sizeof(<datatype>))
-		+ nnz_1*(2*sizeof(local_int_t) + 4*sizeof(<datatype>))
-		+ n_2*(6*sizeof(void*) + 2*sizeof(int) + 6*sizeof(<datatype>))
-		+ nnz_2*(2*sizeof(local_int_t) + 4*sizeof(<datatype>)))
-	
-	
-	calculated for actual setup (sizeof(void*) -> 8 bytes, sizeof(local_int_t) -> sizeof(int) -> 4 bytes)
-			
-		480
-	
-		+ n_0*(130 + 16*sizeof(<datatype>))
-		+ n_1*(130 + 16*sizeof(<datatype>))
-		+ n_2*(130 + 16*sizeof(<datatype>))
-		+ n_3*(56 + 6*sizeof(<datatype>))
-	
-		+ nnz_0*(20 + 10*sizeof(<datatype>))
-		+ nnz_1*(20 + 10*sizeof(<datatype>))
-		+ nnz_2*(20 + 10*sizeof(<datatype>))
-		+ nnz_3*(8 + 4*sizeof(<datatype>))
-			
+
+	= {
+		well cached:
+			= 8*sizeof(int) + 30*sizeof(void*) + 10*sizeof(local_int_t)
+
+			+ n_0*(2*sizeof(void*) + sizeof(int) + 2*sizeof(local_int_t) + 4*sizeof(<datatype>))
+			+ n_1*(2*sizeof(void*) + sizeof(int) + 2*sizeof(local_int_t) + 4*sizeof(<datatype>))
+			+ n_2*(2*sizeof(void*) + sizeof(int) + 2*sizeof(local_int_t) + 4*sizeof(<datatype>))
+
+			+ nnz_0*(sizeof(local_int_t)+2*sizeof(<datatype>))
+			+ nnz_1*(sizeof(local_int_t)+2*sizeof(<datatype>))
+			+ nnz_2*(sizeof(local_int_t)+2*sizeof(<datatype>))
+
+			+ 4 + n_3*(56 + 6*sizeof(<datatype>)) + nnz_3*(8 + 2*sizeof(<datatype>))
+
+			+ (numberOfPresmootherSteps+numberOfPostsmootherSteps)
+				*(12 + n_0*(56 + 6*sizeof(<datatype>)) + nnz_0*(8 + 2*sizeof(<datatype>))
+					+ n_1*(56 + 6*sizeof(<datatype>)) + nnz_1*(8 + 2*sizeof(<datatype>))
+					+ n_2*(56 + 6*sizeof(<datatype>)) + nnz_2*(8 + 2*sizeof(<datatype>)))
+		poorly cached:
+			nnz_3*2*sizeof(<datatype>)
+			+ (numberOfPresmootherSteps+numberOfPostsmootherSteps)
+				*(nnz_0*2*sizeof(<datatype>)
+				  + nnz_1*2*sizeof(<datatype>)
+				  + nnz_2*2*sizeof(<datatype>))
+	}
+
+
+	calculated for actual setup (sizeof(void*) -> 8 bytes, sizeof(local_int_t) -> sizeof(int) -> 4 bytes, numberOfPresmootherSteps = numberOfPostsmootherSteps = 1)
+		well cached:
+			  340
+
+			+ n_0*(140 + 16*sizeof(<datatype>))
+			+ n_1*(140 + 16*sizeof(<datatype>))
+			+ n_2*(140 + 16*sizeof(<datatype>))
+			+ n_3*(56 + 6*sizeof(<datatype>))
+
+			+ nnz_0*(20 + 6*sizeof(<datatype>))
+			+ nnz_1*(20 + 6*sizeof(<datatype>))
+			+ nnz_2*(20 + 6*sizeof(<datatype>))
+			+ nnz_3*(8 + 2*sizeof(<datatype>))
+
+		poorly cached:
+			  nnz_0*4*sizeof(<datatype>)
+			+ nnz_1*4*sizeof(<datatype>)
+			+ nnz_2*4*sizeof(<datatype>)
+			+ nnz_3*2*sizeof(<datatype>)
+
 		with 32-bit floats
-			480
-			+ n_0*(178)
-			+ n_1*(178)
-			+ n_2*(178)
-			+ n_3*(80)
-			+ nnz_0*(60)
-			+ nnz_1*(60)
-			+ nnz_2*(60)
-			+ nnz_3*(24)
-			
-			≈480
-			+ nnz_0*44230/663
-			+ nnz_1*34820/521
-			+ nnz_2*33740/503
-			+ nnz_3*1288/47
-		
-			≈75.059*nnz
-		
+
+			{
+				well cached:
+					340 + 204*(n_0+n_1+n_2) + 80*n_3
+						+ 44*(nnz_0+nnz_1+nnz_2) + 16*nnz_3
+				poorly cached:
+					16*(nnz_0 + nnz_1 + nnz_2) + 8*nnz_3
+			}
+			≈{
+				well cached:
+					58.8568*nnz
+				poorly cached:
+					18.21384*nnz
+			}
+
 		with 64-bit floats
-			480
-			+ n_0*258
-			+ n_1*258
-			+ n_2*258
-			+ n_3*104
-			+ nnz_0*100
-			+ nnz_1*100
-			+ nnz_2*100
-			+ nnz_3*40
-			
-			≈480
-			+ nnz_0*72750/663
-			+ nnz_1*57260/521
-			+ nnz_2*55460/503
-			+ nnz_3*2088/47
-			
-			≈ nnz*124.922
-				
-		theoretical  - 39.92% decrease
+
+			{
+				well cached:
+					340 + 268*(n_0 + n_1 + n_2) + 104*n_3
+						+ 68*(nnz_0 + nnz_1 + nnz_2) + 24*nnz_3
+				poorly cached:
+					32*(nnz_0+nnz_1+nnz_2) + 16*nnz_3
+			}
+			≈{
+				well cached:
+					88.92479*nnz
+				poorly cached:
+					36.42768*nnz
+			}
+
+		theoretical  -  33.81% decrease in well cached bytes
+						50.00% decrease in poorly cached bytes
