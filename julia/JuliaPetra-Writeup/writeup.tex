@@ -341,7 +341,9 @@ Each combination of implementation, problem size and number of processors was ru
 and the average, minimum and maximum are presented.
 The Julia implementations were run once before collecting the timings, to ensure all code was
 compiled before the timing started.
-MPI used TCP for communication.
+Additionally, the setup for the problems were not counted as part of the times.
+
+MPI used TCP for all inter-process communication.
 The Julia tests were run with Julia v0.6.0 precompiled binary for Linux
 with the \snippet{-O3} flag enabled at run time.
 The Epetra tests were compiled with GCC 4.8.5, the \snippet{-O3} flag and Trilinos 12.10.1.
