@@ -220,6 +220,27 @@ So, any methods that use one of those types accepts an object of any type and sp
 methods are implemented in the documentation.
 Figure~\ref{fig:type-hierarchy} shows the full type hierarchy.
 
+\section{Optimizations of JuliaPetra}
+%TODO clean up the wording and flow of this section
+
+The main improvement to performance in JuliaPetra came from improving type stability,
+where the compiler can inference the types of all values.
+Type stability allows function calls to be inlined, especially arithmatic and array operations.
+%REVIEW does type stability need a citation?
+%REVIEW mention that this is standard Julia advice?
+
+One notable optimization came from using \snippet{Ptr} objects to pass views of arrays.
+This reduces heap allocation and garbage collection, because \snippet{Ptr}s can be stack allocationed
+while \snippet{SubArray}s must be heap allocated.
+However, the length of the view must be manually managed.
+
+Other, common and minor optimizations were also made.
+Skipping unnecessary bounds checks was one such optimization.
+Another optimization was to access array data in the order it is stored in memory.
+Additionally, function calls in frequently used loops were replaced with specialized, inlined versions
+that take into account the context of the calling method and avoid building on other generalized methods.
+%REVIEW wording
+
 \section{Comparisons with Other Distributed Libraries}
 
 \subsection{Comparison with Epetra}
