@@ -223,17 +223,26 @@ Figure~\ref{fig:type-hierarchy} shows the full type hierarchy.
 %This is to give insight on best practices for people who don't look at the general Julia discussions
 %Talk about the "story" of improving the code and how optimizations improved performance.
 
-The main improvement to performance in JuliaPetra came from improving type stability.
+There were alot of optimizations used to optimize JuliaPetra,
+many of which are standard adivice for optimizing Julia, such as type stability,
+or for optimization in general, such as accessing arrays in memory order.
+The only major unusual optimization was using \snippet{Ptr} objects to pass views of arrays
+in an effort to reduce allocation and garbage collection.
+
+The main improvements to performance in JuliaPetra came from improving type stability.
 Type stability is where the compiler can inference the types of all values.
-When a function is type stable, the compiler is able to fully inline function calls, especially arithmetic and array operations.
-Because Julia is designed to support both slower type unstable code and faster type stable code,
+This allows the compiler is able to fully inline function calls, especially arithmetic and array operations.
+Because Julia is designed to support both slower, type unstable code and faster, type stable code,
 unlike C++ which is restricted to type stable code, some effort needs to be put into verifying
 type stability of performance critical code. \cite{Bezanson:2017:FreshApproach}
-The \snippet{code_warntype} function was a crucial tool in finding type instabilities.
-%REVIEW citation?
 %REVIEW mention that this is standard Julia advice?
+Removing type instabilities from performance critical sections of JuliaPetra improved performance
+by a few orders of magnitude.
+The \snippet{code_warntype} function was an important tool in finding type instabilities.
+Due to \snippet{code_warntype} requiring manual inspection, a few utilities were created
+based on \snippet{code_warntype} to automatic type stability checks.
 
-One notable optimization came from using \snippet{Ptr} objects to pass views of arrays.
+Another notable optimization came from using \snippet{Ptr} objects to pass views of arrays.
 Because Julia is a garbage collected language, most objects in Julia must be allocated on the heap,
 then garbage collected when they are no longer used.
 However, certain objects, such as integers and floating point numbers can be allocated on the stack,
@@ -241,16 +250,18 @@ so they don't need garbage collection.
 %needs some citations here
 So, by passing \snippet{Ptr} objects, which can be stack allocated,
 instead of \snippet{SubArray} objects, which must be heap allocated,
-The heap allocation and garbage collection can be greatly reduced in some performance critical sections
-However, this does lose access to higher level logic that Julia normally provides,
+the heap allocations and garbage collection can be greatly reduced in some performance critical sections
+However, this prevents use of higher level interfaces that Julia normally provides,
 such as the array length being stored with the array its self.
+This had much less of a performance increase that improving type stability,
+however, it is not a standard optimization for Julia so it deserved mention.
 
 Other, common and minor optimizations were also made.
-Skipping unnecessary bounds checks was one such optimization.
-%TODO get data to back this up
-Another optimization was to ensure access array data in the order it is stored in memory.
+This optimizations include skipping unnecessary bounds checks
+and ensuring arrays data was accessed in the order it is stored in memory.
 Additionally, function calls in frequently used loops were replaced with specialized, inlined versions
-that take into account the context of the calling method and avoid using generalized methods that may produce extra computations.
+that take into account the context of the calling method
+and avoid using generalized methods that produce extra computations.
 %REVIEW should I go into more detail on the specific example (getting a row in SpMV)
 
 \section{Comparisons with Other Distributed Libraries}
