@@ -44,12 +44,14 @@ MatLab/pcg results - *.mat
 hpcg/Linux_Serial_Double/*
 hpcg/Linux_Serial_Mixed/*/*
 hpcg/Linux_Serial_Single/*/*
+hpcg/Linux_Serial_Templated/*/*
 hpcg/MPI_gprof_OMP_Double/*/*
 hpcg/MPI_gprof_OMP_Mixed/*/*
 hpcg/MPI_gprof_OMP_Single/*/*
 hpcg/MPI_Intel_OMP_Double/*
 hpcg/MPI_Intel_OMP_Mixed/*/*
 hpcg/MPI_Intel_OMP_Single/*/*
+hpcg/MPI_Intel_OMP_Templated/*/*
 
 
 #libreoffice lock files
