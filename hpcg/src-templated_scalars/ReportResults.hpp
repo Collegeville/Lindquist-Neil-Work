@@ -102,13 +102,13 @@ void ReportResults(const SparseMatrix<Datatype> & A, int numberOfMgLevels, int n
     // ======================== Memory bandwidth model =======================================
 
     // Read/Write counts come from implementation of CG in CG.cpp (include 1 extra for the CG preamble ops)
-    double fnreads_ddot = (3.0*fniters+fNumberOfCgSets)*2.0*fnrow*sizeof(float); // 3 ddots with 2 nrow reads
-    double fnwrites_ddot = (3.0*fniters+fNumberOfCgSets)*sizeof(float); // 3 ddots with 1 write
-    double fnreads_waxpby = (3.0*fniters+fNumberOfCgSets)*2.0*fnrow*sizeof(float); // 3 WAXPBYs with nrow adds and nrow mults
-    double fnwrites_waxpby = (3.0*fniters+fNumberOfCgSets)*fnrow*sizeof(float); // 3 WAXPBYs with nrow adds and nrow mults
-    double fnreads_sparsemv = (fniters+fNumberOfCgSets)*(fnnz*(sizeof(float)+sizeof(local_int_t)) + fnrow*sizeof(float));// 1 SpMV with nnz reads of values, nnz reads indices,
+    double fnreads_ddot = (3.0*fniters+fNumberOfCgSets)*2.0*fnrow*sizeof(Datatype); // 3 ddots with 2 nrow reads
+    double fnwrites_ddot = (3.0*fniters+fNumberOfCgSets)*sizeof(Datatype); // 3 ddots with 1 write
+    double fnreads_waxpby = (3.0*fniters+fNumberOfCgSets)*2.0*fnrow*sizeof(Datatype); // 3 WAXPBYs with nrow adds and nrow mults
+    double fnwrites_waxpby = (3.0*fniters+fNumberOfCgSets)*fnrow*sizeof(Datatype); // 3 WAXPBYs with nrow adds and nrow mults
+    double fnreads_sparsemv = (fniters+fNumberOfCgSets)*(fnnz*(sizeof(Datatype)+sizeof(local_int_t)) + fnrow*sizeof(Datatype));// 1 SpMV with nnz reads of values, nnz reads indices,
     // plus nrow reads of x
-    double fnwrites_sparsemv = (fniters+fNumberOfCgSets)*fnrow*sizeof(float); // 1 SpMV nrow writes
+    double fnwrites_sparsemv = (fniters+fNumberOfCgSets)*fnrow*sizeof(Datatype); // 1 SpMV nrow writes
     // Op counts from the multigrid preconditioners
     double fnreads_precond = 0.0;
     double fnwrites_precond = 0.0;
@@ -118,19 +118,19 @@ void ReportResults(const SparseMatrix<Datatype> & A, int numberOfMgLevels, int n
       double fnrow_Af = Af->totalNumberOfRows;
       double fnumberOfPresmootherSteps = Af->mgData->numberOfPresmootherSteps;
       double fnumberOfPostsmootherSteps = Af->mgData->numberOfPostsmootherSteps;
-      fnreads_precond += fnumberOfPresmootherSteps*fniters*(2.0*fnnz_Af*(sizeof(float)+sizeof(local_int_t)) + fnrow_Af*sizeof(float)); // number of presmoother reads
-      fnwrites_precond += fnumberOfPresmootherSteps*fniters*fnrow_Af*sizeof(float); // number of presmoother writes
-      fnreads_precond += fniters*(fnnz_Af*(sizeof(float)+sizeof(local_int_t)) + fnrow_Af*sizeof(float)); // Number of reads for fine grid residual calculation
-      fnwrites_precond += fniters*fnnz_Af*sizeof(float); // Number of writes for fine grid residual calculation
-      fnreads_precond += fnumberOfPostsmootherSteps*fniters*(2.0*fnnz_Af*(sizeof(float)+sizeof(local_int_t)) + fnrow_Af*sizeof(float));  // number of postsmoother reads
-      fnwrites_precond += fnumberOfPostsmootherSteps*fniters*fnnz_Af*sizeof(float);  // number of postsmoother writes
+      fnreads_precond += fnumberOfPresmootherSteps*fniters*(2.0*fnnz_Af*(sizeof(Datatype)+sizeof(local_int_t)) + fnrow_Af*sizeof(Datatype)); // number of presmoother reads
+      fnwrites_precond += fnumberOfPresmootherSteps*fniters*fnrow_Af*sizeof(Datatype); // number of presmoother writes
+      fnreads_precond += fniters*(fnnz_Af*(sizeof(Datatype)+sizeof(local_int_t)) + fnrow_Af*sizeof(Datatype)); // Number of reads for fine grid residual calculation
+      fnwrites_precond += fniters*fnnz_Af*sizeof(Datatype); // Number of writes for fine grid residual calculation
+      fnreads_precond += fnumberOfPostsmootherSteps*fniters*(2.0*fnnz_Af*(sizeof(Datatype)+sizeof(local_int_t)) + fnrow_Af*sizeof(Datatype));  // number of postsmoother reads
+      fnwrites_precond += fnumberOfPostsmootherSteps*fniters*fnnz_Af*sizeof(Datatype);  // number of postsmoother writes
       Af = Af->Ac; // Go to next coarse level
     }
 
     double fnnz_Af = Af->totalNumberOfNonzeros;
     double fnrow_Af = Af->totalNumberOfRows;
-    fnreads_precond += fniters*(2.0*fnnz_Af*(sizeof(float)+sizeof(local_int_t)) + fnrow_Af*sizeof(float));; // One symmetric GS sweep at the coarsest level
-    fnwrites_precond += fniters*fnrow_Af*sizeof(float); // One symmetric GS sweep at the coarsest level
+    fnreads_precond += fniters*(2.0*fnnz_Af*(sizeof(Datatype)+sizeof(local_int_t)) + fnrow_Af*sizeof(Datatype));; // One symmetric GS sweep at the coarsest level
+    fnwrites_precond += fniters*fnrow_Af*sizeof(Datatype); // One symmetric GS sweep at the coarsest level
     double fnreads = fnreads_ddot+fnreads_waxpby+fnreads_sparsemv+fnreads_precond;
     double fnwrites = fnwrites_ddot+fnwrites_waxpby+fnwrites_sparsemv+fnwrites_precond;
     double frefnreads = fnreads * ((double) refMaxIters)/((double) optMaxIters);
@@ -145,23 +145,23 @@ void ReportResults(const SparseMatrix<Datatype> & A, int numberOfMgLevels, int n
     double size = ((double) A.geom->size); // Needed for estimating size of halo
 
     double fnbytes = ((double) sizeof(Geometry));      // Geometry struct in main.cpp
-    fnbytes += ((double) sizeof(float)*fNumberOfCgSets); // testnorms_data in main.cpp
+    fnbytes += ((double) sizeof(Datatype)*fNumberOfCgSets); // testnorms_data in main.cpp
 
     // Model for GenerateProblem_ref.cpp
     fnbytes += fnrow*sizeof(char);      // array nonzerosInRow
     fnbytes += fnrow*((double) sizeof(global_int_t*)); // mtxIndG
     fnbytes += fnrow*((double) sizeof(local_int_t*));  // mtxIndL
-    fnbytes += fnrow*((double) sizeof(float*));      // matrixValues
-    fnbytes += fnrow*((double) sizeof(float*));      // matrixDiagonal
+    fnbytes += fnrow*((double) sizeof(Datatype*));      // matrixValues
+    fnbytes += fnrow*((double) sizeof(Datatype*));      // matrixDiagonal
     fnbytes += fnrow*numberOfNonzerosPerRow*((double) sizeof(local_int_t));  // mtxIndL[1..nrows]
-    fnbytes += fnrow*numberOfNonzerosPerRow*((double) sizeof(float));       // matrixValues[1..nrows]
+    fnbytes += fnrow*numberOfNonzerosPerRow*((double) sizeof(Datatype));       // matrixValues[1..nrows]
     fnbytes += fnrow*numberOfNonzerosPerRow*((double) sizeof(global_int_t)); // mtxIndG[1..nrows]
-    fnbytes += fnrow*((double) 3*sizeof(float)); // x, b, xexact
+    fnbytes += fnrow*((double) 3*sizeof(Datatype)); // x, b, xexact
 
     // Model for CGData.hpp
     double fncol = ((global_int_t) A.localNumberOfColumns) * size; // Estimate of the global number of columns using the value from rank 0
-    fnbytes += fnrow*((double) 2*sizeof(float)); // r, Ap
-    fnbytes += fncol*((double) 2*sizeof(float)); // z, p
+    fnbytes += fnrow*((double) 2*sizeof(Datatype)); // r, Ap
+    fnbytes += fncol*((double) 2*sizeof(Datatype)); // z, p
 
     std::vector<double> fnbytesPerLevel(numberOfMgLevels); // Count byte usage per level (level 0 is main CG level)
     fnbytesPerLevel[0] = fnbytes;
@@ -177,23 +177,23 @@ void ReportResults(const SparseMatrix<Datatype> & A, int numberOfMgLevels, int n
       double fnbytes_Af = 0.0;
       // Model for GenerateCoarseProblem.cpp
       fnbytes_Af += fnrow_Af*((double) sizeof(local_int_t)); // f2cOperator
-      fnbytes_Af += fnrow_Af*((double) sizeof(float)); // rc
-      fnbytes_Af += 2.0*fncol_Af*((double) sizeof(float)); // xc, Axf are estimated based on the size of these arrays on rank 0
+      fnbytes_Af += fnrow_Af*((double) sizeof(Datatype)); // rc
+      fnbytes_Af += 2.0*fncol_Af*((double) sizeof(Datatype)); // xc, Axf are estimated based on the size of these arrays on rank 0
       fnbytes_Af += ((double) (sizeof(Geometry)+sizeof(SparseMatrix<Datatype>)+2*sizeof(Vector<Datatype>)+sizeof(Vector<Datatype>)+sizeof(MGData<Datatype, Datatype>))); // Account for structs geomc, Ac, rc, xc, Axf - (minor)
 
       // Model for GenerateProblem.cpp (called within GenerateCoarseProblem.cpp)
       fnbytes_Af += fnrow_Af*sizeof(char);      // array nonzerosInRow
       fnbytes_Af += fnrow_Af*((double) sizeof(global_int_t*)); // mtxIndG
       fnbytes_Af += fnrow_Af*((double) sizeof(local_int_t*));  // mtxIndL
-      fnbytes_Af += fnrow_Af*((double) sizeof(float*));      // matrixValues
-      fnbytes_Af += fnrow_Af*((double) sizeof(float*));      // matrixDiagonal
+      fnbytes_Af += fnrow_Af*((double) sizeof(Datatype*));      // matrixValues
+      fnbytes_Af += fnrow_Af*((double) sizeof(Datatype*));      // matrixDiagonal
       fnbytes_Af += fnrow_Af*numberOfNonzerosPerRow*((double) sizeof(local_int_t));  // mtxIndL[1..nrows]
-      fnbytes_Af += fnrow_Af*numberOfNonzerosPerRow*((double) sizeof(float));       // matrixValues[1..nrows]
+      fnbytes_Af += fnrow_Af*numberOfNonzerosPerRow*((double) sizeof(Datatype));       // matrixValues[1..nrows]
       fnbytes_Af += fnrow_Af*numberOfNonzerosPerRow*((double) sizeof(global_int_t)); // mtxIndG[1..nrows]
 
       // Model for SetupHalo_ref.cpp
 #ifndef HPCG_NO_MPI
-      fnbytes_Af += ((double) sizeof(float)*Af->totalToBeSent); //sendBuffer
+      fnbytes_Af += ((double) sizeof(Datatype)*Af->totalToBeSent); //sendBuffer
       fnbytes_Af += ((double) sizeof(local_int_t)*Af->totalToBeSent); // elementsToSend
       fnbytes_Af += ((double) sizeof(int)*Af->numberOfSendNeighbors); // neighbors
       fnbytes_Af += ((double) sizeof(local_int_t)*Af->numberOfSendNeighbors); // receiveLength, sendLength
