@@ -98,8 +98,7 @@ int CG(const SparseMatrix<Datatype> & A, CGData<Datatype> & data, const Vector<D
   normr0 = normr;
 
   // Start iterations
-  int k=1;
-  for (; k<=max_iter && normr/normr0 > tolerance; k++ ) {
+  for (int k=1; k<=max_iter && normr/normr0 > tolerance; k++ ) {
     TICK();
     if (doPreconditioning)
       ComputeMG(A, r, z); // Apply preconditioner
@@ -130,8 +129,6 @@ int CG(const SparseMatrix<Datatype> & A, CGData<Datatype> & data, const Vector<D
 #endif
     niters = k;
   }
-  
-  std::cout << "Total iterations: " << k << std::endl;
 
   // Store times
   times[1] += t1; // dot-product time
