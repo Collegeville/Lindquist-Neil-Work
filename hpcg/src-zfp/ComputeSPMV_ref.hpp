@@ -53,9 +53,9 @@ int ComputeSPMV_ref( const SparseMatrix<DatatypeA> & A, Vector<DatatypeX> & x, V
   const zfp::array1<DatatypeX>& xv = x.values;
   zfp::array1<DatatypeY>& yv = y.values;
   const local_int_t nrow = A.localNumberOfRows;
-#ifndef HPCG_NO_OPENMP
-  #pragma omp parallel for
-#endif
+//#ifndef HPCG_NO_OPENMP
+//  #pragma omp parallel for
+//#endif
   for (local_int_t i=0; i< nrow; i++)  {
     DatatypeY sum = 0.0;
     const DatatypeA * const cur_vals = A.matrixValues[i];

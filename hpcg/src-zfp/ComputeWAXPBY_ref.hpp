@@ -49,19 +49,19 @@ int ComputeWAXPBY_ref(const local_int_t n, const double alpha,
   zfp::array1<Datatype3>& wv = w.values;
 
   if (alpha==1.0) {
-#ifndef HPCG_NO_OPENMP
-    #pragma omp parallel for
-#endif
+//#ifndef HPCG_NO_OPENMP
+//    #pragma omp parallel for
+//#endif
     for (local_int_t i=0; i<n; i++) wv[i] = xv[i] + beta * yv[i];
   } else if (beta==1.0) {
-#ifndef HPCG_NO_OPENMP
-    #pragma omp parallel for
-#endif
+//#ifndef HPCG_NO_OPENMP
+//    #pragma omp parallel for
+//#endif
     for (local_int_t i=0; i<n; i++) wv[i] = alpha * xv[i] + yv[i];
   } else  {
-#ifndef HPCG_NO_OPENMP
-    #pragma omp parallel for
-#endif
+//#ifndef HPCG_NO_OPENMP
+//    #pragma omp parallel for
+//#endif
     for (local_int_t i=0; i<n; i++) wv[i] = alpha * xv[i] + beta * yv[i];
   }
 

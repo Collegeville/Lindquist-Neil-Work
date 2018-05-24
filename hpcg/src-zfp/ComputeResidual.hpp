@@ -52,10 +52,10 @@ int ComputeResidual(const local_int_t n, const Vector<Datatype1> & v1,
   ResultDatatype local_residual = 0.0;
 
 #ifndef HPCG_NO_OPENMP
-  #pragma omp parallel default(none) shared(local_residual, v1v, v2v)
+  //#pragma omp parallel default(none) shared(local_residual, v1v, v2v)
   {
     ResultDatatype threadlocal_residual = 0.0;
-    #pragma omp for
+    //#pragma omp for
     for (local_int_t i=0; i<n; i++) {
       ResultDatatype diff = std::fabs(ResultDatatype(v1v[i]) - ResultDatatype(v2v[i]));
       if (diff > threadlocal_residual) threadlocal_residual = diff;

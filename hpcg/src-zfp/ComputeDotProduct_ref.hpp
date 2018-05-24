@@ -50,14 +50,14 @@ int ComputeDotProduct_ref(const local_int_t n, const Vector<Datatype1> & x,
   const zfp::array1<Datatype1>& xv = x.values;
   const zfp::array1<Datatype2>& yv = y.values;
   if ((void*)&yv==(void*)&xv) {
-#ifndef HPCG_NO_OPENMP
-    #pragma omp parallel for reduction (+:local_result)
-#endif
+//#ifndef HPCG_NO_OPENMP
+//    #pragma omp parallel for reduction (+:local_result)
+//#endif
     for (local_int_t i=0; i<n; i++) local_result += ResultDatatype(xv[i])*ResultDatatype(xv[i]);
   } else {
-#ifndef HPCG_NO_OPENMP
-    #pragma omp parallel for reduction (+:local_result)
-#endif
+//#ifndef HPCG_NO_OPENMP
+//    #pragma omp parallel for reduction (+:local_result)
+//#endif
     for (local_int_t i=0; i<n; i++) local_result += ResultDatatype(xv[i])*ResultDatatype(yv[i]);
   }
 

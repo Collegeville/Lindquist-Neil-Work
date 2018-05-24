@@ -71,9 +71,9 @@ void CheckProblem(SparseMatrix<DatatypeA> & A, Vector<DatatypeB> * b, Vector<Dat
 
   local_int_t localNumberOfNonzeros = 0;
   // TODO:  This triply nested loop could be flattened or use nested parallelism
-#ifndef HPCG_NO_OPENMP
-  #pragma omp parallel for
-#endif
+//#ifndef HPCG_NO_OPENMP
+//  #pragma omp parallel for
+//#endif
   for (local_int_t iz=0; iz<nz; iz++) {
     global_int_t giz = giz0+iz;
     for (local_int_t iy=0; iy<ny; iy++) {
