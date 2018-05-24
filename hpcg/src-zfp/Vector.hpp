@@ -99,11 +99,8 @@ inline void FillRandomVector(Vector<Datatype> & v) {
  */
 template<class Datatype1, class Datatype2>
 inline void CopyVector(const Vector<Datatype1> & v, Vector<Datatype2> & w) {
-  local_int_t localLength = v.localLength;
-  assert(w.localLength >= localLength);
-  const zfp::array1<Datatype1>& vv = v.values;
-  zfp::array1<Datatype2>& wv = w.values;
-  for (int i=0; i<localLength; ++i) wv[i] = (Datatype2)vv[i];
+  assert(w.localLength >= v.localLength);
+  w.values = v.values;
   return;
 }
 
