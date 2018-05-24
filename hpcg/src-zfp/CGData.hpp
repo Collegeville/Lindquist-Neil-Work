@@ -40,12 +40,11 @@ struct CGData {
  */
 template<class DatatypeA, class DatatypeData>
 inline void InitializeSparseCGData(SparseMatrix<DatatypeA> & A, CGData<DatatypeData> & data) {
-  local_int_t nrow = A.localNumberOfRows;
-  local_int_t ncol = A.localNumberOfColumns;
-  InitializeVector(data.r, nrow);
-  InitializeVector(data.z, ncol);
-  InitializeVector(data.p, ncol);
-  InitializeVector(data.Ap, nrow);
+  Geometry geom = *A.geom;
+  InitializeVector(data.r, geom.nx, geom.ny, geom.nz);
+  InitializeVector(data.z, geom.nx, geom.ny, geom.nz);
+  InitializeVector(data.p, geom.nx, geom.ny, geom.nz);
+  InitializeVector(data.Ap, geom.nx, geom.ny, geom.nz);
   return;
 }
 

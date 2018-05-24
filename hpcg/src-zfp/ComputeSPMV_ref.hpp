@@ -50,8 +50,8 @@ int ComputeSPMV_ref( const SparseMatrix<DatatypeA> & A, Vector<DatatypeX> & x, V
 #ifndef HPCG_NO_MPI
     ExchangeHalo(A,x);
 #endif
-  const zfp::array1<DatatypeX>& xv = x.values;
-  zfp::array1<DatatypeY>& yv = y.values;
+  const zfp::array3<DatatypeX>& xv = x.values;
+  zfp::array3<DatatypeY>& yv = y.values;
   const local_int_t nrow = A.localNumberOfRows;
 //#ifndef HPCG_NO_OPENMP
 //  #pragma omp parallel for

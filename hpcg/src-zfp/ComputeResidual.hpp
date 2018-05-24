@@ -44,11 +44,11 @@
   @return Returns zero on success and a non-zero value otherwise.
 */
 template<class Datatype1, class Datatype2, class ResultDatatype>
-int ComputeResidual(const local_int_t n, const Vector<Datatype1> & v1,
-                    const Vector<Datatype2> & v2, ResultDatatype & residual) {
+int ComputeResidual(const local_int_t n, Vector<Datatype1> & v1,
+                    Vector<Datatype2> & v2, ResultDatatype & residual) {
 
-  const zfp::array1<Datatype1>& v1v = v1.values;
-  const zfp::array1<Datatype2>& v2v = v2.values;
+  zfp::array3<Datatype1>& v1v = v1.values;
+  zfp::array3<Datatype2>& v2v = v2.values;
   ResultDatatype local_residual = 0.0;
 
 #ifndef HPCG_NO_OPENMP
@@ -56,8 +56,8 @@ int ComputeResidual(const local_int_t n, const Vector<Datatype1> & v1,
   {
     ResultDatatype threadlocal_residual = 0.0;
     //#pragma omp for
-    for (local_int_t i=0; i<n; i++) {
-      ResultDatatype diff = std::fabs(ResultDatatype(v1v[i]) - ResultDatatype(v2v[i]));
+    for (typename zfp::array3<Datatype1>::iterator it = v1v.begin(); it != v1v.end(); it++) {
+      ResultDatatype diff = std::fabs(ResultDatatype(*it) - ResultDatatype(v2v(it.i(), it.j(), it.k())));
       if (diff > threadlocal_residual) threadlocal_residual = diff;
     }
     #pragma omp critical
@@ -66,11 +66,11 @@ int ComputeResidual(const local_int_t n, const Vector<Datatype1> & v1,
     }
   }
 #else // No threading
-  for (local_int_t i=0; i<n; i++) {
-    ResultDatatype diff = std::fabs(ResultDatatype(v1v[i]) - ResultDatatype(v2v[i]));
+  for (typename zfp::array3<Datatype1>::iterator it = v1v.begin(); it != v1v.end(); it++) {
+    ResultDatatype diff = std::fabs(ResultDatatype(*it) - ResultDatatype(v2v(it.i(), it.j(), it.k())));
     if (diff > local_residual) local_residual = diff;
 #ifdef HPCG_DETAILED_DEBUG
-    HPCG_fout << " Computed, exact, diff = " << v1v[i] << " " << v2v[i] << " " << diff << std::endl;
+    HPCG_fout << " Computed, exact, diff = " << *it << " " << v2v(it.i(), it.j(), it.k()) << " " << diff << std::endl;
 #endif
   }
 #endif

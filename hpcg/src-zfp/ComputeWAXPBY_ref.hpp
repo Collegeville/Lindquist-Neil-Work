@@ -38,31 +38,37 @@
 */
 template<class Datatype1, class Datatype2, class Datatype3>
 int ComputeWAXPBY_ref(const local_int_t n, const double alpha,
-    const Vector<Datatype1> & x, const double beta, const Vector<Datatype2> & y,
+    Vector<Datatype1> & x, const double beta, Vector<Datatype2> & y,
     Vector<Datatype3> & w) {
 
   assert(x.localLength>=n); // Test vector lengths
   assert(y.localLength>=n);
 
-  const zfp::array1<Datatype1>& xv = x.values;
-  const zfp::array1<Datatype2>& yv = y.values;
-  zfp::array1<Datatype3>& wv = w.values;
+  zfp::array3<Datatype1>& xv = x.values;
+  zfp::array3<Datatype2>& yv = y.values;
+  zfp::array3<Datatype3>& wv = w.values;
 
   if (alpha==1.0) {
 //#ifndef HPCG_NO_OPENMP
 //    #pragma omp parallel for
 //#endif
-    for (local_int_t i=0; i<n; i++) wv[i] = xv[i] + beta * yv[i];
+    for (typename zfp::array3<Datatype3>::iterator it = wv.begin(); it != wv.end(); it++) {
+      *it = xv(it.i(), it.j(), it.k()) + beta * yv(it.i(), it.j(), it.k());
+    }
   } else if (beta==1.0) {
 //#ifndef HPCG_NO_OPENMP
 //    #pragma omp parallel for
 //#endif
-    for (local_int_t i=0; i<n; i++) wv[i] = alpha * xv[i] + yv[i];
+    for (typename zfp::array3<Datatype3>::iterator it = wv.begin(); it != wv.end(); it++) {
+      *it = alpha * xv(it.i(), it.j(), it.k()) + yv(it.i(), it.j(), it.k());
+    }
   } else  {
 //#ifndef HPCG_NO_OPENMP
 //    #pragma omp parallel for
 //#endif
-    for (local_int_t i=0; i<n; i++) wv[i] = alpha * xv[i] + beta * yv[i];
+    for (typename zfp::array3<Datatype3>::iterator it = wv.begin(); it != wv.end(); it++) {
+      *it = alpha * xv(it.i(), it.j(), it.k()) + beta * yv(it.i(), it.j(), it.k());
+    }
   }
 
   return 0;

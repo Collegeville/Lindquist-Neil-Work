@@ -127,7 +127,7 @@ inline void InitializeSparseMatrix(SparseMatrix<Datatype> & A, Geometry * geom) 
 template <class Datatype>
 inline void CopyMatrixDiagonal(SparseMatrix<Datatype> & A, Vector<Datatype> & diagonal) {
     Datatype ** curDiagA = A.matrixDiagonal;
-    zfp::array1<Datatype>& dv = diagonal.values;
+    zfp::array3<Datatype>& dv = diagonal.values;
     assert(A.localNumberOfRows==diagonal.localLength);
     for (local_int_t i=0; i<A.localNumberOfRows; ++i) dv[i] = *(curDiagA[i]);
   return;
@@ -141,7 +141,7 @@ inline void CopyMatrixDiagonal(SparseMatrix<Datatype> & A, Vector<Datatype> & di
 template <class Datatype>
 inline void ReplaceMatrixDiagonal(SparseMatrix<Datatype> & A, Vector<Datatype> & diagonal) {
     Datatype ** curDiagA = A.matrixDiagonal;
-    zfp::array1<Datatype>& dv = diagonal.values;
+    zfp::array3<Datatype>& dv = diagonal.values;
     assert(A.localNumberOfRows==diagonal.localLength);
     for (local_int_t i=0; i<A.localNumberOfRows; ++i) *(curDiagA[i]) = dv[i];
   return;

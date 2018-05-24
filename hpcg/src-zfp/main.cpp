@@ -174,8 +174,8 @@ int main(int argc, char * argv[]) {
   local_int_t ncol = A.localNumberOfColumns;
 
   Vector<double> x_overlap, b_computed;
-  InitializeVector(x_overlap, ncol); // Overlapped copy of x vector
-  InitializeVector(b_computed, nrow); // Computed RHS vector
+  InitializeVector(x_overlap, nx, ny, nz); // Overlapped copy of x vector
+  InitializeVector(b_computed, nx, ny, nz); // Computed RHS vector
 
 
   // Record execution time of reference SpMV and MG kernels for reporting times

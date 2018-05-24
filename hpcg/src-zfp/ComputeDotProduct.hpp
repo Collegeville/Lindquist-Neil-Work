@@ -35,8 +35,8 @@
   @see ComputeDotProduct_ref
 */
 template<class Datatype1, class Datatype2, class Datatype3>
-int ComputeDotProduct(const local_int_t n, const Vector<Datatype1> & x,
-    const Vector<Datatype2> & y, Datatype3 & result, double & time_allreduce,
+int ComputeDotProduct(const local_int_t n, Vector<Datatype1> & x,
+    Vector<Datatype2> & y, Datatype3 & result, double & time_allreduce,
     bool & isOptimized) {
 
   // This line and the next two lines should be removed and your version of ComputeDotProduct should be used.

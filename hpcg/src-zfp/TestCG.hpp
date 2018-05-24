@@ -67,9 +67,10 @@ int TestCG(SparseMatrix<Datatype> & A, CGData<Datatype> & data, Vector<Datatype>
   std::vector< double > times(8,0.0);
   // Temporary storage for holding original diagonal and RHS
   Vector<Datatype> origDiagA, exaggeratedDiagA, origB;
-  InitializeVector(origDiagA, A.localNumberOfRows);
-  InitializeVector(exaggeratedDiagA, A.localNumberOfRows);
-  InitializeVector(origB, A.localNumberOfRows);
+  Geometry geom = *A.geom;
+  InitializeVector(origDiagA, geom.nx, geom.ny, geom.nz);
+  InitializeVector(exaggeratedDiagA, geom.nx, geom.ny, geom.nz);
+  InitializeVector(origB, geom.nx, geom.ny, geom.nz);
   CopyMatrixDiagonal(A, origDiagA);
   CopyVector(origDiagA, exaggeratedDiagA);
   CopyVector(b, origB);
@@ -134,4 +135,3 @@ int TestCG(SparseMatrix<Datatype> & A, CGData<Datatype> & data, Vector<Datatype>
 }
 
 #endif  // TESTCG_HPP
-

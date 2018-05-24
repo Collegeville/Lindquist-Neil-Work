@@ -45,7 +45,7 @@ void ExchangeHalo(const SparseMatrix<Datatype> & A, Vector<Datatype> & x) {
   local_int_t totalToBeSent = A.totalToBeSent;
   local_int_t * elementsToSend = A.elementsToSend;
 
-  zfp::array1<Datatype>& xv = x.values;
+  zfp::array3<Datatype>& xv = x.values;
 
   int size, rank; // Number of MPI processes, My process ID
   MPI_Comm_size(MPI_COMM_WORLD, &size);

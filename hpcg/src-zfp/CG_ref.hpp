@@ -56,7 +56,7 @@
   @see CG()
 */
 template<class Datatype>
-int CG_ref(const SparseMatrix<Datatype> & A, CGData<Datatype> & data, const Vector<Datatype> & b, Vector<Datatype> & x,
+int CG_ref(const SparseMatrix<Datatype> & A, CGData<Datatype> & data, Vector<Datatype> & b, Vector<Datatype> & x,
     const int max_iter, const Datatype tolerance, int & niters, Datatype & normr, Datatype & normr0,
     double * times, bool doPreconditioning) {
 

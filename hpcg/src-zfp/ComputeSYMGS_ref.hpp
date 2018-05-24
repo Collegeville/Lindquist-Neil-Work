@@ -60,8 +60,8 @@ int ComputeSYMGS_ref(const SparseMatrix<DatatypeA> & A, const Vector<DatatypeR> 
 
   const local_int_t nrow = A.localNumberOfRows;
   DatatypeA ** matrixDiagonal = A.matrixDiagonal;  // An array of pointers to the diagonal entries A.matrixValues
-  const zfp::array1<DatatypeR>& rv = r.values;
-  zfp::array1<DatatypeX>& xv = x.values;
+  const zfp::array3<DatatypeR>& rv = r.values;
+  zfp::array3<DatatypeX>& xv = x.values;
 
   for (local_int_t i=0; i< nrow; i++) {
     const DatatypeA * const currentValues = A.matrixValues[i];

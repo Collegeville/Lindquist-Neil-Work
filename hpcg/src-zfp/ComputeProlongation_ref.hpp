@@ -36,8 +36,8 @@
 template<class DatatypeA, class DatatypeX>
 int ComputeProlongation_ref(const SparseMatrix<DatatypeA> & Af, Vector<DatatypeX> & xf) {
 
-  zfp::array1<DatatypeX>& xfv = xf.values;
-  zfp::array1<DatatypeA>& xcv = Af.mgData->xc->values;
+  zfp::array3<DatatypeX>& xfv = xf.values;
+  zfp::array3<DatatypeA>& xcv = Af.mgData->xc->values;
   local_int_t * f2c = Af.mgData->f2cOperator;
   local_int_t nc = Af.mgData->rc->localLength;
 

@@ -62,9 +62,9 @@ void CheckProblem(SparseMatrix<DatatypeA> & A, Vector<DatatypeB> * b, Vector<Dat
   local_int_t localNumberOfRows = nx*ny*nz; // This is the size of our subblock
   global_int_t totalNumberOfRows = gnx*gny*gnz; // Total number of grid points in mesh
 
-  zfp::array1<DatatypeB>* bv;
-  zfp::array1<DatatypeX>* xv;
-  zfp::array1<DatatypeX>* xexactv;
+  zfp::array3<DatatypeB>* bv;
+  zfp::array3<DatatypeX>* xv;
+  zfp::array3<DatatypeX>* xexactv;
   if (b!=0) bv = &b->values; // Only compute exact solution if requested
   if (x!=0) xv = &x->values; // Only compute exact solution if requested
   if (xexact!=0) xexactv = &xexact->values; // Only compute exact solution if requested

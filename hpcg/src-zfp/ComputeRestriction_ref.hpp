@@ -37,9 +37,9 @@
 template<class DatatypeA, class DatatypeR>
 int ComputeRestriction_ref(const SparseMatrix<DatatypeA> & A, const Vector<DatatypeR> & rf) {
 
-  zfp::array1<DatatypeA>& Axfv = A.mgData->Axf->values;
-  const zfp::array1<DatatypeR>& rfv = rf.values;
-  zfp::array1<DatatypeA>& rcv = A.mgData->rc->values;
+  zfp::array3<DatatypeA>& Axfv = A.mgData->Axf->values;
+  const zfp::array3<DatatypeR>& rfv = rf.values;
+  zfp::array3<DatatypeA>& rcv = A.mgData->rc->values;
   local_int_t * f2c = A.mgData->f2cOperator;
   local_int_t nc = A.mgData->rc->localLength;
 

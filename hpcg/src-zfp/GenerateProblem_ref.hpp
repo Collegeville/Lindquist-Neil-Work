@@ -78,12 +78,12 @@ void GenerateProblem_ref(SparseMatrix<DatatypeA> & A, Vector<DatatypeB> * b, Vec
   DatatypeA ** matrixValues = new DatatypeA*[localNumberOfRows];
   DatatypeA ** matrixDiagonal = new DatatypeA*[localNumberOfRows];
 
-  if (b!=0) InitializeVector(*b, localNumberOfRows);
-  if (x!=0) InitializeVector(*x, localNumberOfRows);
-  if (xexact!=0) InitializeVector(*xexact, localNumberOfRows);
-  zfp::array1<DatatypeB>* bv;
-  zfp::array1<DatatypeX>* xv;
-  zfp::array1<DatatypeX>* xexactv;
+  if (b!=0) InitializeVector(*b, nx, ny, nz);
+  if (x!=0) InitializeVector(*x, nx, ny, nz);
+  if (xexact!=0) InitializeVector(*xexact, nx, ny, nz);
+  zfp::array3<DatatypeB>* bv;
+  zfp::array3<DatatypeX>* xv;
+  zfp::array3<DatatypeX>* xexactv;
   if (b!=0) bv = &b->values; // Only compute exact solution if requested
   if (x!=0) xv = &x->values; // Only compute exact solution if requested
   if (xexact!=0) xexactv = &xexact->values; // Only compute exact solution if requested

@@ -41,24 +41,29 @@
   @see ComputeDotProduct
 */
 template<class Datatype1, class Datatype2, class ResultDatatype>
-int ComputeDotProduct_ref(const local_int_t n, const Vector<Datatype1> & x,
-    const Vector<Datatype2> & y, ResultDatatype & result, double & time_allreduce) {
+int ComputeDotProduct_ref(const local_int_t n, Vector<Datatype1> & x,
+    Vector<Datatype2> & y, ResultDatatype & result, double & time_allreduce) {
   assert(x.localLength>=n); // Test vector lengths
   assert(y.localLength>=n);
 
+
   ResultDatatype local_result = 0.0;
-  const zfp::array1<Datatype1>& xv = x.values;
-  const zfp::array1<Datatype2>& yv = y.values;
+  zfp::array3<Datatype1>& xv = x.values;
+  zfp::array3<Datatype2>& yv = y.values;
   if ((void*)&yv==(void*)&xv) {
 //#ifndef HPCG_NO_OPENMP
 //    #pragma omp parallel for reduction (+:local_result)
 //#endif
-    for (local_int_t i=0; i<n; i++) local_result += ResultDatatype(xv[i])*ResultDatatype(xv[i]);
+    for (typename zfp::array3<Datatype1>::iterator it = xv.begin(); it != xv.end(); it++) {
+      local_result += ResultDatatype(*it)*ResultDatatype(*it);
+    }
   } else {
 //#ifndef HPCG_NO_OPENMP
 //    #pragma omp parallel for reduction (+:local_result)
 //#endif
-    for (local_int_t i=0; i<n; i++) local_result += ResultDatatype(xv[i])*ResultDatatype(yv[i]);
+    for (typename zfp::array3<Datatype1>::iterator it = xv.begin(); it != xv.end(); it++) {
+      local_result += ResultDatatype(*it)*ResultDatatype(yv(it.i(), it.j(), it.k()));
+    }
   }
 
 #ifndef HPCG_NO_MPI

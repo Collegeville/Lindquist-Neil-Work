@@ -96,9 +96,9 @@ void GenerateCoarseProblem(const SparseMatrix<Datatype> & Af) {
   Vector<Datatype> *rc = new Vector<Datatype>;
   Vector<Datatype> *xc = new Vector<Datatype>;
   Vector<Datatype> *Axf = new Vector<Datatype>;
-  InitializeVector(*rc, Ac->localNumberOfRows);
-  InitializeVector(*xc, Ac->localNumberOfColumns);
-  InitializeVector(*Axf, Af.localNumberOfColumns);
+  InitializeVector(*rc, geomc->nx, geomc->ny, geomc->nz);
+  InitializeVector(*xc, geomc->nx, geomc->ny, geomc->nz);
+  InitializeVector(*Axf, Af.geom->nx, Af.geom->ny, Af.geom->nz);
   Af.Ac = Ac;
   MGData<Datatype, Datatype> * mgData = new MGData<Datatype, Datatype>;
   InitializeMGData(f2cOperator, rc, xc, Axf, *mgData);

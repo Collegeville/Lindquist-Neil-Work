@@ -75,9 +75,10 @@ int TestSymmetry(SparseMatrix<Datatype> & A, Vector<Datatype> & b, Vector<Dataty
  local_int_t ncol = A.localNumberOfColumns;
 
  Vector<Datatype> x_ncol, y_ncol, z_ncol;
- InitializeVector(x_ncol, ncol);
- InitializeVector(y_ncol, ncol);
- InitializeVector(z_ncol, ncol);
+ Geometry geom = *A.geom;
+ InitializeVector(x_ncol, geom.nx, geom.ny, geom.nz);
+ InitializeVector(y_ncol, geom.nx, geom.ny, geom.nz);
+ InitializeVector(z_ncol, geom.nx, geom.ny, geom.nz);
 
  double t4 = 0.0; // Needed for dot-product call, otherwise unused
  testsymmetry_data.count_fail = 0;

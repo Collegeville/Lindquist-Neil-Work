@@ -38,7 +38,7 @@
 */
 template<class datatype1, class datatype2, class datatype3>
 int ComputeWAXPBY(const local_int_t n, const double alpha,
-    const Vector<datatype1> & x, const double beta, const Vector<datatype2> & y,
+    Vector<datatype1> & x, const double beta, Vector<datatype2> & y,
     Vector<datatype3> & w, bool & isOptimized) {
 
   // This line and the next two lines should be removed and your version of ComputeWAXPBY should be used.
