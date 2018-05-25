@@ -42,11 +42,21 @@ int ComputeRestriction_ref(const SparseMatrix<DatatypeA> & A, const Vector<Datat
   zfp::array3<DatatypeA>& rcv = A.mgData->rc->values;
   local_int_t * f2c = A.mgData->f2cOperator;
   local_int_t nc = A.mgData->rc->localLength;
+  local_int_t nx = A.Ac->geom->nx;
+  local_int_t ny = A.Ac->geom->ny;
 
 //#ifndef HPCG_NO_OPENMP
 //#pragma omp parallel for
 //#endif
-  for (local_int_t i=0; i<nc; ++i) rcv[i] = rfv[f2c[i]] - Axfv[f2c[i]];
+  for (local_int_t j=0; j< nc; j++)  {
+    local_int_t block = j>>6;
+    local_int_t iz = (j>>4)&(local_int_t)0x03 + (block>>2)&(local_int_t(-1-15));
+    local_int_t iy = (j>>2)&(local_int_t)0x03 + block&(local_int_t(-1-15));
+    local_int_t ix = j&(local_int_t)0x03 + block<<2;
+    local_int_t i = ix + iy*nx+iz*nx+ny;
+
+    rcv[i] = rfv[f2c[i]] - Axfv[f2c[i]];
+  }
 
   return 0;
 }

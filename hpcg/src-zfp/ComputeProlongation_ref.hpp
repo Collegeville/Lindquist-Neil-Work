@@ -40,12 +40,22 @@ int ComputeProlongation_ref(const SparseMatrix<DatatypeA> & Af, Vector<DatatypeX
   zfp::array3<DatatypeA>& xcv = Af.mgData->xc->values;
   local_int_t * f2c = Af.mgData->f2cOperator;
   local_int_t nc = Af.mgData->rc->localLength;
+  local_int_t nx = Af.Ac->geom->nx;
+  local_int_t ny = Af.Ac->geom->ny;
 
 //#ifndef HPCG_NO_OPENMP
 //#pragma omp parallel for
 //#endif
 // TODO: Somehow note that this loop can be safely vectorized since f2c has no repeated indices
-  for (local_int_t i=0; i<nc; ++i) xfv[f2c[i]] += xcv[i]; // This loop is safe to vectorize
+  for (local_int_t j=0; j< nc; j++)  {
+    local_int_t block = j>>6;
+    local_int_t iz = (j>>4)&(local_int_t)0x03 + (block>>2)&(local_int_t(-1-15));
+    local_int_t iy = (j>>2)&(local_int_t)0x03 + block&(local_int_t(-1-15));
+    local_int_t ix = j&(local_int_t)0x03 + block<<2;
+    local_int_t i = ix + iy*nx+iz*nx+ny;
+
+    xfv[f2c[i]] += xcv[i]; // This loop is safe to vectorize
+  }
 
   return 0;
 }
