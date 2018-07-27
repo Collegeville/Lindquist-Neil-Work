@@ -35,14 +35,14 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
     for iter = 1:niters
         normz = norm2(z)[1]
 
-        @. q.data = z.data/normz
+        @. q = z/normz
 
 
         apply!(z, A, q, ONE, ZERO)
         λ = dot(q, z)[1]
         if iter%100 == 0 || iter+1 == niters
             #TODO improve - currently works, but is a little bit of a hack around MultiVector's lack of math operators
-            @. resid.data = z.data - λ*q.data
+            @. resid = z - λ*q
             residual = norm2(resid)[1]
 
             if residual < tolerance
