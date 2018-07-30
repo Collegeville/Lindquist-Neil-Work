@@ -19,7 +19,7 @@ struct FE2dMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer
             linearIndices::Bool
             ) where {Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
 
-        new{Data, GID, PID, LID}(FE2dGraph(problemWidth, problemHeight, rangeMap, domainMap, colMap, importer, Nullable{Export{GID, PID, LID}}()),
+        new{Data, GID, PID, LID}(FE2dGraph(problemWidth, problemHeight, rangeMap, domainMap, colMap, importer),
             problemWidth, problemHeight, rangeMap, domainMap, colMap, importer, linearIndices)
     end
 end
@@ -211,6 +211,11 @@ getGraph(mat::FE2dMatrix) = mat.graph
 leftScale!(::FE2dMatrix, ::AbstractArray) = error("Finite Element matrices can't be modified")
 rightScale!(::FE2dMatrix, ::AbstractArray) = error("Finite Element matrices can't be modified")
 
+#the rows are never stored, so need to copy the row
+function getGlobalRowView(matrix::FE2dMatrix{Data, GID}, row::GID) where {Data, GID}
+    getGlobalRowCopy(matrix, row)
+end
+
 function getGlobalRowCopy(matrix::FE2dMatrix{Data, GID}, row::GID) where {Data, GID}
     globalWidth = matrix.problemWidth
     globalHeight = matrix.problemHeight
@@ -222,30 +227,36 @@ function getGlobalRowCopy(matrix::FE2dMatrix{Data, GID}, row::GID) where {Data, 
     vals = Data[]
 
     if globalY > 1
-        push!(row-globalWidth, inds)
-        push!(Data(-1), vals)
+        push!(inds, row-globalWidth)
+        push!(vals, Data(-1))
     end
     if globalX > 1
-        push!(row-1, inds)
-        push(Data(-1), vals)
+        push!(inds, row-1)
+        push!(vals, Data(-1))
     end
-    push!(row, inds)
-    push!(Data(4), vals)
+    push!(inds, row)
+    push!(vals, Data(4))
     if globalX < globalWidth
-        push!(row+1, inds)
-        push(Data(-1), vals)
+        push!(inds, row+1)
+        push!(vals, Data(-1))
     end
     if globalY < globalHeight
-        push!(row+globalWidth, inds)
-        push(Data(-1), vals)
+        push!(inds, row+globalWidth)
+        push!(vals, Data(-1))
     end
     (inds, vals)
+end
+
+#the rows are never stored, so need to copy the row
+function getLocalRowView(matrix::FE2dMatrix{Data, GID}, row::GID) where {Data, GID}
+    getGlobalRowCopy(matrix, row)
 end
 
 function getLocalRowCopy(mat::FE2dMatrix{Data, GID, PID, LID}, row::LID) where {Data, GID, PID, LID}
     rowMap = getRowMap(mat)
     inds, vals = getGlobalRowCopy(mat, gid(rowMap, row))
-    map(x->lid(rowMap, x), inds), vals
+    colMap = getColMap(mat)
+    map(x->lid(colMap, x), inds), vals
 end
 
 function getLocalDiagCopy(mat::FE2dMatrix{Data}) where Data
@@ -259,52 +270,7 @@ getRangeMap(mat::FE2dMatrix) = mat.rangeMap
 getDomainMap(mat::FE2dMatrix) = mat.domainMap
 
 
-function apply!(Y::MultiVector{Data, GID, PID, LID},
-        operator::FE2dMatrix{Data, GID, PID, LID}, X::MultiVector{Data, GID, PID, LID},
-        mode::TransposeMode, alpha::Data, beta::Data) where {Data, GID, PID, LID}
-
-    if alpha == Data(0)
-        if beta == Data(0)
-            fill!(Y, Data(0))
-        elseif beta != Data(1)
-            scale!(Y, beta)
-        end
-        return Y
-    end
-
-
-    importer = getGraph(operator).importer
-
-    YIsOverwritten = (beta == ZERO)
-    YIsReplicated = !distributedGlobal(Y) && numProc(getComm(Y)) != 0
-
-    #part of special case for replicated MV output
-    if YIsReplicated && myPid(getComm(Y)) != 1
-        beta = Data(0)
-    end
-
-
-    if isnull(importer)
-        XColMap = X
-    else
-        #need to import source multivector
-        XColMap = MultiVector{Data}(getColMap(operator), numVectors(X), false)
-        doImport(X, XColMap, get(importer), INSERT)
-    end
-
-
-    if XColMap === Y
-        error("Cannot do multiplication in place")
-    else
-        localApply(Y, operator, XColMap, mode, alpha, beta)
-    end
-
-    if YIsReplicated
-        commReduce(Y)
-    end
-    Y
-end
-
+#=
 TypeStability.@stable_function [(MultiVector{D, G, P, L}, FE2dMatrix{D, G, P, L},
                         MultiVector{D, G, P, L}, TransposeMode, D, D)
                     for (D, G, P, L) in Base.Iterators.product(
@@ -397,3 +363,5 @@ function localApply(Y::MultiVector{Data, GID, PID, LID},
     end
 end
 end
+
+# =#

@@ -8,19 +8,13 @@ struct FE2dGraph{GID <: Integer, PID <: Integer, LID <: Integer} <: RowGraph{GID
     domainMap::BlockMap{GID, PID, LID}
     colMap::BlockMap{GID, PID, LID}
     importer::Nullable{Import{GID, PID, LID}}
-    exporter::Nullable{Export{GID, PID, LID}}
 end
 
 getRowMap(graph::FE2dGraph) = graph.rangeMap
 getColMap(graph::FE2dGraph) = graph.colMap
 hasColMap(graph::FE2dGraph) = true
 getImporter(graph::FE2dGraph) = graph.importer
-function getExporter(graph::FE2dGraph)
-    if isnull(graph.exporter)
-        graph.exporter = Nullable(Export(rangeMap, rangeMap))
-    end
-    get(graph.exporter)
-end
+getExporter(graph::FE2dGraph{GID, PID, LID}) where {GID, PID, LID} = Nullable{Export{GID, PID, LID}}()
 
 getGlobalNumDiags(graph::FE2dGraph) = numAllElements(getRowMap(graph))
 getLocalNumDiags(graph::FE2dGraph) = numMyElements(getRowMap(graph))

@@ -57,12 +57,20 @@ try
     end
     preconditioner = DiagonalInversePreconditioner(A)
     b = MultiVector(map, bData)
-    x = MultiVector{Float64}(map, 1)
+
+    log("running warmup")
+    tic()
+    conjugate_gradient(A, b; niters = 500)
+    toq()
 
     log("Starting conjugate gradient")
+    x = conjugate_gradient(A, b; niters = 500)
 
-    k = conjugate_gradient(A, x, b, preconditioner; niters = 500)
-    log("k = $k")
+    log("Results")
+    barrier(getComm(x))
+    print("$(myPid(getComm(x))): x = $x\n")
+    barrier(getComm(x))
+    log("Residual: $(norm2(apply(b, A, x, Float64(-1), Float64(1)))[1])")
 catch err
     #if pid == 1
         rethrow(err)

@@ -1,14 +1,14 @@
 
 struct DiagonalInversePreconditioner{Data <: Number, GID <: Integer, PID <: Integer, LID <: Integer}
     mat::RowMatrix{Data, GID, PID, LID}
-    importer::Nullable{Import{Data, GID, PID, LID}}
+    importer::Nullable{Import{GID, PID, LID}}
 end
 
 function DiagonalInversePreconditioner(mat::RowMatrix{Data, GID, PID, LID}) where {Data, GID, PID, LID}
     #currently assuming range and domain are the same
-    @assert getRangeMap(operator) == getDomainMap(operator) || sameAs(getRangeMap(operator), getDomainMap(operator))
+    @assert sameAs(getRangeMap(mat), getDomainMap(mat))
 
-    DiagonalInversePreconditioner(mat, Nullable{Import{Data, GID, PID, LID}})
+    DiagonalInversePreconditioner(mat, Nullable{Import{GID, PID, LID}}())
 end
 
 getRangeMap(prec::DiagonalInversePreconditioner) = getDomainMap(prec.mat)
