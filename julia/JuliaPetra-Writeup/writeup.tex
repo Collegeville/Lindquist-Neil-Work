@@ -116,7 +116,8 @@ The communication layer provides an abstraction on which the distributed data st
 
 The linear algebra objects are built on top of the abstractions provided by the communication layer.
 JuliaPetra has two main linear algebra types.
-The first type is the concrete type \snippet{MultiVector} which holds one or more dense vectors.
+The first type is the abstract type \snippet{MultiVector} which holds one or more vectors.
+This type is implemented by \snippet{DenseMultiVector} which stores dense vectors.
 The second type is the \snippet{Operator} interface which is implemented by types that provide a
 \(y \gets \alpha\cdot A(x) + \beta\cdot y\) operation, where \(\alpha\) and \(\beta\) are scalars,
 \(x\) and \(y\) are vectors and \(A\) is the operator.
@@ -182,9 +183,12 @@ and \snippet{RowMatrix} types to allow existing Julia code to interact with data
 
 	\typeNode{AbstractArray}{ExplicitInterface}{left=of Operator}
 
-	\typeNode{MultiVector}{ConcreteType}{below=of AbstractArray}
+	\typeNode{MultiVector}{ExplicitInterface}{below=of AbstractArray}
 	\implicitInheritance{DistObject}{MultiVector.north east}
 	\explicitInheritance{AbstractArray}{MultiVector.north}
+	
+	\typeNode{DenseMultiVector}{ConcreteType}{below=.75cm of MultiVector}
+	\explicitInheritance{MultiVector}{DenseMultiVector.north}
 
 	\typeNode{RowMatrix}{ExplicitInterface}{below=of Operator}
 	\implicitInheritance{DistObject}{RowMatrix.north east}
@@ -313,6 +317,7 @@ since it is built on MPI's low level interface as opposed to Julia's high level,
 
 \subsection{Timing Results}
 
+% TODO re-run tests since the JuliaPetra code has been modified some.
 \begin{table}
 	\begin{tabular}{|c c|r|r|r||r|r|}
 		\hline
