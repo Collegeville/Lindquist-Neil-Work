@@ -19,9 +19,9 @@ Returns a tuple of the computed λ and if the λ is within tolerance
 """
 function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
         tolerance::Data, verbose::Bool)::Tuple{Data, Bool} where {Data, GID, PID, LID}
-    q = MultiVector{Data, GID, PID, LID}(getRowMap(A), 1)
-    z = MultiVector{Data, GID, PID, LID}(getRowMap(A), 1)
-    resid = MultiVector{Data, GID, PID, LID}(getRowMap(A), 1)
+    q = DenseMultiVector{Data}(getRowMap(A), 1)
+    z = DenseMultiVector{Data}(getRowMap(A), 1)
+    resid = DenseMultiVector{Data}(getRowMap(A), 1)
 
     #skipping flop counting
 
@@ -33,7 +33,7 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
     const ZERO = zero(Data)
 
     for iter = 1:niters
-        normz = norm2(z)[1]
+        normz = norm(z, 2)[1]
 
         @. q = z/normz
 
@@ -41,9 +41,8 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
         apply!(z, A, q, ONE, ZERO)
         λ = dot(q, z)[1]
         if iter%100 == 0 || iter+1 == niters
-            #TODO improve - currently works, but is a little bit of a hack around MultiVector's lack of math operators
             @. resid = z - λ*q
-            residual = norm2(resid)[1]
+            residual = norm(resid, 2)[1]
 
             if residual < tolerance
                 return (λ, true)
