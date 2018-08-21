@@ -38,7 +38,7 @@ julia --color=yes -p $numProcs -O3 power-method/DA-power-method.jl $EQs
 echo
 echo
 echo JuliaPetra Power Method:
-mpirun --mca pml ob1 --mca btl tcp,self -np $numProcs julia --color=yes -O3 power-method/power-method.jl $EQs
+mpirun --mca pml ob1 --mca btl tcp,self -np $numProcs julia --color=yes --project=. -O3 power-method/power-method.jl $EQs
 #mpirun -np $numProcs ~/bin/julia  --track-allocation=user --color=yes julia/power-method/power-method.jl $EQs
 
 

@@ -1,4 +1,5 @@
 using JuliaPetra
+using Random
 
 #program settings
 const useMPI = true
@@ -19,9 +20,9 @@ Returns a tuple of the computed λ and if the λ is within tolerance
 """
 function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
         tolerance::Data, verbose::Bool)::Tuple{Data, Bool} where {Data, GID, PID, LID}
-    q = MultiVector{Data, GID, PID, LID}(getRowMap(A), 1)
-    z = MultiVector{Data, GID, PID, LID}(getRowMap(A), 1)
-    resid = MultiVector{Data, GID, PID, LID}(getRowMap(A), 1)
+    q = DenseMultiVector{Data}(getRowMap(A), 1)
+    z = DenseMultiVector{Data}(getRowMap(A), 1)
+    resid = DenseMultiVector{Data}(getRowMap(A), 1)
 
     #skipping flop counting
 
@@ -29,11 +30,11 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
 
     randn!(z.data)
 
-    const ONE = one(Data)
-    const ZERO = zero(Data)
+    ONE = one(Data)
+    ZERO = zero(Data)
 
     for iter = 1:niters
-        normz = norm2(z)[1]
+        normz = norm(z, 2)[1]
 
         @. q = z/normz
 
@@ -41,9 +42,8 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
         apply!(z, A, q, ONE, ZERO)
         λ = dot(q, z)[1]
         if iter%100 == 0 || iter+1 == niters
-            #TODO improve - currently works, but is a little bit of a hack around MultiVector's lack of math operators
             @. resid = z - λ*q
-            residual = norm2(resid)[1]
+            residual = norm(resid, 2)[1]
 
             if residual < tolerance
                 return (λ, true)
@@ -59,14 +59,14 @@ end
 
 function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type) where{GID, PID, LID}
 
-    const pid = myPid(comm)
-    const nProc = numProc(comm)
+    pid = myPid(comm)
+    nProc = numProc(comm)
 
     map = BlockMap(numGlobalElements, comm)
 
     numMyElements = JuliaPetra.numMyElements(map)
     myGlobalElements = JuliaPetra.myGlobalElements(map)
-    numNz = Array{GID, 1}(numMyElements)
+    numNz = Array{GID, 1}(undef, numMyElements)
     for i = 1:numMyElements
         if myGlobalElements[i] == 1 || myGlobalElements[i] == numGlobalElements
             numNz[i] = 2
@@ -75,10 +75,10 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
         end
     end
 
-    const A = CSRMatrix{Data}(map, numNz, STATIC_PROFILE)
+    A = CSRMatrix{Data}(map, numNz, STATIC_PROFILE)
 
-    const values = Data[-1, -1]
-    const two = Data[Data(2)]
+    values = Data[-1, -1]
+    two = Data[Data(2)]
 
     for i = 1:numMyElements
         if myGlobalElements[i] == 1
@@ -95,26 +95,20 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
 
     fillComplete(A, map, map)#use map for domain and range
 
-    const niters = numGlobalElements*10
-    const tolerance = 1.0e-2
+    niters = numGlobalElements*10
+    tolerance = 1.0e-2
 
     log("starting tests")
 
     #compile all the nessacery methods before timing
-    tic()
-    λ, success = powerMethod(A, niters, tolerance, verbose)
-    elapsedTime = toq()
+
+    elapsedTime = @elapsed λ, success = powerMethod(A, niters, tolerance, verbose)
 
     log("λ = $λ; is within tolerance? $success")
     log("total time for first solve (plus compile) = $elapsedTime sec\n\n")
 
-    tic()
-    #Profile.clear_malloc_data()
-    #@time
-    λ, success = powerMethod(A, niters, tolerance, verbose)
-    #exit(0)
+    elapsedTime = @elapsed λ, success = powerMethod(A, niters, tolerance, verbose)
     #TODO look into storing FLOPS
-    elapsedTime = toq()
 
 
     log("λ = $λ; is within tolerance? $success")
@@ -131,9 +125,7 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
         end
     end
 
-    tic()
-    λ, success = powerMethod(A, niters, tolerance, verbose)
-    elapsedTime = toq()
+    elapsedTime = @elapsed λ, success = powerMethod(A, niters, tolerance, verbose)
 
     log("")
 
