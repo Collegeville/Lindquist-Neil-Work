@@ -1,7 +1,20 @@
 
 #Power method implementation using DistributedArrays.jl
 
-@everywhere using DistributedArrays
+using Distributed
+
+@everywhere begin
+
+    #hack to get around the fact the master proc's project isn't passed to worker procs
+    using Pkg
+    Pkg.activate(".")
+
+    using LinearAlgebra
+    using SparseArrays
+
+    using DistributedArrays
+end
+
 
 """
 Returns a tuple of the computed λ and if the λ is within tolerance
@@ -24,15 +37,16 @@ function powerMethod(A::DArray{Data, 2}, niters::Integer,
 
         #map!(z->z/normz, q, z)
         z, q = q, z
-        scale!(q, 1/normz)
+        rmul!(q, 1/normz)
 
-        A_mul_B!(Data(1), A, q, Data(0), z)
+        DistributedArrays.mul!(z, A, q)
         λ = dot(q, z)
         if iter%100 == 0 || iter+1 == niters
             #REVIEW mapping and broadcasting 2 dArrays -> 1 dArray not yet supported
+            #@. resid = z - λ*q
             #map!((z,q)->z-λ*q, resid, z, q)
-            copy!(resid, z)
-            Base.axpy!(-λ, q, resid)
+            copyto!(resid, z)
+            axpy!(-λ, q, resid)
 
             residual::Data = norm(resid, 2)
 
@@ -53,17 +67,17 @@ function main(numGlobalElements)
         colIndices = I[2]
 
         if rowIndices.start == 1
-            lColIndices = (rowIndices.start:rowIndices.stop-1)
+            lColIndices = rowIndices.start:rowIndices.stop-1
             lRowIndices = 2:length(rowIndices)
         else
-            lColIndices = rowIndices-1
+            lColIndices = rowIndices.-1
             lRowIndices = 1:length(lColIndices)
         end
 
         if rowIndices.stop == colIndices.stop
-            rColIndices = (rowIndices.start+1:rowIndices.stop)
+            rColIndices = rowIndices.start+1:rowIndices.stop
         else
-            rColIndices = rowIndices+1
+            rColIndices = rowIndices.+1
         end
         rRowIndices = 1:length(rColIndices)
 
@@ -73,26 +87,19 @@ function main(numGlobalElements)
         sparse(rows, cols, vals, length(rowIndices), length(colIndices))
     end
 
-    const niters = numGlobalElements*10
-    const tolerance = Data(1.0e-2)
+    niters = numGlobalElements*10
+    tolerance = Data(1.0e-2)
 
     println("starting tests")
 
     #compile all the nessacery methods before timing
-    tic()
-    λ, success = powerMethod(A, niters, tolerance)
-    elapsedTime = toq()
+    elapsedTime = @elapsed λ, success = powerMethod(A, niters, tolerance)
 
     println("λ = $λ; is within tolerance? $success")
     println("total time for first solve (plus compile) = $elapsedTime sec\n\n")
 
-    tic()
-    #Profile.clear_malloc_data()
-    #@time
-    λ, success = powerMethod(A, niters, tolerance)
-    #exit(0)
+    elapsedTime = @elapsed λ, success = powerMethod(A, niters, tolerance)
     #TODO look into storing FLOPS
-    elapsedTime = toq()
 
 
     println("λ = $λ; is within tolerance? $success")
@@ -102,16 +109,14 @@ function main(numGlobalElements)
     #REVIEW this feels really low-level, is there a higher level way that has access to global indices?
     @sync for p in procs(A)
         @async remotecall_fetch(p, A) do A
-            if (1 in localindexes(A)[1]) && (1 in localindexes(A)[2])
+            if (1 in localindices(A)[1]) && (1 in localindices(A)[2])
                 DistributedArrays.localpart(A)[1, 1] *= 10
             end
           nothing
       end
     end
 
-    tic()
-    λ, success = powerMethod(A, niters, tolerance)
-    elapsedTime = toq()
+    elapsedTime = @elapsed λ, success = powerMethod(A, niters, tolerance)
 
     println("")
 
