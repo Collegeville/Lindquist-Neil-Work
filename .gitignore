@@ -67,3 +67,6 @@ julia/power-method/ePetra-PowerMethod/CMakeCache.txt
 julia/power-method/ePetra-PowerMethod/cmake_install.cmake
 julia/power-method/ePetra-PowerMethod/Makefile
 julia/power-method/ePetra-PowerMethod/petra_power_method_LL
+
+#Manifest file for julia work
+julia/Manifest.toml
