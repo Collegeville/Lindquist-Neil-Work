@@ -317,7 +317,6 @@ since it is built on MPI's low level interface as opposed to Julia's high level,
 
 \subsection{Timing Results}
 
-% TODO re-run tests since the JuliaPetra code has been modified some.
 \begin{table}
 	\begin{tabular}{|c c|r|r|r||r|r|}
 		\hline
@@ -330,45 +329,45 @@ since it is built on MPI's low level interface as opposed to Julia's high level,
 		\hline
 			\multicolumn{7}{|l|}{4 Processors}\\
 		\hline
-			100,000			&Average & 0.27690 & 0.19294 & 1.86626 & 1.43515 & 0.14837 \\
-			equations		&Minimum & 0.26948 & 0.18933 & 1.59244 & 1.42335 & 0.16922 \\
-							&Maximum & 0.28782 & 0.19614 & 2.15375 & 1.46745 & 0.13364 \\
+			100,000			&Average & 0.22850 & 0.18045 &  & 1.26633 &  \\
+			equations		&Minimum & 0.22768 & 0.13394 &  & 1.69985 &  \\
+							&Maximum & 0.22933 & 0.21588 &  & 1.06232 &  \\
 		\hline
-			1,000,000		&Average & 3.07809 & 2.38844 & 14.7880 & 1.28875 & 0.20815 \\
-			equations		&Minimum & 2.98883 & 2.35483 & 13.2876 & 1.26923 & 0.22493 \\
-							&Maximum & 3.15854 & 2.44491 & 18.4698 & 1.29188 & 0.17101 \\
+			1,000,000		&Average & 2.82589 & 2.35860 &  & 1.19812 &  \\
+			equations		&Minimum & 2.80843 & 2.34777 &  & 1.19621 &  \\
+							&Maximum & 2.83711 & 2.36840 &  & 1.19790 &  \\
 		\hline
-			10,000,000		&Average & 33.0215 & 24.6116 & 108.760 & 1.34171 & 0.30362 \\
-			equations		&Minimum & 31.5646 & 24.4134 & 107.118 & 1.29292 & 0.29467 \\
-							&Maximum & 35.1871 & 24.7888 & 109.561 & 1.41947 & 0.32116 \\
+			10,000,000		&Average & 30.7656 & 24.6991 &  & 1.24562 &  \\
+			equations		&Minimum & 30.5471 & 24.5430 &  & 1.24464 &  \\
+							&Maximum & 31.2470 & 24.7841 &  & 1.26077 &  \\
 		\hline
 			\multicolumn{7}{|l|}{16 Processors}\\
 		\hline
-			100,000			&Average & 0.58371 & 0.51138 & 3.23072 & 1.15766 & 0.18068 \\
-			equations		&Minimum & 0.54744 & 0.49328 & 2.99947 & 1.10979 & 0.18251 \\
-							&Maximum & 0.60776 & 0.51907 & 3.47056 & 1.17086 & 0.17512 \\
+			100,000			&Average & 0.54401 & 0.55244 &  & 0.98474 &  \\
+			equations		&Minimum & 0.52902 & 0.50857 &  & 1.04021 &  \\
+							&Maximum & 0.55428 & 0.56908 &  & 0.97400 &  \\
 		\hline
-			1,000,000		&Average & 7.46367 & 7.39699 & 21.5343 & 1.00901 & 0.34659 \\
-			equations		&Minimum & 7.36098 & 7.32456 & 20.0884 & 1.00497 & 0.36643 \\
-							&Maximum & 7.59598 & 7.48964 & 22.8655 & 1.01420 & 0.33220 \\
+			1,000,000		&Average & 7.44313 & 7.43903 &  & 1.00055 &  \\
+			equations		&Minimum & 7.41123 & 7.42147 &  & 0.99862 &  \\
+							&Maximum & 7.53777 & 7.45056 &  & 1.01171 &  \\
 		\hline
-			10,000,000		&Average & 74.6001 & 73.6360 & 151.184 & 1.01310 & 0.49344 \\
-			equations		&Minimum & 73.7350 & 73.4646 & 150.411 & 1.00368 & 0.49022 \\
-							&Maximum & 74.9087 & 73.8342 & 152.033 & 1.01455 & 0.49271 \\
+			10,000,000		&Average & 7.47297 & 73.9551 &  & 0.99348 &  \\
+			equations		&Minimum & 73.1307 & 73.9172 &  & 0.98936 &  \\
+							&Maximum & 74.1664 & 73.9953 &  & 1.00231 &  \\
 		\hline
 				\multicolumn{7}{|l|}{20 Processors}\\
 		\hline
-			100,000			&Average & 0.73843 & 0.70837 & 3.14911 & 1.04244 & 0.23449 \\
-			equations		&Minimum & 0.73621 & 0.69428 & 2.90237 & 1.06039 & 0.25366 \\
-							&Maximum & 0.73967 & 0.71449 & 3.64133 & 1.03524 & 0.20313 \\
+			100,000			&Average & 0.76502 & 0.72094 &  & 1.06114 &  \\
+			equations		&Minimum & 0.73781 & 0.69893 &  & 1.05563 &  \\
+							&Maximum & 0.79881 & 0.76437 &  & 1.04507 &  \\
 		\hline
-			1,000,000		&Average & 9.19411 & 9.18584 & 23.2980 & 1.00090 & 0.39463 \\
-			equations		&Minimum & 9.14960 & 9.16630 & 22.7740 & 0.99814 & 0.40177 \\
-							&Maximum & 9.22002 & 9.21510 & 24.6296 & 1.00053 & 0.37435 \\
+			1,000,000		&Average & 9.67784 & 9.74738 &  & 0.99287 &  \\
+			equations		&Minimum & 9.47876 & 9.61908 &  & 0.98541 &  \\
+							&Maximum & 9.85454 & 9.86118 &  & 0.99933 &  \\
 		\hline
-			10,000,000		&Average & 92.0613 & 91.6512 & 174.402 & 1.00447 & 0.52786 \\
-			equations		&Minimum & 91.5029 & 91.2491 & 173.480 & 1.00278 & 0.52746 \\
-							&Maximum & 92.5630 & 91.7905 & 175.096 & 1.00842 & 0.52864 \\
+			10,000,000		&Average & 96.6538 & 97.4296 &  & 0.99204 &  \\
+			equations		&Minimum & 95.1889 & 96.7890 &  & 0.98347 &  \\
+							&Maximum & 97.5618 & 98.0169 &  & 0.99536 &  \\
 		\hline
 	\end{tabular}
 	
@@ -392,10 +391,8 @@ All implementations were run once before collecting the timings, to ensure all J
 compiled before the timing started.
 Additionally, the setup for the problems were not counted as part of the times.
 
-The MPI implementation was Open MPI version 1.10.3
-with TCP used for all inter-process communication.
-The Julia tests were run with the Julia v0.6.0 precompiled binary for Linux
-with the \snippet{-O3} flag enabled at run time.
+The MPI implementation was MPICH version 3.2 with TCP used for all inter-process communication.
+The Julia tests were run with the Julia v1.0.0 precompiled binary for Linux with the \snippet{-O3} flag enabled at run time.
 The Epetra tests were compiled with GCC 4.8.5, the \snippet{-O3} flag and Trilinos 12.10.1.
 Tests were run on a Red Hat Enterprise Linux Workstation, version 7.3,
 with a 20 core Intel E5-2698 v4 CPU.
