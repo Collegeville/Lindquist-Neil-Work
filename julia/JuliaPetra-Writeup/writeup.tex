@@ -8,7 +8,7 @@
 \title{JuliaPetra: An Implementation of the Petra Object Model in Julia}
 
 \author{Neil Lindquist}
-\email{neillindquist5@gmail.com}
+\email{nslindquist@csbsju.edu}
 
 \acmJournal{TOMS}
 
@@ -50,7 +50,7 @@
 \ccsdesc[100]{Computing methodologies~Self-organization}
 
 \begin{abstract}
-JuliaPetra provides linear algebra data structures that are commonly used in large scale linear solver algorithms.
+JuliaPetra provides linear algebra data structures that are commonly used in large scale, linear solver algorithms.
 The data structures in JuliaPetra focus on vectors and sparse matrices, in both serial and
 distributed, parallel environments.
 The library is written in Julia, a high level programming language with comparable performance to C or Fortran.
@@ -245,7 +245,7 @@ type stability of performance critical code \cite{Bezanson:2017:FreshApproach}.
 Removing type instabilities from performance critical sections of JuliaPetra improved performance
 by a few orders of magnitude.
 The \snippet{code_warntype} function was an important tool in finding type instabilities.
-Due to \snippet{code_warntype} requiring manual inspection, a few utilities were created
+Due to \snippet{code_warntype} requiring manual inspection, the TypeStability.jl library was created
 based on \snippet{code_warntype} to automatic type stability checks.
 
 Another notable optimization came from using \snippet{Ptr} objects to pass views of arrays.
