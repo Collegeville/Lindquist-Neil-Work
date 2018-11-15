@@ -4,6 +4,7 @@
 \usepackage{array}
 \usepackage{tikz}
 \usetikzlibrary{positioning}
+\usepackage{siunitx}
 
 \title{JuliaPetra: An Implementation of the Petra Object Model in Julia}
 
@@ -96,14 +97,15 @@ and finally, comparisons with two similar libraries, Epetra and DistributedArray
 The design of JuliaPetra follows closely with that of the C++ implementations of the
 Petra object model, Epetra and Tpetra.
 Like Epetra and Tpetra, JuliaPetra uses MPI and Single-Program-Multiple-Data as its base parallel model.
-The API is split into two main layers of abstraction, the communication layer and the data structures layer.
+The API is split into three main layers of abstraction, the communication layer, the problem distribution layer and the data structures layer.
 
-The first level of abstraction handles the communication details and how the problem is
-distributed across processes.
-The \snippet{Comm} and \snippet{Distributor} types provide a low level interface to support
-different communication methods.
-Because all interprocess communication is done through these objects,
-new communication systems can be implemented without affected the objects built on top of the communication layer.
+The first level of abstraction handles actual communication between processes.
+The \snippet{Comm} and \snippet{Distributor} types provide a low level interface to support different communication methods.
+Because all interprocess communication is done through these objects, new communication systems can be implemented without affected the objects built on top of the communication layer.
+There are two existing implementations of this layer, a serial implementation, with a trivial implementation, and an MPI implementation, built on MPI.jl\cite{Github:MPI}.
+This communication layer provides the abstraction to build Single-Program-Multiple-Data logic without regard for the underlying communication implementation.
+
+The next layer of abstraction manages how the problem is distributed across processes.
 The \snippet{BlockMap}, \snippet{Directory}, \snippet{Import} and \snippet{Export}
 types handle the distribution of the problem across the processors.
 \snippet{BlockMap} and \snippet{Directory} manage which processor the various parts of
@@ -112,9 +114,9 @@ the problem are located.
 the problem among the processes.
 The \snippet{SrcDistObject} and \snippet{DistObject} interfaces provide a connection between
 the redistributing logic and the data structures themselves.
-The communication layer provides an abstraction on which the distributed data structures can build.
+This provides an abstraction on which the distributed data structures can build.
 
-The linear algebra objects are built on top of the abstractions provided by the communication layer.
+The linear algebra objects are built on top of the abstractions provided by the problem distribution layer.
 JuliaPetra has two main linear algebra types.
 The first type is the abstract type \snippet{MultiVector} which holds one or more vectors.
 This type is implemented by \snippet{DenseMultiVector} which stores dense vectors.
@@ -221,6 +223,7 @@ So, the other interfaces for the data structures are not explicit types,
 but simply contracts promised in the documentation.
 These implicit interfaces include \snippet{Operator}, \snippet{SrcDistObject}
 and \snippet{DistObject}.
+%TODO consider discussing the vagueness of the definition of (Src)DistObject
 So, any methods that use one of those types accepts an object of any type
 and the documentation specifies the methods that must be implemented.
 Figure~\ref{fig:type-hierarchy} shows the full type hierarchy.
@@ -299,75 +302,74 @@ DistributedArrays.jl is a similar library to JuliaPetra that supports
 distributed arrays in parallel environments \cite{Github:DA}.
 It uses Julia's built in fork-and-join model for parallelism
 \cite{Bezanson:2017:FreshApproach}.
-DistributedArrays.jl offers a number of advantages over JuliaPetra, however, it is not able to
-match the speed of JuliaPetra.
+DistributedArrays.jl offers a number of usability advantages over JuliaPetra, however, it is not able to match the speed of JuliaPetra.
 
 DistributedArrays.jl has advantages over JuliaPetra because it is better designed to function with
 existing Julia code.
-For example, it is built around the standard Julia parallelization and array APIs and models.
+For example, it is built around the standard models of parallelization and arrays in Julia.
 Another advantage is that DistributedArrays.jl uses an instance of \snippet{AbstractArray}
 for a process's local storage, this allows automatic support for different array structures.
 Finally, by keeping the program logic on the master process, DistributedArrays.jl can be used to
 do distributed computations while using Julia's read-eval-print loop.
 
-However, DistributedArrays.jl is not able to match the speed of JuliaPetra.
-JuliaPetra is able to run within half of the execution time of DistributedArrays.jl.
-This difference in time is caused by JuliaPetra's less frequent and more efficient inter-process communication,
-since it is built on MPI's low level interface as opposed to Julia's high level, function based interface.
+However, DistributedArrays.jl is performs much worse for the sparse operations used in the comparison timings.
+This difference in performance likely stems from the fact that DistributedArrays.jl is optimized towards dense matrix operations, resulting in unnecessary communication and computation when working with sparse matrices.
+A Julia 0.6.0 version of DistributedArrays.jl was modified to be more conducive to sparse matrix operations, but that implementation was neither able to match the performance of JuliaPetra nor updated to the Julia 1.0 compatible version of DistributedArrays.jl.
 
 \subsection{Timing Results}
 
 \begin{table}
-	\begin{tabular}{|c c|r|r|r||r|r|}
+	\begin{tabular}{|c c|S|S|S||S|}
 		\hline
 			\multicolumn{2}{|c|}{Equations Per Process}
-			& JuliaPetra
-			& Epetra
+			& {JuliaPetra}
+			& {Epetra}
 			& \multicolumn{1}{m{1.8cm}||}{Distributed\-Arrays.jl}
-			& \multicolumn{1}{m{1.75cm}|}{JuliaPetra / Epetra}
-			& \multicolumn{1}{m{1.8cm}|}{JuliaPetra / Distributed\-Arrays.jl} \\
+			& \multicolumn{1}{m{1.75cm}|}{JuliaPetra / Epetra}\\
 		\hline
-			\multicolumn{7}{|l|}{4 Processors}\\
+			\multicolumn{6}{|l|}{4 Processors}\\
+			
 		\hline
-			100,000			&Average & 0.22850 & 0.18045 &  & 1.26633 &  \\
-			equations		&Minimum & 0.22768 & 0.13394 &  & 1.69985 &  \\
-							&Maximum & 0.22933 & 0.21588 &  & 1.06232 &  \\
+			100,000			&Average & 0.22850 & 0.18045 & 124.322 & 1.26633 \\
+			equations		&Minimum & 0.22768 & 0.13394 & 123.324 & 1.69985 \\
+							&Maximum & 0.22933 & 0.21588 & 126.464 & 1.06232 \\
 		\hline
-			1,000,000		&Average & 2.82589 & 2.35860 &  & 1.19812 &  \\
-			equations		&Minimum & 2.80843 & 2.34777 &  & 1.19621 &  \\
-							&Maximum & 2.83711 & 2.36840 &  & 1.19790 &  \\
+			1,000,000		&Average & 2.82589 & 2.35860 & 1149.26 & 1.19812 \\
+			equations		&Minimum & 2.80843 & 2.34777 & 1144.52 & 1.19621 \\
+							&Maximum & 2.83711 & 2.36840 & 1162.54 & 1.19790 \\
 		\hline
-			10,000,000		&Average & 30.7656 & 24.6991 &  & 1.24562 &  \\
-			equations		&Minimum & 30.5471 & 24.5430 &  & 1.24464 &  \\
-							&Maximum & 31.2470 & 24.7841 &  & 1.26077 &  \\
+			10,000,000		&Average & 30.7656 & 24.6991 & {-} & 1.24562 \\
+			equations		&Minimum & 30.5471 & 24.5430 & {-} & 1.24464 \\
+							&Maximum & 31.2470 & 24.7841 & {-} & 1.26077 \\
 		\hline
-			\multicolumn{7}{|l|}{16 Processors}\\
+			\multicolumn{6}{|l|}{16 Processors}\\
 		\hline
-			100,000			&Average & 0.54401 & 0.55244 &  & 0.98474 &  \\
-			equations		&Minimum & 0.52902 & 0.50857 &  & 1.04021 &  \\
-							&Maximum & 0.55428 & 0.56908 &  & 0.97400 &  \\
+			100,000			&Average & 0.54401 & 0.55244 & 2569.82 & 0.98474 \\
+			equations		&Minimum & 0.52902 & 0.50857 & 2525.37 & 1.04021 \\
+							&Maximum & 0.55428 & 0.56908 & 2713.96 & 0.97400 \\
 		\hline
-			1,000,000		&Average & 7.44313 & 7.43903 &  & 1.00055 &  \\
-			equations		&Minimum & 7.41123 & 7.42147 &  & 0.99862 &  \\
-							&Maximum & 7.53777 & 7.45056 &  & 1.01171 &  \\
+		
+			1,000,000		&Average & 7.44313 & 7.43903 & {-} & 1.00055 \\
+			equations		&Minimum & 7.41123 & 7.42147 & {-} & 0.99862 \\
+							&Maximum & 7.53777 & 7.45056 & {-} & 1.01171 \\
 		\hline
-			10,000,000		&Average & 7.47297 & 73.9551 &  & 0.99348 &  \\
-			equations		&Minimum & 73.1307 & 73.9172 &  & 0.98936 &  \\
-							&Maximum & 74.1664 & 73.9953 &  & 1.00231 &  \\
+			10,000,000		&Average & 73.4730 & 73.9551 & {-} & 0.99348 \\
+			equations		&Minimum & 73.1307 & 73.9172 & {-} & 0.98936 \\
+							&Maximum & 74.1664 & 73.9953 & {-} & 1.00231 \\
 		\hline
-				\multicolumn{7}{|l|}{20 Processors}\\
+				\multicolumn{6}{|l|}{20 Processors}\\
 		\hline
-			100,000			&Average & 0.76502 & 0.72094 &  & 1.06114 &  \\
-			equations		&Minimum & 0.73781 & 0.69893 &  & 1.05563 &  \\
-							&Maximum & 0.79881 & 0.76437 &  & 1.04507 &  \\
+			100,000			&Average & 0.76502 & 0.72094 & {-} & 1.06114 \\
+			equations		&Minimum & 0.73781 & 0.69893 & {-} & 1.05563 \\
+							&Maximum & 0.79881 & 0.76437 & {-} & 1.04507 \\
 		\hline
-			1,000,000		&Average & 9.67784 & 9.74738 &  & 0.99287 &  \\
-			equations		&Minimum & 9.47876 & 9.61908 &  & 0.98541 &  \\
-							&Maximum & 9.85454 & 9.86118 &  & 0.99933 &  \\
+			1,000,000		&Average & 9.67784 & 9.74738 & {-} & 0.99287 \\
+			equations		&Minimum & 9.47876 & 9.61908 & {-} & 0.98541 \\
+							&Maximum & 9.85454 & 9.86118 & {-} & 0.99933 \\
 		\hline
-			10,000,000		&Average & 96.6538 & 97.4296 &  & 0.99204 &  \\
-			equations		&Minimum & 95.1889 & 96.7890 &  & 0.98347 &  \\
-							&Maximum & 97.5618 & 98.0169 &  & 0.99536 &  \\
+			10,000,000		&Average & 96.6538 & 97.4296 & {-} & 0.99204 \\
+			equations		&Minimum & 95.1889 & 96.7890 & {-} & 0.98347 \\
+							&Maximum & 97.5618 & 98.0169 & {-} & 0.99536 \\
 		\hline
 	\end{tabular}
 	
@@ -376,23 +378,25 @@ since it is built on MPI's low level interface as opposed to Julia's high level,
 \end{table}
 
 As can be seen in Table~\ref{tab:timing-results}, JuliaPetra is very close to the performance
-of Epetra for large problem sizes.
-Additionally, JuliaPetra is able to significantly outperform DistributedArrays.jl, performing in less than
-half the time of DistributedArrays.jl for all but the largest problems.
+of Epetra for large problem sizes and is even able to outperform Epetra for the largest of problems.
+Additionally, JuliaPetra is able to significantly outperform DistributedArrays.jl.
 
 The timings come from implementations of the power method for finding the largest eigenvalue of a matrix
 \cite{Gu:2000:PowerMethod}.
 This tests the performance of vector dot product, vector L2-norm and sparse matrix-vector multiplication functionalities.
-The matrices used were various sizes of symmetric tridiagonal matrices, with the diagonal containing 2's
+The matrices used were various sizes of symmetric tridiagonal matrices, with the diagonal consisting of 2's
 and the off diagonals containing -1's, that were distributed over different numbers of processors.
 Each combination of implementation, problem size and number of processors was run five times
 and the average, minimum and maximum are presented.
 All implementations were run once before collecting the timings, to ensure all Julia code was
 compiled before the timing started.
 Additionally, the setup for the problems were not counted as part of the times.
+Note that the DistributedArrays.jl implementation took over an hour to find the eigenvalue for some problem sizes.
+Given the timings produced by the Petra implementations, these problems were not run to completion and left without a time on the table.
 
-The MPI implementation was MPICH version 3.2 with TCP used for all inter-process communication.
+The MPI implementation was MPICH version 3.2 with TCP used for all inter-process communication, with MPI.jl version 0.7.0 wrapping MPI for JuliaPetra.
 The Julia tests were run with the Julia v1.0.0 precompiled binary for Linux with the \snippet{-O3} flag enabled at run time.
+Version 0.5.1 of DistributedArrays.jl was used.
 The Epetra tests were compiled with GCC 4.8.5, the \snippet{-O3} flag and Trilinos 12.10.1.
 Tests were run on a Red Hat Enterprise Linux Workstation, version 7.3,
 with a 20 core Intel E5-2698 v4 CPU.
