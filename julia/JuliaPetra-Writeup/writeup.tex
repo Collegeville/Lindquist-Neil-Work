@@ -5,6 +5,7 @@
 \usepackage{tikz}
 \usetikzlibrary{positioning}
 \usepackage{siunitx}
+\usepackage{todonotes}
 
 \title{JuliaPetra: An Implementation of the Petra Object Model in Julia}
 
@@ -91,6 +92,10 @@ These computations include dot products, vector norms and sparse matrix - vector
 This document provides, first, an overview of the types and interfaces of JuliaPetra,
 second, a summary of optimizations used to implement JuliaPetra,
 and finally, comparisons with two similar libraries, Epetra and DistributedArrays.jl.
+
+\section{The Petra Object Model}
+
+A general discussion of the Petra Object model, along with class diagrams.
 
 \section{Design of JuliaPetra}
 
@@ -376,6 +381,10 @@ A Julia 0.6.0 version of DistributedArrays.jl was modified to be more conducive 
 	\caption{Timing results of various power method implementations.  All times are in seconds.}
 	\label{tab:timing-results}
 \end{table}
+
+\todo[inline]{
+The timing results could be a bit confusing to the reader.  It would be worth mentioning specifically what the total number of equations is, at least in the description.  Also, it would be good to get some timing results from something beyond a tridiagonal matrix.
+}
 
 As can be seen in Table~\ref{tab:timing-results}, JuliaPetra is very close to the performance
 of Epetra for large problem sizes and is even able to outperform Epetra for the largest of problems.
