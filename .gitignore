@@ -22,6 +22,9 @@
 *.mtc1
 *.out
 *.synctex.gz
+*.nav
+*.snm
+*.vrb
 *.pdf
 
 #backup files
