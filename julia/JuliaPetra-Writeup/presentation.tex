@@ -9,8 +9,8 @@
 \pgfplotsset{compat=1.16}
 \usepackage{inconsolata}
 
-%\usepackage{pgfpages}
-%\setbeameroption{show notes on second screen=left}
+\usepackage{pgfpages}
+\setbeameroption{show notes on second screen=left}
 
 % presentation themeing
 \usetheme{Singapore}
@@ -56,6 +56,8 @@
 		high level language
 		
 		can perform on par with C
+		
+		Compiler uses some tricks to achieve this performance with minimal type annotations
 		\begin{itemize}
 			\item type inferencing
 			\item compiling each concrete method signature
@@ -74,7 +76,9 @@
 		\item 3 existing implementations
 	\end{itemize}
 	\note{
-		The Petra libraries are the underlying data structures used by Trilinos
+		Trilinos uses a family of libraries know as the Petra Object Model for its core data represetation
+		
+		These libraries are basic frameworks for sparse linear algebra
 		
 		3 implementations
 		\begin{itemize}
@@ -85,32 +89,39 @@
 	}
 \end{frame}
 \begin{frame}
-	\frametitle{JuliaPetra Organization}
+	\frametitle{Petra Organization}
 	\nocite{Github:MPI}
 	\centering
 	\begin{tikzpicture}
 		\node[rectangle, draw=black] (CommLayer) {Communication Layer};
+		\pause
 		\node[rectangle, draw=black] (DistLayer) [below=2cm of CommLayer] {Problem Distribution Layer};
-		\node[rectangle, draw=black] (LALayer) [below=2cm of DistLayer] {Linear Algebra Layer};
 		\draw[-{Latex[length=3mm]}] (CommLayer.south) -- (DistLayer);
+		\pause
+		\node[rectangle, draw=black] (LALayer) [below=2cm of DistLayer] {Linear Algebra Layer};
 		\draw[-{Latex[length=3mm]}] (DistLayer.south) -- (LALayer);
 	\end{tikzpicture}
-	\note{
-	Communication layer handles the movement of data between processes
-	\begin{itemize}
-		\item Can be implemented with any Single-Program-Multiple-Data parallel system
-		\item There are serial and MPI implementations
-		\item MPI.jl is used for MPI communication
-	\end{itemize}
-	Distribution layer managed how the parts of the problem are distributed
-	
-	Linear Algebra layer provides the iterfaces for vector and linear transformation objects
+	\note<1>{
+		Communication layer handles the movement of data between processes
+		\begin{itemize}
+			\item Can be implemented with any Single-Program-Multiple-Data parallel system
+			\item There are serial and MPI implementations
+			\item MPI.jl is used for MPI communication
+		\end{itemize}
+	}
+	\note<2>{
+		Distribution layer managed how the parts of the problem are distributed
+		
+		This layer isn't extended by the user
+	}
+	\note<3>{
+		Linear Algebra layer provides the iterfaces for vector and linear transformation objects
 	}
 \end{frame}
 \begin{frame}[fragile]
 	\frametitle{JuliaPetra Example}
-	%TODO should only part of the snippet be here for better absorbability?
-	\begin{lstlisting}[
+	%TODO improve the example and description there of
+	\lstset{
 		language         =Julia,
 		basicstyle       =\ttfamily,
 		keywordstyle     ={[1]\bfseries\color{black}},
@@ -119,27 +130,45 @@
 		commentstyle     =\color{gray},
 		showstringspaces =false,
 		mathescape
-		]
+		}
+	\begin{onlyenv}<1>
+		\begin{lstlisting}
 apply!(z, A, q)
-$\lambda$ = dot(q, z)[1]
-@. r = z - $\lambda$*q
+		\end{lstlisting}
+	\end{onlyenv}
+	\begin{onlyenv}<2>
+		\begin{lstlisting}
+@. z = A*q
+		\end{lstlisting}
+	\end{onlyenv}
+	\begin{lstlisting}
+$\lambda$ = d$\cdot$z  # = dot(q, z)
 	\end{lstlisting}
-	\note{
-		Here is an example of JuliaPetra.
+	\begin{lstlisting}
+@. z = s - $\lambda$*q
+	\end{lstlisting}
+	\note<1>{
+		Example function calls.
+		A is an existing matrix, q,r,z are existing vectors
 		
-		This is a few lines from the power method for finding eigenvalues
-		
-		Note that greek letters are allowed in the source
+		Note the support for greek letters in identifiers as well as supporting a binary dot product operator
 		\begin{itemize}
-			\item vector symbol is also allowed, but latex has issues with compiling it
+			\item Julia editors support latex-like abbreviations
 		\end{itemize}
+		
+		Note that vector arithmetic can be written with binary operators thanks to the broadcast operation
+		\begin{itemize}
+			\item Should be a single loop, without allocating a vector
+		\end{itemize}
+	}
+	\note<2>{
+		possible to broadcast matrix vector product too
 	}
 \end{frame}
 \begin{frame}
 	\frametitle{Performance Comparison}
 	\nocite{Github:DA,Gu:2000:PowerMethod}
 	\centering
-	%TODO this graph doesn't really show that much.  Change to ratio instead?
 	\begin{tikzpicture}[scale=0.65]
 		\begin{axis}[
 			xlabel = {\Large Overall Problem Size (rows)},
@@ -160,8 +189,14 @@ $\lambda$ = dot(q, z)[1]
 	JuliaPetra Time over Epetra Time.
 	\note{
 		Latency speed up of JuliaPetra over Epetra
+		
+		JuliaPetra was a little slower for the smallest problem, but actually slightly outperformed Epetra for larger problems
+		\begin{itemize}
+			\item both implementations took under a second from the smallest problem
+		\end{itemize}
 	
-		Results are for a tridiagonal matrix using a 20 core machine
+		Results are for the power method for finding eigenvalues given a tridiagonal matrix
+		%TODO mention machine?
 	
 		DistributedArrays.jl was significantly slower
 	}
@@ -267,13 +302,16 @@ $\lambda$ = dot(q, z)[1]
 	\frametitle{Conclusion}
 	\begin{itemize}
 		\item Julia is a promising fast, high level language
+		\item Julia allows for clean APIs
 		\item JuliaPetra matches Epetra's performance
 		\item Optimizing Julia requires disabling some high level features
 	\end{itemize}
 	\note{
 		Julia is fast and high level
 		
-		JuliaPetra matches Epetra
+		Julia allows for elegant API's due to type inferencing and broadcast operator
+		
+		JuliaPetra matches Epetra performance
 		
 		Optimizing Julia requires eliminating the overhead of some high level features
 	}
