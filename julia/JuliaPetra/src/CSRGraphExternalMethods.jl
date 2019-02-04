@@ -390,7 +390,7 @@ function getGlobalView(graph::CSRGraph{GID, PID, LID}, rowInfo::RowInfo{LID}) wh
         if length(graph.globalIndices1D) != 0
             range = rowInfo.offset1D : rowInfo.offset1D + rowInfo.allocSize
             view(graph.globalIndices1D, range)
-        elseif length(graph.globalIndices2D[rowInfo.localRow]) == 0
+        elseif length(graph.globalIndices2D[rowInfo.localRow]) != 0
             globalIndices2D[rowInfo.localRow]
         else
             GID[]
@@ -404,7 +404,7 @@ end
     if rowInfo.allocSize > 0
         if length(graph.globalIndices1D) != 0
             return (pointer(graph.globalIndices1D, rowInfo.offset1D), rowInfo.allocSize)
-        elseif length(graph.globalIndices2D[rowInfo.localRow]) == 0
+        elseif length(graph.globalIndices2D[rowInfo.localRow]) != 0
             baseArray = graph.globalIndices2D[rowInfo.localRow]::Vector{GID}
             return (pointer(baseArray), GID(length(baseArray)))
         end
@@ -417,12 +417,12 @@ function getLocalView(graph::CSRGraph{GID, PID, LID}, rowInfo::RowInfo{LID}) whe
         if length(graph.localIndices1D) != 0
             range = rowInfo.offset1D : rowInfo.offset1D + rowInfo.allocSize-LID(1)
             return view(graph.localIndices1D, range)
-        elseif length(graph.localIndices2D[rowInfo.localRow]) == 0
+        elseif length(graph.localIndices2D[rowInfo.localRow]) != 0
             baseArray = graph.localIndices2D[rowInfo.localRow]
             return view(baseArray, LID(1):LID(length(baseArray)))
         end
     end
-    return LID
+    return LID[]
 end
 
 
@@ -430,7 +430,7 @@ Base.@propagate_inbounds @inline function getLocalViewPtr(graph::CSRGraph{GID, P
     if rowInfo.allocSize > 0
         if length(graph.localIndices1D) != 0
             return (pointer(graph.localIndices1D, rowInfo.offset1D), rowInfo.allocSize)
-        elseif length(graph.localIndices2D[rowInfo.localRow]) == 0
+        elseif length(graph.localIndices2D[rowInfo.localRow]) != 0
             baseArray::Array{LID, 1} = graph.localIndices2D[rowInfo.localRow]
             return (pointer(baseArray), LID(length(baseArray)))
         end
@@ -479,7 +479,7 @@ Base.@propagate_inbounds function getGlobalRowViewPtr(graph::CSRGraph{GID, PID, 
     retVal
 end
 
-function getLocalRowView(graph::CSRGraph{GID}, localRow::GID)::AbstractArray{GID, 1} where {GID}
+function getLocalRowView(graph::CSRGraph{GID, PID, LID}, localRow::LID)::AbstractArray{LID, 1} where {GID, PID, LID}
     if @is_debug_mode
         @assert hasRowInfo() "Graph row information was deleted"
     end
@@ -491,7 +491,7 @@ function getLocalRowView(graph::CSRGraph{GID}, localRow::GID)::AbstractArray{GID
 end
 
 function getLocalRowView(graph::CSRGraph{GID, PID, LID}, rowInfo::RowInfo{LID}
-        )::AbstractArray{GID, 1} where {GID, PID, LID}
+        )::AbstractArray{LID, 1} where {GID, PID, LID}
 
     if isGloballyIndexed(graph)
         throw(InvalidArgumentError("The graph's indices are currently stored as global indices, so a view with local column indices cannot be returned.  Use getLocalRowCopy(::CSRGraph) instead"))

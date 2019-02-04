@@ -37,13 +37,13 @@ mutable struct CSRMatrix{Data <: Number, GID <: Integer, PID <: Integer, LID <: 
             values2D = Array{Array{Data, 1}, 1}(undef, 0)
         else #DYNAMIC_PROFILE
             if isLocallyIndexed(myGraph)
-                graphIndices = myGraph.localIndices
+                graphIndices = myGraph.localIndices2D
             else
-                graphIndices = myGraph.globalIndices
+                graphIndices = myGraph.globalIndices2D
             end
             values2D = Array{Array{Data, 1}, 1}(undef, localNumRows)
             for r = 1:length(graphIndices)
-                values2D[r] = Array{Array{Data, 1}, 1}(undef, length(graphIndices[r]))
+                values2D[r] = Array{Data, 1}(undef, length(graphIndices[r]))
             end
         end
 
@@ -346,11 +346,11 @@ function fillLocalGraphAndMatrix(matrix::CSRMatrix{Data, GID, PID, LID},
 
         localIndices2D = myGraph.localIndices2D
         for row = 1:localNumRows
-            numEnt = numRowEnt[row]
+            numEnt = numRowEntries[row]
             dest = range(ptrs[row], step=1, length=numEnt)
 
-            inds[dest] = localIndices2D[row][:]
-            vals_concrete[dest] = matrix.values2D[row][:]
+            inds[dest] = localIndices2D[row][1:numEnt]
+            vals_concrete[dest] = matrix.values2D[row][1:numEnt]
         end
     elseif getProfileType(matrix) == STATIC_PROFILE
         curRowOffsets = myGraph.rowOffsets
@@ -643,6 +643,8 @@ function fillComplete(matrix::CSRMatrix{Data, GID, PID, LID},
     checkInternalState(myGraph)
 
     fillLocalGraphAndMatrix(matrix, plist)
+
+    matrix
 end
 
 

@@ -58,7 +58,7 @@ getLocalGraph(graph::CSRGraph) = graph.localGraph
 function updateGlobalAllocAndValues(graph::CSRGraph{GID, PID, LID}, rowInfo::RowInfo{LID}, newAllocSize::Integer, rowValues::AbstractArray{Data, 1}) where {Data, GID, PID, LID}
 
     resize!(graph.globalIndices2D[rowInfo.localRow], newAllocSize)
-    resize!(rowVals, newAllocSize)
+    resize!(rowValues, newAllocSize)
 
     nothing
 end
@@ -169,7 +169,6 @@ function computeLocalConstants(graph::CSRGraph{GID, PID, LID}) where {
             rowInfo = getRowInfo(graph, localRow)
             (rowPtr, rowLen) = getLocalViewPtr(graph, rowInfo)
 
-
             for i in 1:rowLen
                 if unsafe_load(rowPtr) == rowLID
                     graph.nodeNumDiags += 1
@@ -224,10 +223,9 @@ end
         numEntries = (length(graph.numRowEntries) == 0 ?
             allocSize : LID(graph.numRowEntries[row]))
     else #dynamic profile
-        if isLocallyIndexed(graph) && length(graph.localIndices2D) == 0
+        if isLocallyIndexed(graph)
             allocSize = LID(length(graph.localIndices2D[row]))
-
-        elseif isGloballyIndexed(graph) && length(graph.globalIndices2D) == 0
+        elseif isGloballyIndexed(graph)
             allocSize = LID(length(graph.globalIndices2D[row]))
         end
         numEntries = (length(graph.numRowEntries) == 0 ?
