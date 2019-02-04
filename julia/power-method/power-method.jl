@@ -1,5 +1,8 @@
 using JuliaPetra
 using Random
+import Profile
+
+include("MMToJP.jl")
 
 #program settings
 const useMPI = true
@@ -19,7 +22,7 @@ end
 Returns a tuple of the computed λ and if the λ is within tolerance
 """
 function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
-        tolerance::Data, verbose::Bool)::Tuple{Data, Bool} where {Data, GID, PID, LID}
+        tolerance::Data, verbose::Bool) where {Data, GID, PID, LID}
     q = DenseMultiVector{Data}(getRowMap(A), 1)
     z = DenseMultiVector{Data}(getRowMap(A), 1)
     resid = DenseMultiVector{Data}(getRowMap(A), 1)
@@ -33,7 +36,8 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
     ONE = one(Data)
     ZERO = zero(Data)
 
-    for iter = 1:niters
+    iter = 1
+    while iter <= niters
         normz = norm(z, 2)[1]
 
         @. q = z/normz
@@ -46,76 +50,58 @@ function powerMethod(A::RowMatrix{Data, GID, PID, LID}, niters::Integer,
             residual = norm(resid, 2)[1]
 
             if residual < tolerance
-                return (λ, true)
+                return (λ, true, iter)
             end
         end
+        iter += 1
     end
-    (λ, false)
+    (λ, false, iter)
 end
 
 function log(values...)
     verbose && println(values...)
 end
 
-function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type) where{GID, PID, LID}
+function main(comm::Comm{GID, PID, LID}, verbose, Data::Type) where{GID, PID, LID}
 
-    pid = myPid(comm)
-    nProc = numProc(comm)
+    #try
+        A = readMM("power-method/matrix.mm", comm)
+    #catch ex
+    #    println("caught error: $ex")
 
-    map = BlockMap(numGlobalElements, comm)
+    #    return
+    #end
 
-    numMyElements = JuliaPetra.numMyElements(map)
-    myGlobalElements = JuliaPetra.myGlobalElements(map)
-    numNz = Array{GID, 1}(undef, numMyElements)
-    for i = 1:numMyElements
-        if myGlobalElements[i] == 1 || myGlobalElements[i] == numGlobalElements
-            numNz[i] = 2
-        else
-            numNz[i] = 3
-        end
-    end
-
-    A = CSRMatrix{Data}(map, numNz, STATIC_PROFILE)
-
-    values = Data[-1, -1]
-    two = Data[Data(2)]
-
-    for i = 1:numMyElements
-        if myGlobalElements[i] == 1
-            indices = LID[2]
-        elseif myGlobalElements[i] == numGlobalElements
-            indices = LID[numGlobalElements-2]
-        else
-            indices = LID[myGlobalElements[i]-1, myGlobalElements[i]+1]
-        end
-
-        insertGlobalValues(A, myGlobalElements[i], indices, values)
-        insertGlobalValues(A, myGlobalElements[i], LID[myGlobalElements[i]], two)
-    end
-
-    fillComplete(A, map, map)#use map for domain and range
-
-    niters = numGlobalElements*10
+    niters = getGlobalNumRows(A)*10
     tolerance = 1.0e-2
 
     log("starting tests")
 
     #compile all the nessacery methods before timing
 
-    elapsedTime = @elapsed λ, success = powerMethod(A, niters, tolerance, verbose)
+    elapsedTime = @elapsed λ, success, iter = powerMethod(A, niters, tolerance, verbose)
 
     log("λ = $λ; is within tolerance? $success")
+    log("Took $iter iterations")
     log("total time for first solve (plus compile) = $elapsedTime sec\n\n")
 
-    elapsedTime = @elapsed λ, success = powerMethod(A, niters, tolerance, verbose)
+    elapsedTime = @elapsed λ, success, iter = powerMethod(A, niters, tolerance, verbose)
+    #elapsedTime = 0
+    #Profile.init(;n=10000000)
+    #Profile.clear()
+    #Profile.@profile begin
+    #    elapsedTime = @elapsed λ, success, iter = powerMethod(A, niters, tolerance, verbose)
+    #end
+    #verbose && Profile.print(;mincount=5)
     #TODO look into storing FLOPS
 
 
     log("λ = $λ; is within tolerance? $success")
+    log("Took $iter iterations")
     log("total time for first solve (pre-compiled) = $elapsedTime sec\n\n")
     log("increasing magnitude of first diagonal term, solving again\n")
 
-    if myGID(map, 1)
+    if myGID(getRowMap(A), 1)
         rowInds, rowVals = getLocalRowView(A, 1)
         for i = 1:getNumEntriesInGlobalRow(A, 1)
             if rowInds[i] == 1
@@ -125,11 +111,12 @@ function main(comm::Comm{GID, PID, LID}, numGlobalElements, verbose, Data::Type)
         end
     end
 
-    elapsedTime = @elapsed λ, success = powerMethod(A, niters, tolerance, verbose)
+    elapsedTime = @elapsed λ, success, iter = powerMethod(A, niters, tolerance, verbose)
 
     log("")
 
     log("λ = $λ; is within tolerance? $success")
+    log("Took $iter iterations")
     log("total time for second solve = $elapsedTime sec\n\n")
 end
 
@@ -142,18 +129,6 @@ else
 end
 
 const pid = myPid(comm)
-const nProc = numProc(comm)
 const verbose = pid == 1
-
 log(comm)
-
-if length(ARGS) != 1
-    log("Usage: 1 argument for the number_of_equations")
-else
-    targetNumGlobalElements = parse(commLID, ARGS[1])
-    if targetNumGlobalElements < nProc
-        log("numGlobalBlocks = $targetNumGlobalElements cannot be < number of processors = $nProc")
-    else
-        main(comm, targetNumGlobalElements, verbose, commData)
-    end
-end
+main(comm, verbose, commData)

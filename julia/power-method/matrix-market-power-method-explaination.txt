@@ -1,0 +1,4 @@
+This branch of the power method allows running the power method on matrix
+market files.  Specifically it will read the file named matrix.mm in this
+directory.  "Run power-method time tests.sh" will run both the Epetra and
+JuliaPetra versions of the power method with that matrix

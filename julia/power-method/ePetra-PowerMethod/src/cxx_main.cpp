@@ -39,6 +39,8 @@
 // ************************************************************************
 //@HEADER
 
+#define EPETRA_MPI
+
 
 #include <cstdio>
 #include <cstdlib>
@@ -51,6 +53,7 @@
 #include "Epetra_MultiVector.h"
 #include "Epetra_Vector.h"
 #include "Epetra_CrsMatrix.h"
+#include "EpetraExt_CrsMatrixIn.h"
 #ifdef EPETRA_MPI
 #include "mpi.h"
 #include "Epetra_MpiComm.h"
@@ -86,7 +89,6 @@ int main(int argc, char *argv[])
 #endif
 
   int MyPID = Comm.MyPID();
-  int NumProc = Comm.NumProc();
   bool verbose = (MyPID==0);
 
   if (verbose){
@@ -94,106 +96,24 @@ int main(int argc, char *argv[])
     std::cout << Comm << std::endl;
   }
 
-  // Get the number of local equations from the command line
-  if (argc!=2)
-   {
-     if (verbose)
-       std::cout << "Usage: " << argv[0] << " number_of_equations" << std::endl;
-    std::exit(1);
-   }
-  long long NumGlobalElements = std::atoi(argv[1]);
 
-  if (NumGlobalElements < NumProc)
-  {
-     if (verbose)
-       std::cout << "numGlobalBlocks = " << NumGlobalElements
-	    << " cannot be < number of processors = " << NumProc << std::endl;
-     std::exit(1);
-   }
+  Epetra_CrsMatrix * Aptr;
+  EPETRA_CHK_ERR(EpetraExt::MatrixMarketFileToCrsMatrix64("power-method/matrix.mm", Comm, Aptr, 0, verbose));
 
-  // Construct a Map that puts approximately the same number of
-  // equations on each processor.
-
-  Epetra_Map Map(NumGlobalElements, 0LL, Comm);
-
-  // Get update list and number of local equations from newly created Map.
-
-  int NumMyElements = Map.NumMyElements();
-
-  std::vector<long long> MyGlobalElements(NumMyElements);
-    Map.MyGlobalElements(&MyGlobalElements[0]);
-
-  // Create an integer vector NumNz that is used to build the Petra Matrix.
-  // NumNz[i] is the Number of OFF-DIAGONAL term for the ith global equation
-  // on this processor
-
-    std::vector<int> NumNz(NumMyElements);
-
-  // We are building a tridiagonal matrix where each row has (-1 2 -1)
-  // So we need 2 off-diagonal terms (except for the first and last equation)
-
-  for (i=0; i<NumMyElements; i++)
-    if (MyGlobalElements[i]==0 || MyGlobalElements[i] == NumGlobalElements-1)
-      NumNz[i] = 2;
-    else
-      NumNz[i] = 3;
-
-  // Create a Epetra_Matrix
-
-  Epetra_CrsMatrix A(Copy, Map, &NumNz[0]);
-
-  // Add  rows one-at-a-time
-  // Need some vectors to help
-  // Off diagonal Values will always be -1
-
-
-  std::vector<double> Values(2);
-  Values[0] = -1.0; Values[1] = -1.0;
-  std::vector<long long> Indices(2);
-  double two = 2.0;
-  int NumEntries;
-
-  for (i=0; i<NumMyElements; i++)
-    {
-    if (MyGlobalElements[i]==0)
-      {
-    Indices[0] = 1;
-    NumEntries = 1;
-      }
-    else if (MyGlobalElements[i] == NumGlobalElements-1)
-      {
-    Indices[0] = NumGlobalElements-2;
-    NumEntries = 1;
-      }
-    else
-      {
-    Indices[0] = MyGlobalElements[i]-1;
-    Indices[1] = MyGlobalElements[i]+1;
-    NumEntries = 2;
-      }
-     ierr = A.InsertGlobalValues(MyGlobalElements[i], NumEntries, &Values[0], &Indices[0]);
-     assert(ierr==0);
-     // Put in the diagonal entry
-     ierr = A.InsertGlobalValues(MyGlobalElements[i], 1, &two, &MyGlobalElements[i]);
-     assert(ierr==0);
-    }
-
-  // Finish up
-  ierr = A.FillComplete();
-  assert(ierr==0);
-
-  // Create vectors for Power method
-
+  Epetra_CrsMatrix & A = *Aptr;
 
   // variable needed for iteration
   double lambda = 0.0;
-  int niters = (int) NumGlobalElements*10;
+  int niters = (int) A.NumGlobalRows64()*10;
+
   double tolerance = 1.0e-2;
+
 
   // Iterate
   Epetra_Time timer(Comm);
   ierr += power_method(A, lambda, niters, tolerance, verbose);
   double elapsed_time = timer.ElapsedTime();
+
 
   if (verbose){
     std::cout << "lambda = " << lambda << std::endl;
@@ -236,7 +156,7 @@ int main(int argc, char *argv[])
   if (verbose){
     std::cout << "lambda = " << lambda << std::endl;
     std::cout << "Total time for second solve = " << elapsed_time << std::endl<< std::endl;
-    std::cout << "\nErrors: " << ierr << std::endl << std::endl; 
+    std::cout << "\nErrors: " << ierr << std::endl << std::endl;
   }
 
 
@@ -265,7 +185,8 @@ int power_method(Epetra_CrsMatrix& A, double &lambda, int niters,
 
   int ierr = 1;
 
-  for (int iter = 0; iter < niters; iter++)
+  int iter = 0;
+  for (; iter < niters; iter++)
   {
     z.Norm2(&normz); // Compute 2-norm of z
     q.Scale(1.0/normz, z);
@@ -280,6 +201,9 @@ int power_method(Epetra_CrsMatrix& A, double &lambda, int niters,
       ierr = 0;
       break;
     }
+  }
+  if (verbose) {
+    std::cout << "Number of iterations: " << iter << std::endl;
   }
   return(ierr);
 }
