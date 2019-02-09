@@ -53,7 +53,7 @@
 	%TODO consider if Wilkins prize should be mentioned
 	%TODO should LLVM be mentioned?
 	\note{
-		high level language
+		high level, dynamic language
 		
 		can perform on par with C
 		
@@ -112,7 +112,7 @@
 	\note<2>{
 		Distribution layer managed how the parts of the problem are distributed
 		
-		This layer isn't extended by the user
+		This layer isn't extended by the user %Note totally true, DistObject is here
 	}
 	\note<3>{
 		Linear Algebra layer provides the iterfaces for vector and linear transformation objects
@@ -124,6 +124,7 @@
 	\lstset{
 		language         =Julia,
 		basicstyle       =\ttfamily,
+		columns          =fixed,
 		keywordstyle     ={[1]\bfseries\color{black}},
 		keywordstyle     ={[2]\color{blue}},
 		stringstyle      =\color{red},
@@ -131,25 +132,14 @@
 		showstringspaces =false,
 		mathescape
 		}
-	\begin{onlyenv}<1>
-		\begin{lstlisting}
+	\begin{lstlisting}
 apply!(z, A, q)
-		\end{lstlisting}
-	\end{onlyenv}
-	\begin{onlyenv}<2>
-		\begin{lstlisting}
-@. z = A*q
-		\end{lstlisting}
-	\end{onlyenv}
-	\begin{lstlisting}
-$\lambda$ = d$\cdot$z  # = dot(q, z)
-	\end{lstlisting}
-	\begin{lstlisting}
+$\lambda$ = d$\,\mathtt{\boldsymbol{\cdot}}\,$z  # = dot(q, z)
 @. z = s - $\lambda$*q
 	\end{lstlisting}
-	\note<1>{
+	\note{
 		Example function calls.
-		A is an existing matrix, q,r,z are existing vectors
+		A is an existing matrix, q, r, z are existing vectors
 		
 		Note the support for greek letters in identifiers as well as supporting a binary dot product operator
 		\begin{itemize}
@@ -161,13 +151,10 @@ $\lambda$ = d$\cdot$z  # = dot(q, z)
 			\item Should be a single loop, without allocating a vector
 		\end{itemize}
 	}
-	\note<2>{
-		possible to broadcast matrix vector product too
-	}
 \end{frame}
 \begin{frame}
 	\frametitle{Performance Comparison}
-	\nocite{Github:DA,Gu:2000:PowerMethod}
+	\nocite{Github:DA, Gu:2000:PowerMethod}
 	\centering
 	\begin{tikzpicture}[scale=0.65]
 		\begin{axis}[
@@ -175,7 +162,7 @@ $\lambda$ = d$\cdot$z  # = dot(q, z)
 			xtick = {6,7,8},
 			xticklabels = {\(2\cdot10^6\), \(2\cdot10^7\), \(2\cdot10^8\)},
 			ybar,
-			bar width = .75,
+			bar width = 0.75,
 			ylabel = {\Large Speed Up},
 			ymin  = -0.1,
 			ymax  = 0.1,
@@ -248,7 +235,7 @@ $\lambda$ = d$\cdot$z  # = dot(q, z)
 	\framesubtitle{Optimizing JuliaPetra}
 	\nocite{Github:TypeStability.jl}
 	\begin{itemize}
-		\item \texttt{code\_warntype} - view deduced types in code
+		\item \texttt{code\_warntype} - view inferred types
 		\item TypeStability.jl - Automate type stability checks
 	\end{itemize}
 	\note{

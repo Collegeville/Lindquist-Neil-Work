@@ -69,9 +69,9 @@
 	JuliaPetra is an implementation of the Petra object model in Julia.
 	The Petra object model is the design used in Trilinos for objects commonly used by linear solver algorithms
 	\cite{Heroux:2005:Trilinos}.
-	Petra libraries provide parallel, distributed matrices, vectors and graphs for other packages to use.
+	Petra libraries provide parallel, distributed matrices, vectors, and graphs for other packages to use.
 	By providing a set of interfaces for basic linear algebra structures, Petra libraries provide a way
-	to develop packages for these types of distributed algorithms that are able to interact and build on each other.
+	to develop packages for these types of distributed algorithms that can interact and build on each other.
 	The Petra object model has previously been implemented in both C++ and Java.
 	%REVIEW should this list of previous implemenetations be in the paper?
 	
@@ -106,7 +106,7 @@
 	The design of JuliaPetra follows closely with that of the C++ implementations of the
 	Petra object model, Epetra and Tpetra.
 	Like Epetra and Tpetra, JuliaPetra uses MPI and Single-Program-Multiple-Data as its base parallel model.
-	The API is split into three main layers of abstraction, the communication layer, the problem distribution layer and the data structures layer.
+	The API is split into three main layers of abstraction, the communication layer, the problem distribution layer, and the data structures layer.
 	
 	The first level of abstraction handles actual communication between processes.
 	The \snippet{Comm} and \snippet{Distributor} types provide a low level interface to support different communication methods.
@@ -136,7 +136,7 @@
 	supports this interface by multiplying the matrix on the left of \(x\).
 	\snippet{RowGraph} is an additionally type used to represent the sparsity pattern of a \snippet{RowMatrix}.
 	Both \snippet{RowMatrix} and \snippet{RowGraph} have concrete implementations based on
-	compressed sparse row format, \snippet{CSRMatrix} and \snippet{CSRGraph} respectively.
+	compressed sparse row format, \snippet{CSRMatrix} and \snippet{CSRGraph}, respectively.
 	Julia's \snippet{AbstractArray} is subtyped by both the \snippet{MultiVector}
 	and \snippet{RowMatrix} types to allow existing Julia code to interact with data in JuliaPetra objects.
 	
@@ -242,30 +242,27 @@
 	%This is to give insight on best practices for people who don't look at the general Julia discussions
 	%Talk about the "story" of improving the code and how optimizations improved performance.
 	
-	There were alot of optimizations used to optimize JuliaPetra,
-	many of which are standard adivice for optimizing Julia, such as type stability,
-	or for optimization in general, such as accessing arrays in memory order.
-	The only major unusual optimization was using \snippet{Ptr} objects to pass views of arrays
-	in an effort to reduce allocation and garbage collection.
+	There were a lot of optimizations used to optimize JuliaPetra, many of which are standard advice for optimizing Julia, such as type stability, or for optimization in general, such as accessing arrays in memory order.
+	The only major, unusual optimization was using \snippet{Ptr} objects to pass views of arrays to reduce allocation and garbage collection.
 	
 	The main improvements to performance in JuliaPetra came from improving type stability.
 	Type stability is where the compiler can inference the types of all values.
-	This allows the compiler is able to fully inline function calls, especially arithmetic and array operations.
+	This allows the compiler to fully inline function calls, especially arithmetic and array operations.
 	Because Julia is designed to support both slower, type unstable code and faster, type stable code,
 	unlike C++ which is restricted to type stable code, some effort needs to be put into verifying
 	type stability of performance critical code \cite{Bezanson:2017:FreshApproach}.
 	%REVIEW mention that this is standard Julia advice?
 	Removing type instabilities from performance critical sections of JuliaPetra improved performance
 	by a few orders of magnitude.
-	The \snippet{code_warntype} function was an important tool in finding type instabilities.
+	The \snippet{code_warntype} function was a valuable tool in finding type instabilities.
 	Due to \snippet{code_warntype} requiring manual inspection, the TypeStability.jl library was created
-	based on \snippet{code_warntype} to automatic type stability checks\cite{Github:TypeStability.jl}.
+	based on \snippet{code_warntype} to automatic type stability checks~\cite{Github:TypeStability.jl}.
 	
 	Another notable optimization came from using \snippet{Ptr} objects to pass views of arrays.
 	Because Julia is a garbage collected language, most objects in Julia must be allocated on the heap,
 	then garbage collected when they are no longer used.
 	However, certain objects, such as integers and floating point numbers can be allocated on the stack,
-	so they don't need garbage collection.
+	so they avoid needing garbage collection.
 	%needs some citations here
 	So, by passing \snippet{Ptr} objects, which can be stack allocated,
 	instead of \snippet{SubArray} objects, which must be heap allocated,
@@ -273,14 +270,12 @@
 	However, this prevents use of higher level interfaces that Julia normally provides,
 	such as the array length being stored with the array its self.
 	This had much less of a performance increase that improving type stability,
-	however, it is not a standard optimization for Julia so it deserved mention.
+	however, it is not a standard optimization for Julia, so it deserved mention.
 	
-	Other, common and minor optimizations were also made.
-	This optimizations include skipping unnecessary bounds checks
+	Other common and minor optimizations were also made.
+	These optimizations include skipping unnecessary bounds checks
 	and ensuring arrays data was accessed in the order it is stored in memory.
-	Additionally, function calls in frequently used loops were replaced with specialized, inlined versions
-	that take into account the context of the calling method
-	and avoid using generalized methods that produce extra computations.
+	Additionally, function calls in frequently used loops were replaced with specialized, inlined versions that consider the context of the calling method and avoid using generalized methods that produce extra computations.
 	%REVIEW should I go into more detail on the specific example (getting a row in SpMV)
 	
 	\section{Comparisons with Other Distributed Libraries}
@@ -298,9 +293,8 @@
 	For example, JuliaPetra takes advantage of higher level structures
 	such as type templating and thrown exceptions.
 	
-	JuliaPetra is able to achieve the same performance as Epetra on large instances of the power method,
-	as shown in Table~\ref{tab:timing-results}.
-	Since Julia uses just in time compiling, the JuliaPetra power method has extra start up costs compared to
+	JuliaPetra can achieve the same performance as Epetra on large instances of the power method, as shown in Table~\ref{tab:timing-results}.
+	Since Julia uses just in time compiling, the JuliaPetra power method has extra startup costs compared to
 	the Epetra version. However, since each specialized method needs to be compiled only once,
 	this is a fixed cost during the first evaluation.
 	Additionally, JuliaPetra uses runtime dispatch in a few locations, such as with
@@ -312,7 +306,7 @@
 	distributed arrays in parallel environments \cite{Github:DA}.
 	It uses Julia's built in fork-and-join model for parallelism
 	\cite{Bezanson:2017:FreshApproach}.
-	DistributedArrays.jl offers a number of usability advantages over JuliaPetra, however, it is not able to match the speed of JuliaPetra.
+	DistributedArrays.jl offers several of usability advantages over JuliaPetra, however, it is not able to match the speed of JuliaPetra.
 	
 	DistributedArrays.jl has advantages over JuliaPetra because it is better designed to function with
 	existing Julia code.
@@ -392,7 +386,7 @@
 	}
 	
 	As can be seen in Table~\ref{tab:timing-results}, JuliaPetra is very close to the performance of Epetra, except when only using a few processors.
-	Additionally, JuliaPetra is able to significantly outperform DistributedArrays.jl.
+	Additionally, JuliaPetra significantly outperforms DistributedArrays.jl.
 	Note that the last column shows the ratio of the JuliaPetra time over the Epetra time; in other words, a higher ratio indicates that the same problem will take longer to solve using JuliaPetra compared to Epetra.
 	Additionally, the number of iterations was consistent between all problems, meaning the number of operations completed is only a function of number of processes and local problem size.
 	The sizes were chosen to test how the libraries respond to different local workloads and different communication loads.
