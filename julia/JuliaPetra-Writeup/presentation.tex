@@ -9,8 +9,10 @@
 \pgfplotsset{compat=1.16}
 \usepackage{inconsolata}
 
+% output configuration
 \usepackage{pgfpages}
 \setbeameroption{show notes on second screen=left}
+\hypersetup{pdfpagemode=FullScreen}
 
 % presentation themeing
 \usetheme{Singapore}
@@ -57,12 +59,6 @@
 		
 		can perform on par with C
 		
-		Compiler uses some tricks to achieve this performance with minimal type annotations
-		\begin{itemize}
-			\item type inferencing
-			\item compiling each concrete method signature
-		\end{itemize}
-		
 		investigating whether Julia is usable for distributed, high performance codes
 	}
 \end{frame}
@@ -106,7 +102,6 @@
 		\begin{itemize}
 			\item Can be implemented with any Single-Program-Multiple-Data parallel system
 			\item There are serial and MPI implementations
-			\item MPI.jl is used for MPI communication
 		\end{itemize}
 	}
 	\note<2>{
@@ -115,7 +110,7 @@
 		This layer isn't extended by the user %Note totally true, DistObject is here
 	}
 	\note<3>{
-		Linear Algebra layer provides the iterfaces for vector and linear transformation objects
+		Linear Algebra layer provides the interfaces for vector and linear transformation objects
 	}
 \end{frame}
 \begin{frame}[fragile]
@@ -231,7 +226,7 @@ $\lambda$ = d$\,\mathtt{\boldsymbol{\cdot}}\,$z  # = dot(q, z)
 	}
 \end{frame}
 \begin{frame}
-	\frametitle{TypeStability Tools}
+	\frametitle{Type Stability Tools}
 	\framesubtitle{Optimizing JuliaPetra}
 	\nocite{Github:TypeStability.jl}
 	\begin{itemize}
@@ -288,15 +283,14 @@ $\lambda$ = d$\,\mathtt{\boldsymbol{\cdot}}\,$z  # = dot(q, z)
 \begin{frame}
 	\frametitle{Conclusion}
 	\begin{itemize}
-		\item Julia is a promising fast, high level language
-		\item Julia allows for clean APIs
-		\item JuliaPetra matches Epetra's performance
-		\item Optimizing Julia requires disabling some high level features
+		\item promising, fast, high level language
+		\item clean APIs
+		\item high performance
 	\end{itemize}
 	\note{
 		Julia is fast and high level
 		
-		Julia allows for elegant API's due to type inferencing and broadcast operator
+		Julia allows for elegant math APIs due to type inferencing and broadcast operator
 		
 		JuliaPetra matches Epetra performance
 		
