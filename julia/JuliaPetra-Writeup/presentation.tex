@@ -67,8 +67,8 @@
 	\frametitle{Petra Object Model}
 	\nocite{Heroux:2005:Trilinos}
 	\begin{itemize}
-		\item Family of sparse linear algebra frameworks
 		\item Underlying data libraries for Trilinos
+		\item Family of sparse linear algebra frameworks
 		\item 3 existing implementations
 	\end{itemize}
 	\note{
@@ -78,7 +78,7 @@
 		
 		3 implementations
 		\begin{itemize}
-			\item Epetra - original, portable version
+			\item Epetra - original, portable version C++
 			\item Tpetra - newer, uses more advanced C++ features
 			\item Jpetra - experiemental, pure java version
 		\end{itemize}
@@ -129,7 +129,7 @@
 		}
 	\begin{lstlisting}
 apply!(z, A, q)
-$\lambda$ = d$\,\mathtt{\boldsymbol{\cdot}}\,$z  # = dot(q, z)
+$\lambda$ = q$\,\mathtt{\boldsymbol{\cdot}}\,$z  # = dot(q, z)
 @. z = s - $\lambda$*q
 	\end{lstlisting}
 	\note{
@@ -170,15 +170,14 @@ $\lambda$ = d$\,\mathtt{\boldsymbol{\cdot}}\,$z  # = dot(q, z)
 	
 	JuliaPetra Time over Epetra Time.
 	\note{
+		Power method for finding eigen values
+	
 		Latency speed up of JuliaPetra over Epetra
 		
 		JuliaPetra was a little slower for the smallest problem, but actually slightly outperformed Epetra for larger problems
 		\begin{itemize}
 			\item both implementations took under a second from the smallest problem
 		\end{itemize}
-	
-		Results are for the power method for finding eigenvalues given a tridiagonal matrix
-		%TODO mention machine?
 	
 		DistributedArrays.jl was significantly slower
 	}
@@ -208,21 +207,21 @@ $\lambda$ = d$\,\mathtt{\boldsymbol{\cdot}}\,$z  # = dot(q, z)
 	\frametitle{Type Stability}
 	\framesubtitle{Optimizing JuliaPetra}
 	\begin{itemize}
-		\item Julia supports dynamically typed code
-		\item When variable types can be inferred, code is ``Type Stable''
-		\item Allows function calls to be inlined
+		\item type annotations are optional
+		\item types inferred \(\implies\) ``Type Stable''
+		\item allows inlining
 	\end{itemize}
 	\note{
-		Because Julia supported dynamically typed code, ensuring that the compile can deduce the types of each value is very important for performant code
+		compile deducing types important for performance
 		
-		This is called type stability.
+		called type stability.
 		
-		Type stable code allows the compiler to figure out which method instance must be called for each function call which reduces the method dispatch overhead and is a requirement for inlining.
+		allows static dispatch and inlining
 		\begin{itemize}
-			\item Because Julia implements almost all operations as function calls, inlining is absolutely critical for code to perform efficiently.
+			\item basic operators implemented as function calls
 		\end{itemize}
 		
-		Julia does compile functions for each set of leaf types that it is called with, to help with type stability.
+		each method compiled with each concrete signature
 	}
 \end{frame}
 \begin{frame}
@@ -231,10 +230,10 @@ $\lambda$ = d$\,\mathtt{\boldsymbol{\cdot}}\,$z  # = dot(q, z)
 	\nocite{Github:TypeStability.jl}
 	\begin{itemize}
 		\item \texttt{code\_warntype} - view inferred types
-		\item TypeStability.jl - Automate type stability checks
+		\item TypeStability.jl - Automated checking
 	\end{itemize}
 	\note{
-		Because type stability is so important to performance, tools to ensure code is type stable are crucial when optimizing
+		tools to ensure code is type stable are crucial
 		
 		code\_warntype is a built in function to manually inspected the results of type inferencing and inlining.
 		
