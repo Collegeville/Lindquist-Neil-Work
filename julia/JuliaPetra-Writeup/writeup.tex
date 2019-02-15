@@ -72,7 +72,7 @@
 	By providing a set of interfaces for basic linear algebra structures, Petra libraries provide a way
 	to develop packages for these types of distributed algorithms that can interact and build on each other.
 	The Petra object model has previously been implemented in both C++ and Java.
-	%REVIEW should this list of previous implemenetations be in the paper?
+	Like other implementations of the Petra object model, JuliaPetra provides the ability to do basic linear algebra computations, including dot products, vector norms, and sparse matrix-vector multiplications.
 	
 	Julia is a programing language that uses just in time compiling and powerful type inferencing
 	to obtain the speed of a statically compiled programing language with the productivity of an
@@ -82,14 +82,6 @@
 	The Celeste project is an example of large scale computations in Julia,
 	using 8,192 cores of the Cori Supercomputer
 	at Lawrence Berkeley National Laboratory~\cite{Bezanson:2017:FreshApproach}.
-	
-	%REVIEW this is a strange paragraph.
-	Like other implementations of the Petra object model,
-	JuliaPetra provides the ability to do basic linear algebra computations.
-	These computations include dot products, vector norms and sparse matrix - vector multiplications.
-	This document provides, first, an overview of the types and interfaces of JuliaPetra,
-	second, a summary of optimizations used to implement JuliaPetra,
-	and finally, comparisons with two similar libraries, Epetra and DistributedArrays.jl.
 	
 	\section{The Petra Object Model}
 	
@@ -112,8 +104,8 @@
 	
 	The next layer of abstraction manages how the problem is distributed across processes.
 	The \snippet{BlockMap}, \snippet{Directory}, \snippet{Import} and \snippet{Export}
-	types handle the distribution of the problem across the processors.
-	\snippet{BlockMap} and \snippet{Directory} manage which processor the various parts of
+	types handle the distribution of the problem across the processes.
+	\snippet{BlockMap} and \snippet{Directory} manage which process the various parts of
 	the problem are located.
 	\snippet{Import} and \snippet{Export} contain the logic behind redistributing
 	the problem among the processes.
@@ -218,8 +210,8 @@
 		};
 		
 		\end{tikzpicture}
-		\Description{The key hierarchy of note is how \snippet{MultiVector}, \snippet{RowMatrix} and \snippet{RowGraph} implement the implicit type \snippet{DistObject} and both \snippet{MultiVector} and \snippet{RowMatrix} are subtypes of Julia's \snippet{AbstracyArray}.}
-		\caption{Type Hierarchy.}
+		\Description{The type hiearchy of JuliaPetra.  The relationships of note are how \snippet{MultiVector}, \snippet{RowMatrix} and \snippet{RowGraph} implement the implicit type \snippet{DistObject} and how both \snippet{MultiVector} and \snippet{RowMatrix} are subtypes of Julia's \snippet{AbstracyArray}.}
+		\caption{Type Hierarchy of JuliaPetra.}
 		\label{fig:type-hierarchy}
 	\end{figure}
 	
@@ -281,6 +273,10 @@
 	
 	\section{Comparisons with Other Distributed Libraries}
 	
+	To determine the quality of JuliaPetra as a distributed linear algebra library, it is compared to two existing libraries, Epetra and DistributedArrays.jl.
+	JuliaPetra is close to the former, as it was implemented partially based on Epetra.
+	It varies much more from the latter; JuliaPetra has much better performance but deviates from some Julia conventions.
+	
 	\subsection{Comparison with Epetra}
 	
 	Epetra is the base implementation of the Petra object model,
@@ -305,8 +301,7 @@
 	
 	DistributedArrays.jl is a similar library to JuliaPetra that supports
 	distributed arrays in parallel environments~\cite{Github:DA}.
-	It uses Julia's built in fork-and-join model for parallelism
-	\cite{Bezanson:2017:FreshApproach}.
+	It uses Julia's built in fork-and-join model for parallelism~\cite{Bezanson:2017:FreshApproach}.
 	DistributedArrays.jl offers several of usability advantages over JuliaPetra, however, it is not able to match the speed of JuliaPetra.
 	
 	DistributedArrays.jl has advantages over JuliaPetra because it is better designed to function with
@@ -322,7 +317,6 @@
 	A Julia 0.6.0 version of DistributedArrays.jl was modified to be more conducive to sparse matrix operations, but that implementation was neither able to match the performance of JuliaPetra nor updated to the Julia 1.0 compatible version of DistributedArrays.jl.
 	
 	\subsection{Timing Results}
-	%TODO use "processes" as label instead of "processors"
 	
 	\begin{table}
 		\caption{Timing results of various power method implementations.  All times are in seconds.}
@@ -335,7 +329,7 @@
 			& \multicolumn{1}{m{1.8cm}||}{Distributed\-Arrays.jl}
 			& \multicolumn{1}{m{1.75cm}|}{JuliaPetra \(\div\) Epetra}\\
 			\hline
-			\multicolumn{6}{|l|}{4 Processors}\\
+			\multicolumn{6}{|l|}{4 Processes}\\
 			
 			\hline
 			100,000			&Mean & 0.22850 & 0.18045 & 124.322 & 1.26633 \\
@@ -350,7 +344,7 @@
 			equations		&Minimum & 30.5471 & 24.5430 & {-} & 1.24464 \\
 			&Maximum & 31.2470 & 24.7841 & {-} & 1.26077 \\
 			\hline
-			\multicolumn{6}{|l|}{16 Processors}\\
+			\multicolumn{6}{|l|}{16 Processes}\\
 			\hline
 			100,000			&Mean & 0.54401 & 0.55244 & 2569.82 & 0.98474 \\
 			equations		&Minimum & 0.52902 & 0.50857 & 2525.37 & 1.04021 \\
@@ -365,7 +359,7 @@
 			equations		&Minimum & 73.1307 & 73.9172 & {-} & 0.98936 \\
 			&Maximum & 74.1664 & 73.9953 & {-} & 1.00231 \\
 			\hline
-			\multicolumn{6}{|l|}{20 Processors}\\
+			\multicolumn{6}{|l|}{20 Processes}\\
 			\hline
 			100,000			&Mean & 0.76502 & 0.72094 & {-} & 1.06114 \\
 			equations		&Minimum & 0.73781 & 0.69893 & {-} & 1.05563 \\
@@ -386,7 +380,7 @@
 		The timing results could be a bit confusing to the reader.  It would be worth mentioning specifically what the total number of equations is, at least in the description.  Better notes on speedups could improve it.  Also, it would be good to get some timing results from something beyond a tridiagonal matrix.
 	}
 	
-	As can be seen in Table~\ref{tab:timing-results}, JuliaPetra is very close to the performance of Epetra, except when only using a few processors.
+	As can be seen in Table~\ref{tab:timing-results}, JuliaPetra is very close to the performance of Epetra, except when only using a few processes.
 	Additionally, JuliaPetra significantly outperforms DistributedArrays.jl.
 	Note that the last column shows the ratio of the JuliaPetra time over the Epetra time; in other words, a higher ratio indicates that the same problem will take longer to solve using JuliaPetra compared to Epetra.
 	Additionally, the number of iterations was consistent between all problems, meaning the number of operations completed is only a function of number of processes and local problem size.
@@ -403,21 +397,21 @@
 		legend pos = outer north east
 		]
 		\addplot[color=black,mark=*] coordinates{(100000,0.22850)(1000000,2.82589)(10000000,30.7656)};
-		\addlegendentry{4 Processors, JuliaPetra}
+		\addlegendentry{4 Processes, JuliaPetra}
 		\addplot[color=gray,mark=*]  coordinates{(100000,0.18045)(1000000,2.35860)(10000000,24.6991)};
-		\addlegendentry{4 Processors, Epetra}
+		\addlegendentry{4 Processes, Epetra}
 		\addplot[color=black,mark=triangle*] coordinates{(100000,0.54401)(1000000,7.44313)(10000000,73.4730)};
-		\addlegendentry{16 Processors, JuliaPetra}
+		\addlegendentry{16 Processes, JuliaPetra}
 		\addplot[color=gray,mark=triangle*]  coordinates{(100000,0.55244)(1000000,7.43903)(10000000,73.9551)};
-		\addlegendentry{16 Processors, Epetra}
+		\addlegendentry{16 Processes, Epetra}
 		\addplot[color=black,mark=diamond*] coordinates{(100000,0.76502)(1000000,9.67784)(10000000,96.6538)};
-		\addlegendentry{20 Processors, JuliaPetra}
+		\addlegendentry{20 Processes, JuliaPetra}
 		\addplot[color=gray,mark=diamond*]  coordinates{(100000,0.72094)(1000000,9.74738)(10000000,97.4296)};
-		\addlegendentry{20 Processors, Epetra}
+		\addlegendentry{20 Processes, Epetra}
 		\end{loglogaxis}
 		\end{tikzpicture}
 		\Description{A graph of data from Table~\ref{tab:timing-results} showing approximately linear relation between the local problem size and the execution time.}
-		\caption{Problem Size Versus Time for Various Numbers of Processors and Implementations.}
+		\caption{Problem Size Versus Time for Various Numbers of Processes and Implementations.}
 		\label{fig:result-localsize}
 	\end{figure}
 	
@@ -426,7 +420,7 @@
 		\begin{axis}[
 		ymode = log,
 		xmode = log,
-		xlabel = {Number of Processors},
+		xlabel = {Number of Processes},
 		xtick = {4,8,12,16,20},
 		xticklabels = {4,8,12,16,20},
 		ylabel = {Time (seconds)},
@@ -446,8 +440,8 @@
 		\addlegendentry{10,000,000 rows, Epetra}
 		\end{axis}
 		\end{tikzpicture}
-		\Description{A graph of data from Table~\ref{tab:timing-results} showing a slightly superlinear relation between the number of processors and the execution time.}
-		\caption{Number of Processors Versus Time for Various Problem Sizes and Implementations.}
+		\Description{A graph of data from Table~\ref{tab:timing-results} showing a slightly superlinear relation between the number of processes and the execution time.}
+		\caption{Number of Processes Versus Time for Various Problem Sizes and Implementations.}
 		\label{fig:result-numproc}
 	\end{figure}
 	
@@ -456,9 +450,8 @@
 	Epetra's \texttt{petra\_power\_method} example is used as the Epetra implementation and the other implementations are translations of that code~\cite{Heroux:2005:Trilinos}.
 	This tests the performance of vector dot product, vector L2-norm and sparse matrix-vector multiplication functionalities.
 	The matrices used were various sizes of symmetric tridiagonal matrices, with the diagonal consisting of 2's
-	and the off diagonals containing -1's, that were distributed over different numbers of processors.
-	Each combination of implementation, problem size and number of processors was run five times
-	and the average, minimum and maximum are presented.
+	and the off diagonals containing -1's, that were distributed over different numbers of processes.
+	Each combination of implementation, problem size, and number of processes was run five times and the average, minimum and maximum are presented.
 	All implementations were run once before collecting the timings, to ensure all Julia code was
 	compiled before the timing started.
 	Additionally, the setup for the problems were not counted as part of the times.
@@ -478,6 +471,7 @@
 	So, it provides an interface for distributed solver algorithms to interact with and build on each other.
 	Additionally, by performing at the same speeds as Epetra,
 	it allows Julia to compete with C++ for these types of high performance computations.
+	This implementation demonstrates that Julia is a suitable candidate for these types of large scale, high performance, distributed codes.
 	
 	%REVIEW are there other things that should be discussed in the conclusion
 	%It feels pretty short
