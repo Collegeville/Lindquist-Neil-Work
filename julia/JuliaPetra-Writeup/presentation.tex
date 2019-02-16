@@ -156,29 +156,30 @@ $\lambda$ = q$\,\mathtt{\boldsymbol{\cdot}}\,$z  # = dot(q, z)
 			xlabel = {\Large Overall Problem Size (rows)},
 			xtick = {6,7,8},
 			xticklabels = {\(2\cdot10^6\), \(2\cdot10^7\), \(2\cdot10^8\)},
+			xmin = 5.5,
+			xmax = 8.5,
 			ybar,
 			bar width = 0.75,
-			ylabel = {\Large Speed Up},
-			ymin  = -0.1,
-			ymax  = 0.1,
+			ylabel = {\Large Performance (\%)},
+			ymin  = 0,
+			ymax  = 100,
 			yticklabel style={/pgf/number format/fixed},
 			]
-			\addplot[blue,fill=blue] coordinates{(6,-0.0576)(7,0.0072)(8,0.0080)};
+			\addplot[blue,fill=blue] coordinates{(6, 91.362)(7,93.146)(8,94.536)};
 			\addplot[very thick,red,sharp plot,update limits=false] coordinates{(5,0) (9,0)};
 		\end{axis}
 	\end{tikzpicture}
 	
-	JuliaPetra Time over Epetra Time.
+	JuliaPetra relative to Epetra.
 	\note{
-		Power method for finding eigen values
-	
-		Latency speed up of JuliaPetra over Epetra
+		Power method for finding eigenvalues
 		
-		JuliaPetra was a little slower for the smallest problem, but actually slightly outperformed Epetra for larger problems
+		Relative to Epetra, JuliaPetra is slightly slower, but still close.
 		\begin{itemize}
-			\item both implementations took under a second from the smallest problem
+			\item JuliaPetra is between 90- and 95\% of Epetra
+			\item larger problems are closer
 		\end{itemize}
-	
+		
 		DistributedArrays.jl was significantly slower
 	}
 \end{frame}
