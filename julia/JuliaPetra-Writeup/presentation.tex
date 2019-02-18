@@ -36,6 +36,18 @@
    morestring=[m]{'}{'},
 }[keywords,comments,strings]
 
+\lstset{
+	language         =Julia,
+	basicstyle       =\ttfamily\footnotesize,
+	columns          =fixed,
+	keywordstyle     ={[1]\bfseries\color{black}},
+	keywordstyle     ={[2]\color{blue}},
+	stringstyle      =\color{red},
+	commentstyle     =\color{gray},
+	showstringspaces =false,
+	mathescape
+}
+
 
 \title[JuliaPetra]{Obtaining Performance from a Julia-Implementation of Trilinos Data Libraries}
 \author{Neil Lindquist}
@@ -114,36 +126,56 @@
 	}
 \end{frame}
 \begin{frame}[fragile]
-	\frametitle{JuliaPetra Example}
-	%TODO improve the example and description there of
-	\lstset{
-		language         =Julia,
-		basicstyle       =\ttfamily,
-		columns          =fixed,
-		keywordstyle     ={[1]\bfseries\color{black}},
-		keywordstyle     ={[2]\color{blue}},
-		stringstyle      =\color{red},
-		commentstyle     =\color{gray},
-		showstringspaces =false,
-		mathescape
-		}
+	\frametitle{JuliaPetra Example I}
 	\begin{lstlisting}
-apply!(z, A, q)
-$\lambda$ = q$\,\mathtt{\boldsymbol{\cdot}}\,$z  # = dot(q, z)
-@. z = s - $\lambda$*q
+function powerMethod(A::RowMatrix{Data},
+        tol::Data) where Data
+    blockmap = getRowMap(A)
+    q = DenseMultiVector{Data}(blockmap, 1)
+    z = DenseMultiVector{Data}(blockmap, 1)
+    randn!(z.data)
+    r = DenseMultiVector{Data}(blockmap, 1)
 	\end{lstlisting}
 	\note{
-		Example function calls.
-		A is an existing matrix, q, r, z are existing vectors
+		Sample implementation of the power method for finding eigenvalues.
 		
-		Note the support for greek letters in identifiers as well as supporting a binary dot product operator
+		This is the method setup
+		
+		Note that the data type used by the vectors is just listed as ``Data''
+	}
+\end{frame}
+\begin{frame}[fragile]
+	\frametitle{JuliaPetra Example II}
+	\begin{lstlisting}
+    while true
+        normz = norm2(z)
+        @. q = z/nomrz
+        apply!(z, A, q)
+        $\lambda$ = q$\,\mathtt{\boldsymbol{\cdot}}\,$z  # = dot(q, z)
+        @. z = 1 - $\lambda$*q
+        if norm2(resid)[1] < tol
+            return $\lambda$
+        end
+    end
+end
+	\end{lstlisting}
+	\note{
+		This is the main loop of the method
+		
+		``apply!'' is the matrix vector product
+		\begin{itemize}
+			\item exclemation indicates z is mutated
+		\end{itemize}
+		
+		unicode support
 		\begin{itemize}
 			\item Julia editors support latex-like abbreviations
 		\end{itemize}
 		
-		Note that vector arithmetic can be written with binary operators thanks to the broadcast operation
+		``@.'' is the broadcast operator
 		\begin{itemize}
 			\item Should be a single loop, without allocating a vector
+			\item multivector scalars
 		\end{itemize}
 	}
 \end{frame}
@@ -151,7 +183,7 @@ $\lambda$ = q$\,\mathtt{\boldsymbol{\cdot}}\,$z  # = dot(q, z)
 	\frametitle{Performance Comparison}
 	\nocite{Github:DA, Gu:2000:PowerMethod}
 	\centering
-	\begin{tikzpicture}[scale=0.65]
+	\begin{tikzpicture}[scale=0.7]
 		\begin{axis}[
 			xlabel = {\Large Overall Problem Size (rows)},
 			xtick = {6,7,8},
@@ -166,11 +198,10 @@ $\lambda$ = q$\,\mathtt{\boldsymbol{\cdot}}\,$z  # = dot(q, z)
 			yticklabel style={/pgf/number format/fixed},
 			]
 			\addplot[blue,fill=blue] coordinates{(6, 91.362)(7,93.146)(8,94.536)};
-			\addplot[very thick,red,sharp plot,update limits=false] coordinates{(5,0) (9,0)};
 		\end{axis}
 	\end{tikzpicture}
 	
-	JuliaPetra relative to Epetra.
+	20 CPU processes on a 20 core node.
 	\note{
 		Power method for finding eigenvalues
 		
@@ -181,6 +212,31 @@ $\lambda$ = q$\,\mathtt{\boldsymbol{\cdot}}\,$z  # = dot(q, z)
 		\end{itemize}
 		
 		DistributedArrays.jl was significantly slower
+	}
+\end{frame}
+\begin{frame}
+	\frametitle{Performance Comparison}
+	\centering
+	\begin{tikzpicture}[scale=0.7]
+		\begin{axis}[
+			xlabel = {\Large Number of Processes},
+			ylabel = {\Large Execution Time (s)},
+			ymin = 0,
+			ymax = 6.5,
+			legend pos = south east
+		]
+			\addplot coordinates{(5, 5.554918) (10, 4.705534) (15, 4.64124) (20, 4.591788)};
+			\addlegendentry{Epetra}
+			\addplot coordinates{(5, 6.110807973) (10, 4.851059517) (15, 4.67226152) (20, 4.856775282)};
+			\addlegendentry{JuliaPetra}
+		\end{axis}
+	\end{tikzpicture}
+	
+	\(10^7\) rows on a 20 core node.
+	\note{
+		Comparison for varying numbers of processes.
+		
+		JuliaPetra has something weird going on, since perfomance slightly drops when every core is used.  Epetra doesn't have this problem.
 	}
 \end{frame}
 \begin{frame}
@@ -283,7 +339,7 @@ $\lambda$ = q$\,\mathtt{\boldsymbol{\cdot}}\,$z  # = dot(q, z)
 \begin{frame}
 	\frametitle{Conclusion}
 	\begin{itemize}
-		\item promising, fast, high level language
+		\item promising, high level language
 		\item clean APIs
 		\item high performance
 	\end{itemize}
