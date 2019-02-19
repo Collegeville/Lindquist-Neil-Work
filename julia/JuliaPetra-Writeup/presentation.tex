@@ -11,7 +11,7 @@
 
 % output configuration
 \usepackage{pgfpages}
-\setbeameroption{show notes on second screen=left}
+%\setbeameroption{show notes on second screen=left}
 \hypersetup{pdfpagemode=FullScreen}
 
 % presentation themeing
@@ -40,6 +40,7 @@
 	language         =Julia,
 	basicstyle       =\ttfamily\footnotesize,
 	columns          =fixed,
+	numbers          =left,
 	keywordstyle     ={[1]\bfseries\color{black}},
 	keywordstyle     ={[2]\color{blue}},
 	stringstyle      =\color{red},
@@ -146,7 +147,7 @@ function powerMethod(A::RowMatrix{Data},
 \end{frame}
 \begin{frame}[fragile]
 	\frametitle{JuliaPetra Example II}
-	\begin{lstlisting}
+	\begin{lstlisting}[firstnumber=8]
     while true
         normz = norm2(z)
         @. q = z/nomrz
