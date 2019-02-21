@@ -150,11 +150,11 @@ function powerMethod(A::RowMatrix{Data},
 	\begin{lstlisting}[firstnumber=8]
     while true
         normz = norm2(z)
-        @. q = z/nomrz
+        @. q = z/normz
         apply!(z, A, q)
         $\lambda$ = q$\,\mathtt{\boldsymbol{\cdot}}\,$z  # = dot(q, z)
-        @. z = 1 - $\lambda$*q
-        if norm2(resid)[1] < tol
+        @. r = z - $\lambda$*q
+        if norm2(r)[1] < tol
             return $\lambda$
         end
     end
