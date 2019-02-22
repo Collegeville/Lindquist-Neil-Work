@@ -149,12 +149,12 @@ function powerMethod(A::RowMatrix{Data},
 	\frametitle{JuliaPetra Example II}
 	\begin{lstlisting}[firstnumber=8]
     while true
-        normz = norm2(z)
+        normz = norm(z, 2)
         @. q = z/normz
         apply!(z, A, q)
         $\lambda$ = q$\,\mathtt{\boldsymbol{\cdot}}\,$z  # = dot(q, z)
         @. r = z - $\lambda$*q
-        if norm2(r)[1] < tol
+        if norm(r, 2)[1] < tol
             return $\lambda$
         end
     end
