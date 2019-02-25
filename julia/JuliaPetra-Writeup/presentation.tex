@@ -64,8 +64,8 @@
 	\begin{itemize}
 		\item High Level
 		\item Compiles to efficient machine code
+		\item 2019 Wilkinson Prize
 	\end{itemize}
-	%TODO consider if Wilkins prize should be mentioned
 	%TODO should LLVM be mentioned?
 	\note{
 		high level, dynamic language
@@ -104,11 +104,11 @@
 	\begin{tikzpicture}
 		\node[rectangle, draw=black] (CommLayer) {Communication Layer};
 		\pause
-		\node[rectangle, draw=black] (DistLayer) [below=2cm of CommLayer] {Problem Distribution Layer};
-		\draw[-{Latex[length=3mm]}] (CommLayer.south) -- (DistLayer);
+		\node[rectangle, draw=black] (DistLayer) [above=2cm of CommLayer] {Problem Distribution Layer};
+		\draw[-{Latex[length=3mm]}] (CommLayer.north) -- (DistLayer.south);
 		\pause
-		\node[rectangle, draw=black] (LALayer) [below=2cm of DistLayer] {Linear Algebra Layer};
-		\draw[-{Latex[length=3mm]}] (DistLayer.south) -- (LALayer);
+		\node[rectangle, draw=black] (LALayer) [above=2cm of DistLayer] {Linear Algebra Layer};
+		\draw[-{Latex[length=3mm]}] (DistLayer.north) -- (LALayer.south);
 	\end{tikzpicture}
 	\note<1>{
 		Communication layer handles the movement of data between processes
@@ -165,7 +165,7 @@ end
 		
 		``apply!'' is the matrix vector product
 		\begin{itemize}
-			\item exclemation indicates z is mutated
+			\item exclamation indicates z is mutated
 		\end{itemize}
 		
 		unicode support
