@@ -99,7 +99,6 @@
 \end{frame}
 \begin{frame}
 	\frametitle{Petra Organization}
-	\nocite{Github:MPI}
 	\centering
 	\begin{tikzpicture}
 		\node[rectangle, draw=black] (CommLayer) {Communication Layer};
@@ -221,15 +220,16 @@ end
 	\begin{tikzpicture}[scale=0.7]
 		\begin{axis}[
 			xlabel = {\Large Number of Processes},
-			ylabel = {\Large Execution Time (s)},
+			ylabel style = {align=center},
+			ylabel = {\Large Speedup Over Epetra\\(1 Process)},
 			ymin = 0,
-			ymax = 6.5,
-			legend pos = south east
+			legend style={at={(0.98,0.6)}}
 		]
-			\addplot coordinates{(5, 5.554918) (10, 4.705534) (15, 4.64124) (20, 4.591788)};
+			\addplot coordinates{(1, 1) (2, 1.5883416) (3, 2.210738) (5, 2.924896) (7, 3.216142) (10, 3.452862) (15, 3.500694) (19, 3.5278034) (20, 3.538395)};
 			\addlegendentry{Epetra}
-			\addplot coordinates{(5, 6.110807973) (10, 4.851059517) (15, 4.67226152) (20, 4.856775282)};
+			\addplot coordinates{(1, 0.5667807) (2, 1.208247) (3, 1.8400692) (5, 2.658824) (7, 3.0769025) (10, 3.349281) (15, 3.4774509) (19, 3.4541359) (20, 3.345339)};
 			\addlegendentry{JuliaPetra}
+			\draw (axis cs:-1,1) -- (axis cs:25,1);
 		\end{axis}
 	\end{tikzpicture}
 	
@@ -358,12 +358,14 @@ end
 \end{frame}
 \begin{frame}[fragile]
 	\frametitle{Try It}
-	\small
-	\url{github.com/collegeville/JuliaPetra.jl}
-	\bigskip
-	\begin{lstlisting}[numbers=none,basicstyle=\ttfamily]
-Pkg.add("JuliaPetra")
-	\end{lstlisting}
+	\begin{center}
+		\small
+		\url{Github.com/Collegeville/JuliaPetra.jl}
+	\end{center}
+%	\bigskip
+%	\begin{lstlisting}[numbers=none,basicstyle=\ttfamily]
+%Pkg.add("JuliaPetra")
+%	\end{lstlisting}
 \end{frame}
 \begin{frame}[allowframebreaks]
 	\frametitle{References}
