@@ -1,0 +1,12 @@
+# Questions from Q&A
+ * Did the functional nature of Julia help with performance?
+ * How portable is Julia? GPU support? Different CPU hardware?
+ * Won't losing compile time checking increase the number of bugs?
+ * What's the array base? Are multidimentional arrays supported?
+ * How does it compare to Epetra with regard to lines of code?
+ * How is the interopability with C and C++?
+May have been one or two more that I forgot
+
+# Other notes
+ * The text could have been a bit smaller
+ * The presentation itself took about 12-15 minutes, with Q&A bringing it to roughly 20 minutes
