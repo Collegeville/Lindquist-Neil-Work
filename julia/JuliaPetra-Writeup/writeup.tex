@@ -2,6 +2,7 @@
 \bibliographystyle{ACM-Reference-Format}
 
 \usepackage{array}
+\usepackage{listings}
 \usepackage{tikz}
 \usetikzlibrary{positioning}
 \usepackage{pgfplots}
@@ -17,7 +18,39 @@
 \acmJournal{TOMS}
 
 
-\newcommand{\snippet}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\snippet}[1]{\lstinline[mathescape]{#1}}
+
+
+% Julia listings definition
+% Definition based on https://tex.stackexchange.com/a/212794/149437
+\lstdefinelanguage{Julia}
+  {otherkeywords={::},
+   keywords=[1]{::,abstract,break,case,catch,const,continue,do,else,elseif,
+      end,export,for,function,immutable,import,importall,if,in,
+      macro,module,otherwise,quote,return,switch,try,type,typealias,
+      using,while,where},
+   keywords=[2]{false,true},
+   sensitive=true,
+   alsoother={$},
+   morecomment=[l]\#,
+   morecomment=[n]{\#=}{=\#},
+   morestring=[s]{"}{"},
+   morestring=[m]{'}{'},
+}[keywords,comments,strings]
+
+\lstset{
+	language         =Julia,
+	basicstyle       =\ttfamily\small,
+	columns          =fixed,
+	numbers          =left,
+	numberstyle      =\tiny,
+	keywordstyle     ={[1]\bfseries\color{black}},
+	keywordstyle     ={[2]\color{blue}},
+	stringstyle      =\color{red},
+	commentstyle     =\color{gray},
+	showstringspaces =false,
+	mathescape
+}
 
 \begin{document}
 	
@@ -226,10 +259,84 @@
 	and the documentation specifies the methods that must be implemented.
 	Figure~\ref{fig:type-hierarchy} shows the full type hierarchy.
 	
-	\todo[inline]{
-		Consider adding a section here on the advantages of Julia being high level.
-		IE the niceness of broadcast operations and such.
-	}
+	\section{JuliaPetra Syntax}
+	
+	For an example usage of JuliaPetra, Listing~\ref{lst:JP-PCG} contains an implementation of the preconditioned conjugate gradient implemented with JuliaPetra.
+	Note that because vectors are stored in groups as \snippet{MultiVector}s, the implementations support solving multiple right hand sides at the same time.
+	This implementation provides two functions: one that updates \snippet{x} in place, \snippet{conjugate_gradient!}; and one that copies \snippet{x}, \snippet{conjugate_gradient}.
+	Note that function names ending in exclamation marks is merely Julia convention to warn the user that an input is mutated in the function call.
+	Each function takes four mandatory arguments: \snippet{x}, the initial guess; \snippet{A}, the linear operator being solved; \snippet{b}, the right hand side; and \snippet{Minv}, the preconditioning function.
+	Additionally, there are two keyword arguments: \snippet{niters}, the maximum number of iterations; and \snippet{tol}, the target tolerance.
+	
+	\begin{lstlisting}[float,
+						caption=Preconditioned Conjugate Gradient in JuliaPetra,
+						label=lst:JP-PCG,
+						escapechar=|]
+function conjugate_gradient(x::MultiVector{Data, GID, PID, LID}, A,
+        b::MultiVector{Data, GID, PID, LID}, Minv;
+        niters = 100, tol = 1e-6) where {Data, GID, PID, LID}
+    x = copy(x)
+    conjugate_gradient!(x, A, b, Minv; niters=niters, tol=tol)
+    x
+end
+
+function conjugate_gradient!(x::MultiVector{Data, GID, PID, LID}, A,
+        b::MultiVector{Data, GID, PID, LID}, Minv;
+        niters = 100, tol = 1e-6) where {Data, GID, PID, LID}
+    r = apply(b, A, x, Data(-1), Data(1)) # r = -Ax + b
+    z = MultiVector{Data}(getMap(x), numVectors(x), false)
+    apply!(z, Minv, r) # z = Minv*r
+    p = copy(z)
+
+    Ap = MultiVector{Data}(getMap(b), numVectors(b), false)
+
+    r$\,^t$z = r$\,\mathtt{\boldsymbol{\cdot}}\,$z # = dot(r, z) |\label{line:dot}\label{line:^t}|
+
+    for k in 1:niters
+        apply!(Ap, A, p)
+        pAp = p$\,\mathtt{\boldsymbol{\cdot}}\,$Ap |\label{line:dot2}|
+        $\alpha$ = r$\,^t$z ./ pAp |\label{line:alpha}|
+
+        @. x = x + $\alpha$ * p |\label{line:line-broadcast}|
+        @. r = r - $\alpha$ * Ap
+
+        apply!(z, Minv, r)
+
+        r$\,^t$z_old = r$\,^t$z
+        r$\,^t$z = r$\,\mathtt{\boldsymbol{\cdot}}\,$z |\label{line:dot3}|
+        if !any(sqrt.(rtz) .> tol) |\label{line:operator-broadcast}|
+            break
+        end
+        $\beta$ = r$\,^t$z/r$\,^t$z_old |\label{line:beta}|
+        @. p = z + $\beta$ * p
+    end
+    x
+end
+	\end{lstlisting}
+	
+	As the example shows, Julia's syntax is similar to that of Fortran and Matlab.
+	Furthermore, but not show, Julia uses one based indices and supports multidimensional arrays (including slices)~\cite{Bezanson:2017:FreshApproach}.
+	Julia also supports syntactic macros that process the abstract syntax tree of their arguments, like macros in lisp-like languages (and unlike token based macros in C and C++).
+	
+	
+	Julia has strong support for Unicode characters~\cite{Bezanson:2017:FreshApproach}.
+	First, note how both \(\alpha\) and \(\beta\) are used for varable names, as declared on lines~\ref{line:alpha} and~\ref{line:beta} respectively.
+	In addition to supporting greek characters, Julia supports letter exponents in variable names.
+	For example, on line~\ref{line:^t} the value of \(r^tz\) is stored in the variable \texttt{r$\,^t$z}. % using \texttt because \lstinline isn't behaving with mathmode
+	Finally, note the use of a dot symbol for the dot product, as shown on lines~\ref{line:dot}.
+	To allow for these and other characters, Julia editors, including the console interface, provide latex like commands to type many Unicode characters.
+	For example, \texttt{\textbackslash alpha} followed by the tab key generates \(\alpha\).
+	Additionally, Julia can be used with just ASCII characters.
+	Operations like dot products have ASCII function name equivalents, as shown in line~\ref{line:dot}.
+	
+	Another convenience Julia provides and JuliaPetra takes advantage of is the broadcast operator~\cite{Bezanson:2017:FreshApproach}.
+	Examples can be seen in lines~\ref{line:line-broadcast} and~\ref{line:operator-broadcast}.
+	The broadcast operator takes operations on container objects and applies them to each element in the container, allowing any function to be applied element-wise.
+	Additionally, Julia automatically fuses the loops where able, so, for example, line~\ref{line:line-broadcast} will be computed with only a single loop and no intermediate vectors.
+	Julia provides two, interchangeable ways to broadcast operations and functions.
+	Each function call can broadcast individually, as shown on line~\ref{line:operator-broadcast}, or each function in a line can be broadcast, as shown on line~\ref{line:line-broadcast}.
+	Note that JuliaPetra works with multivectors instead of plain vectors, so operations like dot products return array with each of the respective results.
+	These functions and JuliaPetra's broadcasting are implemented so that each result is seamlessly able to be applied to the appropriate vector in the set.
 	
 	\section{Optimizations of JuliaPetra}
 	%This is to give insight on best practices for people who don't look at the general Julia discussions
@@ -459,10 +566,10 @@
 	Given the timings produced by the Petra implementations, these problems were not run to completion and left without a time on the table.
 	
 	The MPI implementation was MPICH version 3.2 with TCP used for all inter-process communication, with MPI.jl version 0.7.0 wrapping MPI for JuliaPetra.
-	The \snippet{mpiexec} command was used to start the MPI processes with the \snippet{-bind-to core} and \snippet{-map-by core} flags.
-	The Julia tests were run with the Julia v1.0.0 precompiled binary for Linux with the \snippet{-O3} flag enabled at run time.
+	The \texttt{mpiexec} command was used to start the MPI processes with the \texttt{-bind-to core} and \texttt{-map-by core} flags.
+	The Julia tests were run with the Julia v1.0.0 precompiled binary for Linux with the \texttt{-O3} flag enabled at run time.
 	Version 0.5.1 of DistributedArrays.jl was used.
-	The Epetra tests were compiled with GCC 4.8.5, the \snippet{-O3} flag and Trilinos 12.10.1.
+	The Epetra tests were compiled with GCC 4.8.5, the \texttt{-O3} flag and Trilinos 12.10.1.
 	Tests were run on a Red Hat Enterprise Linux Workstation, version 7.3,
 	with a 20 core Intel E5-2698 v4 CPU.
 	
