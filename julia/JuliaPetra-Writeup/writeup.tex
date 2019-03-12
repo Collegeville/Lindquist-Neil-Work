@@ -314,14 +314,14 @@ function conjugate_gradient!(x::MultiVector{Data, GID, PID, LID}, A,
 end
 	\end{lstlisting}
 	
-	As the example shows, Julia's syntax is similar to that of Fortran and Matlab.
+	As the example shows, Julia's syntax is similar to that of Fortran and MATLAB.
 	Furthermore, but not show, Julia uses one based indices and supports multidimensional arrays (including slices)~\cite{Bezanson:2017:FreshApproach}.
 	Julia also supports syntactic macros that process the abstract syntax tree of their arguments, like macros in lisp-like languages (and unlike token based macros in C and C++).
 	
 	
 	Julia has strong support for Unicode characters~\cite{Bezanson:2017:FreshApproach}.
-	First, note how both \(\alpha\) and \(\beta\) are used for varable names, as declared on lines~\ref{line:alpha} and~\ref{line:beta} respectively.
-	In addition to supporting greek characters, Julia supports letter exponents in variable names.
+	First, note how both \(\alpha\) and \(\beta\) are used for variable names, as declared on lines~\ref{line:alpha} and~\ref{line:beta}, respectively.
+	In addition to supporting Greek characters, Julia supports letter exponents in variable names.
 	For example, on line~\ref{line:^t} the value of \(r^tz\) is stored in the variable \texttt{r$\,^t$z}. % using \texttt because \lstinline isn't behaving with mathmode
 	Finally, note the use of a dot symbol for the dot product, as shown on lines~\ref{line:dot}.
 	To allow for these and other characters, Julia editors, including the console interface, provide latex like commands to type many Unicode characters.
@@ -497,7 +497,7 @@ end
 	Note that for fewer processes, JuliaPetra under performs Epetra.
 	However, as the number of processes increases, JuliaPetra approaches the performance of Epetra.
 	Although, when all 20 cores of the process are used JuliaPetra has a slight drop in performance.
-	The reason for this has not been determined, but is suspected to be related to Julia relying more heavily on cache and the operating system not having extra cores to run it's other processes on.
+	The reason for this has not been determined but is suspected to be related to Julia relying more heavily on cache and the operating system not having extra cores to run its other processes on.
 	Because JuliaPetra performs closer to Epetra when more processes are present, it seems that JuliaPetra may be slower for the actual computations, but the communication for larger problems overcomes the difference or is more efficient in JuliaPetra.
 	
 	\begin{figure}
@@ -521,7 +521,7 @@ end
 		\label{fig:result-numProcs}
 		\Description{
 			A comparison of the performance of Epetra and JuliaPetra for 1 to 20 processes.
-			JuliaPetra noticably underperforms Epetra for low numbers of processes, but roughly matches the performance of Epetra when the number of processes is around 15.
+			JuliaPetra noticably underperforms Epetra for low numbers of processes, but roughly matches the performance of Epetra when the number of processes is in the double digits.
 		}
 	\end{figure}
 
