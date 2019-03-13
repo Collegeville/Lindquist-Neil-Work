@@ -8,7 +8,9 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.12}
 \usepackage{siunitx}
+
 \usepackage{todonotes}
+\usepackage{ulem} % strikeout - for use in marking parts of todo's addressed
 
 \title{JuliaPetra: An Implementation of the Petra Object Model in Julia}
 
@@ -18,7 +20,7 @@
 \acmJournal{TOMS}
 
 
-\newcommand{\snippet}[1]{\lstinline[mathescape]{#1}}
+\newcommand{\snippet}[1]{\lstinline{#1}}
 
 
 % Julia listings definition
@@ -428,72 +430,76 @@ end
 	\begin{table}
 		\caption{Timing results of various power method implementations.  All times are in seconds.}
 		\label{tab:timing-results}
-		\begin{tabular}{|c c|S|S|S||S|}
+		\sisetup{table-format=2.5}
+		\begin{tabular}{|c c|S|S|S[table-format=4.3]||S|}
 			\hline
 			\multicolumn{2}{|c|}{Equations Per Process}
 			& {JuliaPetra}
 			& {Epetra}
 			& \multicolumn{1}{m{1.8cm}||}{Distributed\-Arrays.jl}
-			& \multicolumn{1}{m{1.75cm}|}{JuliaPetra \(\div\) Epetra}\\
+			& {Speedup} \\
 			\hline
 			\multicolumn{6}{|l|}{4 Processes}\\
 			
 			\hline
-			100,000			&Mean    & 0.22514 & 0.19244 & 124.322 & 1.16988 \\
-			equations		&Minimum & 0.22183 & 0.18437 & 123.324 & 1.20509 \\
-							&Maximum & 0.22747 & 0.22145 & 126.464 & 1.02721 \\
+			100,000			&Mean    & 0.22514 & 0.19244 & 124.322 & -0.14521 \\
+			equations		&Minimum & 0.22183 & 0.18437 & 123.324 & -0.18948 \\
+							&Maximum & 0.22747 & 0.22145 & 126.464 & -0.00171 \\
 			\hline
-			1,000,000		&Mean    & 2.76858 & 2.35595 & 1149.26 & 1.17515 \\
-			equations		&Minimum & 2.75613 & 2.35066 & 1144.52 & 1.12492 \\
-							&Maximum & 2.78917 & 2.36304 & 1162.54 & 1.18033 \\
+			1,000,000		&Mean    & 2.76858 & 2.35595 & 1149.26 & -0.14904 \\
+			equations		&Minimum & 2.75613 & 2.35066 & 1144.52 & -0.15722 \\
+							&Maximum & 2.78917 & 2.36304 & 1162.54 & -0.14262 \\
 			\hline
-			10,000,000		&Mean    & 30.8755 & 24.7034 & {-} & 1.24985 \\
-			equations		&Minimum & 30.6740 & 24.6805 & {-} & 1.24284 \\
-							&Maximum & 31.1139 & 24.7140 & {-} & 1.25896 \\
+			10,000,000		&Mean    & 30.8755 & 24.7034 & {-}     & -0.19990 \\
+			equations		&Minimum & 30.6740 & 24.6805 & {-}     & -0.20677 \\
+							&Maximum & 31.1139 & 24.7140 & {-}     & -0.19430 \\
 			\hline
 			\multicolumn{6}{|l|}{16 Processes}\\
 			\hline
-			100,000			&Mean    & 0.53649 & 0.50143 & 2569.82 & 1.06990 \\
-			equations		&Minimum & 0.53408 & 0.49653 & 2525.37 & 1.07562 \\
-							&Maximum & 0.53741 & 0.50376 & 2713.96 & 1.06680 \\
+			100,000			&Mean    & 0.53649 & 0.50143 & 2569.82 & -0.06533 \\
+			equations		&Minimum & 0.53408 & 0.49653 & 2525.37 & -0.07607 \\
+							&Maximum & 0.53741 & 0.50376 & 2713.96 & -0.05677 \\
 			\hline
 			
-			1,000,000		&Mean    & 7.51502 & 7.40649 & {-} & 1.01465 \\
-			equations		&Minimum & 7.49275 & 7.40309 & {-} & 1.01211 \\
-							&Maximum & 7.54793 & 7.41002 & {-} & 1.01861 \\
+			1,000,000		&Mean    & 7.51502 & 7.40649 & {-}     & -0.01444 \\
+			equations		&Minimum & 7.49275 & 7.40309 & {-}     & -0.01919 \\
+							&Maximum & 7.54793 & 7.41002 & {-}     & -0.01104 \\
 			\hline
-			10,000,000		&Mean    & 74.2079 & 73.9740 & {-} & 1.00316 \\
-			equations		&Minimum & 74.0943 & 73.9240 & {-} & 1.00230 \\
-							&Maximum & 74.2893 & 74.0402 & {-} & 1.00336 \\
+			10,000,000		&Mean    & 74.2079 & 73.9740 & {-}     & -0.00315 \\
+			equations		&Minimum & 74.0943 & 73.9240 & {-}     & -0.00492 \\
+							&Maximum & 74.2893 & 74.0402 & {-}     & -0.00073 \\
 			\hline
 			\multicolumn{6}{|l|}{20 Processes}\\
 			\hline
-			100,000			&Mean    & 0.77256 & 0.70583 & {-} & 1.09454 \\
-			equations		&Minimum & 0.73311 & 0.70270 & {-} & 1.04328 \\
-							&Maximum & 0.80217 & 0.71200 & {-} & 1.12663 \\
+			100,000			&Mean    & 0.77256 & 0.70583 & {-}     & -0.08638 \\
+			equations		&Minimum & 0.73311 & 0.70270 & {-}     & -0.12400 \\
+							&Maximum & 0.80217 & 0.71200 & {-}     & -0.02880 \\
 			\hline
-			1,000,000		&Mean    & 9.89883 & 9.22033 & {-} & 1.07359 \\
-			equations		&Minimum & 9.85269 & 9.21825 & {-} & 1.06882 \\
-							&Maximum & 9.97940 & 9.22443 & {-} & 1.08184 \\
+			1,000,000		&Mean    & 9.89883 & 9.22033 & {-}     & -0.06854 \\
+			equations		&Minimum & 9.85269 & 9.21825 & {-}     & -0.07627 \\
+							&Maximum & 9.97940 & 9.22443 & {-}     & -0.06377 \\
 			\hline
-			10,000,000		&Mean    & 97.4143 & 92.0917 & {-} & 1.05780 \\
-			equations		&Minimum & 96.9243 & 91.9722 & {-} & 1.05384 \\
-							&Maximum & 97.9733 & 92.1464 & {-} & 1.06324 \\
+			10,000,000		&Mean    & 97.4143 & 92.0917 & {-}     & -0.05464 \\
+			equations		&Minimum & 96.9243 & 91.9722 & {-}     & -0.06125 \\
+							&Maximum & 97.9733 & 92.1464 & {-}     & -0.04930 \\
 			\hline
 		\end{tabular}
 	\end{table}
 	
 	\todo[inline]{
-		The timing results could be a bit confusing to the reader.  It would be worth mentioning specifically what the total number of equations is, at least in the description.  Better notes on speedups could improve it.  Also, it would be good to get some timing results from something beyond a tridiagonal matrix.
+		The timing results could be a bit confusing to the reader.  \sout{It would be worth mentioning specifically what the total number of equations is, at least in the description.}  Better notes on speedups could improve it.  Also, it would be good to get some timing results from something beyond a tridiagonal matrix.
 	}
 	
-	As can be seen in Table~\ref{tab:timing-results}, JuliaPetra is close to the performance of Epetra, except when only using a few processes.
+	Table~\ref{tab:timing-results} shows a performance comparison between JuliaPetra and Epetra given a fixed local problem size.
+	Note that JuliaPetra is close to the performance of Epetra, especially for larger problems.
 	Additionally, JuliaPetra significantly outperforms DistributedArrays.jl.
-	Note that the last column shows the ratio of the JuliaPetra time over the Epetra time; in other words, a higher ratio indicates that the same problem will take longer to solve using JuliaPetra compared to Epetra.
+	The last column contains the ``speedup'' in performance of JuliaPetra compared to the equivalent Epetra problem, although all values are negative since JuliaPetra performs slightly worse that Epetra.
+	Note that the minimum speedup is computed using the best Epetra time and worse JuliaPetra time and vice versa for maximum speedup.
 	Additionally, the number of iterations was consistent between all problems, meaning the number of operations completed is only a function of number of processes and local problem size.
 	The sizes were chosen to test how the libraries respond to different local workloads.
-	
-	Figure~\ref{fig:result-numProcs} compares the performance of JuliaPetra and Epetra over a varying number of processes for a fixed problem size.
+	Note that Table~\ref{tab:timing-results} lists the local problem size, so there are globally 400,000 to 40,000,000 rows for 4 processes, 1,600,000 to 160,000,000 rows for 16 processes and 2,000,000 to 200,000,000 rows for 20 processes.
+
+	Figure~\ref{fig:result-numProcs} compares the performance of JuliaPetra and Epetra over a varying number of processes for a fixed global problem size.
 	Note that for fewer processes, JuliaPetra under performs Epetra.
 	However, as the number of processes increases, JuliaPetra approaches the performance of Epetra.
 	Although, when all 20 cores of the process are used JuliaPetra has a slight drop in performance.
