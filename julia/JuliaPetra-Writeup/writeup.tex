@@ -344,41 +344,42 @@ end
 	%This is to give insight on best practices for people who don't look at the general Julia discussions
 	%Talk about the "story" of improving the code and how optimizations improved performance.
 	
-	There were a lot of optimizations used to optimize JuliaPetra, many of which are standard advice for optimizing Julia, such as type stability, or for optimization in general, such as accessing arrays in memory order.
-	The only major, unusual optimization was using \snippet{Ptr} objects to pass views of arrays to reduce allocation and garbage collection.
+	Because Julia is a high level language, optimizing Julia code requires eliminated the extra overhead of some high level features.
+	These optimizations are in addition to the types of optimizations used in lower level languages such as array access order and cache utilization.
+	Some of these high level features include dynamic typing, garbage collection, and array boundary checks.
+	Note that eliminating these high level features should only be necessary in performance critical loops, since the benefit of these features usually out ways the overhead for code called a limited number of times.
 	
-	The main improvements to performance in JuliaPetra came from improving type stability.
-	Type stability is where the compiler can inference the types of all values.
-	This allows the compiler to fully inline function calls, especially arithmetic and array operations.
-	Because Julia is designed to support both slower, type unstable code and faster, type stable code,
-	unlike C++ which is restricted to type stable code, some effort needs to be put into verifying
-	type stability of performance critical code~\cite{Bezanson:2017:FreshApproach}.
-	%REVIEW mention that this is standard Julia advice?
-	Removing type instabilities from performance critical sections of JuliaPetra improved performance
-	by a few orders of magnitude.
+	The main improvements to performance in JuliaPetra came from ensuring the compiler could infer the concrete types of each value.
+	Code is called ``type stable'' when all types can be deduced.
+	Type stability's importance to performance in Julia code due to Julia's support for dynamic typing and the fact that (almost) any method can be overloaded~\cite{Bezanson:2017:FreshApproach}.
+	Removing type instabilities from performance critical sections of JuliaPetra improved performance by a few orders of magnitude.
+	It is worth noting that Julia provides some type stability without user intervention or type annotations, by compiling a function for each set of concrete argument types used.
+	This guarantees the compile is always able to know the types of a function's arguments.
+	Even with this, unintentional type instability is able to arise due to types of constants, unexpected type promotion, and unknown or type instable methods being called.s
 	The \snippet{code_warntype} function was a valuable tool in finding type instabilities.
 	Due to \snippet{code_warntype} requiring manual inspection, the TypeStability.jl library was created
 	based on \snippet{code_warntype} to automatic type stability checks~\cite{Github:TypeStability.jl}.
 	
-	Another notable optimization came from using \snippet{Ptr} objects to pass views of arrays.
-	Because Julia is a garbage collected language, most objects in Julia must be allocated on the heap,
-	then garbage collected when they are no longer used.
-	However, certain objects, such as integers and floating point numbers can be allocated on the stack,
-	so they avoid needing garbage collection.
-	%needs some citations here
-	So, by passing \snippet{Ptr} objects, which can be stack allocated,
-	instead of \snippet{SubArray} objects, which must be heap allocated,
-	the heap allocations and garbage collection can be greatly reduced in some performance critical sections
-	However, this prevents use of higher level interfaces that Julia normally provides,
-	such as the array length being stored with the array its self.
-	This had much less of a performance increase that improving type stability,
-	however, it is not a standard optimization for Julia, so it deserved mention.
+	Julia is a garbage collected language, meaning that the programmer is not required to manually deallocate objects~\cite{Bezanson:2017:FreshApproach}.
+	However, this means that generally objects can only be deallocated when the garbage collector looks through memory for unused objects.
+	This can result is excessive overhead when creating too many objects in a tight loop.
+	Fortunately, certain objects can be allocated on the stack where they can be deallocated when the function knows it is done with the value, so they do not need to be manged by the garbage collector.
+	However, these objects are limited to immutable objects that only reference other stack allocated objects, resulting stack allocation mainly being restricted to primitives like numbers.
+	JuliaPetra's implementation of a sparse matrix vector product relies heavily on passing a view to an array, which in a naive implementation results in extra work finding container objects once the matrix's row is processed.
+	So, to avoid this extra garbage collection, a \snippet{Ptr} object is used to point to the start of array view.
+	Because \snippet{Ptr}s are integers with a different type, an immutable pair containing a view's start and length can be stored on the stack, where is can be trivially deallocated when no longer needed.
+	There are a few caveats with this approach.
+	First, it is possible that improvements to Julia's compile have or will make this technique pointless.
+	Second, using basic pointers instead of a proper array reference removes basically all features of Julia arrays except for 1 dimensional array accesses.
+	Finally, this does rely on the fact that there is some other reference to the array so that the garbage collector does not deallocate the array while in use.
+	Performance wise, this was less significant than type stability, however, it is worth noting since it is not a standard Julia optimization and may be useful when porting code that takes advantage of manual deallocation.
 	
-	Other common and minor optimizations were also made.
-	These optimizations include skipping unnecessary bounds checks
-	and ensuring arrays data was accessed in the order it is stored in memory.
-	Additionally, function calls in frequently used loops were replaced with specialized, inlined versions that consider the context of the calling method and avoid using generalized methods that produce extra computations.
-	%REVIEW should I go into more detail on the specific example (getting a row in SpMV)
+	Finally, Julia automatically checks that accesses to arrays and other data structures are valid and within any boundaries by default~\cite{Bezanson:2017:FreshApproach}.
+	This allows Julia to cleanly throw an informative error when bad accesses happen instead of silently corrupting data or crashing the entire program with a segmentation fault.
+	However, when the programmer is able to know that array accesses are guaranteed to be valid, this checks only add overhead.
+	So, Julia provides a macro-based mechanism to disable these types of checks.
+	The primary macro for this is \snippet{@in_bounds} which indicates that any boundary checks in the given function call or block of code are unnecessary.
+	Note that the array access must be inlined, and thus be type stable, for \snippet{@in_bounds} to function.
 	
 	\section{Comparisons with Other Distributed Libraries}
 	
