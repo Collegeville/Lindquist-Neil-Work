@@ -112,7 +112,7 @@
 	Julia is a programing language that uses just in time compiling and powerful type inferencing
 	to obtain the speed of a statically compiled programing language with the productivity of an
 	interpreted programing language~\cite{Bezanson:2017:FreshApproach}.
-	By providing speed comparable to that of Fortran or C, Julia is a candidate for doing large scale,
+	By providing performance comparable to that of Fortran or C, Julia is a candidate for doing large scale,
 	high performance computations.
 	The Celeste project is an example of large scale computations in Julia,
 	using 8,192 cores of the Cori Supercomputer
@@ -129,7 +129,7 @@
 	The design of JuliaPetra follows closely with that of the C++ implementations of the
 	Petra object model, Epetra and Tpetra.
 	Like Epetra and Tpetra, JuliaPetra uses MPI and Single-Program-Multiple-Data as its base parallel model.
-	The API is split into three main layers of abstraction, the communication layer, the problem distribution layer, and the data structures layer.
+	The API is split into three main layers of abstraction, the communication layer, the problem distribution layer, and the linear algebra layer.
 	
 	The first level of abstraction handles actual communication between processes.
 	The \snippet{Comm} and \snippet{Distributor} types provide a low level interface to support different communication methods.
@@ -317,7 +317,7 @@ end
 	\end{lstlisting}
 	
 	As the example shows, Julia's syntax is similar to that of Fortran and MATLAB.
-	Furthermore, but not show, Julia uses one based indices and supports multidimensional arrays (including slices)~\cite{Bezanson:2017:FreshApproach}.
+	Furthermore, but not show, Julia uses one-based indices and supports multidimensional arrays (including slices)~\cite{Bezanson:2017:FreshApproach}.
 	Julia also supports syntactic macros that process the abstract syntax tree of their arguments, like macros in lisp-like languages (and unlike token based macros in C and C++).
 	
 	
@@ -329,7 +329,7 @@ end
 	To allow for these and other characters, Julia editors, including the console interface, provide latex like commands to type many Unicode characters.
 	For example, \texttt{\textbackslash alpha} followed by the tab key generates \(\alpha\).
 	Additionally, Julia can be used with just ASCII characters.
-	Operations like dot products have ASCII function name equivalents, as shown in line~\ref{line:dot}.
+	Operations, like a dot product, have ASCII function name equivalents, as shown in line~\ref{line:dot}.
 	
 	Another convenience Julia provides and JuliaPetra takes advantage of is the broadcast operator~\cite{Bezanson:2017:FreshApproach}.
 	Examples can be seen in lines~\ref{line:line-broadcast} and~\ref{line:operator-broadcast}.
@@ -337,14 +337,14 @@ end
 	Additionally, Julia automatically fuses the loops where able, so, for example, line~\ref{line:line-broadcast} will be computed with only a single loop and no intermediate vectors.
 	Julia provides two, interchangeable ways to broadcast operations and functions.
 	Each function call can broadcast individually, as shown on line~\ref{line:operator-broadcast}, or each function in a line can be broadcast, as shown on line~\ref{line:line-broadcast}.
-	Note that JuliaPetra works with multivectors instead of plain vectors, so operations like dot products return array with each of the respective results.
+	Note that JuliaPetra works with multivectors instead of plain vectors, so some operations, like a dot product, return array with each of the respective results.
 	These functions and JuliaPetra's broadcasting are implemented so that each result is seamlessly able to be applied to the appropriate vector in the set.
 	
 	\section{Optimizations of JuliaPetra}
 	%This is to give insight on best practices for people who don't look at the general Julia discussions
 	%Talk about the "story" of improving the code and how optimizations improved performance.
 	
-	Because Julia is a high level language, optimizing Julia code requires eliminated the extra overhead of some high level features.
+	Because Julia is a high level language, optimizing Julia code requires eliminating the extra overhead of some high level features.
 	These optimizations are in addition to the types of optimizations used in lower level languages such as array access order and cache utilization.
 	Some of these high level features include dynamic typing, garbage collection, and array boundary checks.
 	Note that eliminating these high level features should only be necessary in performance critical loops, since the benefit of these features usually out ways the overhead for code called a limited number of times.
@@ -355,7 +355,7 @@ end
 	Removing type instabilities from performance critical sections of JuliaPetra improved performance by a few orders of magnitude.
 	It is worth noting that Julia provides some type stability without user intervention or type annotations, by compiling a function for each set of concrete argument types used.
 	This guarantees the compile is always able to know the types of a function's arguments.
-	Even with this, unintentional type instability is able to arise due to types of constants, unexpected type promotion, and unknown or type instable methods being called.s
+	Even with this, unintentional type instability is able to arise due to the types of constants, unexpected type promotion, and unknown or type instable methods being called.s
 	The \snippet{code_warntype} function was a valuable tool in finding type instabilities.
 	Due to \snippet{code_warntype} requiring manual inspection, the TypeStability.jl library was created
 	based on \snippet{code_warntype} to automatic type stability checks~\cite{Github:TypeStability.jl}.
@@ -363,7 +363,7 @@ end
 	Julia is a garbage collected language, meaning that the programmer is not required to manually deallocate objects~\cite{Bezanson:2017:FreshApproach}.
 	However, this means that generally objects can only be deallocated when the garbage collector looks through memory for unused objects.
 	This can result is excessive overhead when creating too many objects in a tight loop.
-	Fortunately, certain objects can be allocated on the stack where they can be deallocated when the function knows it is done with the value, so they do not need to be manged by the garbage collector.
+	Fortunately, certain objects can be allocated on the stack where they can be deallocated when the function knows it is done with the value, so they do not need to be managed by the garbage collector.
 	However, these objects are limited to immutable objects that only reference other stack allocated objects, resulting stack allocation mainly being restricted to primitives like numbers.
 	JuliaPetra's implementation of a sparse matrix vector product relies heavily on passing a view to an array, which in a naive implementation results in extra work finding container objects once the matrix's row is processed.
 	So, to avoid this extra garbage collection, a \snippet{Ptr} object is used to point to the start of array view.
@@ -385,7 +385,7 @@ end
 	
 	To determine the quality of JuliaPetra as a distributed linear algebra library, it is compared to two existing libraries, Epetra and DistributedArrays.jl.
 	JuliaPetra is close to the former, as it was implemented partially based on Epetra.
-	It varies much more from the latter; JuliaPetra has much better performance but deviates from some Julia conventions.
+	It varies much more from the latter; JuliaPetra has much better performance, but deviates from some Julia conventions.
 	
 	\subsection{Comparison with Epetra}
 	
@@ -494,9 +494,9 @@ end
 	Table~\ref{tab:timing-results} shows a performance comparison between JuliaPetra and Epetra given a fixed local problem size.
 	Note that JuliaPetra is close to the performance of Epetra, especially for larger problems.
 	Additionally, JuliaPetra significantly outperforms DistributedArrays.jl.
-	The last column contains the ``speedup'' in performance of JuliaPetra compared to the equivalent Epetra problem, although all values are negative since JuliaPetra performs slightly worse that Epetra.
-	Note that the minimum speedup is computed using the best Epetra time and worse JuliaPetra time and vice versa for maximum speedup.
-	Additionally, the number of iterations was consistent between all problems, meaning the number of operations completed is only a function of number of processes and local problem size.
+	The last column contains the ``speed up'' in performance of JuliaPetra compared to the equivalent Epetra problem, although all values are negative since JuliaPetra performs slightly worse than Epetra.
+	Note that the minimum speed up is computed using the best Epetra time and worse JuliaPetra time and vice versa for maximum speed up.
+	Additionally, the number of iterations was consistent between all problems, meaning the number of operations completed is only a function of the number of processes and local problem size.
 	The sizes were chosen to test how the libraries respond to different local workloads.
 	Note that Table~\ref{tab:timing-results} lists the local problem size, so there are globally 400,000 to 40,000,000 rows for 4 processes, 1,600,000 to 160,000,000 rows for 16 processes and 2,000,000 to 200,000,000 rows for 20 processes.
 
@@ -538,7 +538,7 @@ end
 	This tests the performance of vector dot product, vector L2-norm and sparse matrix-vector multiplication functionalities.
 	The matrices used were various sizes of symmetric tridiagonal matrices, with the diagonal consisting of 2's
 	and the off diagonals containing -1's, that were distributed over different numbers of processes.
-	Each combination of implementation, problem size, and number of processes was run five times and the average, minimum and maximum are presented.
+	Each combination of implementation, problem size, and number of processes was run five times and the average, minimum, and maximum are presented.
 	All implementations were run once before collecting the timings, to ensure all Julia code was
 	compiled before the timing started.
 	Additionally, the setup for the problems were not counted as part of the times.
