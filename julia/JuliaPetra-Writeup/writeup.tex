@@ -117,6 +117,8 @@
 	The Celeste project is an example of large scale computations in Julia,
 	using 8,192 cores of the Cori Supercomputer
 	at Lawrence Berkeley National Laboratory~\cite{Bezanson:2017:FreshApproach}.
+	Additionally, Julia uses LLVM as the compiler backend, which allows for hardware portability and GPU support~\cite{Besard:2016:Julia-GPU}.
+	
 	
 	\section{The Petra Object Model}
 	
@@ -263,8 +265,18 @@
 	
 	\section{JuliaPetra Syntax}
 	
-	For an example usage of JuliaPetra, Listing~\ref{lst:JP-PCG} contains an implementation of the preconditioned conjugate gradient implemented with JuliaPetra.
-	Note that because vectors are stored in groups as \snippet{MultiVector}s, the implementations support solving multiple right hand sides at the same time.
+	As a high level language, Julia is designed to be easier to read and write than lower level languages like C and C++.
+	For example, Julia tries to reduce the amount of boilerplate code, which allows more succinct code.
+	Comparing the number of lines of code gives a rough estimate on this improvement.
+	For the power method implementation used in Section~\ref{sec:timing},
+	the JuliaPetra version took a total of 110 lines of code, compared to the 165 lines of code for Epetra, excluding comments and empty lines.
+	For the implementation of the \snippet{apply} function for CSR matrices, JuliaPetra has 133 lines and Epetra has 255 lines, excluding comments, empty lines, and functionality missing from JuliaPetra.
+	Similarly, Tpetra implements \snippet{apply} in 246 lines, not including the actual spmv loop which implemented in the Kokkos library.
+	%line counts from Trilinos commit 61646d3963f2915eff71e8204b83583f6daac11e
+	
+	
+	For an example of JuliaPetra usage, Listing~\ref{lst:JP-PCG} contains an implementation of the preconditioned conjugate gradient implemented with JuliaPetra.
+	Because vectors are stored in groups as \snippet{MultiVector}s, the implementations support solving multiple right hand sides at the same time.
 	This implementation provides two functions: one that updates \snippet{x} in place, \snippet{conjugate_gradient!}; and one that copies \snippet{x}, \snippet{conjugate_gradient}.
 	Note that function names ending in exclamation marks is merely Julia convention to warn the user that an input is mutated in the function call.
 	Each function takes four mandatory arguments: \snippet{x}, the initial guess; \snippet{A}, the linear operator being solved; \snippet{b}, the right hand side; and \snippet{Minv}, the preconditioning function.
@@ -329,7 +341,7 @@ end
 	To allow for these and other characters, Julia editors, including the console interface, provide latex like commands to type many Unicode characters.
 	For example, \texttt{\textbackslash alpha} followed by the tab key generates \(\alpha\).
 	Additionally, Julia can be used with just ASCII characters.
-	Operations, like a dot product, have ASCII function name equivalents, as shown in line~\ref{line:dot}.
+	Non-ASCII operators, like the dot product, have ASCII function name equivalents, as shown in line~\ref{line:dot}.
 	
 	Another convenience Julia provides and JuliaPetra takes advantage of is the broadcast operator~\cite{Bezanson:2017:FreshApproach}.
 	Examples can be seen in lines~\ref{line:line-broadcast} and~\ref{line:operator-broadcast}.
@@ -392,7 +404,7 @@ end
 	Epetra is the base implementation of the Petra object model,
 	written in a stable subset of C++~\cite{Heroux:2005:Trilinos}.
 	Because Epetra was used as a template for implementing JuliaPetra,
-	the APIs for JuliaPetra are similar to those for Epetra.
+	the APIs and implementation for JuliaPetra are similar to those for Epetra.
 	The similarities between JuliaPetra and Epetra can be seen in how similar the respective implementations
 	of the power method are.
 	The differences in features between the implementation languages result in differences
@@ -427,6 +439,7 @@ end
 	A Julia 0.6.0 version of DistributedArrays.jl was modified to be more conducive to sparse matrix operations, but that implementation was neither able to match the performance of JuliaPetra nor updated to the Julia 1.0 compatible version of DistributedArrays.jl.
 	
 	\subsection{Timing Results}
+	\label{sec:timing}
 	
 	\begin{table}
 		\caption{Timing results of various power method implementations.  All times are in seconds.}
