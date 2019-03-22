@@ -267,7 +267,7 @@ end
 	Removing type instabilities from performance critical sections of JuliaPetra improved performance by a few orders of magnitude.
 	It is worth noting that Julia provides some type stability without user intervention or type annotations, by compiling a function for each set of concrete argument types used.
 	This guarantees the compile is always able to know the types of a function's arguments.
-	Even with this, unintentional type instability is able to arise due to the types of constants, unexpected type promotion, and unknown or type instable methods being called.s
+	Even with this, unintentional type instability is able to arise due to the types of constants, unexpected type promotion, and unknown or type instable methods being called.
 	The \snippet{code_warntype} function was a valuable tool in finding type instabilities.
 	Due to \snippet{code_warntype} requiring manual inspection, the TypeStability.jl library was created
 	based on \snippet{code_warntype} to automatic type stability checks~\cite{Github:TypeStability.jl}.
@@ -297,7 +297,7 @@ end
 	
 	To determine the quality of JuliaPetra as a distributed linear algebra library, it is compared to two existing libraries, Epetra and DistributedArrays.jl.
 	JuliaPetra is close to the former, as it was implemented partially based on Epetra.
-	It varies much more from the latter; JuliaPetra has much better performance, but deviates from some Julia conventions.
+	It varies much more from the latter; JuliaPetra has much better performance but deviates from some Julia conventions.
 	
 	\subsection{Comparison with Epetra}
 	
@@ -403,9 +403,10 @@ end
 	\section{Conclusion}
 	
 	JuliaPetra is an implementation of the Petra object model in the Julia programming language.
-	So, it provides an interface for distributed solver algorithms to interact with and build on each other.
-	Additionally, by performing at the same speeds as Epetra,
-	it allows Julia to compete with C++ for these types of high performance computations.
+	So, it provides a Julia framework for distributed, sparse linear algebra.
+	Additionally, by performing at the same speeds as Epetra, it shows that Julia can compete with C++ for these types of high performance computations.
+	Finally, the high level nature of Julia allows JuliaPetra to provide a more elegant and mathematical API than Epetra.
+	Although, the high level features do add overhead that needs to be optimized away in critical sections of code.
 	This implementation demonstrates that Julia is a suitable candidate for these types of large scale, high performance, distributed codes.
 	
 	%REVIEW are there other things that should be discussed in the conclusion
