@@ -1,0 +1,94 @@
+\documentclass{standalone}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.12}
+
+\newcommand{\snippet}[1]{\lstinline{#1}}
+
+\begin{document}
+
+%name, type, location
+\newcommand{\typeNode} [3]{\node[#2] (#1) [#3] {\snippet{#1}};}
+\newcommand{\explicitInheritance}[2]{\draw[->] (#1.south) -- (#2);}
+\newcommand{\implicitInheritance}[2]{\draw[dashed,->] (#1.south) -- (#2);}
+\begin{tikzpicture}[
+	ImplicitInterface/.style={rectangle, draw=black, dashed, minimum size=5mm},
+	ExplicitInterface/.style={rectangle, draw=black, minimum size=5mm},
+	ConcreteType/.style={rectangle, draw=black, very thick, minimum size=5mm}
+	]
+	
+	\typeNode{Comm}{ExplicitInterface}{}
+	
+	\typeNode{MPIComm}{ConcreteType}{below=.75cm of Comm}
+	\explicitInheritance{Comm}{MPIComm.north}
+	
+	\typeNode{SerialComm}{ConcreteType}{right=.25cm of MPIComm}
+	\explicitInheritance{Comm}{SerialComm.north}
+	
+	\typeNode{LocalComm}{ConcreteType}{left=.25cm of MPIComm}
+	\explicitInheritance{Comm}{LocalComm.north}
+	
+	\typeNode{Distributor}{ExplicitInterface}{left=5.1cm of Comm}
+	
+	\typeNode{SerialDistributor}{ConcreteType}{below right=.75cm and -1cm of Distributor}
+	\explicitInheritance{Distributor}{SerialDistributor.north}
+	
+	\typeNode{MPIDistributor}{ConcreteType}{left=.25cm of SerialDistributor}
+	\explicitInheritance{Distributor}{MPIDistributor.north}
+	
+	
+	
+	\typeNode{Directory}{ExplicitInterface}{below right=.75cm and -1.25cm of MPIDistributor}
+	
+	\typeNode{BasicDirectory}{ConcreteType}{below=.75cm of Directory}
+	\explicitInheritance{Directory}{BasicDirectory.north}
+	
+	\typeNode{BlockMap}{ConcreteType}{right=of Directory}
+	
+	\typeNode{Import}{ConcreteType}{right=of BlockMap}
+	
+	\typeNode{Export}{ConcreteType}{right=of Import}
+	
+	
+	
+	\typeNode{SrcDistObject}{ImplicitInterface}{below left=.75cm and -.9cm of Export}
+	
+	\typeNode{DistObject}{ImplicitInterface}{below=.75cm of SrcDistObject}
+	\implicitInheritance{SrcDistObject}{DistObject.north}
+	
+	\typeNode{Operator}{ImplicitInterface}{left=of DistObject}
+	
+	\typeNode{AbstractArray}{ExplicitInterface}{left=of Operator}
+	
+	\typeNode{MultiVector}{ExplicitInterface}{below=of AbstractArray}
+	\implicitInheritance{DistObject}{MultiVector.north east}
+	\explicitInheritance{AbstractArray}{MultiVector.north}
+	
+	\typeNode{DenseMultiVector}{ConcreteType}{below=.75cm of MultiVector}
+	\explicitInheritance{MultiVector}{DenseMultiVector.north}
+	
+	\typeNode{RowMatrix}{ExplicitInterface}{below=of Operator}
+	\implicitInheritance{DistObject}{RowMatrix.north east}
+	\implicitInheritance{Operator}{RowMatrix.north}
+	\explicitInheritance{AbstractArray}{RowMatrix.north west}
+	
+	\typeNode{RowGraph}{ExplicitInterface}{below=of DistObject}
+	\implicitInheritance{DistObject}{RowGraph.north}
+	
+	\typeNode{CSRMatrix}{ConcreteType}{below=.75cm of RowMatrix}
+	\explicitInheritance{RowMatrix}{CSRMatrix.north}
+	
+	\typeNode{CSRGraph}{ConcreteType}{below=.75cm of RowGraph}
+	\explicitInheritance{RowGraph}{CSRGraph.north}
+	
+	\matrix [draw,below=.25cm] at (current bounding box.south) {
+		\node[ImplicitInterface,label=right:Implicit Type] {}; \\
+		\node[ExplicitInterface,label=right:Abstract Type] {}; \\
+		\node[ConcreteType,label=right:Concrete Type] {}; \\
+	};
+
+\end{tikzpicture}
+
+\end{document}

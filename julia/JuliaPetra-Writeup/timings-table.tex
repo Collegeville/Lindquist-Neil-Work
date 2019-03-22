@@ -1,0 +1,60 @@
+\documentclass{standalone}
+
+\usepackage{siunitx}
+
+\begin{document}
+\sisetup{table-format=2.5}
+\begin{tabular}{|c c|S|S|S[table-format=4.3]||S|}
+	\hline
+	\multicolumn{2}{|c|}{Equations Per Process}
+	& {JuliaPetra}
+	& {Epetra}
+	& \multicolumn{1}{m{1.8cm}||}{Distributed\-Arrays.jl}
+	& {Speedup} \\
+	\hline
+	\multicolumn{6}{|l|}{4 Processes}\\
+	
+	\hline
+	100,000			&Mean    & 0.22514 & 0.19244 & 124.322 & -0.14521 \\
+	equations		&Minimum & 0.22183 & 0.18437 & 123.324 & -0.18948 \\
+					&Maximum & 0.22747 & 0.22145 & 126.464 & -0.00171 \\
+	\hline
+	1,000,000		&Mean    & 2.76858 & 2.35595 & 1149.26 & -0.14904 \\
+	equations		&Minimum & 2.75613 & 2.35066 & 1144.52 & -0.15722 \\
+					&Maximum & 2.78917 & 2.36304 & 1162.54 & -0.14262 \\
+	\hline
+	10,000,000		&Mean    & 30.8755 & 24.7034 & {-}     & -0.19990 \\
+	equations		&Minimum & 30.6740 & 24.6805 & {-}     & -0.20677 \\
+					&Maximum & 31.1139 & 24.7140 & {-}     & -0.19430 \\
+	\hline
+	\multicolumn{6}{|l|}{16 Processes}\\
+	\hline
+	100,000			&Mean    & 0.53649 & 0.50143 & 2569.82 & -0.06533 \\
+	equations		&Minimum & 0.53408 & 0.49653 & 2525.37 & -0.07607 \\
+					&Maximum & 0.53741 & 0.50376 & 2713.96 & -0.05677 \\
+	\hline
+	
+	1,000,000		&Mean    & 7.51502 & 7.40649 & {-}     & -0.01444 \\
+	equations		&Minimum & 7.49275 & 7.40309 & {-}     & -0.01919 \\
+					&Maximum & 7.54793 & 7.41002 & {-}     & -0.01104 \\
+	\hline
+	10,000,000		&Mean    & 74.2079 & 73.9740 & {-}     & -0.00315 \\
+	equations		&Minimum & 74.0943 & 73.9240 & {-}     & -0.00492 \\
+					&Maximum & 74.2893 & 74.0402 & {-}     & -0.00073 \\
+	\hline
+	\multicolumn{6}{|l|}{20 Processes}\\
+	\hline
+	100,000			&Mean    & 0.77256 & 0.70583 & {-}     & -0.08638 \\
+	equations		&Minimum & 0.73311 & 0.70270 & {-}     & -0.12400 \\
+					&Maximum & 0.80217 & 0.71200 & {-}     & -0.02880 \\
+	\hline
+	1,000,000		&Mean    & 9.89883 & 9.22033 & {-}     & -0.06854 \\
+	equations		&Minimum & 9.85269 & 9.21825 & {-}     & -0.07627 \\
+					&Maximum & 9.97940 & 9.22443 & {-}     & -0.06377 \\
+	\hline
+	10,000,000		&Mean    & 97.4143 & 92.0917 & {-}     & -0.05464 \\
+	equations		&Minimum & 96.9243 & 91.9722 & {-}     & -0.06125 \\
+					&Maximum & 97.9733 & 92.1464 & {-}     & -0.04930 \\
+	\hline
+\end{tabular}
+\end{document}
