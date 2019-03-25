@@ -92,12 +92,12 @@
 	Julia is a programing language that uses just in time compiling and powerful type inferencing
 	to obtain the speed of a statically compiled programing language with the productivity of an
 	interpreted programing language~\cite{Bezanson:2017:FreshApproach}.
-	By providing performance comparable to that of Fortran or C, Julia is a candidate for doing large scale,
-	high performance computations.
+	It tries to solve the ``two language problem'' were software is prototyped in a slower, high-level language, then reimplemented using a faster, low-level language.
+	By providing performance comparable to that of Fortran or C with better user productivity, Julia is a candidate for doing large scale, high performance computations.
 	The Celeste project is an example of large scale computations in Julia,
 	using 8,192 cores of the Cori Supercomputer
 	at Lawrence Berkeley National Laboratory~\cite{Bezanson:2017:FreshApproach}.
-	Additionally, Julia uses LLVM as the compiler backend, which allows for hardware portability and GPU support~\cite{Besard:2016:Julia-GPU}.
+	Additionally, Julia provides support for GPU computing and writing high level GPU kernals~\cite{Besard:2019:Julia-Prototyping}.
 	
 	
 	\section{The Petra Object Model}
@@ -326,16 +326,14 @@ end
 	It uses Julia's built in fork-and-join model for parallelism~\cite{Bezanson:2017:FreshApproach}.
 	DistributedArrays.jl offers several of usability advantages over JuliaPetra, however, it is not able to match the speed of JuliaPetra.
 	
-	DistributedArrays.jl has advantages over JuliaPetra because it is better designed to function with
-	existing Julia code.
-	For example, it is built around the standard models of parallelization and arrays in Julia.
-	Another advantage is that DistributedArrays.jl uses an instance of \snippet{AbstractArray}
-	for a process's local storage, this allows automatic support for different array structures.
-	Finally, by keeping the program logic on the master process, DistributedArrays.jl can be used to
-	do distributed computations while using Julia's read-eval-print loop.
+	DistributedArrays.jl has an API that better supports Julia conventions and libraries as well as providing a higher level API than JuliaPetra's C++ inspired API~\cite{Besard:2019:Julia-Prototyping}.
+	In particular, it is built around the standard models of parallelization and arrays in Julia.
+	One advantage this exposes is that DistributedArrays.jl uses an instance of \snippet{AbstractArray} for a process's local storage, this allows automatic support for different array structures, including GPU storage~\cite{Besard:2019:Julia-Prototyping}.
+	Another advantage arises from keeping the program logic on the master process, DistributedArrays.jl can be used to do distributed computations while using Julia's read-eval-print loop.
 	
 	However, DistributedArrays.jl is performs much worse for the sparse operations used in the comparison timings.
 	This difference in performance likely stems from the fact that DistributedArrays.jl is optimized towards dense matrix operations, resulting in unnecessary communication and computation when working with sparse matrices.
+	There is some optimization being done to improve the performance so DistributedArrays.jl might be a stronger candidate in the future~\cite{Besard:2019:Julia-Prototyping}.
 	A Julia 0.6.0 version of DistributedArrays.jl was modified to be more conducive to sparse matrix operations, but that implementation was neither able to match the performance of JuliaPetra nor updated to the Julia 1.0 compatible version of DistributedArrays.jl.
 	
 	\subsection{Timing Results}
