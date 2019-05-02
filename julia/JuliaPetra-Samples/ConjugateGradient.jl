@@ -23,7 +23,7 @@ x is modified in place
 function conjugate_gradient!(x::MultiVector{Data, GID, PID, LID}, A, b::MultiVector{Data, GID, PID, LID},
         ; niters = 100, tol = 1e-6) where {Data, GID, PID, LID}
     Ax = apply(b, A, x)
-    r = apply(b, A, x, Data(-1), Data(1))
+    r = apply(b, A, x, Data(-1))
     p = copy(r)
     rtr = dot(r, r)
 
