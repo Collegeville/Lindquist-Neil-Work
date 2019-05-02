@@ -1,0 +1,95 @@
+total_size = 0
+bits = 1
+for cat in 1:8
+    while bits <= bitsizes[cat]
+        total_size += sizes[cat] * count[bits]
+        bits++
+
+
+
+bitsizes[1] =
+bitsizes[2] =
+bitsizes[3] =
+bitsizes[4] =
+bitsizes[5] =
+bitsizes[6] =
+bitsizes[7] =
+bitsizes[8] = 29
+
+
+
+
+∑(cat in 1:8) (sizes[cat] * ∑(bits in bitsizes[cat-1]:bitsizes[cat]) count[bits])
+
+
+alg (counts, indLow, indHigh, bitsLow, bitsHigh):
+    if indLow = indHigh
+        ([3+bitsHigh], bitsHigh)
+    else if bitsLow = bitsHigh
+        ([3-log_2(indHigh-indLow+1)+bitsHigh, repeat indHigh-indLow], [bitsHigh, repeat indHigh-indLow])
+    else
+        total_count = ∑ counts
+        let bitPivot ∈ bitsLow:bitsHigh be the smallest such that total_count/2 ≤ ∑ counts[bitsLow:ind]
+        let indPivot = (indLow+indHigh)/2
+
+        (sizes[indLow:ind], bitsizes[indLow:ind]) = alg(counts, indLow, indPivot, bitsLow, bitPivot)
+        (sizes[ind+1:indHigh], bitsizes[ind+1:indHigh]) = alg(counts, indPivot+1, indHigh, bitPivot+1, bitsHigh)
+
+
+
+## alg applied to 96^3 HPCG with the first ind in each row stored explicitly
+counts:
+	1		15925284
+	2		      18
+	3			  36
+	4			  72
+	5			 144
+	6			 288
+	7			 320
+	8			  64
+	9			 128
+	10			 256
+	11			 512
+	12			1024
+	13			2048
+	14		   13118
+	15			8192
+	16		   16384
+	17		   32768
+	18		   65536
+	19		  131072
+	20        163840
+
+alg(counts, 1, 8, 1, 29)
+	total_count = 16361104
+	bitPivot = 1
+	indPivot = 4
+	alg(counts, 1, 4, 1, 1)
+		ret ([2, 2, 2, 2], [1, 1, 1, 1])
+	alg(counts, 5, 8, 2, 29)
+		total_counts = 217910
+		bitPivot = 18
+		indPivot = 6
+		alg(counts, 5, 6, 2, 18)
+			total_counts = 70454
+			bitPivot = 15
+			indPivot = 5
+			alg(counts, 5, 5, 2, 15)
+				ret ([18], [15])
+			alg(counts, 6, 6, 17, 18)
+				ret ([21], [18])
+		alg(counts, 7, 8, 19, 29)
+			total_counts = 294912
+			bitPivot = 20
+			indPivot = 7
+			alg(counts, 7, 7, 19, 20)
+				ret ([23], [20])
+			alg(counts, 8, 8, 21, 29)
+				ret([32], [29])
+
+
+0xx -> 1
+100 -> 15
+101 -> 18
+110 -> 20
+111 -> 29

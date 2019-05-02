@@ -1,0 +1,133 @@
+Indices (for middle points)
+i-s*s-s-1
+i-s*s-s
+i-s*s-s+1
+i-s*s-1
+i-s*s
+i-s*s+1
+i-s*s+s-1
+i-s*s+s
+i-s*s+s+1
+i-s-1
+i-s
+i-s+1
+i-1
+i
+i+1
+i+s-1
+i+s
+i+s+1
+i+s*s-s-1
+i+s*s-s
+i+s*s-s+1
+i+s*s-1
+i+s*s
+i+s*s+1
+i+s*s+s-1
+i+s*s+s
+i+s*s+s+1
+
+
+
+Ideas (N = # bits)
+Elias gamma coding - N-1 0's then significant bits of #	(wiki)
+Elias delta coding - encode N with gamma coding, then last N-1 bits of # (wiki)
+Huffman-Int - Huffman code N-1, then last N-1 bits of # (goog slide 46)
+Byte aligned encoding - continuation bit 	(goog slide 56)
+Byte aligned encoding - byte length			(goog slide 56)
+Grouped Byte aligned encoding - byte length	(goog slide 63)
+
+
+
+
+Index Deltas (for middle points)
+-2*s*s-2*s-2
+1
+1
+s-2
+1
+1
+s-2
+1
+1
+s*s-2*s-2
+1
+1
+s-2
+1
+1
+s-2
+1
+1
+s*s-2*s-2
+1
+1
+s-2
+1
+1
+s-2
+1
+1
+
+
+Delta counts
+1				18
+s-2				6
+s*s-2*s-2		2
+-2*s*s-2*s-2	1
+
+
+
+Scaled deltas
+local Size		64		96		128			160
+1				    1	     1	     1		    1
+s-2				   62	    94	   126        158
+s*s-2*s-2		 3966	  9022	 16126		25278	
+-2*s*s-2*s-2	-8322	−18626	−33026
+
+
+
+
+
+
+center row size (bits)	64		96		128		160
+Plain ints				864		864		864		864
+Elias gamma per row		162		182		182		198
+Elias gamma continuous 	211		217		221		
+Elias delta per row		146		156		156		176
+Huffman per row			 66		 66		 66		 66		#for only middle points
+Huffman continuous		 39		 39		 39		 39		#for only middle points
+Huffman-Int per row		118		128		134		136		#for only middle points
+Huffman-Int cont 2x+1	131		142						#for only middle points
+Byte aligned-cont bit
+	per Row				480		480		480		180
+	continuous-sgn extd	248		312
+Byte aligned-len	
+	per Row				256		304
+	continuous-sgn extd	248
+block byte aligned-len
+	per Row				312		312
+	continuous-sgn extd	294
+
+
+
+
+Elias Delta convertion table
+   1 > 1						N=1, L=0		bits=1
+   2 > 0 10 0					N=2, L=1
+   4 > 0 11 00					N=3, L=1
+   8 > 00 100 000				N=4, L=2
+   9 > 00 100 001				N=4, L=2
+  16 > 00 101 0000				N=5, L=2
+  32 > 00 110 0-0000   			N=6, L=2
+  62 > 00 110 1-1110   			N=6, L=2		bits = 10
+  94 > 00 111 01-1110			N=7, L=2		bits = 11
+ 128 > 00 111 11-1110			N=7, L=2		bits = 11
+ 160 > 000 1000 010-0000		N=8, L=3		bits = 14
+3966 > 000 1100 111-0111-1110	N=12,L=3		bits = 18
+9022 > 000 1110 0-0011-0011-1110	N=14,L=3	bits = 20
+16126> 000 1110 1-1110-1111-1110	N=14,L=3	bits = 20
+25278> 000 1111 10-0010-1011-1110	N=15,L=3	bits = 21
+
+
+

@@ -1,0 +1,104 @@
+
+0xx -> 4
+100 -> 5
+110 -> 15
+101 -> 20
+111 -> 29
+
+sx = sy = sz = 64
+174 bits per center row (no first)
+
+sx = sy = sz = 96
+234 bits per center row (no first)
+
+sx = sy = sz = 128
+234 bits per center row (no first)
+
+sx = sy = sz = 160
+234 bits per center row (no first)
+
+-------------------------------
+
+0x -> 1
+10 -> 14
+11 -> 29
+
+sx = sy = sz = 64
+164 bits per center row (no first)
+
+sx = sy = sz = 96
+164 bits per center row (no first)
+
+sx = sy = sz = 128
+164 bits per center row (no first)
+
+sx = sy = sz = 160
+194 bits per center row (no first)
+
+
+
+--------------------------------
+
+# optimized for problems of size 96^3
+0x -> 1
+10 -> 7
+11 -> 29
+
+sx = sy = sz = 96
+116 bits per center row (no first)
+
+---------------------------------
+
+# optimized for problems of size 96^3
+0xx -> 1
+100 -> 7
+101 -> 14
+111 -> 29
+
+
+sx = sy = sz = 96
+130 bits per center row (no first)
+
+---------------------------------
+
+# optimized for problems of size 96^3 
+0xx -> 1
+10x -> 7
+110 -> 14
+111 -> 29
+
+sx = sy = sz = 96
+124 bits per center row (no first)
+
+
+--------------------------------
+
+#alg optimized for problems of size 96^3 with initialPrevious(r) = 0
+0xx -> 1
+100 -> 15
+101 -> 18
+110 -> 20
+111 -> 29
+
+sx = sy = sz = 96
+180 + row start bits
+
+
+
+
+
+--------------------------------
+basic op selection algorithm
+
+
+alg(counts, indLow, indHigh, bitLow, bitHigh):
+  if indLow = indHigh:
+    ret ([3], [bitHigh])
+  else if bitLow = bitHigh:
+    ret ([3 - log_2(indHigh-indLow+1), repeat indHigh-indLow], [bitHigh, repeat indHigh-indLow])
+  else
+    let total_count = ∑ counts
+    let bitPivot ∈ bitLow:bitHigh be the smallest such that total_count/2 ≤ ∑ counts[bitLow:bitPivot]
+    let indPivot = (indLow + indHigh)/2
+    (opsizes[indLow:indPivot], bitCounts[indLow:indPivot]) = alg(counts, indLow, indPivot, bitLow, bitPivot)
+    (opsizes[indPivot+1:indHigh], bitCounts[indPivor+1:indHigh]) = alg(counts, indLow, indPivot, bitLow, bitPivot)

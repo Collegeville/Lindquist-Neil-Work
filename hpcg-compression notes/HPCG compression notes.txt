@@ -1,0 +1,55 @@
+Things to keep in mind when optimizing
+	Gauss seidel preconditioner takes of most of the time
+		so adding OMP threads doesn't improve performance
+	Matrix values and indices need sequential reads
+		forwards and backwards
+			can be seperate iterations
+	Vectors need random reads and sequential writes
+		idea: compress common data, that allows storing less data for each individual block
+			sign? No; some sections where negatives and positives adjacent (and not really small)
+			exponent? Maybe; would still need to store a few bits for the individual numbers
+			mantissa? Probs not; there isn't that much direct relation between adjacent numbers
+
+			Number crunch
+				Use 1 communal exponent byte - equivalent to 32 bit float's exponent range,
+				need 1 sign bit
+				2 bits to store variation from block exponent should be sufficient
+				need more than 24 effective bits of mantissa (32bit floats not accurate enough
+				don't need more than 53 effective bits (64 bit floats accurate enough)
+				24 bits -> 22 effective bit mantissa
+				32 bits -> 30 effective bit mantissa
+				40 bits -> 38 effective bit mantissa
+				48 bits -> 46 effective bit mantissa
+				56 bits -> 54 effective bit mantissa
+
+
+
+matrix value compression
+	uncompressed - random element access
+	sz: continuous
+		2 modes
+		3 modes - slower
+		4 modes - slowest
+	sz: per row - random row access
+		2 modes
+		3 modes
+	32 bit - random elemen access
+	zfp - very slow
+
+
+
+matrix indices
+	uncompressed - random element access
+	sz: continuous
+	gamma - random row access
+	delta - slower than gamma, random row access
+
+
+
+
+vector values
+	uncompressed - random element access
+	single precision - random element access, destroys convergance rate
+	mixed precision - random element access
+	zfp - random block access, very slow
+	SZ - random block access, slow
