@@ -1,0 +1,128 @@
+Tables~\ref{tab:results-vec}, \ref{tab:results-val}, and~\ref{tab:results-ind} show the compression results for compressing just the vector values, matrix values, and matrix indices, respectively.
+\input{figures/4.Results/Vec.tex} %
+\input{figures/4.Results/Val.tex} %
+\input{figures/4.Results/Ind.tex} %
+These tables, and all following tables of test results, contain the HPCG rating; the GFLOP rating with convergence overhead; the number of iterations needed for convergence; and, where computed, the compression rate based on the number of cache lines fetched, which may be different then the memory allocated.
+Note that some compression strategies had multiple variations that were tested.
+Sections~\ref{sec:results-vec}, \ref{sec:results-vals}, and~\ref{sec:results-inds} provide details on the compression of each specific data structure.
+
+Note that for comparing times, ten runs of the baseline implementation with the standard test settings had a range of 0.6128 and a standard deviation of 0.1846 for the HPCG rating.
+For the effective GFLOP/s, there was a range of 0.4629 and a standard deviation of 0.1504.
+Thus, when comparing similar values, it should be noted that the values likely vary by a few tenths of a GFLOP/s between runs.
+
+Next, because compressing a single data structure failed to improve performance, both matrix data structures were compressed.
+SZ and single precision compression where tried for the matrix values and using SZ, gamma and delta compression for the matrix indices.
+Table~\ref{tab:results-combined-mat} shows the results of these combined schemes.
+The combined scheme with the best performance used SZ compression for both values and indices.
+\input{figures/4.Results/Combined-mat.tex} %
+The only other approach that outperformed the baseline implementation used 32-bit compression for the values and gamma compression for the indices.
+
+Finally, vector compression was combined with the successful combined matrix compression.
+Only the best few versions of mixed precision vector compression were used.
+Table~\ref{tab:results-combined-vec+mat} shows the results for these compression strategies.
+\input{figures/4.Results/Combined-vec+mat.tex} %
+The first column indicates which vectors were stored in 32bit; the rest of the columns correspond to their counterparts in Table~\ref{tab:results-combined-mat}.
+Note that vector compression improved the performance of the SZ compressed matrices but reduced the performance of the gamma compressed matrices.
+So, the best implementation for the test problem uses mixed precision vectors with \(\vec{b}, \vec{x}\) and \(\mat{A}\vec{d}\) stored in single precision, and SZ compressed matrix values and indices.
+
+\subsection{Vector Compression}
+\label{sec:results-vec}
+As shown in Table~\ref{tab:results-vec} and discussed previously, vector compression was not successfully used to improve performance.
+However, certain combinations of single and double precision vector values were able to perform close to the baseline performance.
+These mixed precision implementations were able to improve performance when combined with other compressions, as shown in Table~\ref{tab:results-combined-vec+mat}.
+Note that the single precision implementation has a 2.3-times increase in iterations to converge over the baseline implementation and that the GFLOPs rating of the single precision implementation is reduced by a factor of approximately 2.19 from the baseline implementation.
+This hints that, even without increasing the number of Conjugate Gradient iterations, vector compression requires a compression rate better than 1:2 to provide much of an improvement in performance.
+
+The compression schemes used mixed precision vectors are listed by which vectors are stored in single precision; the unlisted vectors are stored in double precision.
+When only \(\vec{b}, \vec{x}\), and optionally \(\mat{A}\vec{d}\), are stored in single precision, then the code can perform close to the baseline implementation.
+Note that \(\vec{b}\) only contains integers in the test problem, so using single precision does not result in any loss of precision.
+Similarly, \(\vec{x}\) is not used to compute other values.
+Thus, any error that occurs in \(\vec{x}\) will not be propagated into the computation of other values.
+Additionally, making \(\vec{x}\) single precision does not affect the accuracy of the solution.
+Using single precision for \(\vec{x}\) and \(\vec{b}\) did not affect the value of \(\|\vec{x}_\text{computed} - \vec{x}_\text{exact}\|_2\).
+However, making \(\vec{x}, \vec{b}\) and \(\mat{A}\vec{d}\) single precision increased the value from 1235.61 to 1658.75.
+
+ZFP had poor performance when compressing vector information.
+The high-level array API was used to provide the necessary random access.
+That API provides an adjustable cache for decoded values.
+Figure~\ref{fig:results-zfp-cache} shows the performance of 1d ZFP compression versus the cache size.
+\input{figures/4.Results/Vec-zfp-cache.tex} %
+Note that the two large jumps occur when the values only need to be decoded once per matrix-vector product and when the values can be left permanently decoded.
+The results in Table~\ref{tab:results-vec} use the default cache size of 2 blocks for 1 dimensional compression and \({2\cdot\ceil{nz/2}\cdot\ceil{ny/2}}\) blocks for 3-dimensional compression.
+The array API also allows selecting the compression rate, with a 16-bit granularity for 1-dimensional compression and a 1-bit granularity for 3-dimensional compression~\cite{Lindstrom:2014:zfp}.
+These granularity restrictions and the resulting iterations needed were used to select the tested compression rates.
+
+SZ compression has two main configurable settings, the number of values in each block and the error bound.
+There were two measures of error that were considered, absolute error and pointwise relative error.
+The performance was tested with both a single error being bounded, and both errors being bounded.
+Absolute error is the absolute value of the difference between predicted and actual.
+The pointwise relative error is the absolute error divided by the actual value.
+Table~\ref{tab:results-vec} contains results for various block sizes with both an absolute error bound of \(10^{-10}\) and a pointwise relative error bound of \(10^{-10}\).
+Table~\ref{tab:results-vec-SZ} contains a comparison of various error bounds for a block size of 8 values per block.
+\input{figures/4.Results/Vec-SZ.tex} %
+Note that an absolute bound of \(10^{-2}\) was unable to converge within 500 iterations.
+
+
+\subsection{Matrix Value Compression}
+\label{sec:results-vals}
+Like vector compression, matrix value compression alone was unable to outperform the baseline implementation.
+As shown in Table~\ref{tab:results-val}, 1-bit compression underperformed the baseline implementation, indicating compressing the matrix values alone in unable to improve performance.
+Both SZ compression and single precision compression were not significantly under the baseline, indicating that they may be usable in conjunction with other compression techniques.
+On the other hand, ZFP compression performed over a magnitude slower than the baseline, making it unlikely that it could improve performance, even when combined with other techniques.
+
+As mentioned in Section~\ref{sec:bg-comp-sz}, there were two possible sets of predictors that could be used for matrix value compression.
+One setup uses only the Neighbor predictor, and the other setup uses both the Neighbor and Neighbor's Neighbor predictors.
+Both setups performed similarly, with the 2-predictor version performing slightly better.
+The 1-predictor version was used when combining with other compression methods.
+Also, because the only matrix values are -1 and 26, all reasonable error bounds provide equivalent compression.
+
+%TODO look at the level of effort applied to ZFP
+%Should probably reimplement ZFP matVal versions to be variable rate encoded w/ a forward and backward iterations
+%Or just drop ZFP matVals b/c technically not designed for the type of data that is being compressed
+ZFP compression had multiple configurations that could be used.
+However, the possible configurations were not fully experimented with since the matrix values lacks the spatial relations that ZFP is designed for and ZFP performs poorly on the configurations that were tested, for both vector and matrix value compression.
+First, unlike ZFP vector compression, only the 1-dimensional codec was tested because the data does not have spatial patterns, let alone multiple dimensions of them.
+Second, due to the simple access pattern for matrix values, both the high-level array API and the low-level API were tried.
+The compression rate was kept at 32 bits per value.
+None of the configurations tested were able to provide even mediocre performance, so ZFP compression was not tested further for matrix compression.
+
+\subsection{Matrix Index Compression}
+\label{sec:results-inds}
+Matrix index compression was unable to outperform the baseline implementation.
+Both SZ compression and the Elias codings were able to perform in the ballpark of the baseline implementation.
+Neither Huffman coding nor Op Code compression were able to perform close to the performance of baseline implementation.
+
+Variations of the Huffman coding implementation were experimented with to find the best set of parameters.
+The first parameter was whether to compress the first index or to leave it uncompressed.
+Because Huffman coding needs a codeword for each represented value, compressing the first index will reduce the memory of that value but reduce the efficiency of compressing the rest of the values~\cite{Huffman:1952:coding}.
+Since neither version was obviously better, both were tried.
+The second parameter was how many bits to view at a time when decoding.
+Second, decoding was implemented using chaining of lookup tables.
+Decoding is implemented using chained lookup tables.
+So, each lookup checked the next \texttt{window\_size} bits, which either provided the value and number of bits consumed or a further table to check the next \texttt{window\_size} bits on~\cite{Schindler:1998:huffman-decode}.
+So, a higher window size increases the memory needed, but reduces the total number of lookups to do, providing a tradeoff between the amount of cache space used up and the average time to decode each value.
+
+Although Opcode compression has outperformed uncompressed values in some settings, it was unable to perform well in this code base~\cite{Lawlor:2013:compression}.
+Several sets of opcodes were tried, including the original shown in Figure~\ref{tab:bg-comp-opcode-CCIdecodeTable}.
+The set of opcodes with the best performance is shown in Figure~\ref{tab:results-opcode-decodeTable}; it was designed for the best performance on the matrices used.
+\input{figures/4.Results/opcode-decodeTable} %
+The difference in success of the CCI opcodes from previous works likely comes from a difference in the data access patterns, cache sizes or decoding implementation.
+
+\subsection{Testing Environment}
+The compression rates were either analytically computed or computed from the compressed size.
+Other numbers were provided by HPCG's benchmark results.
+The HPCG rating is the benchmark's rating, located in the yaml results file as the ``GFLOP/s Summary: Total with convergence and optimization phase overhead'' field.
+The GFLOP/s rating can similarly be found in the ``GFLOP/s Summary: Total with convergence overhead'' field.
+The iteration count was determined using the content of the ``Iteration Count Overhead'' field.
+All results were obtained with a minimum run time of 300 seconds.
+
+The timings presented were obtained when using a per-process problem size of \(96^3\) matrix rows across 60 processes, as described in Section~\ref{sec:bg}.
+The cluster used for timings had a 20-core, 2.2 GHz, Intel Xeon E5-2698 v4 head node and an additional five 8-core, 1.7GHz, Intel Xeon E5-2605 nodes.
+One process was created for each core, with a single OMP thread per process.
+
+The code was implemented using version 3.0.0 of the HPCG benchmark~\cite{Dongarra:2015:HPCG}.
+Many of the implementations with timings listed in this paper can be found at \url{https://github.com/Collegeville/HPCG-ZFP}~\cite{Lindquist:2018:projectGithub}.
+The code was compiled with the OpenMPI cxx wrapper using GCC version 4.8.5.
+OpenMPI 3.0.2 was used for the compiler wrapper and MPI runtime.
+The \texttt{O3} and \texttt{fopenmp} flags were used for compilation, in addition to a selection of warning flags and the \texttt{std} flag, as necessary.
+No \texttt{HPCG\_OPTS} flags were enabled.

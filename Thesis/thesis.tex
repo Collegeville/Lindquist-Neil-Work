@@ -1,0 +1,100 @@
+\documentclass[]{csbsjuthesis}
+
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{etoolbox}
+\usepackage[hidelinks]{hyperref}
+\usepackage{ifdraft}
+\usepackage{listings}
+\usepackage{mathtools}
+\usepackage{pgfplots}
+	\pgfplotsset{compat=1.16}
+\usepackage{csvsimple}
+\usepackage{siunitx}
+\usepackage{subcaption}
+\usepackage[obeyFinal]{todonotes}
+
+
+%math typeseting
+\newcommand{\mat}[1]{\mathbf{#1}}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\renewcommand\qedsymbol{$\blacksquare$}
+
+%setup todo notes
+%note that notes are hidden in draft mode to improve compile times
+\newcommand{\review}[1]{\ifdraft{}{\todo[linecolor=yellow,backgroundcolor=yellow!25,bordercolor=yellow]{REVIEW: #1}}}
+\newcommand{\change}[1]{\ifdraft{}{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red]{TODO: #1}}}
+\newcommand{\info}[1]{\ifdraft{}{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue]{INFO: #1}}}
+
+
+% opening information
+\title{\input{title.txt}}
+\author{Neil Lindquist}
+\date{April 2019}
+
+\advisor{Mike Heroux}{Scientist in Residence}
+\reader{Robert Hesse}{Associate Professor of Mathematics}
+\reader{Jeremy Iverson}{Assistant Professor of Computer Science}
+\deptchair{Bret Benesh}{Mathematics}
+\deptchair{Imad Rahal}{Computer Science}
+
+\begin{document}
+
+%Example environment
+\theoremstyle{definition}
+\newtheorem{example}{Example}
+
+\maketitle
+
+\sigpage
+
+\begin{abstract}
+	Solving large, sparse systems of linear equations plays a significant role in certain scientific computations, such as approximating the solutions of partial differential equations.
+	However, solvers for these types of problems usually spend most of their time fetching data from main memory.
+	In an effort to improve the performance of these solvers, this work explores using data compression to reduce the amount of data that needs to be fetched from main memory.
+	Some compression methods were found that improve the performance of the solver and problem found in the HPCG benchmark, with an increase in floating point operations per second of up to 84\%.
+	These results indicate that, if similar improvements can be made with other linear systems, compression could improve the performance of real-world solvers.
+\end{abstract}
+
+\tableofcontents
+\clearpage
+
+\listofalgorithms
+\listoffigures
+\listoftables
+\clearpage
+
+\mainmatter
+
+\section{Introduction}
+\input{sections/1.Introduction.tex}
+
+\section{Problem Implementation}
+%Note this section is still interally referenced as the background
+\label{sec:bg}
+\input{sections/2.Background.tex}
+
+\section{Performance Models}
+\input{"sections/3.Performance Models.tex"}
+
+\section{Test Results}
+\label{sec:results}
+\input{"sections/4.Test Results.tex"}
+
+\section{Conclusions}
+\input{sections/5.Conclusion.tex}
+
+\bibliography{bibliograph}
+
+\appendix
+
+\section{Performance Model Source Code}
+\label{app:decode-model-source}
+\input{appendices/modelSource.tex}
+ 
+
+\end{document}

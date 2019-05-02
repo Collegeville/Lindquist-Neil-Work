@@ -1,0 +1,13 @@
+\begin{table}
+	\centering
+	\begin{tabular}{l|l|l|S[table-format=2.6]|S[table-format=2.6]|r}
+		\multicolumn{3}{c|}{Compression} & & & \\
+		32-bit  &       &       & {HPCG}   & {GFLOPs} &            \\
+		Vectors & Value & Index & {Rating} & {Rating} & Iterations \\
+		\hline
+		\multicolumn{3}{c|}{Baseline} & 15.3654 & 15.7394 & 50 \\
+		\csvreader[head to column names,separator=semicolon,filter strcmp={\vectp}{Y}]{figures/4.Results/Combined.csv}{}{ \vect & \matind & \matval & \hpcg & \gflops & \iterations \\}
+	\end{tabular}
+	\caption{Results of combined vector, matrix value and matrix index compression schemes.}
+	\label{tab:results-combined-vec+mat}
+\end{table}

@@ -1,0 +1,129 @@
+Numerous compression strategies were considered for this project.
+Figure~\ref{fig:comp-overview} lists the compressions tried for each of the main data structures.
+\input{"figures/2.Background/Compression/Strategies Overview.tex"} %
+Note that most compression methods were only used with one or two of the data types, even if able to be reasonably used within the constraints of other types of data.
+
+\subsubsection{Restrictions on Compression Strategies}
+The restrictions on usable compression strategies primarily come from the data access requirements described in Section~\ref{sec:bg-da}.
+These requirements were that matrix rows need to be readable in both a forward and backward iteration, the diagonal for a given row must be accessible, and the vectors have both random read access and random, immediate write access.
+Due to the highly regular nature of the particular matrix used and the existence of solvers specially optimized for solving this type of problem, the requirement that all compression techniques can handle any sparse matrix was added to increase the usefulness of this work~\cite{Saad:2003:IterativeMethods}.
+Although, an exception was made to the requirement to handle general matrices for the 1-bit Compression described in Section~\ref{sec:bg-comp-1bit} as that compression method is designed to provide an upper bound for improvements from compressing matrix values.
+Finally, integer compression was limited to lossless compression methods to ensure that the proper vector entries were fetched, while floating point compression was allowed to be lossy.
+
+Note that some cleverness can be used to work around some restrictions.
+By compressing the data in small blocks, sequential compression strategies can be used while retaining effectively random access reads and writes~\cite{Lindstrom:2014:zfp}.
+Then, at most, the individual block needs to be decompressed or recompressed for a single read or write.
+Similarly, a sequential compression method can be used on the matrix information by compressing the data twice, once for forward iteration and once for backwards iteration.
+
+
+\subsubsection{Single and Mixed Precision Floating Point Numbers}
+\label{sec:bg-comp-floatPrec}
+The most obvious compression of floating point data is using single precision representation instead of double precision representation.
+While it only has a compression rate of 1:2, it allows the compression and decompression of values using at most 1 extra hardware operation.
+Additionally, it provides the same data access properties as the double precision version.
+For the matrix values, single precision representation is lossless in the test problem, since each matrix value is an integer.
+However, for the vector values, using single precision floats resulted in a significant increase of Conjugate Gradient iterations due to the loss of precision.
+So, by making only select vectors single precision, a compromise can be found where vectors that need high precision can keep that precision and vectors that do not need as much precision can get improved performance.
+
+\subsubsection{1-bit Compression}
+\label{sec:bg-comp-1bit}
+To provide an estimated upper bound for improvements in performance from matrix value compression, 1-bit compression was devised.
+This scheme uses the fact that the matrix values in the test matrix are all either -1 or 26.
+Note that as implemented, this scheme can compress a limited number of matrices.
+However, certain compression schemes that modify the compression based on the data being compressed, such as Huffman coding described in Section~\ref{sec:bg-comp-huffman}, can achieve the same compression for the test matrix.
+Note that the upper bound provided for 1-bit compression is only an upper bound for the particular pair of vector and index compressions that 1-bit compression was used with.
+The importance of compressing multiple structures, as described in Section~\ref{sec:bg-comp-combined}, is shown using 1-bit compression.
+
+\subsubsection{Squeeze (SZ) Compression}
+\label{sec:bg-comp-sz}
+Squeeze (SZ) compression is a group of compression strategies based on using curve fitting and can be used for both integers and floating point values.
+The compression strategy referred to as SZ compression in this paper deviates from the original description by using a generalization of the core approach of the original implementation of SZ compression~\cite{Di:2016:SZ}.
+SZ compression allows for string bounds to be placed on the compression error.
+
+The compressed data is stored in two arrays, one storing the predictor each value is compressed with and the other storing values that could not be predicted within tolerance.
+To compress each value, the error between the prediction made by each predictor is compared.
+If the smallest error is within the user supplied tolerance, the associated predictor is stored.
+Otherwise, the value is appended to the list of uncompressed values and the predictor is stored as uncompressed.
+Because only the compressed value is available when decompressing, those values are used during compression when computing the value produced by each predictor.
+This allows error requirements to be met.
+The compression rate is
+\[
+	\frac{ps+\ceil{\log_2(n)}}{s}
+\]
+where \(s\) be the number of bits used by an uncompressed value, \(p\) be the percent of values that are compressed, and \(n\) be the number of predictors available.
+Note that due to the granularity of the matrix values and indices, bounding the error to be less than one results in an effective error bound of 0.
+Thus, when compressing those data structure, only an error bound of 0 is used.
+
+The predictors available are selected based on the nature of the data being compressed.
+Figure~\ref{fig:comp-sz-modes} shows all predictor functions used.
+\input{figures/2.Background/Compression/SZ-modes.tex} %
+For compressing vector values, the Neighbor, Linear and Quadratic predictors were used.
+Because the vector values represent a value at each grid point, these predictors attempted to capture smooth changes and relations in the data.
+The matrix indices were compressed using only the increment compression mode, since approximately two thirds of the indices fit that pattern.
+The matrix values were compressed with a few different combinations of predictors.
+These combinations were Neighbor alone, then Neighbor and Neighbor's Neighbor.
+These predictors were chosen to find the best way to compress a series of -1's with occasional 26's.
+
+\subsubsection{ZFP Compression}
+ZFP compression is a lossy floating point compression scheme designed for spatial correlated data~\cite{Lindstrom:2014:zfp}.
+ZFP compression is designed to take advantage of spatial relations for data up to 4 dimensions.
+Note that the matrix values were compressed with ZFP, even though there is no spatial relation between points.
+Because the vectors represent points in 3 dimensions, 1- and 3- dimensional compression was tried.
+The matrix values were only compressed with 1 dimension.
+ZFP compresses its values by grouping the data into blocks of \(4^d\) elements, where \(d\) is the number of dimensions compressing with~\cite{Lindstrom:2014:zfp}.
+When random access is required, each block is compressed at a fixed size to allow access to arbitrary blocks.
+ZFP was implemented using the existing C++ library.
+Both the high-level and low-level interfaces were tried for the vector compression.
+
+
+\subsubsection{Elias Gamma Coding and Delta Coding}
+Elias Gamma and Delta codings are a pair of similar compression methods that are designed to compress positive integers by not storing extra leading 0's~\cite{Elias:1975:codeword}.
+Because these schemes are better at compressing smaller numbers, the matrix indices were stored as the offset from the preceding value.
+Then, because these codings are only able to compress positive integers, the indices of each row must be sorted in acceding order.
+Finally, the first index in each row is stored as the offset from -1, to ensure an index of 0 is properly encoded.
+
+To encode an integer \(n\) with Gamma coding, let \(N = \floor{\log_2(n)}+1\) be the number of bits needed to store \(n\).
+Then, \(n\) is represented by \(N-1\) zeros followed by the \(N\) bits of \(n\)~\cite{Elias:1975:codeword}.
+Thus, \(n\) can be stored with only \(2N-1\) bits.
+For small values of \(N\) this is highly affected, reaching compression ratios of up to 1:32.
+See Figure~\ref{fig:bg-comp-gamma-ex} for examples of gamma coding.
+\input{figures/2.Background/Compression/Gamma-Ex.tex}
+
+Delta coding is like Gamma coding, except instead of preceding the number with \(N-1\) 0's, the number is preceded by \(gamma(N)\) and only the last \(N-1\) bits are stored.
+So, \(n\) can be stored with only \(N + 2\floor{\log_2(N)}\) bits.
+Figure~\ref{fig:bg-comp-delta-ex} contains examples of delta coding.
+\input{figures/2.Background/Compression/Delta-Ex.tex} %
+Note that delta coding provides better compression for large numbers, but worse compression for certain smaller numbers.
+Additionally, because decoding a delta encoded value requires decoding a gamma encoded value, decoding a delta coded value is more expensive than decoding a gamma coded value.
+
+\subsubsection{Huffman Coding}
+\label{sec:bg-comp-huffman}
+Huffman coding is an optimal prefix code usable for lossless compression~\cite{Huffman:1952:coding}.
+A prefix code is a coding where each representable value is assigned a unique coding such that no code is the beginning of another code.
+However, Huffman coding does not take advantage of local patterns in the data, just the overall frequencies of each value.
+Additionally, Huffman coding can only be decoded sequentially, due to the variable length of storage for each value.
+So, while it can compress matrix values and indices, it is unable to meet the requirements to compress vector values.
+Note that the Huffman coding of the matrix values in the test problem is equivalent to the 1-bit coding described in Section~\ref{sec:bg-comp-1bit}.
+Thus, only matrix indices were tested with Huffman coding.
+
+\subsubsection{Opcode Compression}
+\label{sec:bg-comp-opcode}
+Opcode compression is based on the index compression used in Compressed Column Index (CCI) matrices~\cite{Lawlor:2013:compression}.
+Note that this integer compression is never given its own name in the original description and so is referred to as opcode compression in this paper.
+Opcode compression is inspired by CPU instruction encodings which are separated into an ``opcode'' portion and a data portion (hence the name).
+To read each value, the first few bits are read to determine the number of bits used for the data portion, which stores the encoded value.
+Like Gamma and Delta coding, opcode compression reduces the number of leading 0's stored, and similarly is utilized by encoding the difference from the preceding index.
+If some opcodes are used significantly, that opcode can be shorted to save bits.
+This shortened opcode can be handled in a lookup table by placing the opcode's information at every location that begins with the opcode.
+For example, if 0, 10 and 11 are the possible opcodes, then the information for opcode 0 is located at the indices of 00 and 01.
+
+The description of CCI matrix format uses a fixed decode table.
+However, when using a lookup table, using custom decode tables to adjust the compression for the specific matrix's sparsity pattern will not have a significant performance penalty to decoding.
+Table~\ref{tab:bg-comp-opcode-CCIdecodeTable} shows the opcodes used for CCI format.
+\input{figures/2.Background/Compression/opcode-CCIdecodeTable.tex}
+
+\subsubsection{Combined Compression Strategies}
+\label{sec:bg-comp-combined}
+In addition to compressing a single data structure at a time, compression strategies which compress multiple data structures were tried.
+This provided the opportunity to achieve an overall reduction in data that could not be achieved by compressing a single data structure.
+Additionally, as discussed in Section~\ref{sec:bg-da} and as shown in Section~\ref{sec:results}, compressing matrix values alone cannot provide performance improvement.

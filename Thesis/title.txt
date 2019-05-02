@@ -1,0 +1,1 @@
+Reducing Memory Access Latencies using Data Compression in Sparse, Iterative Linear Solvers

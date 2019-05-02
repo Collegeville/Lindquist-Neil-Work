@@ -1,0 +1,54 @@
+The Conjugate Gradient and Multigrid implementations in HPCG do not directly access the matrix and vector values, but instead use low-level functions to manipulate the data structures~\cite{Dongarra:2015:HPCG}.
+These low-level functions include copying a vector, setting a vector to zero, the dot product, a scaled vector sum, the matrix vector product, the symmetric Gauss-Seidel step, the multigrid restriction, and the multigrid prolongation.
+Further data accessing functions exist in HPCG, however, they are not part of the timing.
+So, any additionally restrictions can be overcome by converting to an uncompressed format, applying the function, then recompressing.
+The low-level functions used in the timed section of the code can be viewed together to produce the overall data access requirements,
+For the matrices, the matrices do not need to be mutable, the rows need to be readable in both a forward and backward iteration, the data for a given row has no restriction on its read order, and the diagonal for a given row must be accessible.
+The vectors, on the other hand, need both random read and write access, with the writes being immediately accessible to future reads.
+
+In addition to the restrictions on usable compression schemes imposed by the data access patterns, they influence the effectiveness of compression schemes.
+Note that in the inner loop of both the sparse matrix vector product and the symmetric Gauss-Seidel step do not have a data dependency between matrix values and the vector values; however, the vector values are dependent on the matrix indices.
+So, the matrix values can be fetched in parallel to the matrix indices and vector values~\cite{Hennessy:1990:ComputerArchitecture}.
+This will result in ineffective compression when just compressing one part of the problem, as discussed in Section~\ref{sec:bg-comp-combined}.
+
+% zero and copy vector
+Copying a vector and setting a vector to zero provide the least data access requirements.
+Note that a vector's content can by copied by transferring the current representation of the values without any processing.
+Setting a vector to zero merely requires the ability to write vector values.
+These functions add little to the data access requirements and are both simple to implement with alternative vector representation.
+
+% Dot product and WAXPBY
+The dot product and sum of scaled vectors are both straightforward functions.
+Each of them iterates over two or three vectors and applies a few arithmetic operations.
+The dot product accumulates the sum of the product of the pair of vector entries across the iterations.
+The sum of scaled vectors computes \(w_i = \alpha x_i + \beta y_i\) for each set of entries.
+Note that the only data iteration between rows in either of these operations is the sum in the dot product, however addition is an associative operation.
+Thus, these functions can be arbitrarily parallelized or have their iteration reordered.
+
+% SPMV
+The matrix vector product iterates once over the rows and for each row sums the nonzero entries times the vectors corresponding entries~\cite{Dongarra:2015:HPCG}.
+Both the rows and the sum in each row may be iterated in any order or in parallel.
+Thus, the matrix information can be compressed for any iteration order of rows and any iteration order of the values in each row.
+However, the vector information must be able to be read at an arbitrary index.
+For each iteration, the matrix information is read only once, and the vector entries are read for each nonzero value in the corresponding column (8 to 27 times for this matrix).
+So, assuming the problem is too large for the matrix to fit entirely in the memory caches, the matrix data will always need to be read from main memory, while vector data will be able to utilize caches, resulting in up to 27-fold fewer reads than the matrix data.
+This hints that the compressing matrix information is more likely to provide an increase in performance of the matrix vector product than compressing the vector information.
+
+% SYMGS
+The symmetric Gauss-Seidel step is similar to the sparse matrix-vector product, with added complications.
+First, the step has two iterations, one forward and one backward.
+Instead of simply summing the row-vector product, each row does the following calculation
+\[
+	x_i \gets b_i - \frac{1}{a_{ii}}\sum_{j=1}^{n}a_{ij}x_j
+\]
+where only terms with nonzero \(a_{ij}\) are computed, \(x_i, b_i\) are the ith elements of \(\vec{x}, \vec{b}\) respectively and \(a_{ij}\) is the entry of \(\mat{A}\) in the ith row and jth column~\cite{Dongarra:2015:HPCG}.
+Note that each \(x_i\) is used immediately in the subsequent rows, this means that any deviation from the base row iteration order or any parallelization of the rows may reduce the effectiveness of the step.
+Because any delay in writing the new values to \(\vec{x}\) results in effectively parallelizing the iteration of the rows, the vector values must be written immediately or within a few iterations.
+Additionally, the Gauss-Seidel step has the additional requirement that the matrix diagonal of the current row must be accessible.
+
+%Further kernals
+The restriction and prolongation functions used in the multigrid are the last matrix and vector value accessing functions used in the Conjugate Gradient implementation.
+Restriction samples points from two fine grid vectors and stores the difference in a coarse grid vector.
+Prolongation takes the entries in a coarse grid vector and adds them to select fine grid vectors.
+So, between these two functions, random read and write access is needed by vectors in all but the coarsest mesh.
+

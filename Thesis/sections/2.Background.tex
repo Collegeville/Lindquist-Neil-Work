@@ -1,0 +1,36 @@
+This project uses the High Performance Conjugate Gradient (HPCG) benchmark as the baseline implementation.
+This means that an implementation of the Conjugate Gradient algorithm with a multigrid precondition variant is used as the linear solver~\cite{Dongarra:2015:HPCG}.
+The benchmark's linear system is a discretization of a steady-state heat equation problem in three dimensions.
+The zero vector is the initial value for \(x\).
+
+%problem and discresionization
+The problem used to create the linear system used by HPCG, and thus by this project, is a three-dimensional partial differential equation (PDE) model~\cite{Dongarra:2015:HPCG}.
+This problem is approximating the function \(u(x, y, z)\) over the three-dimensional rectangular region \(\Omega\subset\mathbb{R}^3\) such that
+\[
+	\Delta u = \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} + \frac{\partial^2 u}{\partial z^2} = 0,
+\] with \(u(x, y, z) = 1\) along the boundaries of \(\Omega\).
+Note that the solution is \(u(x, y, z) = 1\) for the region \(\Omega\).
+The linear system is created by using the finite difference method with a 27-point stencil on the PDE over a rectangular grid with nodes of fixed distance.
+The matrix's diagonal consists of the value 26, and -1's fill the entries for the row's 26 grid neighbors.
+The right-hand side of the equation has a value of 14 for corner points, 12 for edge points, 9 for side points and 0 for interior points~\cite{Kincaid:2009:Numerical}.
+The solution vector consists of all 1's.
+
+% HPCG's solve details
+As HPCG is designed to emulate the performance characteristics of real-world problems without needing to be a robust solver, it only uses 3 levels of grid coarseness with only a single smoother iteration at the coarsest grid level.
+The smoother used by the multigrid is based on a symmetric Gauss-Seidel step; however, values are only synchronized between processors at the beginning of the step.
+The restriction operation simply samples half the points in dimension, resulting in a reduction of grid size by a factor of eight in each level of coarseness.
+To prolong the coarse grids, each coarse point is added to the fine point it was sampled from.
+
+The problem is distributed over 60 processes, each with a cubic subproblem 96 nodes per side.
+The processors are distributed in a rectangular prism of size 5 by 4 by 3 processors.
+The resulting linear system has 53,084,160 total rows.
+MPI is used for interprocess communication.
+
+
+\subsection{Data Access Patterns of High Performance Conjugate Gradient}
+\label{sec:bg-da}
+\input{"sections/2.Background.Data Access.tex"}
+
+\subsection{Compression Strategies}
+\label{sec:bg-comp}
+\input{"sections/2.Background.Compression.tex"}

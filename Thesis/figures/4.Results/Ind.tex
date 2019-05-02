@@ -1,0 +1,21 @@
+\begin{table}
+	\centering
+	\begin{tabular}{l|S[table-format=2.6]|S[table-format=2.6]|r|c}
+		            & {HPCG}   & {GFLOPs} &            & Compression \\
+		Compression & {Rating} & {Rating} & Iterations & Rate \\
+		\hline
+		\csvreader[head to column names,separator=semicolon,filter strcmp={\type}{}]{figures/4.Results/Ind.csv}{}{ \tablename & \hpcg & \gflops & \iterations & \rate \\}
+		Huffman & & & & \\
+		\hspace{3mm}No First Index & & & & \\
+			\csvreader[head to column names,separator=semicolon,filter strcmp={\type}{huffman-nofirst}]{figures/4.Results/Ind.csv}{}{\hspace{3mm}\tablename & \hpcg & \gflops & \iterations & \rate \\}
+		\hspace{3mm}First Index & & & & \\
+			%huffman-nofirst;6-bit window;Huffman - No First - 6 bit;10.7666;10.9715;51; \({\sim}1\):9;
+			%huffman-nofirst;10-bit window;Huffman - No First - 10 bit;10.8156;11.024;51;\({\sim}3\):10;1
+			\csvreader[head to column names,separator=semicolon,filter strcmp={\type}{huffman-first}]{figures/4.Results/Ind.csv}{}{\hspace{6mm}\tablename & \hpcg & \gflops & \iterations & \rate \\}
+		%TODO consider adding more Huffman timings (single table, cont alloc)
+		Op Code & & & & \\
+		\csvreader[head to column names,separator=semicolon,filter strcmp={\type}{opcode}]{figures/4.Results/Ind.csv}{}{\hspace{3mm}\tablename & \hpcg & \gflops & \iterations & \rate \\}
+	\end{tabular}
+	\caption{Results of compressing matrix indices.}
+	\label{tab:results-ind}
+\end{table}

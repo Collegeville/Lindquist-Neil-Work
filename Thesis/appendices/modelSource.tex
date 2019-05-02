@@ -1,0 +1,93 @@
+Below is the implementation of the simulation-based performance model.
+The model was implemented in Common Lisp and used with Steel Bank Common Lisp version 1.4.0.
+
+\begin{lstlisting}[language=Lisp,
+					showstringspaces=false,
+					numbers=left,
+					numberstyle=\tiny]
+;;; Global Variables
+
+; Cluster properties
+(defparameter *l1-time* 5)
+(defparameter *l2-time* 12)
+(defparameter *main-mem-time* 1656/10)
+
+; Model parameters
+(defparameter *rows-to-check* 128)
+
+; Default compression settings
+(defparameter *bytes-per-mat-ind* 4)
+(defparameter *bytes-per-mat-val* 8)
+(defparameter *bytes-per-vect* 8)
+(defparameter *inds-decode-time* 0)
+(defparameter *vals-decode-time* 0)
+(defparameter *vect-decode-time* 0)
+(defparameter *vect-encode-time* 0)
+
+
+;;; Model Implementation
+
+(defmethod fetch ((obj (eql :mat-inds)) (i integer))
+  "Computes the cost of fetching the ith matrix index"
+  (if (/= (floor (* (1- i) *bytes-per-mat-ind*) 64)
+          (floor (* i *bytes-per-mat-ind*) 64))
+    *main-mem-time*
+    *l1-time*))
+
+(defmethod fetch ((obj (eql :mat-vals)) (i integer))
+  "Computes the cost of fetching the ith matrix value"
+  (if (/= (floor (* (1- i) *bytes-per-mat-val*) 64)
+          (floor (* i *bytes-per-mat-val*) 64))
+    *main-mem-time*
+    *l1-time*))
+
+(defmethod fetch ((obj (eql :vect)) (i integer))
+  "Computes the code of fetching the ith vector value"
+  (cond
+    ; 2/3rds of values were used by the previous index
+    ((/= (mod i 3) 2) *l1-time*)
+    ; 2/9ths of values were used by y-1
+    ((< (/ i 3) 6) *l2-time*)
+    ; 1/9th of values are being used for the first time
+    (t (if (/= (floor (* (1- (/ i 27)) *bytes-per-vect*)
+                      64)
+               (floor (* (/ i 27) *bytes-per-vect*)
+                      64))
+         *main-mem-time*
+         *l1-time*))))
+
+
+(defun 1-row ()
+  "Computes the average cost to load a row.
+   *rows-to-check* provides the number of rows to use"
+  (+ (/ (loop
+          :for i :from 0 :below (* *rows-to-check* 27)
+          :for inds-fetch-time = (fetch :mat-inds i)
+          :for vals-fetch-time = (fetch :mat-vals i)
+          :for vect-fetch-time = (fetch :vect i)
+          :for total-vals-time = (+ vals-fetch-time
+                                    *vals-decode-time*)
+          :for total-vect-time = (+ inds-fetch-time
+                                    *inds-decode-time*
+                                    vect-fetch-time
+                                    *vect-decode-time*)
+          :summing (min total-vals-time total-vect-time))
+        *rows-to-check*)
+     *vect-encode-time*))
+
+
+(defun 1-row-with-props (ind-size val-size vect-size
+                         ind-decode val-decode
+                         vect-decode vect-encode)
+  "Like 1-row, but sets the compression properties"
+  (let ((*bytes-per-mat-ind* ind-size)
+        (*bytes-per-mat-val* val-size)
+        (*bytes-per-vect* vect-size)
+        (*inds-decode-time* ind-decode)
+        (*vals-decode-time* val-decode)
+        (*vect-decode-time* vect-decode)
+        (*vect-encode-time* vect-encode))
+    (1-row)))
+
+
+\end{lstlisting}

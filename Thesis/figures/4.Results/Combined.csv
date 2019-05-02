@@ -1,0 +1,13 @@
+vectp;vect;matind;matval;hpcg;gflops;iterations;comment
+N;;SZ;SZ;18.9702;19.5759;50;
+N;;SZ;Gamma;13.661;13.9794;51;
+N;;SZ;Delta;10.9903;11.1961;50;
+N;;32 bits;SZ;14.1796;14.5156;51;
+N;;32 bits;Gamma;17.6676;18.1835;51;
+N;;32 bits;Delta;12.56;12.8181;51;
+Y;None;SZ;SZ;18.9702;19.5759;50;
+Y;{\(\vec{b}, \vec{x}\)};SZ;SZ;23.967;24.9875;50;
+Y;{\(\vec{b}, \vec{x}, \mat{A}\vec{d}\)};SZ;SZ;27.5974;28.9699;50;
+Y;None;32 bits;Gamma;17.6676;18.1835;51;
+Y;{\(\vec{b}, \vec{x}\)};32 bits;Gamma;16.6048;17.0684;50;
+Y;{\(\vec{b}, \vec{x}, \mat{A}\vec{d}\)};32 bits;Gamma;16.5665;17.0294;50;

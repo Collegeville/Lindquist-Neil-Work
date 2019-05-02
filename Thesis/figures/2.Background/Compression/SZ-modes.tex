@@ -1,0 +1,16 @@
+\begin{figure}
+	\centering
+	\begin{tabular}{cl}
+		Uncompressed & \(v_i \gets \) original \(i\)th value \\
+		Neighbor & \(v_i \gets v_{i-1}\) \\
+		Linear & \(v_i \gets 2v_{i-1} - v_{i-2}\) \\
+		Quadratic & \(v_i \gets 3v_{i-1} - 3v_{i-2} + v_{i-3}\) \\
+		Neighbor's Neighbor & \(v_i \gets v_{i-2}\) \\
+		Last Uncompressed & \(v_i \gets\) last value stored uncompressed \\
+		Increment & \(v_i \gets v_{i-1}+1\)
+	\end{tabular}
+
+	\caption{Prediction functions used in SZ compression.}
+	\label{fig:comp-sz-modes}
+	
+\end{figure}

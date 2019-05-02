@@ -1,0 +1,222 @@
+Conjugate Gradient is the iterative solver used by HPCG~\cite{Dongarra:2015:HPCG}.
+Symmetric, positive definite matrices will guarantee the converge of Conjugate Gradient to the correct solution within \(n\) iterations, where \(n\) is the rows of the matrix, when using exact algebra~\cite{Saad:2003:IterativeMethods}.
+More importantly, Conjugate Gradient can be used as in iterative method, providing a solution, \(\vec{x}\), where \(\left\|\mat{A}\vec{x}-\vec{b}\right\|\) is within some tolerance, after significantly fewer than \(n\) iterations, allowing it to find solutions to problems where computing \(n\) iterations is infeasible~\cite{Shewchuk:1994:IntroToCG}.
+As an iterative method, Conjugate Gradient forms update directions from Krylov subspaces of the form \(\mathcal{K}_n(\vec{r}_0, \mat{A})=\text{span}(\vec{r}_0, \mat{A}\vec{r}_0, \mat{A}^2\vec{r}_0, \dots, \mat{A}^n\vec{r}_0)\), where \(\vec{r}=\vec{b}-\mat{A}\vec{x}_0\).
+
+%Steepest Decent
+To understand the Conjugate Gradient, first consider the quadratic form of \(\mat{A}\vec{x} = \vec{b}\).
+The quadratic form is a function \(f:\mathbb{R}^n\to\mathbb{R}\) where
+\begin{equation}
+\label{eq:cg-quad-form}
+	f(\vec{x}) = \tfrac{1}{2}\vec{x}^T\mat{A}\vec{x} - \vec{b}\cdot\vec{x} + c
+\end{equation}
+for some \(c\in\mathbb{R}\).
+Note that
+\[
+	\nabla f\left(\vec{x}\right) = \tfrac{1}{2}\left(\mat{A}+\mat{A}^T\right)\vec{x}-\vec{b}
+\]
+Then, when \(\mat{A}\) is symmetric,
+\begin{equation*}
+	\nabla f(\vec{x}) = \mat{A}\vec{x} - \vec{b}
+\end{equation*}
+So, the solution to \(\mat{A}\vec{x} = \vec{b}\) is the sole critical point of \(f\)~\cite{Nearing:2010:toolsForPhysics}.
+Since \(\mat{A}\) is the Hessian matrix of \(f\) at the point, if \(\mat{A}\) is positive definite, then that critical point is a minimum.
+Thus, if \(\mat{A}\) is a symmetric, positive definite matrix, then the minimum of \(f\) is the solution to \(\mat{A}\vec{x} = \vec{b}\)~\cite{Shewchuk:1994:IntroToCG}.
+
+The method of Steepest Decent is useful for understanding Conjugate Gradient, because they both use a similar approach to minimize Equation~\ref{eq:cg-quad-form}, and thus solve \(\mat{A}\vec{x}=\vec{b}\).
+This shared approach is to take an initial \(\vec{x}_0\) and move downwards in the steepest direction, within certain constraints, of the surface defined by Equation~\ref{eq:cg-quad-form}~\cite{Nearing:2010:toolsForPhysics}.
+Because the gradient at a point is the direction of maximal increase, \(\vec{x}\) should be moved in the opposite direction of the gradient.
+Thus, to compute the next value of \(\vec{x}\), use
+\begin{equation}
+\label{eq:cg-xUpdate}
+	\vec{x}_{i+1} = \vec{x}_i + \alpha_i \vec{r}_i
+\end{equation}
+for some \(\alpha_i > 0\) and where \(\vec{r}_i = -\nabla f\left(\vec{x}_i\right) = \vec{b} - \mat{A}\vec{x}_i\) is the residual of \(\vec{x}_i\).
+Since \(\mat{A}\vec{x} = \vec{b}\) is the only critical point and a minimum of the quadratic function, \(f\), the ideal value of \(\alpha_i\) is the one that minimizes \(f\left(\vec{x}_{i+1}\right)\).
+Thus, choose \(\alpha_i\) such that
+\begin{align*}
+	0
+	&= \tfrac{\mathrm{d}}{\mathrm{d} \alpha_i} f\left(\vec{x}_{i+1}\right) \\
+	&= \tfrac{\mathrm{d}}{\mathrm{d} \alpha_i} f\left(\vec{x}_i + \alpha \vec{r}_i\right) \\
+%
+	\alpha_i
+	&= \frac{\vec{r}_i\cdot \vec{r}_i}{\vec{r}_i\cdot\mat{A}\vec{r}_i}.
+\end{align*}
+Note that by using Equation~\ref{eq:cg-xUpdate}, we can derive
+\begin{equation}
+\label{eq:CG-improvedResidual}
+	\vec{r}_{i+1} = \vec{r}_i - \alpha\mat{A}\vec{r}_i.
+\end{equation}
+Because \(\mat{A}\vec{r}_i\) is already computed to find \(\alpha_i\), using Equation~\ref{eq:CG-improvedResidual} to compute the residual results in one less matrix-vector product per iteration.
+Algorithm~\ref{alg:bg-cg-alg-steepestDecent} shows the resulting algorithm.
+\begin{algorithm}[tb]
+	\begin{algorithmic}
+		\STATE \(\vec{r}_0 \gets \vec{b} - \mat{A}\vec{x}_0\)
+		\FOR{\(i = 0, 1, \dots\) \textbf{until} \(\left\|\vec{r}_i\right\| \leq \epsilon\)}
+			\STATE \(\alpha_i \gets \frac{\vec{r}_i\cdot \vec{r}_i}{\vec{r}_i\cdot\mat{A}\vec{r}_i}\)
+			\STATE \(\vec{x}_{i+1} = \vec{x}_i + \alpha_i\vec{r}_i\)
+			\STATE \(\vec{r}_{i+1} = \vec{r}_i - \alpha\mat{A}\vec{r}_i\)
+		\ENDFOR
+	\end{algorithmic}
+	
+	\caption{Steepest Decent~\cite{Shewchuk:1994:IntroToCG}.}
+	\label{alg:bg-cg-alg-steepestDecent}
+\end{algorithm}
+
+
+\begin{example}
+\label{ex:CG-SteepestDecent}
+%x = (2, 1)
+Consider the linear system
+\[
+	\mat{A} = \begin{bmatrix}
+		2 & 1 \\
+		1 & 3
+	\end{bmatrix},
+	\quad
+	\vec{b} = \begin{bmatrix}
+		5 \\
+		5 
+	\end{bmatrix}
+\]
+and use \(c=0\).
+Note that the solution is
+\[
+	\vec{x} = \begin{bmatrix}
+		2 \\ 1
+	\end{bmatrix}.
+\]
+When starting at the origin, the iteration of Method of Steepest Decent becomes
+\begin{align*}
+	 \vec{x}_0 &= \begin{bmatrix}0\\0\end{bmatrix}
+	&\vec{r}_0 &= \begin{bmatrix}5\\5\end{bmatrix}
+	&\alpha_0  &= 2/7 \\
+	%
+	 \vec{x}_1 &= \begin{bmatrix}10/7\\10/7\end{bmatrix}
+	&\vec{r}_1 &= \begin{bmatrix}5/7\\-5/7\end{bmatrix}
+	&\alpha_1  &= 2/3 \\
+	%
+	 \vec{x}_2 &= \begin{bmatrix}40/21\\20/21\end{bmatrix}
+	&\vec{r}_2 &= \begin{bmatrix}5/21\\5/21\end{bmatrix}
+	&\alpha_2  &= 2/7 \\
+	%
+	 \vec{x}_3 &= \begin{bmatrix}290/147\\50/49\end{bmatrix}
+	&\vec{r}_3 &= \begin{bmatrix}5/147\\-5/147\end{bmatrix}
+	&\alpha_3  &= 2/3 \\
+	%
+	&\vdots &&\vdots &&\vdots
+\end{align*}
+The \(\vec{x}_i\)s are plotted with a contour graph of the quadratic form in Figure~\ref{fig:CG-steepestDecentExample-Iterations}. \qed
+\input{"figures/1.Introduction/Steepest Decent Example-Iterations.tex"}
+\end{example}
+
+%Conjugate Directions
+The Conjugate Directions family of linear solvers, of which Conjugate Gradient is a member of, attempts to improve on the number of iterations needed by Steepest Decent.~\cite{Shewchuk:1994:IntroToCG}.
+Note that, in Example~\ref{ex:CG-SteepestDecent}, the directions of \(\vec{r}_0\) and \(\vec{r}_2\) are the same and the directions of \(\vec{r}_1\) and \(\vec{r}_3\) are the same.
+Thus, the same direction is traversed multiple times.
+Additionally, note that the two sets of residual directions are perpendicular to each other.
+Conjugate Directions attempts to improve on this, by making the search directions, \(\vec{d}_0, \vec{d}_1, \dots\), \(\mat{A}\)-orthogonal to each other and only moving \(\vec{x}\) once in each search direction.
+Two vectors, \(\vec{u}, \vec{v}\), are \(\mat{A}\)-orthogonal, or conjugate, if \(\vec{u}^T\mat{A}\vec{v}=0\).
+The requirement for Conjugate Directions is to make \(\vec{e}_{i+1}\) \(\mat{A}\)-orthogonal to \(\vec{d}_i\), where \(\vec{e}_i = \vec{x}_i - \mat{A}^{-1}\vec{b}\) is the error of \(\vec{x}_i\).
+The computation of \(\alpha_i\) changes to find the minimal value along \(\vec{d}_i\) instead of \(\vec{r}_i\).
+\[
+	\alpha_i = \frac{\vec{d}_i^T\vec{r}_i}{\vec{d}_i^T\mat{A}\vec{d}_i}.
+\]
+
+%Conjugate Gradient proper
+Conjugate Gradient is a form of Conjugate Directions where the residuals are made to be \(\mat{A}\)-orthogonal to each other~\cite{Shewchuk:1994:IntroToCG}.
+This is done using the Conjugate Gram-Schmidt Process.
+To do this, each search direction, \(\vec{d}_i\) is computed by taking \(\vec{r}_i\) and removing any components that are not \(\mat{A}\)-orthogonal to the previous \(\vec{d}\)'s~\cite{Shewchuk:1994:IntroToCG}.
+So, let \(\vec{d}_0 = \vec{r}_0\) and for \(i > 0\) let
+\[
+	\vec{d}_i = \vec{r}_i + \sum_{k=0}^{i-1} \beta_{(i, k)}\vec{d}_k
+\]
+with \(\beta_{(i, k)}\) defined for \(i > k\).
+Then, solving for \(\beta_{(i, k)}\) gives
+\[
+	\beta_{(i, k)} = -\frac{\vec{r}_i\cdot\mat{A}\vec{d}_i}{\vec{d}_j\cdot\mat{A}\vec{d}_j}.
+\]
+Note that each residual is orthogonal to the previous search directions, and thus the previous residuals.
+So, it can be shown that \(\vec{r}_{i+1}\) is \(\mat{A}\)-orthogonal to all previous search directions, except \(\vec{d}_i\)~\cite{Shewchuk:1994:IntroToCG}.
+Then, \(\beta_{(i, k)} = 0\) for \(i-1 \neq k\).
+To simplify notation, let \(\beta_i = \beta_{(i, i-1)}\).
+So, each new search direction can then be computed by
+\[
+	\vec{d}_i = \vec{r}_i + \beta_i\vec{d}_{i-1}.
+\]
+Algorithm~\ref{alg:bg-cg-alg-cg} shows the final Conjugate Gradient algorithm.
+
+\begin{algorithm}[tb]
+	\begin{algorithmic}
+		\STATE \(\vec{r}_0 \gets \vec{b} - \mat{A}\vec{x}_0\)
+		\STATE \(\vec{d}_0 \gets \vec{r}_0\)
+		\FOR{\(i = 0, 1, \dots\) \textbf{until} \(\left\|\vec{r}_i\right\| \leq \epsilon\)}
+			\STATE \(\alpha_i \gets \frac{\vec{r}_i\cdot\vec{r}_i}{\vec{d}_i\cdot \mat{A}\vec{d}_i}\)
+			
+			\STATE \(\vec{x}_{i+1} \gets \vec{x}_i + \alpha_i\vec{d}_i\)
+			\STATE \(\vec{r}_{i+1} \gets \vec{r}_i + \alpha_i\mat{A}\vec{d}_i\)
+			\STATE \(\beta_{i+1} \gets \frac{\vec{r}_{i+1}\cdot\vec{r}_{i+1}}{\vec{r}_i\cdot\vec{r}_i}\)
+			\STATE \(\vec{r}_{i+1} + \beta_{i+1}\vec{d}_i\)
+		\ENDFOR
+	\end{algorithmic}
+	
+	\caption{Conjugate Gradient~\cite{Saad:2003:IterativeMethods}.}
+	\label{alg:bg-cg-alg-cg}
+\end{algorithm}
+
+
+% 2 1
+% 1 3
+\begin{example}
+\label{ex:CG-CG}
+Consider the linear system used in Example~\ref{ex:CG-SteepestDecent} where
+\[
+	\mat{A} = \begin{bmatrix} 2 & 1 \\ 1 & 3 \end{bmatrix},
+	\quad
+	\vec{b} = \begin{bmatrix} 5 \\ 5 \end{bmatrix}.
+\]
+The result of applying Conjugate Gradient is
+\begin{align*}
+	 \vec{x}_0 &= \begin{bmatrix}0\\0\end{bmatrix}
+	&\vec{r}_0 &= \begin{bmatrix}5\\5\end{bmatrix}
+	& &
+	&\vec{d}_0 &= \begin{bmatrix}5\\5\end{bmatrix}
+	&\alpha_0  &= 2/7 \\
+	%
+	 \vec{x}_1 &= \begin{bmatrix}10/7\\10/7\end{bmatrix}
+	&\vec{r}_1 &= \begin{bmatrix}5/7\\-5/7\end{bmatrix}
+	&\beta_1   &= 1/49
+	&\vec{d}_1 &= \begin{bmatrix}40/49\\-30/49\end{bmatrix}
+	&\alpha_1  &= 7/10 \\
+	%
+	 \vec{x}_2 &= \begin{bmatrix}2\\1\end{bmatrix}
+	&\vec{r}_2 &= \begin{bmatrix}0\\0\end{bmatrix}
+\end{align*}
+Note that after two iterations, \(\vec{x}\) reaches the exact solution, compared to the iterations of Steepest Decent in Example~\ref{ex:CG-SteepestDecent}.
+Figure~\ref{fig:CG-CGExample-Iterations} shows the values of \(\vec{x}\) with the contour graph of the quadratic function. \qed
+\input{"figures/1.Introduction/CG Example-Iterations.tex"}
+\end{example}
+
+One way to improve the Conjugate Gradient method is to precondition the system~\cite{Saad:2003:IterativeMethods}.
+Instead of solving the original system, \(\mat{A}\vec{x} = \vec{b}\), a Preconditioned Conjugate Gradient solves \(\mat{M}^{-1}\left(\mat{A}\vec{x} - \vec{b}\right) = 0\) instead, where \(\mat{M}^{-1}\) is the preconditioner.
+Note that \(\mat{M}\) should be similar to \(\mat{A}\), but \(\mat{M}^{-1}\) should be easier to compute than \(\mat{A}^{-1}\).
+When \(\mat{M}\) is similar to \(\mat{A}\), the system becomes close to \(\mat{I}\vec{x} = \mat{M}^{-1}\vec{b}\), which is easy to solve if \(\mat{M}^{-1}\vec{b}\) can be computed cheaply.
+Algorithm~\ref{alg:bg-cg-alg-pcg} shows the preconditioned variant of the Conjugate Gradient.
+\begin{algorithm}[tb]
+	\begin{algorithmic}
+		\STATE \(\vec{r}_0 \gets \vec{b} - \mat{A}\vec{x}_0\)
+		\STATE \(\vec{z}_0 \gets \mat{M}^{-1}\vec{r}_0\)
+		\STATE \(\vec{d}_0 \gets \vec{z}_0\)
+		\FOR{\(i = 0, 1, \dots\) \textbf{until} \(\left\|\vec{r}_i\right\| \leq \epsilon\)}
+			\STATE \(\alpha_i \gets \frac{\vec{r}_i\cdot\vec{z}_i}{\vec{d}_i\cdot\mat{A}\vec{d}_i}\)
+			\STATE \(\vec{x}_{i+1} \gets \vec{x}_i + \alpha_i\vec{d}_i\)
+			\STATE \(\vec{r}_{i+1} \gets \vec{r}_i + \alpha_i\mat{A}\vec{d}_i\)
+			\STATE \(\vec{z}_{i+1} \gets \mat{M}^{-1}\vec{r}_{i+1}\)
+			\STATE \(\beta_{i+1} \gets \frac{\vec{r}_{i+1}\cdot\vec{z}_{i+1}}{\vec{r}_i\cdot\vec{z}_i}\)
+			\STATE \(\vec{d}_{i+1} \gets \vec{z}_{i+1} + \beta_{i+1}\vec{d}_i\)
+		\ENDFOR
+	\end{algorithmic}
+	
+	\caption{Preconditioned Conjugate Gradient~\cite{Saad:2003:IterativeMethods}.}
+	\label{alg:bg-cg-alg-pcg}
+\end{algorithm}

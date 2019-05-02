@@ -1,0 +1,26 @@
+\begin{table}
+	\centering
+	\begin{tabular}{l|S[table-format=2.6]|S[table-format=2.6]|r}
+		            & {HPCG}   & {GFLOPs} &            \\
+		Error Bound & {Rating} & {Rating} & Iterations \\
+		\hline
+		\(10^{-2}\) relative & 3.66859 & 3.69056 & 69 \\
+		\(10^{-6}\) relative & 5.7806 & 5.83461 & 57 \\
+		\(10^{-10}\) relative & 5.82527 & 8.87961 & 57 \\
+		\(10^{-14}\) relative & 5.81357 & 5.8677 & 57 \\
+		\(10^{-18}\) relative & 5.73277 & 5.78596 & 57 \\
+		\(10^{-2}\) absolute & {NA} & {NA} & \(\geq 500\) \\
+		\(10^{-6}\) absolute & 4.51827 & 4.55158 & 57 \\
+		\(10^{-10}\) absolute & 5.14058 & 5.18313 & 57\\
+		\(10^{-14}\) absolute & 5.64338 & 5.69436 & 57 \\
+		\(10^{-18}\) absolute & 5.81642 & 5.87097 & 57 \\
+		\(10^{-2}\) absolute and \(10^{-10}\) relative & 5.75538 & 5.809 & 57 \\
+		\(10^{-10}\) absolute and \(10^{-2}\) relative & 5.22592 & 5.27053 & 57 \\
+		\(10^{-10}\) absolute and \(10^{-10}\) relative & 5.78711 & 5.84115 & 57 \\
+%		\(10^{-2}\) absolute or \(10^{-10}\) relative & 5.77713 & 5.83097 & 57 \\
+%		\(10^{-10}\) absolute or \(10^{-2}\) relative & 5.16793 & 5.21054 & 57 \\
+%		\(10^{-10}\) absolute or \(10^{-10}\) relative & 5.80555 & 5.86009 & 57 \\
+	\end{tabular}
+	\caption[Performance of SZ compressed vectors versus minimum error.]{Results of compressing vector values with SZ compression using various error bounds.}
+	\label{tab:results-vec-SZ}
+\end{table}

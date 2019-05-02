@@ -1,0 +1,13 @@
+type;tablename;graphname;hpcg;gflops;iterations;rate;comment
+;Baseline;Baseline;15.3654;15.7394;50;1:1;using mixed prec "all doubles" time
+;SZ;SZ;14.9322;15.2964;50;\({\sim}1\):2;
+;Elias Gamma;Elias Gamma;14.6553;15.0062;50;\({\sim}1\):9;
+;Elias Delta;Elias Delta;14.3036;14.6485;51;\({\sim}1\):8;
+huffman-nofirst;4-bit window;Huffman - No First - 4 bit;10.654;10.8548;51;\({\sim}1\):9;
+huffman-nofirst;8-bit window;Huffman - No First - 8 bit;10.8941;11.1043;51;\({\sim}1\):9;
+huffman-nofirst;12-bit window;Huffman - No First - 12 bit;10.8158;11.0251;51;\({\sim}1\):8;
+huffman-first;4-bit window; Huffman - All - 4 bit;10.9359;11.148;51;\({\sim}1\):9;
+huffman-first;8-bit window; Huffman - All - 8 bit;11.1134;11.3336;51;\({\sim}1\):9;
+huffman-first;16-bit window; Huffman - All - 16 bit;10.3323;10.5819;51;\({\sim}20\):11;
+opcode;CCI Format~\cite{Lawlor:2013:compression};Op Code - CCI;8.51257;8.63578;51;\({\sim}3\):10;
+opcode;Best Result;Op Code - Best Result;8.52272;8.64752;51;\({\sim}1\):6;

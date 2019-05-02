@@ -1,0 +1,29 @@
+Data compression was able to successfully increase the performance of the sparse linear solver in HPCG~\cite{Dongarra:2015:HPCG}.
+The best performance increase came from using SZ compression on the matrix indices and values and using single precision values for select vectors with an increase in the effective GFLOPs of about 84\%.
+However, there are only a few compression strategies that outperform the baseline.
+
+When considering more general matrices, note that the effectiveness of SZ compression is highly dependent on local relationships between compressed values.
+So, SZ based compression strategies will likely lose performance on many other matrices.
+However, because the performance of single precision ``compression'' is unaffected by the values being compressed and that the effectiveness of gamma compression is proportional to the number of significant bits, using 32bit matrix values and gamma compressed matrix indices will likely perform more consistently than the SZ based compression approach and may perform better on some matrices.
+
+\subsection{Future Work}
+There are two general directions in which this work can be extended: different problem setups and different compression methods.
+The first direction extends this idea of this project to more general situations, including different linear systems and different solvers.
+The second direction is to provide either better compression for this problem or demonstrate that the effective compression methods cannot be significantly outperformed.
+
+Note that the stencil matrix used by HPCG is very consistent and has a large amount of repetition; this makes it easy to compress.
+So, experimenting with other matrices would provide a more general idea of the performance, and should be done before applying this work to production solvers.
+The SuiteSparse Matrix Collection provides linear systems that could be used for this investigation~\cite{Davis:2011:FloridaMatrixCollection}.
+However, note that the HPCG implementation makes some assumptions about the matrix in the problem setup, so some of the setup sections would need to be rewritten~\cite{Dongarra:2015:HPCG}.
+
+Another aspect that could be further experimented with is the solver used.
+Other solvers and preconditioner likely have different data access patterns than the solver used in HPCG.
+These differences may change the available compression strategies, have different precision requirements, or have different ratios of memory fetches to arithmetic.
+So, different solvers may have better optimal compression strategies.
+Additionally, GPU accelerated solvers may performance differently due to the differences between GPU and CPU execution and performance.
+
+The last area this work could be extended is different compression methods and variants of previously used compression methods.
+One such topic would be looking at using different error tolerances for different vectors, like what is done with single precision compression, for SZ or another compression.
+Another possible variation would be to compress additional data structures, such as the matrix diagonals.
+Finally, other compression strategies could be tried.
+

@@ -1,0 +1,23 @@
+Multigrid solvers are a class of methods designed for solving discretized partial differential equations (PDEs) and take advantage of more information that just the coefficient matrix and the right-hand side~\cite{Saad:2003:IterativeMethods}.
+Specifically, the solvers use discretizations of varying mesh sizes to improve performance of relaxation-based solvers.
+In HPCG, a multigrid solver with high tolerance is used as the preconditioner~\cite{Dongarra:2015:HPCG}.
+Because the solver provides an approximation to \(\mat{A}^{-1}\), the preconditioned matrix approximates \(\mat{A}^{-1}\mat{A} = \mat{I}\).\textsl{}
+This reduces the condition number of the linear system, and so, reduces the number of iterations needed for Conjugate Gradient to converge~\cite{Saad:2003:IterativeMethods}.
+
+The multigrid method uses meshes of varying sizes to improve performance of a relaxation style iterative solver~\cite{Saad:2003:IterativeMethods}.
+Relaxation based solvers ``relax'' a few coordinates at a time to eliminate a few components of the current residual.
+Most of these solvers can quickly reduce the components of the residual in the direction of eigenvectors associated with large eigenvalues of the iteration matrix.
+Such eigenvectors are called high frequency modes.
+The other components, eigenvectors called low frequency modes, are difficult to reduce with standard relaxation.
+However, on a coarser mesh, many of these low frequency modes are mapped to high frequency modes~\cite{Saad:2003:IterativeMethods}.
+Thus, by applying a relaxation type iterative solver at various mesh sizes, the various components of the residual can be reduced quickly.
+
+In HPCG, a symmetric Gauss-Seidel iteration is used by the multigrid as the relaxation iteration solver at each level of coarseness~\cite{Dongarra:2015:HPCG}.
+The symmetric Gauss-Seidel iteration consists of a forward Gauss-Seidel iteration followed by a backward Gauss-Seidel iteration.
+Letting \(\mat{A} = \mat{L}+\mat{D}+\mat{U}\) where \(\mat{L}\) is strictly lower triangular, \(\mat{D}\) is diagonal, and \(\mat{U}\) is strictly upper triangular, the iteration can be represented by
+\begin{align*}
+	\vec{x}_{i^*}   &= \mat{D}^{-1}\left(\vec{b} - \mat{L}\vec{x}_{i^*} - \mat{U}\vec{x}_i\right) \\
+	\vec{x}_{i+1} &= \mat{D}^{-1}\left(\vec{b} - \mat{U}\vec{x}_{i+1} - \mat{L}\vec{x}_{i^*}\right)
+\end{align*}
+with \(\vec{x}_{i^*}\) representing an intermediate vector.
+Note that while \(\vec{x}_{i^*}\) and \(\vec{x}_{i+1}\) are on both sides of the equation where they are respectively computed, they can be computed with this formulation by computing the entries in order as they become available for the product with \(L\) and \(U\), respectively, by iterating in row order then in reverse row order.  So, the update of a Gauss-Seidel step can be computed in place.

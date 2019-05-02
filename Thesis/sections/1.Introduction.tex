@@ -1,0 +1,42 @@
+Solving large, sparse linear systems of equations plays a vital role in certain scientific computations.
+For example, the finite element method solves a system of linear equations to approximate the solution to certain partial differential equations~\cite{Saad:2003:IterativeMethods}.
+These problems can be large, with easily millions of variables or more~\cite{Davis:2011:FloridaMatrixCollection}.
+So, solving these problems efficiently requires a fast linear solver.
+
+Iterative solvers are often used to solve these large, sparse systems.
+These solvers take an initial guess then improve it until it is within some tolerance~\cite{Saad:2003:IterativeMethods}.
+On modern computers, these solvers often spend most of their time fetching data from main memory to the processor where the actual computation is done~\cite{Lawlor:2013:compression}.
+This work tries to improve the performance of iterative solvers by compressing the data to reduce the time spent accessing main memory.
+
+To avoid implementing an entire sparse linear solver, the High Performance Conjugate Gradient (HPCG) benchmark was used as the initial codebase for the project~\cite{Dongarra:2015:HPCG}.
+The HPCG benchmark is designed to measure the performance of computing systems when processing sparse solvers and does so by solving one such test problem.
+In addition, as a benchmark, HPCG has built in measurements of elapsed time, solver iterations and the number of floating point operations that needed to be computed.
+These factors all make the HPCG codebase a natural starting point for developing improvements to sparse, iterative linear solvers.
+
+There are three main data structures that were experimented with in this project: the vector values, the matrix values, and the matrix indices.
+For each of these data structures, compression methods were found that were able to fulfill the requirements on read and write access.
+Additionally, two models were constructed to estimate the minimum performance a compression method would need to outperform the baseline.
+Both models indicated that vector values must be decoded with only a few instructions, but that decoding the matrix values has a much larger, but still limited, window for improvement.
+In the actual tests, a couple of configurations were found to be able to outperform the baseline implementation, with an increase in performance of up to 84\%.
+
+\subsection{Previous Work}
+First, this work draws heavily on existing data compression methods.
+Some of the algorithms used were designed with scientific computations in mind, such as ZFP and SZ compression~\cite{Lindstrom:2014:zfp,Di:2016:SZ}.
+Other algorithms are more general purpose, such as Huffman and Elias Codings~\cite{Huffman:1952:coding,Elias:1975:codeword}.
+Section~\ref{sec:bg-comp} goes into detail on what compression methods were used and how they work.
+
+Much work has been done on various aspects of utilizing single precision floating point numbers while retaining the accuracy of double precision numbers in iterative linear solvers.
+One approach, which this work draws inspiration from, is to apply the preconditioner using single precision, while otherwise using double precision, which result in similar accuracy unless the matrix is poorly conditioned~\cite{Buttari:2008:mixedPrec, Hogg:2010:multiplePasses}.
+This strategy of mixing floating point precision for various parts of the solver algorithm leads to the use of making certain vectors single precision, as described in Section~\ref{sec:bg-comp-floatPrec}.
+
+Another effort at compressing large, sparse Linear Systems is Compressed Column Index (CCI) format to store matrices~\cite{Lawlor:2013:compression}.
+This format is based on Compressed Sparse Row (CSR) matrix format except uses compression to reduce the size of the matrix indices.
+The index compression used by CCI is described in Section~\ref{sec:bg-comp-opcode} and tested in this project.
+This project generalizes the ideas of CCI matrices, both by compressing additional data structures and using additional compression methods.
+However, only a single matrix is tested for this project, as opposed to the suite of matrices used to look at the performance of CCI matrices.
+
+\subsection{Mathematics of Conjugate Gradient}
+\input{"sections/1.Introduction.Conjugate Gradient.tex"}
+
+\subsection{Mathematics of the Multigrid Preconditioner}
+\input{"sections/1.Introduction.MG Preconditioner.tex"}

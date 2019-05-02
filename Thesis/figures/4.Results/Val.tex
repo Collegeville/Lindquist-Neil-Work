@@ -1,0 +1,15 @@
+\begin{table}
+	\centering
+	\begin{tabular}{l|S[table-format=2.6]|S[table-format=2.6]|r|c}
+		            & {HPCG}   & {GFLOPs} &            & Compression \\
+		Compression & {Rating} & {Rating} & Iterations & Rate \\
+		\hline
+		\csvreader[head to column names,separator=semicolon,filter strcmp={\type}{}]{figures/4.Results/Val.csv}{}{ \tablename & \hpcg & \gflops & \iterations & \rate \\}
+		SZ & & & & \\
+		\csvreader[head to column names,separator=semicolon,filter strcmp={\type}{SZ}]{figures/4.Results/Val.csv}{}{\hspace{3mm}\tablename & \hpcg & \gflops & \iterations & \rate \\}
+		ZFP & & & & \\
+		\csvreader[head to column names,separator=semicolon,filter strcmp={\type}{ZFP}]{figures/4.Results/Val.csv}{}{\hspace{3mm}\tablename & \hpcg & \gflops & \iterations & \rate \\}
+	\end{tabular}
+	\caption{Results of compressing matrix values.}
+	\label{tab:results-val}
+\end{table}
