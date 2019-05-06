@@ -1,0 +1,1233 @@
+
+starting 16000000 / 16
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 7.74895
+
+lambda = 3.99501
+Total time for first (warmed) solve = 7.42147
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 3.74553
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 7.48017
+
+lambda = 3.99501
+Total time for first (warmed) solve = 7.45056
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 3.75964
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 8.1921
+
+lambda = 3.99501
+Total time for first (warmed) solve = 7.44395
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 3.74889
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 7.45997
+
+lambda = 3.99501
+Total time for first (warmed) solve = 7.44915
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 3.76033
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 7.5349
+
+lambda = 3.99501
+Total time for first (warmed) solve = 7.43002
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 3.7506
+
+
+Errors: 0
+
+
+starting 160000000 / 16
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 74.1558
+
+lambda = 3.99501
+Total time for first (warmed) solve = 73.9612
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 37.3346
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 74.1322
+
+lambda = 3.99501
+Total time for first (warmed) solve = 73.9585
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 37.3304
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 74.1952
+
+lambda = 3.99501
+Total time for first (warmed) solve = 73.9953
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 37.3483
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 74.1363
+
+lambda = 3.99501
+Total time for first (warmed) solve = 73.9172
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 37.3229
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 74.1193
+
+lambda = 3.99501
+Total time for first (warmed) solve = 73.9432
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 37.323
+
+
+Errors: 0
+
+
+starting 20000000 / 20
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 9.67628
+
+lambda = 3.99501
+Total time for first (warmed) solve = 9.79116
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 4.91942
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 9.84872
+
+lambda = 3.99501
+Total time for first (warmed) solve = 9.86118
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 5.02755
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 9.67894
+
+lambda = 3.99501
+Total time for first (warmed) solve = 9.61908
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 4.91629
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 9.90758
+
+lambda = 3.99501
+Total time for first (warmed) solve = 9.82129
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 4.86588
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 9.70649
+
+lambda = 3.99501
+Total time for first (warmed) solve = 9.64421
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 4.91663
+
+
+Errors: 0
+
+
+starting 200000000 / 20
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 96.5217
+
+lambda = 3.99501
+Total time for first (warmed) solve = 97.7715
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 48.9771
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 97.9275
+
+lambda = 3.99501
+Total time for first (warmed) solve = 96.789
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 49.293
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 96.9292
+
+lambda = 3.99501
+Total time for first (warmed) solve = 98.0169
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 48.5797
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 97.1825
+
+lambda = 3.99501
+Total time for first (warmed) solve = 97.1992
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 48.6251
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 97.7479
+
+lambda = 3.99501
+Total time for first (warmed) solve = 97.3715
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 49.3561
+
+
+Errors: 0
+
+
+starting 1600000 / 16
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.995
+Total Time for first (warm up) solve = 0.552814
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.558992
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.282412
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.995
+Total Time for first (warm up) solve = 0.567042
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.56908
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.286698
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.995
+Total Time for first (warm up) solve = 0.576175
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.55928
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.281404
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.995
+Total Time for first (warm up) solve = 0.564667
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.566276
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.284211
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.995
+Total Time for first (warm up) solve = 0.513833
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.508572
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.255787
+
+
+Errors: 0
+
+
+starting 2000000 / 20
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99499
+Total Time for first (warm up) solve = 0.722533
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.719265
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.36322
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99499
+Total Time for first (warm up) solve = 0.756099
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.764367
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.3849
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99499
+Total Time for first (warm up) solve = 0.759952
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.720934
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.36169
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99499
+Total Time for first (warm up) solve = 0.735008
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.701196
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.364184
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99499
+Total Time for first (warm up) solve = 0.706498
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.698926
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.352904
+
+
+Errors: 0
+
+
+starting 4000000 / 4
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 4000000 equations
+Using 4 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 2.35277
+
+lambda = 3.99501
+Total time for first (warmed) solve = 2.34777
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 1.18681
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 4000000 equations
+Using 4 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 2.39346
+
+lambda = 3.99501
+Total time for first (warmed) solve = 2.3684
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 1.19642
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 4000000 equations
+Using 4 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 2.36787
+
+lambda = 3.99501
+Total time for first (warmed) solve = 2.35671
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 1.19107
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 4000000 equations
+Using 4 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 2.37848
+
+lambda = 3.99501
+Total time for first (warmed) solve = 2.35964
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 1.1935
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 4000000 equations
+Using 4 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 2.45364
+
+lambda = 3.99501
+Total time for first (warmed) solve = 2.3605
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 1.1953
+
+
+Errors: 0
+
+
+starting 40000000 / 4
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 40000000 equations
+Using 4 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 24.8274
+
+lambda = 3.99502
+Total time for first (warmed) solve = 24.7153
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 12.5535
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 40000000 equations
+Using 4 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 25.098
+
+lambda = 3.99502
+Total time for first (warmed) solve = 24.71
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 12.4956
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 40000000 equations
+Using 4 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 24.7737
+
+lambda = 3.99502
+Total time for first (warmed) solve = 24.7841
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 12.4675
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 40000000 equations
+Using 4 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 24.5998
+
+lambda = 3.99502
+Total time for first (warmed) solve = 24.543
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 12.4282
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 40000000 equations
+Using 4 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 24.7976
+
+lambda = 3.99502
+Total time for first (warmed) solve = 24.7432
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 12.4866
+
+
+Errors: 0
+
+
+starting 400000 / 4
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 400000 equations
+Using 4 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99507
+Total Time for first (warm up) solve = 0.214168
+
+lambda = 3.99499
+Total time for first (warmed) solve = 0.215875
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.105787
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 400000 equations
+Using 4 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99507
+Total Time for first (warm up) solve = 0.188228
+
+lambda = 3.99499
+Total time for first (warmed) solve = 0.185269
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.0936131
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 400000 equations
+Using 4 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99507
+Total Time for first (warm up) solve = 0.130191
+
+lambda = 3.99499
+Total time for first (warmed) solve = 0.133943
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.0685086
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 400000 equations
+Using 4 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99507
+Total Time for first (warm up) solve = 0.183513
+
+lambda = 3.99499
+Total time for first (warmed) solve = 0.182767
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.0936077
+
+
+Errors: 0
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 400000 equations
+Using 4 processors
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99507
+Total Time for first (warm up) solve = 0.186699
+
+lambda = 3.99499
+Total time for first (warmed) solve = 0.184376
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.0844622
+
+
+Errors: 0
+

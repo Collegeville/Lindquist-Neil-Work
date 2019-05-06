@@ -1,0 +1,2118 @@
+
+starting
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 400000 equations
+Using 4 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.994965486942148; is within tolerance? true
+total time for first solve (plus compile) = 1.696362353 sec
+
+
+λ = 3.9950390145318426; is within tolerance? true
+total time for first solve (pre-compiled) = 0.227470152 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.110839967 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99507
+Total Time for first (warm up) solve = 0.187354
+
+lambda = 3.99499
+Total time for first (warmed) solve = 0.185638
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.0933828
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 400000 equations
+Using 4 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.9949395448648435; is within tolerance? true
+total time for first solve (plus compile) = 1.689085452 sec
+
+
+λ = 3.995074030114063; is within tolerance? true
+total time for first solve (pre-compiled) = 0.222183419 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.110321948 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99507
+Total Time for first (warm up) solve = 0.186572
+
+lambda = 3.99499
+Total time for first (warmed) solve = 0.185981
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.0932119
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 400000 equations
+Using 4 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.9949578104527115; is within tolerance? true
+total time for first solve (plus compile) = 1.687291773 sec
+
+
+λ = 3.9949017462927383; is within tolerance? true
+total time for first solve (pre-compiled) = 0.225637242 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.110568032 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99507
+Total Time for first (warm up) solve = 0.186684
+
+lambda = 3.99499
+Total time for first (warmed) solve = 0.184371
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.0932362
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 400000 equations
+Using 4 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.9950813495720396; is within tolerance? true
+total time for first solve (plus compile) = 1.68996771 sec
+
+
+λ = 3.9949914371030895; is within tolerance? true
+total time for first solve (pre-compiled) = 0.224694523 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.109693796 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99507
+Total Time for first (warm up) solve = 0.185565
+
+lambda = 3.99499
+Total time for first (warmed) solve = 0.184783
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.0836496
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 400000 equations
+Using 4 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.994984450328289; is within tolerance? true
+total time for first solve (plus compile) = 1.689243376 sec
+
+
+λ = 3.9950283220464935; is within tolerance? true
+total time for first solve (pre-compiled) = 0.225692027 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.109795967 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99507
+Total Time for first (warm up) solve = 0.188355
+
+lambda = 3.99499
+Total time for first (warmed) solve = 0.221445
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.0890749
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.994934255734509; is within tolerance? true
+total time for first solve (plus compile) = 2.396227107 sec
+
+
+λ = 3.995009487862525; is within tolerance? true
+total time for first solve (pre-compiled) = 0.537408947 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.267260183 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.995
+Total Time for first (warm up) solve = 0.512905
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.503758
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.254396
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949667854544493; is within tolerance? true
+total time for first solve (plus compile) = 2.429256466 sec
+
+
+λ = 3.9949729442722495; is within tolerance? true
+total time for first solve (pre-compiled) = 0.534080256 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.267992667 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.995
+Total Time for first (warm up) solve = 0.502523
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.503713
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.252639
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.995003943158358; is within tolerance? true
+total time for first solve (plus compile) = 2.384169053 sec
+
+
+λ = 3.9949771896936612; is within tolerance? true
+total time for first solve (pre-compiled) = 0.536328658 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.268023478 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.995
+Total Time for first (warm up) solve = 0.497694
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.499414
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.250159
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.994999818985816; is within tolerance? true
+total time for first solve (plus compile) = 2.392700067 sec
+
+
+λ = 3.99502254929524; is within tolerance? true
+total time for first solve (pre-compiled) = 0.53735579 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.268155926 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.995
+Total Time for first (warm up) solve = 0.503539
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.503757
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.250623
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949758345903073; is within tolerance? true
+total time for first solve (plus compile) = 2.395545358 sec
+
+
+λ = 3.9949829817601086; is within tolerance? true
+total time for first solve (pre-compiled) = 0.537255279 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.273576748 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.995
+Total Time for first (warm up) solve = 0.501589
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.496532
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.250063
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949910883466258; is within tolerance? true
+total time for first solve (plus compile) = 3.767575225 sec
+
+
+λ = 3.9949984119507578; is within tolerance? true
+total time for first solve (pre-compiled) = 0.799999648 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.400125918 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99499
+Total Time for first (warm up) solve = 0.712242
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.702696
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.355394
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.994977698915445; is within tolerance? true
+total time for first solve (plus compile) = 3.36247319 sec
+
+
+λ = 3.994963301138466; is within tolerance? true
+total time for first solve (pre-compiled) = 0.776329916 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.404803172 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99499
+Total Time for first (warm up) solve = 0.709546
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.705783
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.351928
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.994955907942757; is within tolerance? true
+total time for first solve (plus compile) = 2.689563985 sec
+
+
+λ = 3.9949811066952634; is within tolerance? true
+total time for first solve (pre-compiled) = 0.73310658 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.372136307 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99499
+Total Time for first (warm up) solve = 0.717209
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.712004
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.359957
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9950055189424694; is within tolerance? true
+total time for first solve (plus compile) = 3.256663154 sec
+
+
+λ = 3.994979149033054; is within tolerance? true
+total time for first solve (pre-compiled) = 0.751212247 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.380798002 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99499
+Total Time for first (warm up) solve = 0.70874
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.702862
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.353297
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949879251520963; is within tolerance? true
+total time for first solve (plus compile) = 2.958454618 sec
+
+
+λ = 3.994972254934468; is within tolerance? true
+total time for first solve (pre-compiled) = 0.802167947 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.402129306 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99499
+Total Time for first (warm up) solve = 0.710476
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.705814
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.354947
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 4000000 equations
+Using 4 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.994994504121974; is within tolerance? true
+total time for first solve (plus compile) = 4.131443044 sec
+
+
+λ = 3.9949890342870185; is within tolerance? true
+total time for first solve (pre-compiled) = 2.764269792 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 1.363745786 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 2.37457
+
+lambda = 3.99501
+Total time for first (warmed) solve = 2.36304
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 1.19352
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 4000000 equations
+Using 4 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.9949870867736768; is within tolerance? true
+total time for first solve (plus compile) = 4.101590394 sec
+
+
+λ = 3.9949981948710915; is within tolerance? true
+total time for first solve (pre-compiled) = 2.789172741 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 1.359319775 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 2.38369
+
+lambda = 3.99501
+Total time for first (warmed) solve = 2.35687
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 1.19185
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 4000000 equations
+Using 4 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.9949596265411076; is within tolerance? true
+total time for first solve (plus compile) = 4.095598589 sec
+
+
+λ = 3.994994315015595; is within tolerance? true
+total time for first solve (pre-compiled) = 2.772012442 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 1.355998155 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 2.36091
+
+lambda = 3.99501
+Total time for first (warmed) solve = 2.35066
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 1.19329
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 4000000 equations
+Using 4 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.99500728217094; is within tolerance? true
+total time for first solve (plus compile) = 4.095806417 sec
+
+
+λ = 3.9949801928280197; is within tolerance? true
+total time for first solve (pre-compiled) = 2.761329979 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 1.35919477 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 2.37514
+
+lambda = 3.99501
+Total time for first (warmed) solve = 2.35591
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 1.19115
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 4000000 equations
+Using 4 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.9949822504406045; is within tolerance? true
+total time for first solve (plus compile) = 4.090114923 sec
+
+
+λ = 3.994995557719383; is within tolerance? true
+total time for first solve (pre-compiled) = 2.75612906 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 1.35501706 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 2.36958
+
+lambda = 3.99501
+Total time for first (warmed) solve = 2.35325
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 1.19684
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949809293367666; is within tolerance? true
+total time for first solve (plus compile) = 9.115841792 sec
+
+
+λ = 3.9949899974067167; is within tolerance? true
+total time for first solve (pre-compiled) = 7.520845965 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 3.730024013 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 7.4046
+
+lambda = 3.99501
+Total time for first (warmed) solve = 7.40977
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 3.74053
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.994978325057756; is within tolerance? true
+total time for first solve (plus compile) = 9.143582275 sec
+
+
+λ = 3.9949803718700427; is within tolerance? true
+total time for first solve (pre-compiled) = 7.510113116 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 3.719029565 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 7.40501
+
+lambda = 3.99501
+Total time for first (warmed) solve = 7.40309
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 3.73253
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.994985332525995; is within tolerance? true
+total time for first solve (plus compile) = 9.145610546 sec
+
+
+λ = 3.9949794109255414; is within tolerance? true
+total time for first solve (pre-compiled) = 7.503445085 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 3.707009562 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 7.40314
+
+lambda = 3.99501
+Total time for first (warmed) solve = 7.41002
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 3.74039
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949809596898724; is within tolerance? true
+total time for first solve (plus compile) = 9.153946285 sec
+
+
+λ = 3.9949799697203314; is within tolerance? true
+total time for first solve (pre-compiled) = 7.547932661 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 3.705542286 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 7.41001
+
+lambda = 3.99501
+Total time for first (warmed) solve = 7.40384
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 3.73913
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949763118804418; is within tolerance? true
+total time for first solve (plus compile) = 9.120825273 sec
+
+
+λ = 3.9949836516152235; is within tolerance? true
+total time for first solve (pre-compiled) = 7.492749017 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 3.724501488 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 7.40159
+
+lambda = 3.99501
+Total time for first (warmed) solve = 7.40575
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 3.7379
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949784940734956; is within tolerance? true
+total time for first solve (plus compile) = 12.59818525 sec
+
+
+λ = 3.994998139617973; is within tolerance? true
+total time for first solve (pre-compiled) = 9.916701773 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 4.843574621 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 9.2374
+
+lambda = 3.99501
+Total time for first (warmed) solve = 9.21833
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 4.65222
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.994985227010445; is within tolerance? true
+total time for first solve (plus compile) = 11.857870922 sec
+
+
+λ = 3.994994480356589; is within tolerance? true
+total time for first solve (pre-compiled) = 9.852690634 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 4.951636644 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 9.23889
+
+lambda = 3.99501
+Total time for first (warmed) solve = 9.22067
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 4.6535
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.994986886246072; is within tolerance? true
+total time for first solve (plus compile) = 12.454430189 sec
+
+
+λ = 3.994985370716157; is within tolerance? true
+total time for first solve (pre-compiled) = 9.881595008 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 4.943957462 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 9.22427
+
+lambda = 3.99501
+Total time for first (warmed) solve = 9.21999
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 4.65077
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.99499907471282; is within tolerance? true
+total time for first solve (plus compile) = 12.615981176 sec
+
+
+λ = 3.994988671732173; is within tolerance? true
+total time for first solve (pre-compiled) = 9.863753143 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 4.650507986 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 9.22998
+
+lambda = 3.99501
+Total time for first (warmed) solve = 9.21825
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 4.65405
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.994992112316426; is within tolerance? true
+total time for first solve (plus compile) = 12.571476811 sec
+
+
+λ = 3.9949911497546955; is within tolerance? true
+total time for first solve (pre-compiled) = 9.979396135 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 4.845352307 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 9.23849
+
+lambda = 3.99501
+Total time for first (warmed) solve = 9.22443
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 4.65602
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 40000000 equations
+Using 4 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.994987720960827; is within tolerance? true
+total time for first solve (plus compile) = 32.231272489 sec
+
+
+λ = 3.994987181753562; is within tolerance? true
+total time for first solve (pre-compiled) = 30.83400503 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 15.445269537 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 24.8133
+
+lambda = 3.99502
+Total time for first (warmed) solve = 24.7084
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 12.495
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 40000000 equations
+Using 4 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.994992601022891; is within tolerance? true
+total time for first solve (plus compile) = 32.178024163 sec
+
+
+λ = 3.994987065980955; is within tolerance? true
+total time for first solve (pre-compiled) = 30.839976816 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 15.446540872 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 24.7478
+
+lambda = 3.99502
+Total time for first (warmed) solve = 24.7062
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 12.4844
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 40000000 equations
+Using 4 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.9949899858359754; is within tolerance? true
+total time for first solve (plus compile) = 32.012716446 sec
+
+
+λ = 3.994992360779375; is within tolerance? true
+total time for first solve (pre-compiled) = 30.67398273 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 15.41235983 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 24.7867
+
+lambda = 3.99502
+Total time for first (warmed) solve = 24.708
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 12.485
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 40000000 equations
+Using 4 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.9949904510793606; is within tolerance? true
+total time for first solve (plus compile) = 32.2488548 sec
+
+
+λ = 3.994989740083496; is within tolerance? true
+total time for first solve (pre-compiled) = 30.915490059 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 15.740418557 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 24.7526
+
+lambda = 3.99502
+Total time for first (warmed) solve = 24.714
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 12.4873
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 40000000 equations
+Using 4 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.99498655699147; is within tolerance? true
+total time for first solve (plus compile) = 32.293929661 sec
+
+
+λ = 3.994983376525375; is within tolerance? true
+total time for first solve (pre-compiled) = 31.113900266 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 15.572077629 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 4 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 24.7763
+
+lambda = 3.99502
+Total time for first (warmed) solve = 24.6805
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 12.4731
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949877797667055; is within tolerance? true
+total time for first solve (plus compile) = 75.843170535 sec
+
+
+λ = 3.994987664155267; is within tolerance? true
+total time for first solve (pre-compiled) = 74.289301764 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 37.196400819 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 74.2217
+
+lambda = 3.99501
+Total time for first (warmed) solve = 74.0402
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 37.3832
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949856211012307; is within tolerance? true
+total time for first solve (plus compile) = 75.871308242 sec
+
+
+λ = 3.9949844529971585; is within tolerance? true
+total time for first solve (pre-compiled) = 74.205446921 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 37.140696025 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 74.156
+
+lambda = 3.99501
+Total time for first (warmed) solve = 74.027
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 37.368
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949823294782565; is within tolerance? true
+total time for first solve (plus compile) = 75.780075378 sec
+
+
+λ = 3.9949877512909078; is within tolerance? true
+total time for first solve (pre-compiled) = 74.094349016 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 37.147002111 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 74.1184
+
+lambda = 3.99501
+Total time for first (warmed) solve = 73.9372
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 37.3226
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.99498710131393; is within tolerance? true
+total time for first solve (plus compile) = 75.740182076 sec
+
+
+λ = 3.994989188579771; is within tolerance? true
+total time for first solve (pre-compiled) = 74.21341937 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 37.15818854 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 74.1072
+
+lambda = 3.99501
+Total time for first (warmed) solve = 73.924
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 37.3162
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949830709080647; is within tolerance? true
+total time for first solve (plus compile) = 75.745718889 sec
+
+
+λ = 3.994993867358871; is within tolerance? true
+total time for first solve (pre-compiled) = 74.237089559 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 37.174303068 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 74.3903
+
+lambda = 3.99501
+Total time for first (warmed) solve = 73.9414
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 37.324
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.994985236951716; is within tolerance? true
+total time for first solve (plus compile) = 98.83909723 sec
+
+
+λ = 3.9949882835082122; is within tolerance? true
+total time for first solve (pre-compiled) = 97.553535118 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 49.190953058 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 92.3226
+
+lambda = 3.99501
+Total time for first (warmed) solve = 92.1302
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 46.498
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949857100293906; is within tolerance? true
+total time for first solve (plus compile) = 100.637943202 sec
+
+
+λ = 3.99498791477031; is within tolerance? true
+total time for first solve (pre-compiled) = 97.350940285 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 48.738128054 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 92.3324
+
+lambda = 3.99501
+Total time for first (warmed) solve = 92.1095
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 46.4782
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.994989521702906; is within tolerance? true
+total time for first solve (plus compile) = 99.310098356 sec
+
+
+λ = 3.9949865693887903; is within tolerance? true
+total time for first solve (pre-compiled) = 96.924294623 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 49.202477687 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 92.3446
+
+lambda = 3.99501
+Total time for first (warmed) solve = 92.1464
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 46.5057
+
+
+Errors: 0
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949870259479; is within tolerance? true
+total time for first solve (plus compile) = 100.58043514 sec
+
+
+λ = 3.9949860103168424; is within tolerance? true
+total time for first solve (pre-compiled) = 97.269287452 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 48.555145451 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 92.3177
+
+lambda = 3.99501
+Total time for first (warmed) solve = 92.1
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 46.4726
+
+
+Errors: 0
+
+
+Git Commit:
+6b4f608cd4bc6bef1c2e3770687be8a01c0be427
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.994988532074068; is within tolerance? true
+total time for first solve (plus compile) = 99.273408833 sec
+
+
+λ = 3.994985677012605; is within tolerance? true
+total time for first solve (pre-compiled) = 97.973291629 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 48.846755075 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 92.1764
+
+lambda = 3.99501
+Total time for first (warmed) solve = 91.9722
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 46.4087
+
+
+Errors: 0
+

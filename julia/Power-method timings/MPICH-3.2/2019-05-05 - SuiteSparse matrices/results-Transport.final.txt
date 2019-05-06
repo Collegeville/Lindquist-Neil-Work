@@ -1,0 +1,305 @@
+Git Commit:
+64336efbef755045c9850014fba1164ecd6283bb
+
+Evaluating equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 1.0; is within tolerance? true
+Took 100 iterations
+total time for first solve (plus compile) = 2.572990715 sec
+
+
+λ = 1.0; is within tolerance? true
+Took 100 iterations
+total time for first solve (pre-compiled) = 1.576549639 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 1.0; is within tolerance? true
+Took 100 iterations
+total time for second solve = 1.578447142 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+Reading MatrixMarket file power-method/matrix.mm
+1M 2M 3M 4M 5M 6M 7M 8M 9M 10M 11M 12M 13M 14M 15M 16M 17M 18M 19M 20M 21M 22M 23M 
+   Sorting local nonzeros
+
+   Constructing the matrix
+   Inserting global values
+   Completing matrix fill
+File Read time (secs):  11.7345
+Number of iterations: 100
+lambda = 1
+Total Time for first (warm up) solve = 0.949228
+
+Number of iterations: 100
+lambda = 1
+Total time for first (warmed) solve = 0.944818
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+Number of iterations: 100
+lambda = 1
+Total time for second solve = 0.943975
+
+
+Errors: 0
+
+Git Commit:
+64336efbef755045c9850014fba1164ecd6283bb
+
+Evaluating equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 1.0; is within tolerance? true
+Took 100 iterations
+total time for first solve (plus compile) = 2.564238343 sec
+
+
+λ = 1.0; is within tolerance? true
+Took 100 iterations
+total time for first solve (pre-compiled) = 1.568197723 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 1.0000000000000002; is within tolerance? true
+Took 100 iterations
+total time for second solve = 1.569233863 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+Reading MatrixMarket file power-method/matrix.mm
+1M 2M 3M 4M 5M 6M 7M 8M 9M 10M 11M 12M 13M 14M 15M 16M 17M 18M 19M 20M 21M 22M 23M 
+   Sorting local nonzeros
+
+   Constructing the matrix
+   Inserting global values
+   Completing matrix fill
+File Read time (secs):  11.8869
+Number of iterations: 100
+lambda = 1
+Total Time for first (warm up) solve = 0.956541
+
+Number of iterations: 100
+lambda = 1
+Total time for first (warmed) solve = 0.942872
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+Number of iterations: 100
+lambda = 1
+Total time for second solve = 0.943819
+
+
+Errors: 0
+
+Git Commit:
+64336efbef755045c9850014fba1164ecd6283bb
+
+Evaluating equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 1.0; is within tolerance? true
+Took 100 iterations
+total time for first solve (plus compile) = 2.569814268 sec
+
+
+λ = 1.0000000000000002; is within tolerance? true
+Took 100 iterations
+total time for first solve (pre-compiled) = 1.562451075 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 1.0; is within tolerance? true
+Took 100 iterations
+total time for second solve = 1.567133089 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+Reading MatrixMarket file power-method/matrix.mm
+1M 2M 3M 4M 5M 6M 7M 8M 9M 10M 11M 12M 13M 14M 15M 16M 17M 18M 19M 20M 21M 22M 23M 
+   Sorting local nonzeros
+
+   Constructing the matrix
+   Inserting global values
+   Completing matrix fill
+File Read time (secs):  11.5184
+Number of iterations: 100
+lambda = 1
+Total Time for first (warm up) solve = 0.950868
+
+Number of iterations: 100
+lambda = 1
+Total time for first (warmed) solve = 0.950295
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+Number of iterations: 100
+lambda = 1
+Total time for second solve = 0.946141
+
+
+Errors: 0
+
+Git Commit:
+64336efbef755045c9850014fba1164ecd6283bb
+
+Evaluating equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 1.0; is within tolerance? true
+Took 100 iterations
+total time for first solve (plus compile) = 2.559113075 sec
+
+
+λ = 1.0000000000000002; is within tolerance? true
+Took 100 iterations
+total time for first solve (pre-compiled) = 1.523210618 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 1.0; is within tolerance? true
+Took 100 iterations
+total time for second solve = 1.546160401 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+Reading MatrixMarket file power-method/matrix.mm
+1M 2M 3M 4M 5M 6M 7M 8M 9M 10M 11M 12M 13M 14M 15M 16M 17M 18M 19M 20M 21M 22M 23M 
+   Sorting local nonzeros
+
+   Constructing the matrix
+   Inserting global values
+   Completing matrix fill
+File Read time (secs):  12.3991
+Number of iterations: 100
+lambda = 1
+Total Time for first (warm up) solve = 0.951462
+
+Number of iterations: 100
+lambda = 1
+Total time for first (warmed) solve = 0.945335
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+Number of iterations: 100
+lambda = 1
+Total time for second solve = 0.947425
+
+
+Errors: 0
+
+Git Commit:
+64336efbef755045c9850014fba1164ecd6283bb
+
+Evaluating equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 1.0; is within tolerance? true
+Took 100 iterations
+total time for first solve (plus compile) = 2.540856286 sec
+
+
+λ = 1.0; is within tolerance? true
+Took 100 iterations
+total time for first solve (pre-compiled) = 1.54731432 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 1.0000000000000002; is within tolerance? true
+Took 100 iterations
+total time for second solve = 1.554287966 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+Reading MatrixMarket file power-method/matrix.mm
+1M 2M 3M 4M 5M 6M 7M 8M 9M 10M 11M 12M 13M 14M 15M 16M 17M 18M 19M 20M 21M 22M 23M 
+   Sorting local nonzeros
+
+   Constructing the matrix
+   Inserting global values
+   Completing matrix fill
+File Read time (secs):  12.3338
+Number of iterations: 100
+lambda = 1
+Total Time for first (warm up) solve = 0.946102
+
+Number of iterations: 100
+lambda = 1
+Total time for first (warmed) solve = 0.951281
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+Number of iterations: 100
+lambda = 1
+Total time for second solve = 0.941429
+
+
+Errors: 0
+

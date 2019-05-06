@@ -1,0 +1,29 @@
+
+------------O3-test branch---------
+40000eq/4proc		commit	allocs		alloc-amt		time (sec)	gc time
+MPIDist imp stable:	ec3eea	   20.31 k	 111.169 MiB	2.538573	 .25%
+MPIDist. stable:	03edab	   20.46 k	 111.942 MiB	2.552798	 .25%
+getViewPtr stable:	59a337	   22.59 k	 112.013 MiB	2.684140	 .23%
+no rowinfo pool: 	1e1a51	70970 k		1844.224 MiB	2.910815	8.23%
+
+
+
+16000000eq/16 proc	commit	allocs		alloc-amt		time (sec)	gc time
+MPIDist imp stable:	ec3eea	20.46 k		1.082 GiB		38.588773	   .60%
+MPIDist. stable:	03edab	20.46 k		1.082 GiB		30.158182	   .77%
+getViewPtr stable:	59a337	22.59 k		1.082 GiB		29.641357	   .76%
+no rowinfo pool: 	1e1a51	709.97 M	18.009 GiB		35.076622	 13.96%
+
+
+40000000eq/20 proc	commit	allocs		alloc-amt		time (sec)	gc time
+MPIDist imp stable:	ec3eea	34.94 k		2.163 GiB		66.877107	  .44%
+MPIDist. stable:	03edab	20.46 k		2.162 GiB		77.514003	  .37%
+getViewPtr stable:	59a337	22.59 k		2.162 GiB		68.899315	  .44%
+no rowinfo pool: 	1e1a51	1.42 G		36.017 GiB		78.936588	10.21%
+
+
+40000000eq/20 proc	commit	allocs		alloc-amt		time (sec)	gc time
+MPIDist imp stable:	ec3eea	20.46 k		2.162 GiB		77.510495	  .39%
+MPIDist. stable:	03edab	20.46 k		2.162 GiB		73.662851	  .39%
+getViewPtr stable:	59a337	22.59 k		2.162 GiB		62.758724	  .46%
+no rowinfo pool: 	1e1a51	1.42 G		36.017 GiB		78.985171	10.57%

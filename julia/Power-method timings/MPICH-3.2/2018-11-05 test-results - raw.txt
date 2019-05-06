@@ -1,0 +1,115 @@
+starting 400000 / 4
+Git Commit:
+02310c24df5c083a4da7ead53b5778f483c93278
+
+Evaluating 400000 equations
+Using 4 processors
+DistributedArrays Power Method:
+Running with 4 workers
+starting tests
+λ = 3.9949857705368457; is within tolerance? true
+total time for first solve (plus compile) = 126.946882762 sec
+
+
+λ = 3.994912601306255; is within tolerance? true
+total time for first solve (pre-compiled) = 123.478130029 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 61.673068532 sec
+
+
+Git Commit:
+02310c24df5c083a4da7ead53b5778f483c93278
+
+Evaluating 400000 equations
+Using 4 processors
+DistributedArrays Power Method:
+Running with 4 workers
+starting tests
+λ = 3.9949893418399807; is within tolerance? true
+total time for first solve (plus compile) = 127.598624719 sec
+
+
+λ = 3.995023858645621; is within tolerance? true
+total time for first solve (pre-compiled) = 124.102785706 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 62.094452307 sec
+
+
+Git Commit:
+02310c24df5c083a4da7ead53b5778f483c93278
+
+Evaluating 400000 equations
+Using 4 processors
+DistributedArrays Power Method:
+Running with 4 workers
+starting tests
+λ = 3.994967696394497; is within tolerance? true
+total time for first solve (plus compile) = 127.135806585 sec
+
+
+λ = 3.9949229638032016; is within tolerance? true
+total time for first solve (pre-compiled) = 123.324446661 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 61.42645847 sec
+
+
+Git Commit:
+02310c24df5c083a4da7ead53b5778f483c93278
+
+Evaluating 400000 equations
+Using 4 processors
+DistributedArrays Power Method:
+Running with 4 workers
+starting tests
+λ = 3.995093065903467; is within tolerance? true
+total time for first solve (plus compile) = 128.030549653 sec
+
+
+λ = 3.995024503529957; is within tolerance? true
+total time for first solve (pre-compiled) = 124.243900526 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 61.938379825 sec
+
+
+Git Commit:
+02310c24df5c083a4da7ead53b5778f483c93278
+
+Evaluating 400000 equations
+Using 4 processors
+DistributedArrays Power Method:
+Running with 4 workers
+starting tests
+λ = 3.995026877519751; is within tolerance? true
+total time for first solve (plus compile) = 127.357124821 sec
+
+
+λ = 3.9949871487978466; is within tolerance? true
+total time for first solve (pre-compiled) = 126.464781172 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 62.012550034 sec
+

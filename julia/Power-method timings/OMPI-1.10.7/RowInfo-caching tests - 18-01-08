@@ -1,0 +1,58 @@
+
+------------O3-test branch---------
+400000eq/4proc		commit	allocs		alloc-amt		time (sec)	gc time
+don't force inline:	35cebe	15.88 k		112.467 MiB		2.711742	 .24%
+Fix MPIDist stable:	30e75b	15.77 k		111.697 MiB		2.651750	 .24%
+MPIDist imp stable:	ec3eea	20.31 k		111.169 MiB		3.512784	 .18%
+MPIDist. stable:	03edab	20.46 k		111.942 MiB		2.603848	 .25%
+getViewPtr stable:	59a337	22.75 k		112.786 MiB		2.519601	 .25%
+no rowinfo pool: 	1e1a51	70.97 M 	1.801 GiB		2.946840	8.04%
+
+
+
+16000000eq/16 proc	commit	allocs		alloc-amt		time (sec)	gc time
+don't force inline:	35cebe	15.77 k		1.081 GiB		37.408022	  .73%
+Fix MPIDist stable:	30e75b	15.77 k		1.081 GiB		48.053387	  .56%
+MPIDist imp stable:	ec3eea	20.46 k		1.082 GiB		30.004585	  .91%
+MPIDist. stable:	03edab	20.46 k		1.082 GiB		32.208984	  .70%
+getViewPtr stable:	59a337	22.59 k		1.082 GiB		47.208338	  .49%
+no rowinfo pool: 	1e1a51	709.97 M	18.009 GiB		38.570855	12.52%
+
+
+40000000eq/20 proc	commit	allocs		alloc-amt		time (sec)	gc time
+don't force inline:	35cebe	15.77 k		2.162 GiB		66.362408	 .63%
+Fix MPIDist stable:	30e75b	15.77 k		2.162 GiB		72.109901	 .57%
+MPIDist imp stable:	ec3eea	20.46 k		2.162 GiB		65.553565	 .44%
+MPIDist. stable:	03edab	20.46 k		2.162 GiB		64.587479	 .46%
+getViewPtr stable:	59a337	22.59 k		2.162 GiB		79.497321	 .37%
+no rowinfo pool: 	1e1a51	1.42 G		36.017 GiB		79.063424	9.96%
+
+
+
+-----minor rebase-----
+
+400000eq/4 proc		commit	allocs		alloc-amt		time (sec)	gc time
+Simplify MPIDist:	d963c3	15.77 k		111.697 MiB		2.615961	 .25%
+Fix MPIDist stable:	f97e80	15.77 k		111.697 MiB		2.580593	 .25%
+don't force inline:	0ccae4	20.46 k		111.942 MiB		2.596546	 .24%
+MPIDist imp stable:	ec3eea	20.31 k		111.169 MiB		2.616911	 .24%
+MPIDist. stable:	03edab	20.60 k		112.714 MiB		2.545691	 .25%
+no rowinfo pool: 	1e1a51	70.97 M		1.801 GiB		2.865458	8.50%
+
+16000000eq/16 proc	commit	allocs		alloc-amt		time (sec)	gc time
+Simplify MPIDist:	d963c3	15.77 k		 1.081 GiB		32.282452	 .85%
+Fix MPIDist stable:	f97e80	15.77 k		 1.081 GiB		36.124702	 .76%
+don't force inline:	0ccae4	20.46 k		 1.082 GiB		33.066113	 .82%
+MPIDist imp stable:	ec3eea	20.46 k		 1.082 GiB		31.672378	 .85%
+MPIDist. stable:	03edab	20.46 k		 1.082 GiB		29.817413	 .78%
+no rowinfo pool: 	1e1a51	709.97 M	18.009 GiB		34.788525	15.62%
+
+40000000eq/20 proc	commit	allocs		alloc-amt		time (sec)	gc time
+Simplify MPIDist:	d963c3	15.77 k		2.162 GiB		71.506806	0.58%
+Fix MPIDist stable:	f97e80	15.77 k		2.162 GiB		68.312357	0.62%
+don't force inline:	0ccae4	20.46 k		2.162 GiB		72.516228	0.42%
+MPIDist imp stable:	ec3eea	20.46 k		2.162 GiB		64.818316	0.44%
+MPIDist. stable:	03edab	20.46 k		2.162 GiB		66.572892	0.44%
+no rowinfo pool: 	1e1a51	1.42 G		36.017 GiB		79.370490	10.11%
+
+

@@ -1,0 +1,1172 @@
+
+starting 16000000 / 16
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949893806181094; is within tolerance? true
+total time for first solve (plus compile) = 9.023599229 sec
+
+
+λ = 3.994999871006678; is within tolerance? true
+total time for first solve (pre-compiled) = 7.411228752 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 3.674638648 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.994995599102172; is within tolerance? true
+total time for first solve (plus compile) = 9.040466048 sec
+
+
+λ = 3.994987874833817; is within tolerance? true
+total time for first solve (pre-compiled) = 7.412758834 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 3.67577374 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949959792731695; is within tolerance? true
+total time for first solve (plus compile) = 9.022807467 sec
+
+
+λ = 3.9949894030058317; is within tolerance? true
+total time for first solve (pre-compiled) = 7.430521878 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 3.69034029 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949929735052514; is within tolerance? true
+total time for first solve (plus compile) = 9.025592353 sec
+
+
+λ = 3.9949938361847726; is within tolerance? true
+total time for first solve (pre-compiled) = 7.423368976 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 3.676755369 sec
+
+
+
+
+ePetra Power Method
+
+starting 160000000 / 16
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.994986915645054; is within tolerance? true
+total time for first solve (plus compile) = 74.858499688 sec
+
+
+λ = 3.994990388997648; is within tolerance? true
+total time for first solve (pre-compiled) = 73.130693909 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 36.689933073 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949889936557508; is within tolerance? true
+total time for first solve (plus compile) = 74.856124142 sec
+
+
+λ = 3.994985571826403; is within tolerance? true
+total time for first solve (pre-compiled) = 73.306446954 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 36.699587462 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.994986016912475; is within tolerance? true
+total time for first solve (plus compile) = 74.831463201 sec
+
+
+λ = 3.994986048178701; is within tolerance? true
+total time for first solve (pre-compiled) = 73.251313706 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 36.712406446 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949869913267104; is within tolerance? true
+total time for first solve (plus compile) = 74.920217589 sec
+
+
+λ = 3.994985429873714; is within tolerance? true
+total time for first solve (pre-compiled) = 73.50995198 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 36.77338098 sec
+
+
+
+
+ePetra Power Method
+
+starting 20000000 / 20
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.994983047680792; is within tolerance? true
+total time for first solve (plus compile) = 12.501528819 sec
+
+
+λ = 3.9949882390627307; is within tolerance? true
+total time for first solve (pre-compiled) = 9.760595051 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 4.831630602 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949841118244627; is within tolerance? true
+total time for first solve (plus compile) = 11.569148176 sec
+
+
+λ = 3.9949799656423663; is within tolerance? true
+total time for first solve (pre-compiled) = 9.478764188 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 4.839774023 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949933939838314; is within tolerance? true
+total time for first solve (plus compile) = 12.359481675 sec
+
+
+λ = 3.9949762415686267; is within tolerance? true
+total time for first solve (pre-compiled) = 9.854543298 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 4.86968212 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9950022467620876; is within tolerance? true
+total time for first solve (plus compile) = 11.437649439 sec
+
+
+λ = 3.9949848878783416; is within tolerance? true
+total time for first solve (pre-compiled) = 9.559843883 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 4.919922739 sec
+
+
+
+
+ePetra Power Method
+
+starting 200000000 / 20
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949877735174706; is within tolerance? true
+total time for first solve (plus compile) = 99.6115567 sec
+
+
+λ = 3.994989662841957; is within tolerance? true
+total time for first solve (pre-compiled) = 96.848871655 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 48.965938352 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949855960892835; is within tolerance? true
+total time for first solve (plus compile) = 98.727876861 sec
+
+
+λ = 3.9949873946083008; is within tolerance? true
+total time for first solve (pre-compiled) = 97.224639017 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 48.191407041 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.994988072303406; is within tolerance? true
+total time for first solve (plus compile) = 97.603627779 sec
+
+
+λ = 3.994985197336854; is within tolerance? true
+total time for first solve (pre-compiled) = 95.188867457 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 48.834666729 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.994986644661521; is within tolerance? true
+total time for first solve (plus compile) = 99.285927072 sec
+
+
+λ = 3.9949889141498893; is within tolerance? true
+total time for first solve (pre-compiled) = 96.444230876 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 48.575606562 sec
+
+
+
+
+ePetra Power Method
+
+starting 1600000 / 16
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949864405034154; is within tolerance? true
+total time for first solve (plus compile) = 2.246105231 sec
+
+
+λ = 3.99502139456669; is within tolerance? true
+total time for first solve (pre-compiled) = 0.529022037 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.29330028 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949610860713; is within tolerance? true
+total time for first solve (plus compile) = 2.250930996 sec
+
+
+λ = 3.9949371076364155; is within tolerance? true
+total time for first solve (pre-compiled) = 0.540745637 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.298870029 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.995000106877255; is within tolerance? true
+total time for first solve (plus compile) = 2.241619739 sec
+
+
+λ = 3.9950103222977478; is within tolerance? true
+total time for first solve (pre-compiled) = 0.545152168 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.293218941 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949509812152355; is within tolerance? true
+total time for first solve (plus compile) = 2.253537793 sec
+
+
+λ = 3.9949831481127127; is within tolerance? true
+total time for first solve (pre-compiled) = 0.554283264 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.297388093 sec
+
+
+
+
+ePetra Power Method
+
+starting 2000000 / 20
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949582057973685; is within tolerance? true
+total time for first solve (plus compile) = 2.977481612 sec
+
+
+λ = 3.9950332747187294; is within tolerance? true
+total time for first solve (pre-compiled) = 0.798813359 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.409228971 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9950188848321617; is within tolerance? true
+total time for first solve (plus compile) = 3.351729043 sec
+
+
+λ = 3.994995391827917; is within tolerance? true
+total time for first solve (pre-compiled) = 0.748749473 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.394825123 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949647050269324; is within tolerance? true
+total time for first solve (plus compile) = 2.815300061 sec
+
+
+λ = 3.994996809304912; is within tolerance? true
+total time for first solve (pre-compiled) = 0.737806326 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.420636156 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949508209103715; is within tolerance? true
+total time for first solve (plus compile) = 2.950314022 sec
+
+
+λ = 3.9950038084298933; is within tolerance? true
+total time for first solve (pre-compiled) = 0.794084136 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.398336033 sec
+
+
+
+
+ePetra Power Method
+
+starting 4000000 / 4
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 4000000 equations
+Using 4 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.9949721970082943; is within tolerance? true
+total time for first solve (plus compile) = 4.131562193 sec
+
+
+λ = 3.9949853406700093; is within tolerance? true
+total time for first solve (pre-compiled) = 2.808431932 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 1.385302041 sec
+
+
+
+
+ePetra Power Method
+
+
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 4000000 equations
+Using 4 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.994964611084347; is within tolerance? true
+total time for first solve (plus compile) = 4.183094757 sec
+
+
+λ = 3.9949843285659528; is within tolerance? true
+total time for first solve (pre-compiled) = 2.837027122 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 1.408074646 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 4000000 equations
+Using 4 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.9949628460774655; is within tolerance? true
+total time for first solve (plus compile) = 4.15977097 sec
+
+
+λ = 3.9949857460962552; is within tolerance? true
+total time for first solve (pre-compiled) = 2.837114064 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 1.403142631 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 4000000 equations
+Using 4 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.99496406173052; is within tolerance? true
+total time for first solve (plus compile) = 4.162035578 sec
+
+
+λ = 3.994990941738594; is within tolerance? true
+total time for first solve (pre-compiled) = 2.833521281 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 1.389965175 sec
+
+
+
+
+ePetra Power Method
+
+starting 40000000 / 4
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 40000000 equations
+Using 4 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.9949869357621726; is within tolerance? true
+total time for first solve (plus compile) = 31.895615282 sec
+
+
+λ = 3.994992442523415; is within tolerance? true
+total time for first solve (pre-compiled) = 31.246963355 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 15.315115399 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 40000000 equations
+Using 4 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.994988990168793; is within tolerance? true
+total time for first solve (plus compile) = 32.029233452 sec
+
+
+λ = 3.9950002533875226; is within tolerance? true
+total time for first solve (pre-compiled) = 30.769602654 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 15.370358505 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 40000000 equations
+Using 4 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.994982713090172; is within tolerance? true
+total time for first solve (plus compile) = 32.036652326 sec
+
+
+λ = 3.9949850292009117; is within tolerance? true
+total time for first solve (pre-compiled) = 30.710386375 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 15.361216983 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 40000000 equations
+Using 4 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.994986822206615; is within tolerance? true
+total time for first solve (plus compile) = 32.126780386 sec
+
+
+λ = 3.9949853211108897; is within tolerance? true
+total time for first solve (pre-compiled) = 30.554118008 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 15.330217217 sec
+
+
+
+
+ePetra Power Method
+
+starting 400000 / 4
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 400000 equations
+Using 4 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.9949468286968948; is within tolerance? true
+total time for first solve (plus compile) = 1.630985423 sec
+
+
+λ = 3.995013864653063; is within tolerance? true
+total time for first solve (pre-compiled) = 0.227682691 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.1410828 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 400000 equations
+Using 4 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.995039604481652; is within tolerance? true
+total time for first solve (plus compile) = 1.627828039 sec
+
+
+λ = 3.99494662489187; is within tolerance? true
+total time for first solve (pre-compiled) = 0.229329127 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.141865724 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 400000 equations
+Using 4 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.994956718258182; is within tolerance? true
+total time for first solve (plus compile) = 1.620691405 sec
+
+
+λ = 3.995032604747012; is within tolerance? true
+total time for first solve (pre-compiled) = 0.228980438 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.142385525 sec
+
+
+
+
+ePetra Power Method
+Git Commit:
+1d474f5defda58aa8623df2707329f7eb51047a6
+
+Evaluating 400000 equations
+Using 4 processors
+
+
+
+
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 4 processes
+starting tests
+λ = 3.994940477807659; is within tolerance? true
+total time for first solve (plus compile) = 1.669862556 sec
+
+
+λ = 3.9950206839984945; is within tolerance? true
+total time for first solve (pre-compiled) = 0.228626397 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.143517165 sec
+
+
+
+
+ePetra Power Method

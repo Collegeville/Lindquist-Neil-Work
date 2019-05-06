@@ -1,0 +1,2529 @@
+
+starting 1600000 / 16
+Git Commit:
+89f91789e5bd23d3cb0f0d44830feec9edf95ae9
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.18326hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18342hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18347hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18328hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18340hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18321hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18345hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18332hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18334hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18338hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18324hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18322hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18330hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18318hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18336hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18346hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949845612143173; is within tolerance? true
+total time for first solve (plus compile) = 2.774188588 sec
+
+
+λ = 3.994960587673996; is within tolerance? true
+total time for first solve (pre-compiled) = 0.582021646 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.291183978 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.18677hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18675hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18676hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18671hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18673hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18681hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18682hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18670hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18668hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18684hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18678hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18672hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18679hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18680hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18683hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18674hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99499
+Total Time for first (warm up) solve = 0.510994
+
+lambda = 3.99499
+Total time for first (warmed) solve = 0.504697
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.252948
+
+
+Errors: 0
+
+Git Commit:
+89f91789e5bd23d3cb0f0d44830feec9edf95ae9
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.18708hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18732hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18729hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18710hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18735hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18712hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18720hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18743hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18740hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18718hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18716hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18738hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18745hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18724hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18714hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.18722hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949866860536654; is within tolerance? true
+total time for first solve (plus compile) = 2.753636037 sec
+
+
+λ = 3.9949896636717623; is within tolerance? true
+total time for first solve (pre-compiled) = 0.546891387 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.274766331 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.19021hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19022hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19023hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19025hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19028hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19024hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19026hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19027hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19029hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19033hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19039hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19035hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19041hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19036hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19042hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19038hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99499
+Total Time for first (warm up) solve = 0.52131
+
+lambda = 3.99499
+Total time for first (warmed) solve = 0.502107
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.252477
+
+
+Errors: 0
+
+Git Commit:
+89f91789e5bd23d3cb0f0d44830feec9edf95ae9
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.19066hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19074hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19091hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19075hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19063hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19082hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19089hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19095hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19079hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19067hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19078hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19071hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19086hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19059hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19069hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19062hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9950118997784356; is within tolerance? true
+total time for first solve (plus compile) = 2.730727687 sec
+
+
+λ = 3.9949817453449046; is within tolerance? true
+total time for first solve (pre-compiled) = 0.557665323 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.293352408 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.19368hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19366hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19374hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19369hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19367hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19372hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19373hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19370hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19371hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19384hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19380hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19381hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19377hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19387hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19383hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19385hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99499
+Total Time for first (warm up) solve = 0.516694
+
+lambda = 3.99499
+Total time for first (warmed) solve = 0.498788
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.252142
+
+
+Errors: 0
+
+Git Commit:
+89f91789e5bd23d3cb0f0d44830feec9edf95ae9
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.19446hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19424hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19430hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19434hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19432hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19417hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19418hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19426hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19436hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19420hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19440hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19422hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19428hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19449hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19413hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19443hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9950060366287374; is within tolerance? true
+total time for first solve (plus compile) = 2.762479454 sec
+
+
+λ = 3.994951925565603; is within tolerance? true
+total time for first solve (pre-compiled) = 0.605986153 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.295947882 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.19721hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19720hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19723hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19719hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19724hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19727hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19726hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19735hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19732hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19725hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19722hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19741hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19737hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19730hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19733hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19739hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99499
+Total Time for first (warm up) solve = 0.522508
+
+lambda = 3.99499
+Total time for first (warmed) solve = 0.518316
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.260269
+
+
+Errors: 0
+
+Git Commit:
+89f91789e5bd23d3cb0f0d44830feec9edf95ae9
+
+Evaluating 1600000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.19782hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19801hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19791hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19768hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19787hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19780hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19773hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19797hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19766hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19772hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19769hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19776hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19783hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19777hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19803hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.19788hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.99499788557757; is within tolerance? true
+total time for first solve (plus compile) = 2.719172162 sec
+
+
+λ = 3.994973446224604; is within tolerance? true
+total time for first solve (pre-compiled) = 0.572936401 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.288497513 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.20074hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20071hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20076hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20070hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20073hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20075hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20072hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20077hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20091hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20083hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20081hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20082hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20093hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20086hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20089hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20078hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99499
+Total Time for first (warm up) solve = 0.51374
+
+lambda = 3.99499
+Total time for first (warmed) solve = 0.498094
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.251599
+
+
+Errors: 0
+
+
+starting 16000000 / 16
+Git Commit:
+89f91789e5bd23d3cb0f0d44830feec9edf95ae9
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.20123hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20121hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20127hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20154hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20143hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20125hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20135hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20133hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20129hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20153hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20145hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20141hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20117hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20119hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20149hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20131hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.994983754729711; is within tolerance? true
+total time for first solve (plus compile) = 9.855279378 sec
+
+
+λ = 3.9949790431798804; is within tolerance? true
+total time for first solve (pre-compiled) = 7.542684526 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 3.743906622 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.20443hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20438hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20439hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20441hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20442hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20444hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20445hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20449hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20459hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20440hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20446hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20454hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20456hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20453hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20451hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20461hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 7.42839
+
+lambda = 3.995
+Total time for first (warmed) solve = 7.39659
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 3.73512
+
+
+Errors: 0
+
+Git Commit:
+89f91789e5bd23d3cb0f0d44830feec9edf95ae9
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.20488hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20503hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20501hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20510hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20490hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20492hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20507hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20517hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20520hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20498hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20519hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20499hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20495hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20514hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20485hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20494hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.994990594770684; is within tolerance? true
+total time for first solve (plus compile) = 9.783209593 sec
+
+
+λ = 3.994994675068611; is within tolerance? true
+total time for first solve (pre-compiled) = 7.436277969 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 3.728351502 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.20840hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20841hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20845hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20846hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20844hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20843hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20849hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20853hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20858hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20862hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20854hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20852hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20842hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20860hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20839hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20847hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 7.3645
+
+lambda = 3.995
+Total time for first (warmed) solve = 7.33507
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 3.70219
+
+
+Errors: 0
+
+Git Commit:
+89f91789e5bd23d3cb0f0d44830feec9edf95ae9
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.20895hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20880hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20892hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20896hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20891hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20879hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20885hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20887hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20899hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20911hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20888hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20904hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20883hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20900hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20917hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.20914hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949952850284527; is within tolerance? true
+total time for first solve (plus compile) = 9.662074627 sec
+
+
+λ = 3.994985448497846; is within tolerance? true
+total time for first solve (pre-compiled) = 7.487125113 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 3.925288331 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.21209hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21210hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21208hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21214hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21207hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21213hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21225hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21211hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21212hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21215hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21218hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21222hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21230hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21220hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21228hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21223hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 7.37103
+
+lambda = 3.995
+Total time for first (warmed) solve = 7.33081
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 3.70055
+
+
+Errors: 0
+
+Git Commit:
+89f91789e5bd23d3cb0f0d44830feec9edf95ae9
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.21247hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21250hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21251hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21275hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21259hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21271hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21255hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21245hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21280hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21262hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21253hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21278hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21265hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21258hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21282hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21263hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.994987865710538; is within tolerance? true
+total time for first solve (plus compile) = 9.6534375 sec
+
+
+λ = 3.9949931730519443; is within tolerance? true
+total time for first solve (pre-compiled) = 7.501395826 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 3.733463594 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.21574hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21572hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21571hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21576hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21587hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21573hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21570hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21591hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21582hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21577hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21585hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21569hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21583hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21575hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21589hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21580hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 7.40981
+
+lambda = 3.995
+Total time for first (warmed) solve = 7.34878
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 3.70899
+
+
+Errors: 0
+
+Git Commit:
+89f91789e5bd23d3cb0f0d44830feec9edf95ae9
+
+Evaluating 16000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.21623hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21630hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21636hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21608hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21618hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21611hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21625hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21614hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21643hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21627hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21621hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21645hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21617hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21642hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21613hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21635hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.994995798210421; is within tolerance? true
+total time for first solve (plus compile) = 9.555300834 sec
+
+
+λ = 3.9949866117486246; is within tolerance? true
+total time for first solve (pre-compiled) = 7.396115971 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 3.703378692 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.21926hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21923hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21929hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21930hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21928hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21927hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21933hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21942hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21924hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21925hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21934hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21922hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21944hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21935hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21940hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21939hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 7.41198
+
+lambda = 3.995
+Total time for first (warmed) solve = 7.36732
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 3.71881
+
+
+Errors: 0
+
+
+starting 160000000 / 16
+Git Commit:
+89f91789e5bd23d3cb0f0d44830feec9edf95ae9
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.21970hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21973hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21984hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21989hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21981hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21982hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21997hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21969hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21976hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21986hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21979hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21991hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22003hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21995hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.21974hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22000hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.994989127205626; is within tolerance? true
+total time for first solve (plus compile) = 76.972470999 sec
+
+
+λ = 3.9949882222022057; is within tolerance? true
+total time for first solve (pre-compiled) = 74.915438977 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 37.55151657 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.22341hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22345hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22343hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22344hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22356hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22351hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22352hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22355hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22347hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22346hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22342hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22340hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22361hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22359hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22362hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22348hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 73.6246
+
+lambda = 3.99501
+Total time for first (warmed) solve = 73.4231
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 37.0589
+
+
+Errors: 0
+
+Git Commit:
+89f91789e5bd23d3cb0f0d44830feec9edf95ae9
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.22431hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22413hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22451hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22417hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22444hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22446hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22429hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22436hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22420hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22415hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22425hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22448hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22427hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22441hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22421hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22423hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.994985960318398; is within tolerance? true
+total time for first solve (plus compile) = 76.958594293 sec
+
+
+λ = 3.994987189770553; is within tolerance? true
+total time for first solve (pre-compiled) = 74.810380217 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 37.574171762 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.22829hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22826hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22828hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22830hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22823hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22827hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22832hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22824hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22835hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22841hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22825hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22839hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22843hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22844hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22847hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22837hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 73.8048
+
+lambda = 3.99501
+Total time for first (warmed) solve = 73.5119
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 37.1114
+
+
+Errors: 0
+
+Git Commit:
+89f91789e5bd23d3cb0f0d44830feec9edf95ae9
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.22934hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22914hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22904hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22941hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22917hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22931hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22921hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22907hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22929hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22937hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22908hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22910hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22922hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22912hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22918hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.22940hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949866139740893; is within tolerance? true
+total time for first solve (plus compile) = 76.868682868 sec
+
+
+λ = 3.9949885497688777; is within tolerance? true
+total time for first solve (pre-compiled) = 74.679261625 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 37.44964696 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.23278hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23276hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23274hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23285hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23280hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23275hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23277hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23288hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23279hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23293hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23295hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23283hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23273hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23281hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23291hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23297hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 74.0395
+
+lambda = 3.99501
+Total time for first (warmed) solve = 73.8243
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 37.2524
+
+
+Errors: 0
+
+Git Commit:
+89f91789e5bd23d3cb0f0d44830feec9edf95ae9
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.23383hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23391hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23382hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23418hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23404hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23402hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23400hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23416hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23398hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23388hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23411hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23385hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23420hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23389hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23393hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23395hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.9949920611955276; is within tolerance? true
+total time for first solve (plus compile) = 76.053270015 sec
+
+
+λ = 3.994987317520854; is within tolerance? true
+total time for first solve (pre-compiled) = 74.798855479 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 37.006014033 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.23765hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23764hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23770hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23763hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23776hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23769hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23773hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23767hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23781hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23778hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23766hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23768hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23785hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23780hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23777hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23782hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 73.9741
+
+lambda = 3.99501
+Total time for first (warmed) solve = 73.7722
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 37.2534
+
+
+Errors: 0
+
+Git Commit:
+89f91789e5bd23d3cb0f0d44830feec9edf95ae9
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.23842hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23844hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23873hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23878hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23854hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23850hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23860hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23858hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23853hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23848hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23847hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23857hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23869hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23866hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23875hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.23862hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+
+starting 160000000 / 16
+Git Commit:
+f2fc8729666738533c332ab14c6d4e2e400733b1
+
+Evaluating 160000000 equations
+Using 16 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.40723hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.40711hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.40736hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.40710hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.40733hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.40708hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.40713hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.40720hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.40721hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.40705hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.40727hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.40742hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.40716hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.40717hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.40725hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.40739hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 16 processes
+starting tests
+λ = 3.994990471156595; is within tolerance? true
+total time for first solve (plus compile) = 76.853561856 sec
+
+
+λ = 3.994984796444271; is within tolerance? true
+total time for first solve (pre-compiled) = 74.778295064 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 37.501730479 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.424hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.427hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.420hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.422hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.421hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.423hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.426hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.425hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.432hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.434hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.435hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.429hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.437hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.438hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.443hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.440hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 16 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 73.3567
+
+lambda = 3.99501
+Total time for first (warmed) solve = 73.262
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 36.9645
+
+
+Errors: 0
+
+
+starting 20000000 / 20
+Git Commit:
+f2fc8729666738533c332ab14c6d4e2e400733b1
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.527hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.537hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.491hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.499hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.496hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.514hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.503hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.493hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.497hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.487hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.535hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.490hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.518hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.510hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.521hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.485hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.531hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.523hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.516hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.502hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949972527981275; is within tolerance? true
+total time for first solve (plus compile) = 2.821520547 sec
+
+
+λ = 3.994956525859915; is within tolerance? true
+total time for first solve (pre-compiled) = 0.756023006 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.369347161 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.924hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.921hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.922hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.918hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.920hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.919hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.955hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.935hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.927hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.923hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.925hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.930hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.933hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.957hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.945hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.949hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.948hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.926hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.947hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.952hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99499
+Total Time for first (warm up) solve = 0.729033
+
+lambda = 3.99498
+Total time for first (warmed) solve = 0.697117
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.349196
+
+
+Errors: 0
+
+Git Commit:
+f2fc8729666738533c332ab14c6d4e2e400733b1
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.977hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.994hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1030hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.979hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.975hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1035hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.981hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.996hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1015hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.973hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1012hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.998hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1033hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1018hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.990hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1020hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1026hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.983hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1023hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.992hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.99499263848133; is within tolerance? true
+total time for first solve (plus compile) = 2.834002504 sec
+
+
+λ = 3.99497468102634; is within tolerance? true
+total time for first solve (pre-compiled) = 0.758127125 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.370122646 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.1421hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1425hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1428hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1418hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1420hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1444hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1417hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1419hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1422hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1423hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1434hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1446hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1438hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1442hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1436hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1432hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1424hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1430hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1448hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1440hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99499
+Total Time for first (warm up) solve = 0.711258
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.703693
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.355894
+
+
+Errors: 0
+
+Git Commit:
+f2fc8729666738533c332ab14c6d4e2e400733b1
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.1503hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1499hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1468hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1511hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1502hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1489hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1506hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1474hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1480hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1464hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1473hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1467hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1485hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1471hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1507hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1512hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1482hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1491hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1509hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1476hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.99497398178853; is within tolerance? true
+total time for first solve (plus compile) = 2.821644985 sec
+
+
+λ = 3.9949930515722767; is within tolerance? true
+total time for first solve (pre-compiled) = 0.756708654 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.36972486 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.1921hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1922hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1919hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1931hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1933hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1915hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1916hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1920hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1918hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1923hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1943hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1917hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1939hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1927hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1914hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1929hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1935hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1941hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1937hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1945hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 0.745983
+
+lambda = 3.99498
+Total time for first (warmed) solve = 0.706713
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.350433
+
+
+Errors: 0
+
+Git Commit:
+f2fc8729666738533c332ab14c6d4e2e400733b1
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.1992hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1999hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2001hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1989hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1968hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1995hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2007hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1965hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1972hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1960hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1988hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1979hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1962hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2009hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1975hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1976hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1966hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1970hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.1980hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2003hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.99500522449699; is within tolerance? true
+total time for first solve (plus compile) = 2.862349932 sec
+
+
+λ = 3.9949851092210444; is within tolerance? true
+total time for first solve (pre-compiled) = 0.792236783 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.386458911 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.2360hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2371hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2365hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2364hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2359hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2361hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2363hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2362hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2375hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2358hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2380hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2382hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2384hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2389hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2369hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2366hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2373hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2387hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2379hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2377hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99503
+Total Time for first (warm up) solve = 0.724677
+
+lambda = 3.99503
+Total time for first (warmed) solve = 0.694753
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.349525
+
+
+Errors: 0
+
+Git Commit:
+f2fc8729666738533c332ab14c6d4e2e400733b1
+
+Evaluating 2000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.2426hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2416hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2422hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2407hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2408hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2415hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2443hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2404hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2439hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2412hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2433hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2436hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2410hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2449hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2454hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2446hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2420hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2418hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2424hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2452hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.994982322649614; is within tolerance? true
+total time for first solve (plus compile) = 2.907206574 sec
+
+
+λ = 3.994977795505072; is within tolerance? true
+total time for first solve (pre-compiled) = 0.757115593 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 0.369156149 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.2798hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2802hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2797hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2794hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2800hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2796hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2801hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2811hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2799hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2813hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2825hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2821hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2809hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2805hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2819hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2795hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2807hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2815hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2823hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2817hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 0.708547
+
+lambda = 3.99501
+Total time for first (warmed) solve = 0.704059
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 0.348716
+
+
+Errors: 0
+
+
+starting 200000000 / 20
+Git Commit:
+f2fc8729666738533c332ab14c6d4e2e400733b1
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.2853hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2843hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2847hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2876hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2857hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2845hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2849hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2859hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2888hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2867hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2864hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2880hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2882hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2851hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2891hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2870hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2855hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2841hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2873hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.2884hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949899089870438; is within tolerance? true
+total time for first solve (plus compile) = 11.44905994 sec
+
+
+λ = 3.9949849473651837; is within tolerance? true
+total time for first solve (pre-compiled) = 9.258389575 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 4.619424496 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.3248hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3245hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3253hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3242hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3246hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3255hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3239hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3264hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3244hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3268hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3241hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3262hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3251hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3243hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3261hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3240hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3257hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3238hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3266hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3259hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 9.1786
+
+lambda = 3.99501
+Total time for first (warmed) solve = 9.17339
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 4.62966
+
+
+Errors: 0
+
+Git Commit:
+f2fc8729666738533c332ab14c6d4e2e400733b1
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.3292hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3303hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3334hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3313hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3288hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3307hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3299hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3293hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3285hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3301hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3326hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3330hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3305hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3317hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3333hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3295hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3320hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3297hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3324hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3290hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.994986281452798; is within tolerance? true
+total time for first solve (plus compile) = 11.2995464 sec
+
+
+λ = 3.994996647675867; is within tolerance? true
+total time for first solve (pre-compiled) = 9.212690027 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 4.618433589 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.3689hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3687hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3696hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3682hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3686hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3697hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3684hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3699hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3683hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3703hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3688hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3690hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3694hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3705hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3713hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3711hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3701hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3685hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3707hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3709hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 9.25854
+
+lambda = 3.99501
+Total time for first (warmed) solve = 9.19782
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 4.64124
+
+
+Errors: 0
+
+Git Commit:
+f2fc8729666738533c332ab14c6d4e2e400733b1
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.3758hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3738hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3762hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3778hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3747hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3743hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3764hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3776hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3773hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3767hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3733hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3746hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3749hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3739hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3742hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3751hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3760hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3736hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3730hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.3732hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.994989926174605; is within tolerance? true
+total time for first solve (plus compile) = 11.24790373 sec
+
+
+λ = 3.9950018655351465; is within tolerance? true
+total time for first solve (pre-compiled) = 9.231402359 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 4.604030001 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.4129hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4135hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4127hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4132hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4133hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4131hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4130hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4144hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4150hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4142hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4156hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4148hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4158hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4154hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4138hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4140hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4128hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4134hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4152hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4146hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 9.19454
+
+lambda = 3.995
+Total time for first (warmed) solve = 9.15943
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 4.6237
+
+
+Errors: 0
+
+Git Commit:
+f2fc8729666738533c332ab14c6d4e2e400733b1
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.4188hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4194hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4200hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4218hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4183hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4220hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4197hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4189hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4232hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4230hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4225hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4196hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4228hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4192hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4204hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4202hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4205hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4216hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4186hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4212hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949927101404925; is within tolerance? true
+total time for first solve (plus compile) = 11.305606408 sec
+
+
+λ = 3.9949953603077777; is within tolerance? true
+total time for first solve (pre-compiled) = 9.233978382 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 4.607007599 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.4585hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4576hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4592hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4577hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4578hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4582hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4581hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4583hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4580hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4584hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4596hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4606hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4600hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4598hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4607hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4602hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4594hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4590hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4588hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4604hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 9.24181
+
+lambda = 3.99501
+Total time for first (warmed) solve = 9.19409
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 4.63987
+
+
+Errors: 0
+
+Git Commit:
+f2fc8729666738533c332ab14c6d4e2e400733b1
+
+Evaluating 20000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.4645hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4686hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4665hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4647hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4676hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4682hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4680hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4674hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4688hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4637hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4653hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4649hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4655hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4660hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4641hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4669hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4639hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4651hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4668hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.4643hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949768972414486; is within tolerance? true
+total time for first solve (plus compile) = 11.257516973 sec
+
+
+λ = 3.9949739238183564; is within tolerance? true
+total time for first solve (pre-compiled) = 9.16321842 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 4.57372104 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.5038hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5037hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5051hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5036hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5043hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5047hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5039hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5055hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5041hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5044hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5040hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5049hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5063hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5042hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5060hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5061hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5056hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5058hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5067hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5053hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99502
+Total Time for first (warm up) solve = 9.24605
+
+lambda = 3.995
+Total time for first (warmed) solve = 9.19271
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 4.6399
+
+
+Errors: 0
+
+
+starting 2000000000 / 20
+Git Commit:
+f2fc8729666738533c332ab14c6d4e2e400733b1
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.5132hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5103hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5087hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5118hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5128hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5085hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5083hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5101hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5112hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5095hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5091hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5115hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5089hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5124hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5097hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5130hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5105hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5122hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5099hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5093hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.994986573011074; is within tolerance? true
+total time for first solve (plus compile) = 93.901994856 sec
+
+
+λ = 3.994986731211677; is within tolerance? true
+total time for first solve (pre-compiled) = 92.114001582 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 46.095873842 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.5583hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5576hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5590hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5580hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5578hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5581hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5592hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5598hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5600hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5595hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5604hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5577hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5584hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5587hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5579hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5606hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5601hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5586hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5588hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5594hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 93.0621
+
+lambda = 3.99501
+Total time for first (warmed) solve = 91.4492
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 46.1481
+
+
+Errors: 0
+
+Git Commit:
+f2fc8729666738533c332ab14c6d4e2e400733b1
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.5692hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5714hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5716hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5677hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5682hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5719hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5691hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5694hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5678hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5684hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5686hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5696hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5701hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5680hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5706hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5725hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5726hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5712hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5710hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.5688hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949863253224094; is within tolerance? true
+total time for first solve (plus compile) = 93.715249027 sec
+
+
+λ = 3.9949842210251667; is within tolerance? true
+total time for first solve (pre-compiled) = 91.682802513 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 45.996648251 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.6158hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6156hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6150hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6146hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6148hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6160hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6149hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6145hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6165hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6161hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6168hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6157hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6164hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6151hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6172hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6167hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6147hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6154hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6174hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6152hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 91.45
+
+lambda = 3.99501
+Total time for first (warmed) solve = 91.1588
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 45.9995
+
+
+Errors: 0
+
+Git Commit:
+f2fc8729666738533c332ab14c6d4e2e400733b1
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.6229hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6245hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6261hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6267hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6241hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6264hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6247hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6276hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6235hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6251hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6249hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6275hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6259hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6227hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6231hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6239hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6243hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6237hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6271hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6233hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.9949841040110177; is within tolerance? true
+total time for first solve (plus compile) = 94.329177586 sec
+
+
+λ = 3.9949857869161165; is within tolerance? true
+total time for first solve (pre-compiled) = 92.42186038 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 46.294137087 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.6703hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6699hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6697hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6705hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6702hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6695hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6700hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6701hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6725hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6708hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6723hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6698hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6710hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6716hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6722hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6696hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6712hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6714hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6718hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6720hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 91.9991
+
+lambda = 3.99502
+Total time for first (warmed) solve = 91.7218
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 46.2901
+
+
+Errors: 0
+
+Git Commit:
+d4d12398ab172b6fc3ca3cd53404c31db5e181d4
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.6789hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6784hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6818hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6787hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6792hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6791hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6830hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6811hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6833hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6801hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6827hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6820hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6831hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6822hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6803hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6797hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6806hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6795hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6807hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.6799hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.994984733744076; is within tolerance? true
+total time for first solve (plus compile) = 94.173994472 sec
+
+
+λ = 3.994988291818249; is within tolerance? true
+total time for first solve (pre-compiled) = 92.189270693 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 46.227749701 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.7259hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7258hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7267hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7270hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7280hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7256hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7282hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7278hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7265hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7257hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7253hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7254hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7273hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7251hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7262hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7255hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7263hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7252hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7260hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7261hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 91.4565
+
+lambda = 3.99501
+Total time for first (warmed) solve = 91.1322
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 45.9925
+
+
+Errors: 0
+
+Git Commit:
+d4d12398ab172b6fc3ca3cd53404c31db5e181d4
+
+Evaluating 200000000 equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+cscihpc0.ad.csbsju.edu.7381hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7340hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7368hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7374hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7383hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7336hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7377hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7345hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7354hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7362hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7371hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7349hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7385hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7350hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7339hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7343hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7346hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7357hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7367hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7353hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.99498760646712; is within tolerance? true
+total time for first solve (plus compile) = 94.205868294 sec
+
+
+λ = 3.9949870679270747; is within tolerance? true
+total time for first solve (pre-compiled) = 92.232505124 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 20.055555555555554; is within tolerance? true
+total time for second solve = 46.221295017 sec
+
+
+
+
+ePetra Power Method
+cscihpc0.ad.csbsju.edu.7805hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7809hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7803hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7804hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7808hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7815hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7807hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7818hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7806hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7822hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7824hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7811hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7834hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7810hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7820hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7816hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7832hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7830hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7827hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+cscihpc0.ad.csbsju.edu.7825hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+lambda = 3.99501
+Total Time for first (warm up) solve = 92.05
+
+lambda = 3.99501
+Total time for first (warmed) solve = 91.7298
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+lambda = 20.0556
+Total time for second solve = 46.295
+
+
+Errors: 0
+

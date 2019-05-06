@@ -1,0 +1,305 @@
+Git Commit:
+df94f82982d651415c35f5ab3aa40ca93895b311
+
+Evaluating equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.2751817483529028e7; is within tolerance? true
+Took 2200 iterations
+total time for first solve (plus compile) = 225.68495771 sec
+
+
+λ = 3.2751817482976045e7; is within tolerance? true
+Took 2300 iterations
+total time for first solve (pre-compiled) = 227.660379576 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 3.275181748342302e7; is within tolerance? true
+Took 2500 iterations
+total time for second solve = 249.97929744 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+Reading MatrixMarket file power-method/matrix.mm
+1M 2M 3M 4M 5M 6M 7M 8M 9M 10M 11M 12M 13M 14M 15M 16M 17M 18M 19M 20M 21M 22M 23M 24M 25M 26M 27M 28M 29M 30M 31M 32M 33M 34M 35M 36M 37M 38M 39M 40M 41M 42M 43M 44M 45M 46M 47M 48M 49M 50M 51M 52M 53M 54M 55M 56M 57M 58M 59M 60M 61M 62M 63M 64M 65M 66M 67M 68M 69M 70M 71M 72M 73M 74M 75M 76M 77M 78M 79M 80M 81M 82M 83M 84M 85M 86M 87M 88M 89M 90M 91M 92M 93M 94M 95M 96M 97M 98M 99M 100M 101M 102M 103M 104M 105M 106M 107M 108M 109M 110M 
+   Sorting local nonzeros
+
+   Constructing the matrix
+   Inserting global values
+   Completing matrix fill
+File Read time (secs):  48.3181
+Number of iterations: 2000
+lambda = 3.27518e+07
+Total Time for first (warm up) solve = 185.737
+
+Number of iterations: 2100
+lambda = 3.27518e+07
+Total time for first (warmed) solve = 195.65
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+Number of iterations: 2200
+lambda = 3.27518e+07
+Total time for second solve = 205.851
+
+
+Errors: 0
+
+Git Commit:
+df94f82982d651415c35f5ab3aa40ca93895b311
+
+Evaluating equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.2751817483416006e7; is within tolerance? true
+Took 2400 iterations
+total time for first solve (plus compile) = 246.686039131 sec
+
+
+λ = 3.2751817483424466e7; is within tolerance? true
+Took 2300 iterations
+total time for first solve (pre-compiled) = 237.359645539 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 3.2751817482910562e7; is within tolerance? true
+Took 2100 iterations
+total time for second solve = 222.614836247 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+Reading MatrixMarket file power-method/matrix.mm
+1M 2M 3M 4M 5M 6M 7M 8M 9M 10M 11M 12M 13M 14M 15M 16M 17M 18M 19M 20M 21M 22M 23M 24M 25M 26M 27M 28M 29M 30M 31M 32M 33M 34M 35M 36M 37M 38M 39M 40M 41M 42M 43M 44M 45M 46M 47M 48M 49M 50M 51M 52M 53M 54M 55M 56M 57M 58M 59M 60M 61M 62M 63M 64M 65M 66M 67M 68M 69M 70M 71M 72M 73M 74M 75M 76M 77M 78M 79M 80M 81M 82M 83M 84M 85M 86M 87M 88M 89M 90M 91M 92M 93M 94M 95M 96M 97M 98M 99M 100M 101M 102M 103M 104M 105M 106M 107M 108M 109M 110M 
+   Sorting local nonzeros
+
+   Constructing the matrix
+   Inserting global values
+   Completing matrix fill
+File Read time (secs):  49.5523
+Number of iterations: 2000
+lambda = 3.27518e+07
+Total Time for first (warm up) solve = 185.628
+
+Number of iterations: 2100
+lambda = 3.27518e+07
+Total time for first (warmed) solve = 195.599
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+Number of iterations: 2200
+lambda = 3.27518e+07
+Total time for second solve = 205.441
+
+
+Errors: 0
+
+Git Commit:
+df94f82982d651415c35f5ab3aa40ca93895b311
+
+Evaluating equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.275181748298061e7; is within tolerance? true
+Took 2600 iterations
+total time for first solve (plus compile) = 264.199326125 sec
+
+
+λ = 3.2751817483025875e7; is within tolerance? true
+Took 2400 iterations
+total time for first solve (pre-compiled) = 258.048799386 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 3.275181748300563e7; is within tolerance? true
+Took 2300 iterations
+total time for second solve = 239.808311453 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+Reading MatrixMarket file power-method/matrix.mm
+1M 2M 3M 4M 5M 6M 7M 8M 9M 10M 11M 12M 13M 14M 15M 16M 17M 18M 19M 20M 21M 22M 23M 24M 25M 26M 27M 28M 29M 30M 31M 32M 33M 34M 35M 36M 37M 38M 39M 40M 41M 42M 43M 44M 45M 46M 47M 48M 49M 50M 51M 52M 53M 54M 55M 56M 57M 58M 59M 60M 61M 62M 63M 64M 65M 66M 67M 68M 69M 70M 71M 72M 73M 74M 75M 76M 77M 78M 79M 80M 81M 82M 83M 84M 85M 86M 87M 88M 89M 90M 91M 92M 93M 94M 95M 96M 97M 98M 99M 100M 101M 102M 103M 104M 105M 106M 107M 108M 109M 110M 
+   Sorting local nonzeros
+
+   Constructing the matrix
+   Inserting global values
+   Completing matrix fill
+File Read time (secs):  50.2531
+Number of iterations: 2000
+lambda = 3.27518e+07
+Total Time for first (warm up) solve = 185.847
+
+Number of iterations: 2100
+lambda = 3.27518e+07
+Total time for first (warmed) solve = 195.826
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+Number of iterations: 2200
+lambda = 3.27518e+07
+Total time for second solve = 205.441
+
+
+Errors: 0
+
+Git Commit:
+df94f82982d651415c35f5ab3aa40ca93895b311
+
+Evaluating equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.2751817483545706e7; is within tolerance? true
+Took 2500 iterations
+total time for first solve (plus compile) = 262.811948987 sec
+
+
+λ = 3.2751817483435795e7; is within tolerance? true
+Took 2100 iterations
+total time for first solve (pre-compiled) = 214.031062459 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 3.2751817483516987e7; is within tolerance? true
+Took 2200 iterations
+total time for second solve = 225.415345501 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+Reading MatrixMarket file power-method/matrix.mm
+1M 2M 3M 4M 5M 6M 7M 8M 9M 10M 11M 12M 13M 14M 15M 16M 17M 18M 19M 20M 21M 22M 23M 24M 25M 26M 27M 28M 29M 30M 31M 32M 33M 34M 35M 36M 37M 38M 39M 40M 41M 42M 43M 44M 45M 46M 47M 48M 49M 50M 51M 52M 53M 54M 55M 56M 57M 58M 59M 60M 61M 62M 63M 64M 65M 66M 67M 68M 69M 70M 71M 72M 73M 74M 75M 76M 77M 78M 79M 80M 81M 82M 83M 84M 85M 86M 87M 88M 89M 90M 91M 92M 93M 94M 95M 96M 97M 98M 99M 100M 101M 102M 103M 104M 105M 106M 107M 108M 109M 110M 
+   Sorting local nonzeros
+
+   Constructing the matrix
+   Inserting global values
+   Completing matrix fill
+File Read time (secs):  49.2541
+Number of iterations: 2000
+lambda = 3.27518e+07
+Total Time for first (warm up) solve = 185.781
+
+Number of iterations: 2100
+lambda = 3.27518e+07
+Total time for first (warmed) solve = 195.75
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+Number of iterations: 2200
+lambda = 3.27518e+07
+Total time for second solve = 205.632
+
+
+Errors: 0
+
+Git Commit:
+df94f82982d651415c35f5ab3aa40ca93895b311
+
+Evaluating equations
+Using 20 processors
+
+
+JuliaPetra Power Method:
+MPIComm{UInt64,UInt8,UInt32} with PID 1 and 20 processes
+starting tests
+λ = 3.2751817483403526e7; is within tolerance? true
+Took 2400 iterations
+total time for first solve (plus compile) = 238.491674844 sec
+
+
+λ = 3.2751817483029988e7; is within tolerance? true
+Took 2400 iterations
+total time for first solve (pre-compiled) = 236.635476501 sec
+
+
+increasing magnitude of first diagonal term, solving again
+
+
+λ = 3.2751817483481396e7; is within tolerance? true
+Took 2200 iterations
+total time for second solve = 230.620010168 sec
+
+
+
+
+ePetra Power Method
+Epetra in Trilinos 12.10.1
+
+Epetra::MpiComm::Processor 0 of 20 total processors.
+Reading MatrixMarket file power-method/matrix.mm
+1M 2M 3M 4M 5M 6M 7M 8M 9M 10M 11M 12M 13M 14M 15M 16M 17M 18M 19M 20M 21M 22M 23M 24M 25M 26M 27M 28M 29M 30M 31M 32M 33M 34M 35M 36M 37M 38M 39M 40M 41M 42M 43M 44M 45M 46M 47M 48M 49M 50M 51M 52M 53M 54M 55M 56M 57M 58M 59M 60M 61M 62M 63M 64M 65M 66M 67M 68M 69M 70M 71M 72M 73M 74M 75M 76M 77M 78M 79M 80M 81M 82M 83M 84M 85M 86M 87M 88M 89M 90M 91M 92M 93M 94M 95M 96M 97M 98M 99M 100M 101M 102M 103M 104M 105M 106M 107M 108M 109M 110M 
+   Sorting local nonzeros
+
+   Constructing the matrix
+   Inserting global values
+   Completing matrix fill
+File Read time (secs):  48.3192
+Number of iterations: 2000
+lambda = 3.27518e+07
+Total Time for first (warm up) solve = 185.968
+
+Number of iterations: 2100
+lambda = 3.27518e+07
+Total time for first (warmed) solve = 195.761
+
+
+Increasing magnitude of first diagonal term, solving again
+
+
+Number of iterations: 2200
+lambda = 3.27518e+07
+Total time for second solve = 205.901
+
+
+Errors: 0
+

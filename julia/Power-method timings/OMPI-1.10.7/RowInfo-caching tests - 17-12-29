@@ -1,0 +1,25 @@
+
+
+
+------------O3-test branch---------
+40000eq/4proc		commit	allocs		alloc-amt		time (sec)	gc time
+getViewPtr stable:	59a337	 21.99 k	 2.463 MiB		0.041363	 .00%
+inline cache get:	83a222	263.18 k 	 6.218 MiB		0.049747	 .00%
+un arr pool improv: 12c62e	254.11 k	 6.005 MiB		0.048137	 .00%
+no rowinfo pool: 	1e1a51	703.00 k	19.628 MiB		0.063489	8.93%
+
+
+
+16000000eq/16 proc	commit	allocs		alloc-amt		time (sec)	gc time
+getViewPtr stable:	59a337	 22.59 k	 1.082 GiB		31.212402	  .73%
+inline cache get:	83a222	283.97 M	 5.313 GiB		35.558387	 1.51%
+un arr pool improv: 12c62e	283.97 M	 5.313 GiB		37.089411	 1.43%
+no rowinfo pool: 	1e1a51	709.97 M	18.009 GiB		35.084910	15.33%
+
+
+40000000eq/20 proc	commit	allocs		alloc-amt		time (sec)	gc time
+getViewPtr stable:	59a337	  22.59 k	 2.162 GiB		65.804452	  .46%
+inline cache get:	83a222	 567.97 M	10.625 GiB		81.638464	 1.38%
+un arr pool improv: 12c62e	 567.97 M	10.625 GiB		79.463895	 1.33%
+no rowinfo pool: 	1e1a51	1420    M	36.017 GiB		79.485628	10.49%
+

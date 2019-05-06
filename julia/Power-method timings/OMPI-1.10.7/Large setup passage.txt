@@ -1,0 +1,6 @@
+## a log of how big problems can get without running out of memeory
+
+					juliaPetra		ePetra
+200,000,000/20		100.951436498	92.0711
+300,000,000/20		152.153355657	  .399012
+400,000,000/20		205.317506432	  .502074  

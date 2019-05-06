@@ -1,0 +1,45 @@
+40000eq/4proc		commit	allocs		alloc-amt		time (sec)	gc time
+inline cache get:	a97096	28.37 M		 544.622 MiB	 3.249138	1.04%
+un arr pool improv:	5f0a03	28.17 M		 540.803 MiB	 3.053363	1.10%
+union array pool:	c65701	28.37 M		 544.622 MiB	29.371782	 .12%
+array rowinfo pool:	6f099a	28.17 M		 540.803 MiB	 5.137258	 .65%
+type stable 3:		8c03ca	28.37 M		 544.622 MiB	44.985460	 .07%
+type stable 2:		688a52	28.17 M		 540.803 MiB	44.985792	 .07%
+type stable pool:	215856	28.57 M		 548.441 MiB	46.400873	 .07%
+no rowinfo pool: 	61020d	70.97 M		1844.224 MiB	 3.079935	7.83%
+
+218588e (rowinfo pool) has been much slower than 2158567, so not it's not a relavant test run
+
+
+
+16000000eq/16 proc	commit	allocs		alloc-amt		time (sec)	gc time
+inline cache get:	a97096	283.97 M	 5.313 GiB		50.295294	 1.04%
+un arr pool improv:	5f0a03	283.97 M	 5.313 GiB		61.435138	  .86%
+array rowinfo pool:	6f099a	283.97 M	 5.313 GiB		72.009472	  .67% 
+no rowinfo pool: 	61020d	709.99 M	18.010 GiB		35.454852	12.64%
+
+
+
+------------O3-test branch---------
+40000eq/4proc		commit	allocs		alloc-amt		time (sec)	gc time
+inline cache get:	83a222	28.57 M		 548.441 MiB	3.137432	1.07%
+un arr pool improv: 12c62e	28.37 M		 544.622 MiB	3.118431	1.10%
+no rowinfo pool: 	1e1a51	70.97 M		1844.224 GiB	2.887905	8.38%
+
+
+
+16000000eq/16 proc	commit	allocs		alloc-amt		time (sec)	gc time
+inline cache get:	83a222	283.97 M	 5.313 GiB		36.032776	 1.44%
+un arr pool improv: 12c62e	283.97 M	 5.313 GiB		36.645891	 1.36%
+no rowinfo pool: 	1e1a51	709.97 M	18.009 GiB		35.030126	11.51%
+
+
+40000000eq/20 proc	commit	allocs		alloc-amt		time (sec)	gc time
+inline cache get:	83a222	567.97 M	10.625 GiB		80.306374	1.40%
+no rowinfo pool: 	1e1a51	1.42 G		36.017 GiB		80.936159	9.64%
+
+
+200000000eq/20 proc	commit	allocs		alloc-amt		time (sec)	gc time
+inline cache get:	83a222	-- not run, since 1e1a51 crashed --
+no rowinfo pool: 	1e1a51	-- crashes with OutOfMemoryError --
+
